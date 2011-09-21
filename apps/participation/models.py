@@ -3,6 +3,7 @@ from datetime import datetime
 from django.conf import settings
 from django.db import models
 from django.core.validators import MaxLengthValidator
+from django.db.models.signals import pre_save
 
 from tower import ugettext_lazy as _
 
@@ -31,7 +32,7 @@ class Participation(BaseModel):
         upload_to=settings.PARTICIPATION_IMAGE_PATH)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'), default=datetime.now())
     end_date = models.DateTimeField(verbose_name=_(u'End data'))
-    moderate = models.BooleanField(verbose_name=_(u'Submissions go live immediately?'),
+    moderate = models.BooleanField(verbose_name=_(u'Moderate entries'),
         default=False)
     allow_voting = models.BooleanField(verbose_name=_(u'Users can vote on submissions?'),
         default=False)
@@ -56,7 +57,8 @@ class Entry(BaseModel):
     """
     The default value for this will be decided depending on it's project
     """
-    is_live = models.BooleanField(verbose_name=_(u'Visible to the public?'))
+    is_live = models.BooleanField(verbose_name=_(u'Visible to the public?'),
+        default=True)
     flagged_offensive = models.BooleanField(verbose_name=_(u'Flagged offensive?'), default=False)
     flagged_offensive_reason=models.CharField(verbose_name=_(u'Reason flagged offensive'),
         blank=True, null=True,max_length=100)
@@ -64,3 +66,15 @@ class Entry(BaseModel):
 
     def __unicode__(self):
         return self.title
+
+def entry_saved_handler(sender, instance, **kwargs):
+    """
+    Check if parent participation is set to moderate and set _is_live to False
+    """
+    if not isinstance(instance, Entry):
+        return
+    if instance.participation.moderate == True:
+        instance.is_live = False
+    else:
+        instance.is_live = True
+pre_save.connect(entry_saved_handler, sender=Entry)
