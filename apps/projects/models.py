@@ -32,7 +32,18 @@ class Project(BaseModel):
     featured = models.BooleanField(default=False)
     followers = models.ManyToManyField(Profile,
                                        verbose_name=_(u'Followers'),
-                                       related_name=u'projects_following')
+                                       related_name='projects_following')
+    allow_participation = models.BooleanField(default=False,
+        verbose_name=_(u'Allow user participation'))
+    allow_sub_projects = models.BooleanField(default=False,
+        verbose_name=_(u'Allow Sub-Projects'))
+    """
+    Need a way to reference the parent project - ID feel about right
+    """
+    parent_project_id = models.IntegerField(blank=True, null=True)
+    sub_project_label = models.CharField(max_length=50,
+        blank=True, null=True,
+        verbose_name=_(u'What would you like to label your sub-projects as to the user?'))
 
     tags = TaggableManager(blank=True)
 

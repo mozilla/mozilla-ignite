@@ -36,7 +36,8 @@ class Participation(BaseModel):
         default=False)
     allow_voting = models.BooleanField(verbose_name=_(u'Users can vote on submissions?'),
         default=False)
-    project = models.ForeignKey(Project, verbose_name=_(u'Project'))
+    project = models.ForeignKey(Project, verbose_name=_(u'Project'),
+        limit_choices_to={'allow_participation' : True })
 
     def __unicode__(self):
         return self.title
