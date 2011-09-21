@@ -1,4 +1,4 @@
-from django.test import TestCase, Client
+from django.test import TestCase
 
 from projects.models import Project
 from participation.models import Participation, Entry
@@ -8,7 +8,8 @@ class EntriesToLive(TestCase):
     
     def setUp(self):
         self.Project = Project.objects.create(
-            name=u'A project for a test'
+            name=u'A project for a test',
+            allow_participation=True
         )
         self.Participation = Participation.objects.create(
             title=u'Testing my entries',
