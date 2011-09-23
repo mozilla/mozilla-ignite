@@ -39,6 +39,11 @@ class Participation(BaseModel):
     project = models.ForeignKey(Project, verbose_name=_(u'Project'),
         limit_choices_to={'allow_participation' : True })
 
+    def get_image_src(self):
+        media_url = getattr(settings, 'MEDIA_URL', '')
+        path = lambda f: f and '%s%s' % (media_url, f)
+        return path(self.image) or path('img/project-default.gif')
+ 
     def __unicode__(self):
         return self.title
 

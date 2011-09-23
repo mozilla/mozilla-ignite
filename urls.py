@@ -13,6 +13,7 @@ urlpatterns = patterns('',
     (r'', include('innovate.urls')),
     (r'', include('users.urls')),
     (r'', include('projects.urls')),
+    (r'', include('participation.urls')),
 )
 
 # Handle 404 and 500 errors

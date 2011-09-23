@@ -1112,6 +1112,38 @@ img.zoom1 {
     overflow: hidden;
 }
 /** Projects/topics */
+.participation li {
+    margin: 0 0 10px;
+    width: 100%;
+    padding: 0 10px 0 0;
+    list-style-type: none;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+.participation img {
+    width: 25%;
+    max-width: 140px;
+    margin-right: 10px;
+    height: auto;
+    float: left;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
+}
+/** Entries */
+.entries footer {
+    padding: 0;
+    background: none;
+    overflow: hidden;
+}
+.entries h4 {
+    margin: 0;
+}
+.entries li {
+    margin-bottom: 0;
+}
+/*=== jQuery isotope styling */
 .sup .tags {
     border-bottom: none;
 }

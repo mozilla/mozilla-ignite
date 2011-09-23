@@ -11,6 +11,7 @@ from tower import ugettext as _
 
 from activity.models import Activity
 from projects.models import Project
+from participation.models import Participation
 
 ACTIVITY_PAGE_SIZE = 10
 
@@ -36,9 +37,11 @@ def show(request, slug):
     """Display information about a single project, specified by ``slug``."""
     project = get_object_or_404(Project, slug=slug)
     topic = request.session.get('topic', None) or project.topics.all()[0].name
+    participation = Participation.objects.filter(project=project) or False
     return jingo.render(request, 'projects/show.html', {
         'project': project,
-        'topic': topic
+        'topic': topic,
+        'participation':participation
     })
 
 
@@ -139,4 +142,9 @@ def recent(request):
     return jingo.render(request, 'projects/all.html', {
         'projects': projects,
         'view': 'recent'
+    })
+
+def add_sub_project(request, slug, label):
+    return jingo.render(request, 'projects/sub_project_form.html', {
+        'request':request
     })

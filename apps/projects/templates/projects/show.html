@@ -45,6 +45,27 @@
       <h2 class="sans light">{{ _('About {project}')|f(project=project.name) }}</h2>
       {# only admins can edit project descriptions, so it's okay to use safe here. #}
       {{ project.long_description|safe }}
+      {% if project.allow_sub_projects %}
+      <h3 class="sans light">Add a {{ project.sub_project_label }}</h3>
+      <p>Mozilla is looking for help on making this project ever more awesome.</p>
+      <a href="{{ url('projects_add_sub_project', slug=project.slug, label=project.sub_project_label|lower|replace(' ', '-')) }}" class="button">Create your {{ project.sub_project_label }}</a>
+      {% endif %}
+      {% if participation %}
+      <div class="participation">
+        <h3 class="sans light">Participate in this project</h3>
+      <ul class="db_related clearfix">
+        {% for p in participation %}
+            <li>
+                <a href="{{ url('participation_show', project=project.slug, slug=p.slug) }}">
+                    <img src="{{ p.get_image_src() }}" alt="" />
+                    <h3>{{ p.title }}</h3> 
+                </a>
+                <p>{{ p.summary }}</p>
+            </li>
+        {% endfor %}
+      </ul>
+      </div>
+      {% endif %}
     </div>
   </div>
   <div class="associated clearfix">

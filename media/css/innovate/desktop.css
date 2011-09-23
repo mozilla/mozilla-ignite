@@ -416,3 +416,12 @@ section#headlines {
     /* right padding - 20/320 = 0.0625 */
     padding: 0 6.25% 0 25%;
 }
+/*=== Participation */
+.participation li {
+    width: 33%;
+}
+.participation img {
+    min-width: 100%;
+    float: none;
+    margin-right: 0
+}
