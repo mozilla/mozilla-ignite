@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block page_id %}participation_detail{% endblock %}
-{% block section_class %}project{% endblock %}
+{% block section_class %}projects{% endblock %}
 
 {% block breadcrumbs %}
 {{ breadcrumbs(
@@ -51,7 +51,7 @@
         </ul>
         </div>
         {% endif %}
-        <a href=""{{ url('participation_create', project=project.slug, slug=p11n.slug) }}class="button submit">Participate now</a>
+        <a href="{{ url('participation_create', project=project.slug, slug=p11n.slug) }}" class="button submit">Participate now</a>
     </div>
 </section>
 {% endblock %}

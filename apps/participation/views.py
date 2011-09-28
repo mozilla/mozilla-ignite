@@ -4,6 +4,7 @@ import jingo
 
 from projects.models import Project
 from participation.models import Participation, Entry
+from participation.forms import EntryForm
 
 def show(request, project, slug):
     participation = get_object_or_404(Participation, slug=slug)
@@ -16,6 +17,11 @@ def show(request, project, slug):
     })
 
 def create_entry(request, project, slug):
+    project = get_object_or_404(Project, slug=project)
+    participation = get_object_or_404(Participation, slug=slug)
+    form = EntryForm()
     return jingo.render(request, 'participation/create.html', {
-        'request': request
+        'project': project,
+        'p11n': participation,
+        'form': form
     })

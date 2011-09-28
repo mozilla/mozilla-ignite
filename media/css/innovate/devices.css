@@ -728,6 +728,9 @@ form li.picture {
 }
 form label {
   display: block;
+}
+form .hint {
+  display: block;
   color: #74726a;
 }
 form .avatarWrap img {
