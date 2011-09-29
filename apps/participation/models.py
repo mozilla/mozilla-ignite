@@ -1,3 +1,5 @@
+import bleach
+
 from datetime import datetime
 
 from django.conf import settings
@@ -79,8 +81,13 @@ def entry_saved_handler(sender, instance, **kwargs):
     """
     if not isinstance(instance, Entry):
         return
+    # check entries we want to moderate don't go direct to live
     if instance.participation.moderate == True:
         instance.is_live = False
     else:
         instance.is_live = True
+    # clean user input description
+    instance.description_html = bleach.clean(
+        instance.description,
+        tags=settings.TAGS, attributes=settings.ALLOWED_ATTRIBUTES)
 pre_save.connect(entry_saved_handler, sender=Entry)

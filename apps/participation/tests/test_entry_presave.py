@@ -19,6 +19,7 @@ class EntriesToLive(TestCase):
         )
         self.Entry = Entry.objects.create(
             title=u'An entry to test',
+            description=u'<h3>Testing bleach</h3>',
             is_live=True,
             participation=self.Participation
         )
@@ -28,3 +29,10 @@ class EntriesToLive(TestCase):
         The user wants the entry to go live but it needs moderating first
         """
         self.assertEqual(self.Entry.is_live, False)
+
+    def test_bleach_clearning(self):
+        """
+        Check that we're stripping out bad content - <h3> isn't in our 
+        allowed list
+        """
+        self.assertEqual(self.Entry.description_html, '&lt;h3&gt;Testing bleach&lt;/h3&gt;')

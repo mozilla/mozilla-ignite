@@ -22,6 +22,16 @@ DATABASES = {}  # See settings_local.
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
 
+#Bleach settings
+TAGS = ('h1', 'h2', 'a', 'b', 'em', 'i', 'strong',
+        'ol', 'ul', 'li', 'blockquote', 'p',
+        'span', 'pre', 'code', 'img')
+
+ALLOWED_ATTRIBUTES = {
+    'a': ['href', 'title'],
+    'img': ['src', 'alt', 'title'],
+}
+
 
 ## Internationalization.
 
