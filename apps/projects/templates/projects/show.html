@@ -45,11 +45,14 @@
       <h2 class="sans light">{{ _('About {project}')|f(project=project.name) }}</h2>
       {# only admins can edit project descriptions, so it's okay to use safe here. #}
       {{ project.long_description|safe }}
+      {% if waffle.switch('labmates') %}
       {% if project.allow_sub_projects %}
       <h3 class="sans light">Add a {{ project.sub_project_label }}</h3>
       <p>Mozilla is looking for help on making this project ever more awesome.</p>
       <a href="{{ url('projects_add_sub_project', slug=project.slug, label=project.sub_project_label|lower|replace(' ', '-')) }}" class="button">Create your {{ project.sub_project_label }}</a>
       {% endif %}
+      {% endif %}
+      {% if waffle.switch('participation-challenges') %}
       {% if participation %}
       <div class="participation">
         <h3 class="sans light">Participate in this project</h3>
@@ -65,6 +68,7 @@
         {% endfor %}
       </ul>
       </div>
+      {% endif %}
       {% endif %}
     </div>
   </div>
