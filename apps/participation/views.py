@@ -22,6 +22,16 @@ def show(request, project, slug):
         'entries': entries
     })
 
+def entries_all(request, project, slug):
+    project = get_object_or_404(Project, slug=project)
+    p11n = get_object_or_404(Participation, slug=slug)
+    entries = Entry.objects.filter(participation=p11n).order_by('-id') or False
+    return jingo.render(request, 'participation/all.html', {
+        'project': project,
+        'p11n': p11n,
+        'entries': entries
+    })
+
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
     participation = get_object_or_404(Participation, slug=slug)
@@ -57,3 +67,14 @@ def create_entry(request, project, slug):
         'form': form,
         'errors': form_errors
     })
+
+def entry_show(request, project, slug, entry_id):
+    project = get_object_or_404(Project, slug=project)
+    p11n = get_object_or_404(Participation, slug=slug)
+    entry = p11n.entry_set.get(pk=entry_id)
+    return jingo.render(request, 'participation/show_entry.html', {
+        'project': project,
+        'p11n': p11n,
+        'entry': entry
+    })
+

@@ -34,6 +34,9 @@
 
 {% macro participation_nav(image_url, summary, start, finish) %}
 <section class="sup c2 clearfix">
+    {% if entry %}
+        <p class="intro">an entry to <a href="{{ url('participation_show', project=project.slug, slug=p11n.slug) }}">{{ p11n.title }}</a></p>
+    {% endif %}
     <img class="block thick" src="{{ image_url }}" />
     <p>Open {{ start|datetime}} until {{ finish|datetime }}</p>
     <h2>In summary</h2>

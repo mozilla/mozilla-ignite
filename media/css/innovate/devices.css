@@ -440,6 +440,13 @@ div[role="banner"] a:focus {
 .sup button {
   float: none;
 }
+.sup .intro {
+    margin-top: 0;
+}
+.sup .intro a {
+    display: inline;
+    padding: 0;
+}
 .sup .related li {
   border: none;
   display: block;
