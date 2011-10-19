@@ -32,6 +32,7 @@ ALLOWED_ATTRIBUTES = {
     'img': ['src', 'alt', 'title'],
 }
 
+APP_NAME = 'Mozilla Labs'
 
 ## Internationalization.
 
@@ -122,6 +123,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     'topics.context_processors.topics',
     'django.core.context_processors.request',
+    'innovate.context_processors.app_name'
 )
 
 TEMPLATE_DIRS = (
