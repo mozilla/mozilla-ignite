@@ -32,7 +32,7 @@ ALLOWED_ATTRIBUTES = {
     'img': ['src', 'alt', 'title'],
 }
 
-APP_NAME = 'Mozilla Labs'
+APP_NAME = 'Mozilla Ignite'
 
 ## Internationalization.
 
