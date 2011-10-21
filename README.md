@@ -17,7 +17,7 @@ Installation
 You've need git and pip installed on the machine you want to install it on
 
 1. Clone the repo
-        git clone git@github.com:rossbruniges/mozilla-ignite.git
+        git clone [git@github.com:rossbruniges/mozilla-ignite.git]: git@github.com:rossbruniges/mozilla-ignite.git
 2. Install the dependancies:
         pip install -r requirements/dev.txt
         pip install -r requirements/compiled.txt
