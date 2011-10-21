@@ -229,7 +229,7 @@ INSTALLED_APPS = (
     # Feature flipping
     'waffle',
 
-    # Betafarm specific
+    # Ignite specific
     'innovate',
     'users',
     'topics',
