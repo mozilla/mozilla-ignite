@@ -17,7 +17,6 @@ Installation
 You've need git and pip installed on the machine you want to install it on
 
 1. Clone the repo
-    '''git clone git@github.com:rossbruniges/mozilla-ignite.git'''
 2. Install the dependancies:
     * pip install -r requirements/dev.txt
     * pip install -r requirements/compiled.txt
@@ -27,14 +26,14 @@ You've need git and pip installed on the machine you want to install it on
     * git submodule init
     * git submodule update
 3. Create local settings file
-    '''cp settings_local.py-dist settings_local.py'''
+    * cp settings_local.py-dist settings_local.py
 4. Create local database
 5. Insert name and login details in settings_local.py
 6. Uncomment and specify an HMAC_KEYS entry
 7. Create generic database tables:
-    '''./manage.py syncdb'''
+    * ./manage.py syncdb
 8. Create mozilla-ignite specific database tables:
-    '''./manage.py migrate'''
+    * ./manage.py migrate
 
 License
 -------
