@@ -65,6 +65,13 @@ class ChallengeEntryTest(test_utils.TestCase):
     def tearDown(self):
         challenge_teardown()
     
+    def test_no_entries(self):
+        """Test that challenges display ok without any entries."""
+        response = self.client.get('/en-US/my-project/challenges/my-challenge/')
+        assert_equal(response.status_code, 200)
+        # Make sure the entries are present and in reverse creation order
+        assert_equal(len(response.context['entries']), 0)
+    
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
     
