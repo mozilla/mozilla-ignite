@@ -8,6 +8,7 @@ from tower import ugettext_lazy as _
 
 from innovate.models import BaseModel
 from projects.models import Project
+from users.models import Profile
 
 
 class Challenge(BaseModel):
@@ -38,6 +39,32 @@ class Challenge(BaseModel):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
         return path(self.image) or path('img/project-default.gif')
+
+    def __unicode__(self):
+        return self.title
+
+
+class Submission(BaseModel):
+    """A user's entry into a challenge."""
+    
+    title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
+    brief_description = models.TextField(verbose_name=_(u'Brief Description'),
+        validators=[MaxLengthValidator(200)],
+        help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
+    description = models.TextField(verbose_name=_(u'Description'))
+    description_html = models.TextField(blank=True, null=True,
+        verbose_name=_(u'Description with bleached HTML'))
+    created_by = models.ManyToManyField(Profile, verbose_name=_(u'Created by'))
+    is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
+    """
+    The default value for this will be decided depending on it's project
+    """
+    is_live = models.BooleanField(verbose_name=_(u'Visible to the public?'),
+        default=True)
+    flagged_offensive = models.BooleanField(verbose_name=_(u'Flagged offensive?'), default=False)
+    flagged_offensive_reason=models.CharField(verbose_name=_(u'Reason flagged offensive'),
+        blank=True, null=True,max_length=100)
+    challenge = models.ForeignKey(Challenge, verbose_name=_(u'Challenge'))
 
     def __unicode__(self):
         return self.title
