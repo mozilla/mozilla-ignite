@@ -75,8 +75,6 @@ class ChallengeEntryTest(test_utils.TestCase):
                                       challenge=Challenge.objects.get())
     
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
-        if response.status_code == 301:
-            print response['Location']
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries']],
