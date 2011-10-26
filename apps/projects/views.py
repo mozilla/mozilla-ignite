@@ -37,11 +37,11 @@ def show(request, slug):
     """Display information about a single project, specified by ``slug``."""
     project = get_object_or_404(Project, slug=slug)
     topic = request.session.get('topic', None) or project.topics.all()[0].name
-    participation = Participation.objects.filter(project=project) or False
+    participation = project.challenge_set.all()
     return jingo.render(request, 'projects/show.html', {
         'project': project,
         'topic': topic,
-        'participation':participation
+        'participation': participation,
     })
 
 

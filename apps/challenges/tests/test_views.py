@@ -1,11 +1,13 @@
 from datetime import datetime, timedelta
 
 from django.http import Http404
+from django.test.client import Client
 from mock import Mock
 from nose.tools import assert_equal, with_setup
+import test_utils
 
 from challenges import views
-from challenges.models import Challenge
+from challenges.models import Challenge, Submission
 from projects.models import Project
 
 
@@ -35,7 +37,7 @@ def challenge_setup():
 
 def challenge_teardown():
     """Tear down any data created by these tests."""
-    for model in [Project, Challenge]:
+    for model in [Project, Challenge, Submission]:
         model.objects.all().delete()
 
 
@@ -52,6 +54,33 @@ def test_show_challenge():
     request = _build_request('/my-project/my-challenge/')
     response = views.show(request, 'my-project', 'my-challenge')
     assert_equal(response.status_code, 200)
+
+
+class ChallengeEntryTest(test_utils.TestCase):
+    # Need to inherit from this base class to get Jinja2 template hijacking
+    
+    def setUp(self):
+        challenge_setup()
+    
+    def tearDown(self):
+        challenge_teardown()
+    
+    def test_challenge_entries(self):
+        """Test that challenge entries come through to the challenge view."""
+    
+        for i in range(1, 4):
+            Submission.objects.create(title='Submission %d' % i,
+                                      brief_description='A submission',
+                                      description='A really good submission',
+                                      challenge=Challenge.objects.get())
+    
+        response = self.client.get('/en-US/my-project/challenges/my-challenge/')
+        if response.status_code == 301:
+            print response['Location']
+        assert_equal(response.status_code, 200)
+        # Make sure the entries are present and in reverse creation order
+        assert_equal([s.title for s in response.context['entries']],
+                     ['Submission %d' % i for i in [3, 2, 1]])
 
 
 @with_setup(challenge_setup, challenge_teardown)
