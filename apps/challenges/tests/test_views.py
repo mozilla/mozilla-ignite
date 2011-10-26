@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.http import Http404
 from mock import Mock
 from nose.tools import assert_equal, with_setup
 
@@ -51,3 +52,32 @@ def test_show_challenge():
     request = _build_request('/my-project/my-challenge/')
     response = views.show(request, 'my-project', 'my-challenge')
     assert_equal(response.status_code, 200)
+
+
+@with_setup(challenge_setup, challenge_teardown)
+def test_challenge_not_found():
+    """Test behaviour when a challenge doesn't exist."""
+    request = _build_request('/my-project/not-a-challenge/')
+    try:
+        response = views.show(request, 'my-project', 'not-a-challenge')
+    except Http404:
+        pass
+    else:
+        assert_equal(response.status_code, 404)
+
+
+@with_setup(challenge_setup, challenge_teardown)
+def test_wrong_project():
+    """Test behaviour when the project and challenge don't match."""
+    project_fields = {'name': 'Another project', 'slug': 'another-project',
+                      'description': "Not the project you're looking for",
+                      'long_description': 'Nothing to see here'}
+    other_project = Project.objects.create(**project_fields)
+    request = _build_request('/another-project/my-challenge/')
+    # We either want 404 by exception or by response code here: either is fine
+    try:
+        response = views.show(request, 'another-project', 'my-challenge')
+    except Http404:
+        pass
+    else:
+        assert_equal(response.status_code, 404)
