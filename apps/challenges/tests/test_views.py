@@ -56,6 +56,23 @@ def test_show_challenge():
     assert_equal(response.status_code, 200)
 
 
+def _create_submissions(count, challenge=None):
+    """Create a number of fake submissions. Return their titles.
+    
+    If a challenge is not supplied, assume only one challenge exists.
+    
+    """
+    if challenge is None:
+        challenge = Challenge.objects.get()
+    titles = ['Submission %d' % i for i in range(1, count + 1)]
+    for title in titles:
+        Submission.objects.create(title=title,
+                                  brief_description='A submission',
+                                  description='A really good submission',
+                                  challenge=challenge)
+    return titles
+
+
 class ChallengeEntryTest(test_utils.TestCase):
     # Need to inherit from this base class to get Jinja2 template hijacking
     
@@ -74,18 +91,26 @@ class ChallengeEntryTest(test_utils.TestCase):
     
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
-    
-        for i in range(1, 4):
-            Submission.objects.create(title='Submission %d' % i,
-                                      brief_description='A submission',
-                                      description='A really good submission',
-                                      challenge=Challenge.objects.get())
-    
+        submission_titles = _create_submissions(3)
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries']],
-                     ['Submission %d' % i for i in [3, 2, 1]])
+                     list(reversed(submission_titles)))
+    
+    def test_entries_view(self):
+        """Test the dedicated entries view.
+        
+        This is currently a thin proxy onto the challenge view, hence this test
+        being practically identical to the one above.
+        
+        """
+        submission_titles = _create_submissions(4)
+        response = self.client.get('/en-US/my-project/challenges/my-challenge/entries/')
+        assert_equal(response.status_code, 200)
+        # Make sure the entries are present and in reverse creation order
+        assert_equal([s.title for s in response.context['entries']],
+                     list(reversed(submission_titles)))
 
 
 @with_setup(challenge_setup, challenge_teardown)
