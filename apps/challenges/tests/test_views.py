@@ -49,14 +49,6 @@ def _build_request(path=None):
     return request
 
 
-@with_setup(challenge_setup, challenge_teardown)
-def test_show_challenge():
-    """Test the view to show an individual challenge."""
-    request = _build_request('/my-project/my-challenge/')
-    response = views.show(request, 'my-project', 'my-challenge')
-    assert_equal(response.status_code, 200)
-
-
 def _create_submissions(count, challenge=None):
     """Create a number of fake submissions. Return their titles.
     
@@ -77,6 +69,14 @@ def _create_submissions(count, challenge=None):
 def _create_users():
     for name in ['alex', 'bob', 'charlie']:
         User.objects.create_user(name, '%s@example.com' % name, password=name)
+
+
+@with_setup(challenge_setup, challenge_teardown)
+def test_show_challenge():
+    """Test the view to show an individual challenge."""
+    request = _build_request('/my-project/my-challenge/')
+    response = views.show(request, 'my-project', 'my-challenge')
+    assert_equal(response.status_code, 200)
 
 
 class ChallengeEntryTest(test_utils.TestCase):
