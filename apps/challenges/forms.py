@@ -1,7 +1,5 @@
 from django import forms
 
-from tower import ugettext_lazy as _
-
 from challenges.models import Submission
 
 
