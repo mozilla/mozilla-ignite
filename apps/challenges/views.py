@@ -41,7 +41,7 @@ def create_entry(request, project, slug):
             if not profile in form.cleaned_data['created_by']:
                 entry.created_by.add(profile)
             entry.save()
-            msg = _('Your entry has now been posted successfully and is now availiable for public review')
+            msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(reverse('challenge_show', kwargs={
                 'project': project.slug,
