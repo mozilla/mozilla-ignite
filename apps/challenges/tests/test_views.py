@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+from django.contrib.auth.models import User
 from django.http import Http404
 from django.test.client import Client
 from mock import Mock
@@ -37,7 +38,7 @@ def challenge_setup():
 
 def challenge_teardown():
     """Tear down any data created by these tests."""
-    for model in [Project, Challenge, Submission]:
+    for model in [Submission, Challenge, Project, User]:
         model.objects.all().delete()
 
 
@@ -71,6 +72,11 @@ def _create_submissions(count, challenge=None):
                                   description='A really good submission',
                                   challenge=challenge)
     return titles
+
+
+def _create_users():
+    for name in ['alex', 'bob', 'charlie']:
+        User.objects.create_user(name, '%s@example.com' % name, password=name)
 
 
 class ChallengeEntryTest(test_utils.TestCase):
@@ -111,6 +117,29 @@ class ChallengeEntryTest(test_utils.TestCase):
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries']],
                      list(reversed(submission_titles)))
+
+
+class CreateEntryTest(test_utils.TestCase):
+    """Tests related to posting a new entry."""
+    
+    def setUp(self):
+        challenge_setup()
+        project_slug, challenge_slug = (Project.objects.get().slug,
+                                        Challenge.objects.get().slug)
+        self.entry_form_path = '/en-US/%s/challenges/%s/entries/add/' % \
+                               (project_slug, challenge_slug)
+        _create_users()
+    
+    def tearDown(self):
+        challenge_teardown()
+    
+    def test_display_form(self):
+        """Test the new entry form."""
+        self.client.login(username='alex', password='alex')
+        response = self.client.get(self.entry_form_path)
+        assert_equal(response.status_code, 200)
+        # Check nothing gets created
+        assert_equal(Submission.objects.count(), 0)
 
 
 @with_setup(challenge_setup, challenge_teardown)
