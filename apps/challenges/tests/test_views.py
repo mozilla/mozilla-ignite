@@ -124,10 +124,10 @@ class CreateEntryTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
-        project_slug, challenge_slug = (Project.objects.get().slug,
-                                        Challenge.objects.get().slug)
+        self.project_slug, self.challenge_slug = (Project.objects.get().slug,
+                                                  Challenge.objects.get().slug)
         self.entry_form_path = '/en-US/%s/challenges/%s/entries/add/' % \
-                               (project_slug, challenge_slug)
+                               (self.project_slug, self.challenge_slug)
         _create_users()
     
     def tearDown(self):
@@ -140,6 +140,18 @@ class CreateEntryTest(test_utils.TestCase):
         assert_equal(response.status_code, 200)
         # Check nothing gets created
         assert_equal(Submission.objects.count(), 0)
+    
+    def test_submit_form(self):
+        self.client.login(username='alex', password='alex')
+        form_data = {'title': 'Submission',
+                     'brief_description': 'A submission',
+                     'description': 'A submission of shining wonderment.',
+                     'created_by': User.objects.get(username='alex').id}
+        response = self.client.post(self.entry_form_path, data=form_data,
+                                    follow=True)
+        redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
+                                                        self.challenge_slug)
+        self.assertRedirects(response, redirect_target)
 
 
 @with_setup(challenge_setup, challenge_teardown)

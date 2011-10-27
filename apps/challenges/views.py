@@ -1,5 +1,9 @@
+from django.contrib import messages
+from django.core.urlresolvers import reverse
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404
 import jingo
+from tower import ugettext as _
 
 from challenges.forms import EntryForm
 from challenges.models import Challenge
