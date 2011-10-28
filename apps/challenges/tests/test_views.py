@@ -152,6 +152,11 @@ class CreateEntryTest(test_utils.TestCase):
         redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
                                                         self.challenge_slug)
         self.assertRedirects(response, redirect_target)
+        # Make sure we actually created the submission
+        self.assertEqual([s.description for s in Submission.objects.all()],
+                         ['A submission of shining wonderment.'])
+        self.assertEqual(Submission.objects.get().challenge.slug,
+                         self.challenge_slug)
 
 
 @with_setup(challenge_setup, challenge_teardown)
