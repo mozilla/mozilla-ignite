@@ -159,6 +159,15 @@ class CreateEntryTest(test_utils.TestCase):
         assert_equal(submission.challenge.slug, self.challenge_slug)
         creator_names = submission.created_by.values_list('user__username')
         assert_equal(list(creator_names), [('alex',)])
+    
+    def test_invalid_form(self):
+        """Test that an empty form submission fails with errors."""
+        self.client.login(username='alex', password='alex')
+        response = self.client.post(self.entry_form_path, data={})
+        # Not so fussed about authors: we'll be re-working that soon enough
+        assert all(k in response.context['errors']
+                   for k in ['title', 'description'])
+        assert_equal(Submission.objects.count(), 0)
 
 
 @with_setup(challenge_setup, challenge_teardown)
