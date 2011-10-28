@@ -197,3 +197,34 @@ def test_wrong_project():
         pass
     else:
         assert_equal(response.status_code, 404)
+
+
+class ShowEntryTest(test_utils.TestCase):
+    """Test functionality of the single entry view."""
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        alex_profile = User.objects.get(username='alex').get_profile()
+        s = Submission.objects.create(challenge=Challenge.objects.get(),
+                                      title='A submission',
+                                      brief_description='My submission',
+                                      description='My wonderful submission')
+        s.created_by = [alex_profile]
+        s.save()
+        
+        self.submission_path = '/en-US/%s/challenges/%s/entries/%d/' % \
+                               (Project.objects.get().slug,
+                                Challenge.objects.get().slug,
+                                Submission.objects.get().id)
+    
+    def test_show_entry(self):
+        response = self.client.get(self.submission_path)
+        assert_equal(response.status_code, 200)
+    
+    def test_entry_not_found(self):
+        # Just double-check a submission with that ID doesn't exist
+        assert 19 not in Submission.objects.values_list('id', flat=True)
+        bad_path = '/en-US/my-project/challenges/my-challenge/entries/19/'
+        response = self.client.get(bad_path)
+        assert_equal(response.status_code, 404, response.content)

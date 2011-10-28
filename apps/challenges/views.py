@@ -66,5 +66,12 @@ def create_entry(request, project, slug):
     })
 
 
-def entry_show(request):
-    pass
+def entry_show(request, project, slug, entry_id):
+    project = get_object_or_404(Project, slug=project)
+    challenge = get_object_or_404(project.challenge_set, slug=slug)
+    entry = get_object_or_404(challenge.submission_set, pk=entry_id)
+    return jingo.render(request, 'challenges/show_entry.html', {
+        'project': project,
+        'p11n': challenge,
+        'entry': entry
+    })
