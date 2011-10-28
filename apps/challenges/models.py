@@ -1,11 +1,13 @@
 from datetime import datetime
 
 from django.conf import settings
-from django.db import models
 from django.core.validators import MaxLengthValidator
+from django.db import models
+from django.db.models.signals import pre_save
 
 from tower import ugettext_lazy as _
 
+from challenges.lib import cached_bleach
 from innovate.models import BaseModel
 from projects.models import Project
 from users.models import Profile
@@ -19,9 +21,12 @@ class Challenge(BaseModel):
     summary = models.TextField(verbose_name=_(u'Summary'),
                                validators=[MaxLengthValidator(200)])
     description = models.TextField(verbose_name=_(u'Description'))
-    description_html = models.TextField(verbose_name=_(u'Description with bleached HTML'),
-                                        null=True,
-                                        blank=True)
+    
+    @property
+    def description_html(self):
+        """Challenge description with bleached HTML."""
+        return cached_bleach(self.description)
+    
     image = models.ImageField(verbose_name=_(u'Project image'),
                               null=True, blank=True,
                               upload_to=settings.PARTICIPATION_IMAGE_PATH)
@@ -52,8 +57,12 @@ class Submission(BaseModel):
         validators=[MaxLengthValidator(200)],
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
     description = models.TextField(verbose_name=_(u'Description'))
-    description_html = models.TextField(blank=True, null=True,
-        verbose_name=_(u'Description with bleached HTML'))
+    
+    @property
+    def description_html(self):
+        """Challenge description with bleached HTML."""
+        return cached_bleach(self.description)
+    
     created_by = models.ManyToManyField(Profile, verbose_name=_(u'Created by'))
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     """
@@ -71,3 +80,16 @@ class Submission(BaseModel):
     
     class Meta:
         ordering = ['-id']
+
+
+def submission_saved_handler(sender, instance, **kwargs):
+    """
+    Check if parent participation is set to moderate and set _is_live to False
+    """
+    if not isinstance(instance, Submission):
+        return
+    # check submissions we want to moderate don't go direct to live
+    instance.is_live = not instance.challenge.moderate
+
+
+pre_save.connect(submission_saved_handler, sender=Submission)
