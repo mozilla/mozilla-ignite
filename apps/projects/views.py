@@ -11,7 +11,6 @@ from tower import ugettext as _
 
 from activity.models import Activity
 from projects.models import Project
-from participation.models import Participation
 
 ACTIVITY_PAGE_SIZE = 10
 
