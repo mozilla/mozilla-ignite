@@ -153,10 +153,12 @@ class CreateEntryTest(test_utils.TestCase):
                                                         self.challenge_slug)
         self.assertRedirects(response, redirect_target)
         # Make sure we actually created the submission
-        self.assertEqual([s.description for s in Submission.objects.all()],
-                         ['A submission of shining wonderment.'])
-        self.assertEqual(Submission.objects.get().challenge.slug,
-                         self.challenge_slug)
+        assert_equal([s.description for s in Submission.objects.all()],
+                     ['A submission of shining wonderment.'])
+        submission = Submission.objects.get()
+        assert_equal(submission.challenge.slug, self.challenge_slug)
+        creator_names = submission.created_by.values_list('user__username')
+        assert_equal(list(creator_names), [('alex',)])
 
 
 @with_setup(challenge_setup, challenge_teardown)
