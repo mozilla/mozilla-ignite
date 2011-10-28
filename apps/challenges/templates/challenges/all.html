@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% from 'layout/breadcrumbs.html' import breadcrumbs %}
-{% from 'layout/helpers.html' import sectiontitle, participation_nav with context %}
+{% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
 
 {% block page_title %}
     {{ _('Entries | {part} | Mozilla Labs')|f(part=p11n.title) }}
@@ -20,7 +20,7 @@
 
 {% block content %}
 {{ sectiontitle(_('All Entries to {part}')|f(part=p11n.title)) }}
-{{ participation_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
+{{ challenge_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
 <section class="c4 clearfix">
     <div class="row clearfix">
     {% if entries %}

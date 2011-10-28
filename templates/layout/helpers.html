@@ -32,7 +32,7 @@
 </section>
 {% endmacro %}
 
-{% macro participation_nav(image_url, summary, start, finish) %}
+{% macro challenge_nav(image_url, summary, start, finish) %}
 <section class="sup c2 clearfix">
     {% if entry %}
         <p class="intro">an entry to <a href="{{ url('challenge_show', project=project.slug, slug=p11n.slug) }}">{{ p11n.title }}</a></p>
