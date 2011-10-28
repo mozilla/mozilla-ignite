@@ -236,7 +236,6 @@ INSTALLED_APPS = (
     'projects',
     'events',
     'activity',
-    'participation',
     'challenges',
 )
 
