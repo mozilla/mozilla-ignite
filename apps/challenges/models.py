@@ -58,6 +58,9 @@ class Phase(BaseModel):
     # TODO: auto-number phases on save
     order = models.IntegerField()
     
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.challenge.title)
+    
     class Meta:
         unique_together = (('challenge', 'name'),)
         ordering = ('order',)

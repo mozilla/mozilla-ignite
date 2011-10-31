@@ -32,7 +32,12 @@ class EntriesToLive(TestCase):
         The user wants the entry to go live but it needs moderating first
         """
         self.assertEqual(self.submission.is_live, False)
-
+    
+    def test_phase_unicode(self):
+        """Test the string representation of a phase."""
+        self.assertEqual(unicode(self.phase),
+                         u'Phase 1 (Testing my submissions)')
+    
     def test_bleach_clearning(self):
         """
         Check that we're stripping out bad content - <h3> isn't in our 
