@@ -6,7 +6,7 @@ import jingo
 from tower import ugettext as _
 
 from challenges.forms import EntryForm
-from challenges.models import Challenge
+from challenges.models import Challenge, Phase, Submission
 from projects.models import Project
 
 
@@ -17,7 +17,7 @@ def show(request, project, slug, template_name='challenges/show.html'):
     return jingo.render(request, template_name, {
         'p11n': challenge,
         'project': project,
-        'entries': challenge.submission_set.all(),
+        'entries': Submission.objects.filter(phase__challenge=challenge),
     })
 
 
@@ -26,19 +26,16 @@ def entries_all(request, project, slug):
     return show(request, project, slug, template_name='challenges/all.html')
 
 
-# Stub views to keep the URL resolvers happy
-
-
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
-    challenge = get_object_or_404(Challenge, slug=slug)
+    phase = get_object_or_404(Phase, challenge__slug=slug)
     profile = request.user.get_profile()
     form_errors = False
     if request.method == 'POST':
         form = EntryForm(data=request.POST)
         if form.is_valid():
             entry = form.save(commit=False)
-            entry.challenge = challenge
+            entry.phase = phase
             entry.save()
             # double save needed to add in m2m key
             entry.created_by = form.cleaned_data['created_by']
@@ -49,7 +46,7 @@ def create_entry(request, project, slug):
             messages.success(request, msg)
             return HttpResponseRedirect(reverse('challenge_show', kwargs={
                 'project': project.slug,
-                'slug': challenge.slug
+                'slug': slug
             }))
         else:
             form_errors = {}
@@ -60,7 +57,7 @@ def create_entry(request, project, slug):
         form = EntryForm()
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
-        'p11n': challenge,
+        'p11n': phase.challenge,
         'form': form,
         'errors': form_errors
     })
@@ -69,7 +66,8 @@ def create_entry(request, project, slug):
 def entry_show(request, project, slug, entry_id):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
-    entry = get_object_or_404(challenge.submission_set, pk=entry_id)
+    entry = get_object_or_404(Submission.objects, pk=entry_id,
+                              phase__challenge=challenge)
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'p11n': challenge,

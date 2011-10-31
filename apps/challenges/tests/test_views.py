@@ -8,7 +8,7 @@ from nose.tools import assert_equal, with_setup
 import test_utils
 
 from challenges import views
-from challenges.models import Challenge, Submission
+from challenges.models import Challenge, Submission, Phase
 from projects.models import Project
 
 
@@ -34,11 +34,17 @@ def challenge_setup():
     c.description = 'This is a challenge of supreme challengingness.'
     c.end_date = datetime.now() + timedelta(days=365)
     c.save()
+    
+    ph = Phase()
+    ph.challenge = c
+    ph.name = 'Phase 1'
+    ph.order = 1
+    ph.save()
 
 
 def challenge_teardown():
     """Tear down any data created by these tests."""
-    for model in [Submission, Challenge, Project, User]:
+    for model in [Submission, Phase, Challenge, Project, User]:
         model.objects.all().delete()
 
 
@@ -49,20 +55,20 @@ def _build_request(path=None):
     return request
 
 
-def _create_submissions(count, challenge=None):
+def _create_submissions(count, phase=None):
     """Create a number of fake submissions. Return their titles.
     
-    If a challenge is not supplied, assume only one challenge exists.
+    If a phase is not supplied, assume only one phase exists.
     
     """
-    if challenge is None:
-        challenge = Challenge.objects.get()
+    if phase is None:
+        phase = Phase.objects.get()
     titles = ['Submission %d' % i for i in range(1, count + 1)]
     for title in titles:
         Submission.objects.create(title=title,
                                   brief_description='A submission',
                                   description='A really good submission',
-                                  challenge=challenge)
+                                  phase=phase)
     return titles
 
 
@@ -206,7 +212,7 @@ class ShowEntryTest(test_utils.TestCase):
         challenge_setup()
         _create_users()
         alex_profile = User.objects.get(username='alex').get_profile()
-        s = Submission.objects.create(challenge=Challenge.objects.get(),
+        s = Submission.objects.create(phase=Phase.objects.get(),
                                       title='A submission',
                                       brief_description='My submission',
                                       description='My wonderful submission')

@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from projects.models import Project
-from challenges.models import Challenge, Submission
+from challenges.models import Challenge, Submission, Phase
 
 
 class EntriesToLive(TestCase):
@@ -17,11 +17,14 @@ class EntriesToLive(TestCase):
             project=self.project,
             moderate=True
         )
+        self.phase = Phase.objects.create(
+            name=u'Phase 1', challenge=self.challenge, order=1
+        )
         self.submission = Submission.objects.create(
             title=u'A submission to test',
             description=u'<h3>Testing bleach</h3>',
             is_live=True,
-            challenge=self.challenge
+            phase=self.phase
         )
 
     def test_entry_hidden(self):
