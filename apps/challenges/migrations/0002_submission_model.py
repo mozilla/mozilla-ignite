@@ -8,58 +8,37 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding model 'Participation'
-        db.create_table('participation_participation', (
-            ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('title', self.gf('django.db.models.fields.CharField')(unique=True, max_length=60)),
-            ('slug', self.gf('django.db.models.fields.SlugField')(unique=True, max_length=60, db_index=True)),
-            ('label', self.gf('django.db.models.fields.CharField')(default=u'Challenge', max_length=60)),
-            ('summary', self.gf('django.db.models.fields.TextField')()),
-            ('description', self.gf('django.db.models.fields.TextField')()),
-            ('description_html', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
-            ('image', self.gf('django.db.models.fields.files.ImageField')(max_length=100, null=True, blank=True)),
-            ('start_date', self.gf('django.db.models.fields.DateTimeField')(default=datetime.datetime(2011, 9, 21, 4, 4, 24, 761162))),
-            ('end_date', self.gf('django.db.models.fields.DateTimeField')()),
-            ('moderate', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('allow_voting', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('project', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['projects.Project'])),
-        ))
-        db.send_create_signal('participation', ['Participation'])
-
-        # Adding model 'Entry'
-        db.create_table('participation_entry', (
+        # Adding model 'Submission'
+        db.create_table('challenges_submission', (
             ('id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
             ('title', self.gf('django.db.models.fields.CharField')(unique=True, max_length=60)),
             ('brief_description', self.gf('django.db.models.fields.TextField')()),
             ('description', self.gf('django.db.models.fields.TextField')()),
             ('description_html', self.gf('django.db.models.fields.TextField')(null=True, blank=True)),
             ('is_winner', self.gf('django.db.models.fields.BooleanField')(default=False)),
-            ('is_live', self.gf('django.db.models.fields.BooleanField')(default=False)),
+            ('is_live', self.gf('django.db.models.fields.BooleanField')(default=True)),
             ('flagged_offensive', self.gf('django.db.models.fields.BooleanField')(default=False)),
             ('flagged_offensive_reason', self.gf('django.db.models.fields.CharField')(max_length=100, null=True, blank=True)),
-            ('participation', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['participation.Participation'])),
+            ('challenge', self.gf('django.db.models.fields.related.ForeignKey')(to=orm['challenges.Challenge'])),
         ))
-        db.send_create_signal('participation', ['Entry'])
+        db.send_create_signal('challenges', ['Submission'])
 
-        # Adding M2M table for field created_by on 'Entry'
-        db.create_table('participation_entry_created_by', (
+        # Adding M2M table for field created_by on 'Submission'
+        db.create_table('challenges_submission_created_by', (
             ('id', models.AutoField(verbose_name='ID', primary_key=True, auto_created=True)),
-            ('entry', models.ForeignKey(orm['participation.entry'], null=False)),
+            ('submission', models.ForeignKey(orm['challenges.submission'], null=False)),
             ('profile', models.ForeignKey(orm['users.profile'], null=False))
         ))
-        db.create_unique('participation_entry_created_by', ['entry_id', 'profile_id'])
+        db.create_unique('challenges_submission_created_by', ['submission_id', 'profile_id'])
 
 
     def backwards(self, orm):
         
-        # Deleting model 'Participation'
-        db.delete_table('participation_participation')
+        # Deleting model 'Submission'
+        db.delete_table('challenges_submission')
 
-        # Deleting model 'Entry'
-        db.delete_table('participation_entry')
-
-        # Removing M2M table for field created_by on 'Entry'
-        db.delete_table('participation_entry_created_by')
+        # Removing M2M table for field created_by on 'Submission'
+        db.delete_table('challenges_submission_created_by')
 
 
     models = {
@@ -92,6 +71,35 @@ class Migration(SchemaMigration):
             'user_permissions': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['auth.Permission']", 'symmetrical': 'False', 'blank': 'True'}),
             'username': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '30'})
         },
+        'challenges.challenge': {
+            'Meta': {'object_name': 'Challenge'},
+            'allow_voting': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'description_html': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'end_date': ('django.db.models.fields.DateTimeField', [], {}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'moderate': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['projects.Project']"}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '60', 'db_index': 'True'}),
+            'start_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime.now'}),
+            'summary': ('django.db.models.fields.TextField', [], {}),
+            'title': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'})
+        },
+        'challenges.submission': {
+            'Meta': {'object_name': 'Submission'},
+            'brief_description': ('django.db.models.fields.TextField', [], {}),
+            'challenge': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['challenges.Challenge']"}),
+            'created_by': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Profile']", 'symmetrical': 'False'}),
+            'description': ('django.db.models.fields.TextField', [], {}),
+            'description_html': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
+            'flagged_offensive': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'flagged_offensive_reason': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
+            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'is_live': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'is_winner': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'title': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'})
+        },
         'contenttypes.contenttype': {
             'Meta': {'ordering': "('name',)", 'unique_together': "(('app_label', 'model'),)", 'object_name': 'ContentType', 'db_table': "'django_content_type'"},
             'app_label': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
@@ -99,38 +107,10 @@ class Migration(SchemaMigration):
             'model': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
-        'participation.entry': {
-            'Meta': {'object_name': 'Entry'},
-            'brief_description': ('django.db.models.fields.TextField', [], {}),
-            'created_by': ('django.db.models.fields.related.ManyToManyField', [], {'related_name': "'project_creators'", 'symmetrical': 'False', 'to': "orm['users.Profile']"}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'description_html': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'flagged_offensive': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'flagged_offensive_reason': ('django.db.models.fields.CharField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_live': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'is_winner': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'participation': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['participation.Participation']"}),
-            'title': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'})
-        },
-        'participation.participation': {
-            'Meta': {'object_name': 'Participation'},
-            'allow_voting': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'description': ('django.db.models.fields.TextField', [], {}),
-            'description_html': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'end_date': ('django.db.models.fields.DateTimeField', [], {}),
-            'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
-            'label': ('django.db.models.fields.CharField', [], {'default': "u'Challenge'", 'max_length': '60'}),
-            'moderate': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'project': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['projects.Project']"}),
-            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '60', 'db_index': 'True'}),
-            'start_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2011, 9, 21, 4, 4, 24, 761162)'}),
-            'summary': ('django.db.models.fields.TextField', [], {}),
-            'title': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '60'})
-        },
         'projects.project': {
             'Meta': {'object_name': 'Project'},
+            'allow_participation': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'allow_sub_projects': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'description': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'featured': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'featured_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
@@ -139,7 +119,9 @@ class Migration(SchemaMigration):
             'image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'long_description': ('django.db.models.fields.TextField', [], {}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
+            'parent_project_id': ('django.db.models.fields.IntegerField', [], {'null': 'True', 'blank': 'True'}),
             'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '100', 'db_index': 'True'}),
+            'sub_project_label': ('django.db.models.fields.CharField', [], {'max_length': '50', 'null': 'True', 'blank': 'True'}),
             'team_members': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['users.Profile']", 'symmetrical': 'False'}),
             'topics': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['topics.Topic']", 'symmetrical': 'False'})
         },
@@ -178,4 +160,4 @@ class Migration(SchemaMigration):
         }
     }
 
-    complete_apps = ['participation']
+    complete_apps = ['challenges']

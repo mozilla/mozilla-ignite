@@ -1,17 +1,15 @@
 from django import forms
 
-from tower import ugettext_lazy as _
+from challenges.models import Submission
 
-from participation.models import Entry
-from users.models import Profile
 
 class EntryForm(forms.ModelForm):
+    
     class Meta:
-        model = Entry
+        model = Submission
         fields = (
             'title',
             'brief_description',
             'description',
             'created_by'
         )
-

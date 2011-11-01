@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% from 'layout/breadcrumbs.html' import breadcrumbs %}
-{% from 'layout/helpers.html' import sectiontitle, participation_nav with context %}
+{% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
 
 {% block page_title %}
     {{ _('Entries | {part} | Mozilla Labs')|f(part=p11n.title) }}
@@ -14,13 +14,13 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('participation_show', project=project.slug, slug=p11n.slug), p11n.title),
+    (url('challenge_show', project=project.slug, slug=p11n.slug), p11n.title),
     last=_('Entries')) }} 
 {% endblock %}
 
 {% block content %}
 {{ sectiontitle(_('All Entries to {part}')|f(part=p11n.title)) }}
-{{ participation_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
+{{ challenge_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
 <section class="c4 clearfix">
     <div class="row clearfix">
     {% if entries %}

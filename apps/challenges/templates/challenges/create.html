@@ -18,7 +18,7 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('participation_show', project=project.slug,  slug=p11n.slug), p11n.title),
+    (url('challenge_show', project=project.slug,  slug=p11n.slug), p11n.title),
     last=_('Create entry')) }}
 {% endblock %}
 
@@ -36,7 +36,7 @@
             {% endfor %}
         </ul>
         {% endif %}
-        <form action="{{ url('participation_create', project=project.slug, slug=p11n.slug) }}" method="post">
+        <form action="{{ url('entry_create', project=project.slug, slug=p11n.slug) }}" method="post">
             {{ csrf()|safe }}
             <ul class="db_objects">
                 <li>
