@@ -35,12 +35,12 @@
 {% macro challenge_nav(image_url, summary, start, finish) %}
 <section class="sup c2 clearfix">
     {% if entry %}
-        <p class="intro">an entry to <a href="{{ url('challenge_show', project=project.slug, slug=p11n.slug) }}">{{ p11n.title }}</a></p>
+        <p class="intro">an entry to <a href="{{ url('challenge_show', project=project.slug, slug=challenge.slug) }}">{{ challenge.title }}</a></p>
     {% endif %}
     <img class="block thick" src="{{ image_url }}" />
     <p>Open {{ start|datetime}} until {{ finish|datetime }}</p>
     <h2>In summary</h2>
     <p>{{ summary }}</p>
-    <a href="{{ url('entry_create', project=project.slug, slug=p11n.slug) }}" class="button submit">Participate now</a>
+    <a href="{{ url('entry_create', project=project.slug, slug=challenge.slug) }}" class="button submit">Participate now</a>
 </section>
 {% endmacro %}

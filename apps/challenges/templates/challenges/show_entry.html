@@ -3,7 +3,7 @@
 {% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
 
 {% block page_title %}
-    {{ _('{title} | Entries | {part} | Mozilla Labs')|f(title=entry.title, part=p11n.title) }}
+    {{ _('{title} | Entries | {part} | Mozilla Labs')|f(title=entry.title, part=challenge.title) }}
 {% endblock %}
 
 {% block page_id %}entry_show{% endblock %}
@@ -14,14 +14,14 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('challenge_show', project=project.slug, slug=p11n.slug), p11n.title),
-    (url('entries_all', project=project.slug, slug=p11n.slug), _('Entries')),
+    (url('challenge_show', project=project.slug, slug=challenge.slug), challenge.title),
+    (url('entries_all', project=project.slug, slug=challenge.slug), _('Entries')),
     last=entry.title) }} 
 {% endblock %}
 
 {% block content %}
 {{ sectiontitle(entry.title) }}
-{{ challenge_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
+{{ challenge_nav(challenge.get_image_src(), challenge.summary, challenge.start_date, challenge.end_date) }}
 <section class="c4 clearfix">
     <div class="row clearfix entries">
         {{ entry.description_html }}

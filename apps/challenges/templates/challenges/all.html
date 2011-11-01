@@ -3,7 +3,7 @@
 {% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
 
 {% block page_title %}
-    {{ _('Entries | {part} | Mozilla Labs')|f(part=p11n.title) }}
+    {{ _('Entries | {part} | Mozilla Labs')|f(part=challenge.title) }}
 {% endblock %}
 
 {% block page_id %}all_entries{% endblock %}
@@ -14,13 +14,13 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('challenge_show', project=project.slug, slug=p11n.slug), p11n.title),
+    (url('challenge_show', project=project.slug, slug=challenge.slug), challenge.title),
     last=_('Entries')) }} 
 {% endblock %}
 
 {% block content %}
-{{ sectiontitle(_('All Entries to {part}')|f(part=p11n.title)) }}
-{{ challenge_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
+{{ sectiontitle(_('All Entries to {part}')|f(part=challenge.title)) }}
+{{ challenge_nav(challenge.get_image_src(), challenge.summary, challenge.start_date, challenge.end_date) }}
 <section class="c4 clearfix">
     <div class="row clearfix">
     {% if entries %}
@@ -30,7 +30,7 @@
         <article>
             <h2 class="light sans">{{ e.title }}</h2>
             <p>{{ e.brief_description }}</p>
-            <p><a href="{{ url('entry_show', project=project.slug, slug=p11n.slug, entry_id=e.id) }}">Read the full entry</a></p>
+            <p><a href="{{ url('entry_show', project=project.slug, slug=challenge.slug, entry_id=e.id) }}">Read the full entry</a></p>
             <footer>
                 <p>Entry from:</p>
                 <ul class="db_related clearfix">

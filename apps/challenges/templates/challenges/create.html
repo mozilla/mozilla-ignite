@@ -4,13 +4,13 @@
 
 {% block page_title %}
     {% if not  errors %}
-        {{ _('Create entry on {part} : Participation : Mozilla Labs')|f(part=p11n.title) }}
+        {{ _('Create entry on {part} : Participation : Mozilla Labs')|f(part=challenge.title) }}
     {% else %}
-        {{ _('Entry failed: Create entry on {part} : Participation : Mozilla Labs')|f(part=p11n.title) }} 
+        {{ _('Entry failed: Create entry on {part} : Participation : Mozilla Labs')|f(part=challenge.title) }} 
     {% endif %}
 {% endblock %}
 
-{% block page_id %}p11n_create{% endblock %}
+{% block page_id %}challenge_create{% endblock %}
 {% block section_class %}projects{% endblock %}
 
 {% block breadcrumbs %}
@@ -18,12 +18,12 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('challenge_show', project=project.slug,  slug=p11n.slug), p11n.title),
+    (url('challenge_show', project=project.slug,  slug=challenge.slug), challenge.title),
     last=_('Create entry')) }}
 {% endblock %}
 
 {% block content %}
-{{ sectiontitle(_('Create entry on {part}')|f(part=p11n.title)) }}
+{{ sectiontitle(_('Create entry on {part}')|f(part=challenge.title)) }}
 <section id="profile_edit" class="w6 clearfix">
     <div class="paper c3">
         {% if errors %}
@@ -36,7 +36,7 @@
             {% endfor %}
         </ul>
         {% endif %}
-        <form action="{{ url('entry_create', project=project.slug, slug=p11n.slug) }}" method="post">
+        <form action="{{ url('entry_create', project=project.slug, slug=challenge.slug) }}" method="post">
             {{ csrf()|safe }}
             <ul class="db_objects">
                 <li>

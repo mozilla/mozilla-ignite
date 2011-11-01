@@ -15,7 +15,7 @@ def show(request, project, slug, template_name='challenges/show.html'):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     return jingo.render(request, template_name, {
-        'p11n': challenge,
+        'challenge': challenge,
         'project': project,
         'entries': Submission.objects.filter(phase__challenge=challenge),
     })
@@ -57,7 +57,7 @@ def create_entry(request, project, slug):
         form = EntryForm()
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
-        'p11n': phase.challenge,
+        'challenge': phase.challenge,
         'form': form,
         'errors': form_errors
     })
@@ -70,6 +70,6 @@ def entry_show(request, project, slug, entry_id):
                               phase__challenge=challenge)
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
-        'p11n': challenge,
+        'challenge': challenge,
         'entry': entry
     })
