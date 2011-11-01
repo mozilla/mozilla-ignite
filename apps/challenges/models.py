@@ -55,7 +55,7 @@ class Phase(BaseModel):
     challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
     
-    # TODO: auto-number phases on save
+    # TODO: replace explicit numbering with start and end dates
     order = models.IntegerField()
     
     def __unicode__(self):
