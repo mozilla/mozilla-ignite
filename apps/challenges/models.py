@@ -52,7 +52,7 @@ class Challenge(BaseModel):
 class Phase(BaseModel):
     """A phase of a challenge."""
     
-    challenge = models.ForeignKey(Challenge)
+    challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
     
     # TODO: auto-number phases on save

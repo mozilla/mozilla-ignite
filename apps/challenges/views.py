@@ -17,6 +17,7 @@ def show(request, project, slug, template_name='challenges/show.html'):
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
+        'phases': list(enumerate(challenge.phases.all(), start=1)),
         'entries': Submission.objects.filter(phase__challenge=challenge),
     })
 
