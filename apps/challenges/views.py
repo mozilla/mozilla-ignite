@@ -26,9 +26,6 @@ def entries_all(request, project, slug):
     return show(request, project, slug, template_name='challenges/all.html')
 
 
-# Stub views to keep the URL resolvers happy
-
-
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(Challenge, slug=slug)
