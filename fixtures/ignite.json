@@ -1,0 +1,60 @@
+[
+    {
+        "pk": 1, 
+        "model": "projects.project", 
+        "fields": {
+            "parent_project_id": null, 
+            "description": "Something something gigabit internet", 
+            "allow_participation": true, 
+            "image": "", 
+            "sub_project_label": "", 
+            "topics": [], 
+            "slug": "us-ignite", 
+            "featured": false, 
+            "team_members": [], 
+            "followers": [], 
+            "featured_image": "", 
+            "allow_sub_projects": false, 
+            "long_description": "Something something gigabit internet.", 
+            "name": "US Ignite"
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "challenges.challenge", 
+        "fields": {
+            "slug": "ignite-challenge", 
+            "description": "<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sit amet arcu orci. Maecenas scelerisque consequat vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas eros risus, dictum quis dapibus nec, ullamcorper in orci.</p>\r\n\r\n<p>Donec varius, elit eu congue adipiscing, nibh enim viverra urna, euismod rhoncus ante augue sit amet est. Proin convallis facilisis sem, nec auctor elit ultricies eu.</p>", 
+            "end_date": "2012-12-31 23:59:59", 
+            "title": "Ignite Challenge", 
+            "image": "", 
+            "summary": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", 
+            "project": 1, 
+            "allow_voting": false, 
+            "moderate": false, 
+            "start_date": "2011-11-01 07:59:15"
+        }
+    }, 
+    {
+        "pk": 2, 
+        "model": "challenges.phase", 
+        "fields": {
+            "challenge": [
+                "ignite-challenge"
+            ], 
+            "name": "Ideation", 
+            "order": 1
+        }
+    }, 
+    {
+        "pk": 3, 
+        "model": "challenges.phase", 
+        "fields": {
+            "challenge": [
+                "ignite-challenge"
+            ], 
+            "name": "Development", 
+            "order": 2
+        }
+    }
+]
