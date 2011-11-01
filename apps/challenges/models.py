@@ -8,19 +8,30 @@ from django.db.models.signals import pre_save
 from tower import ugettext_lazy as _
 
 from challenges.lib import cached_bleach
-from innovate.models import BaseModel
+from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
 from users.models import Profile
 
 
+class ChallengeManager(BaseModelManager):
+    
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+
 class Challenge(BaseModel):
     """A user participation challenge on a specific project."""
+    
+    objects = ChallengeManager()
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
     slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
     summary = models.TextField(verbose_name=_(u'Summary'),
                                validators=[MaxLengthValidator(200)])
     description = models.TextField(verbose_name=_(u'Description'))
+    
+    def natural_key(self):
+        return (self.slug,)
     
     @property
     def description_html(self):
@@ -49,11 +60,24 @@ class Challenge(BaseModel):
         return self.title
 
 
+class PhaseManager(BaseModelManager):
+    
+    def get_from_natural_key(self, challenge_slug, phase_name):
+        return self.get(challenge__slug=challenge_slug, name=phase_name)
+
+
 class Phase(BaseModel):
     """A phase of a challenge."""
     
+    objects = PhaseManager()
+    
     challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
+    
+    def natural_key(self):
+        return self.challenge.natural_key() +  (self.name,)
+    
+    natural_key.dependencies = ['challenges.challenge']
     
     # TODO: replace explicit numbering with start and end dates
     order = models.IntegerField()
