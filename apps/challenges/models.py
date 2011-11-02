@@ -94,8 +94,8 @@ class Submission(BaseModel):
     """A user's entry into a challenge."""
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
-    brief_description = models.TextField(verbose_name=_(u'Brief Description'),
-        validators=[MaxLengthValidator(200)],
+    brief_description = models.CharField(max_length=200,
+        verbose_name=_(u'Brief Description'),
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
     description = models.TextField(verbose_name=_(u'Description'))
     
