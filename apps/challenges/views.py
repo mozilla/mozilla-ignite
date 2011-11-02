@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 import jingo
 from tower import ugettext as _
@@ -29,7 +29,13 @@ def entries_all(request, project, slug):
 
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
-    phase = get_object_or_404(Phase, challenge__slug=slug)
+    
+    # Quick hack to get around the current inability to obtain current phase
+    try:
+        phase = Phase.objects.filter(challenge__slug=slug)[0]
+    except IndexError:
+        raise Http404
+    
     profile = request.user.get_profile()
     form_errors = False
     if request.method == 'POST':
