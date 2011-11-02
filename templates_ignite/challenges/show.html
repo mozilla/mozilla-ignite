@@ -26,13 +26,13 @@
             {{ challenge.description_html }}
         </section>
         
-        <section id="phases">
-            <h2>How it works</h2>
+        <nav id="phases">
+            <ol>
             {% for phase_number, phase in phases %}
-            <section class="phase">
-                <h3>Phase {{ phase_number }}: {{ phase.name }}</h3>
-            </section>
+            <li class="phase">Phase {{ phase_number }}: {{ phase.name }}</li>
             {% endfor %}
+            </ol>
+        </nav>
         </section>
         
         <section id="updates">
