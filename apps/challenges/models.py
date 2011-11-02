@@ -49,6 +49,23 @@ class Challenge(BaseModel):
         return self.title
 
 
+class Phase(BaseModel):
+    """A phase of a challenge."""
+    
+    challenge = models.ForeignKey(Challenge)
+    name = models.CharField(max_length=100)
+    
+    # TODO: auto-number phases on save
+    order = models.IntegerField()
+    
+    def __unicode__(self):
+        return '%s (%s)' % (self.name, self.challenge.title)
+    
+    class Meta:
+        unique_together = (('challenge', 'name'),)
+        ordering = ('order',)
+
+
 class Submission(BaseModel):
     """A user's entry into a challenge."""
     
@@ -73,8 +90,13 @@ class Submission(BaseModel):
     flagged_offensive = models.BooleanField(verbose_name=_(u'Flagged offensive?'), default=False)
     flagged_offensive_reason=models.CharField(verbose_name=_(u'Reason flagged offensive'),
         blank=True, null=True,max_length=100)
-    challenge = models.ForeignKey(Challenge, verbose_name=_(u'Challenge'))
-
+    
+    phase = models.ForeignKey(Phase)
+    
+    @property
+    def challenge(self):
+        return self.phase.challenge
+    
     def __unicode__(self):
         return self.title
     
