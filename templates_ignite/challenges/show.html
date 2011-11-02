@@ -33,6 +33,31 @@
             {% endfor %}
             </ol>
         </nav>
+        
+        <section class="phase">
+            <header>
+                <h2>Ideation Challenge</h2>
+                <dl>
+                    <dt>Start date</dt>
+                    <dd>xxxx-xx-xx</dd>
+                    <dt>End date</dt>
+                    <dd>xxxx-xx-xx</dd>
+                    <dt>Time left</dt>
+                    <dd>xxx days</dd>
+                </dl>
+                <a href="#">Create submission</a>
+            </header>
+            <h3>Submissions</h3>
+            <ul class="submissions">
+                {% for i in range(1, 5) %}
+                <li>
+                    <h4>Submission {{ i }}</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                    vehicula. Sed fringilla feugiat nulla.</p>
+                </li>
+                {% endfor %}
+            </ul>
         </section>
         
         <section id="updates">
