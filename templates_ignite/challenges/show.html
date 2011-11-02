@@ -37,6 +37,7 @@
         
         <section id="updates">
             <h2>Recent updates from the blogs</h2>
+            {% for i in range(3) %}
             <article>
                 <h3>Headline of post</h3>
                 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
@@ -46,24 +47,7 @@
                 Curae; Maecenas eros risus, dictum quis dapibus nec,
                 ullamcorper in orci.</p>
             </article>
-            <article>
-                <h3>Headline of post</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Aenean sit amet arcu orci. Maecenas scelerisque consequat
-                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
-                primis in faucibus orci luctus et ultrices posuere cubilia
-                Curae; Maecenas eros risus, dictum quis dapibus nec,
-                ullamcorper in orci.</p>
-            </article>
-            <article>
-                <h3>Headline of post</h3>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                Aenean sit amet arcu orci. Maecenas scelerisque consequat
-                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
-                primis in faucibus orci luctus et ultrices posuere cubilia
-                Curae; Maecenas eros risus, dictum quis dapibus nec,
-                ullamcorper in orci.</p>
-            </article>
+            {% endfor %}
         </section>
         
         <aside>
