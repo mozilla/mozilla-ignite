@@ -47,9 +47,7 @@ def create_entry(request, project, slug):
             entry.phase = phase
             entry.save()
             # double save needed to add in m2m key
-            entry.created_by = form.cleaned_data['created_by']
-            if not profile in form.cleaned_data['created_by']:
-                entry.created_by.add(profile)
+            entry.created_by.add(profile)
             entry.save()
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
