@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^browserid/', include('django_browserid.urls')),
     url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
+    url(r'^entries/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
 )
 
 # Handle 404 and 500 errors
