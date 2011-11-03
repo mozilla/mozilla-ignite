@@ -53,10 +53,7 @@ def create_entry(request, project, slug):
             entry.save()
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
-            return HttpResponseRedirect(reverse('challenge_show', kwargs={
-                'project': project.slug,
-                'slug': slug
-            }))
+            return HttpResponseRedirect(phase.challenge.get_absolute_url())
         else:
             form_errors = {}
             # this feels horrible but I think required to create a custom error list

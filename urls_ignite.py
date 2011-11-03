@@ -10,7 +10,7 @@ _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^browserid/', include('django_browserid.urls')),
-    url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs),
+    url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
 )
 
 # Handle 404 and 500 errors

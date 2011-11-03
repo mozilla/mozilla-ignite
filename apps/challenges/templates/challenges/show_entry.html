@@ -14,7 +14,7 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    (url('challenge_show', project=project.slug, slug=challenge.slug), challenge.title),
+    (challenge.get_absolute_url(), challenge.title),
     (url('entries_all', project=project.slug, slug=challenge.slug), _('Entries')),
     last=entry.title) }} 
 {% endblock %}
