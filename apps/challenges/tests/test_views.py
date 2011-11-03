@@ -139,6 +139,22 @@ class CreateEntryTest(test_utils.TestCase):
     def tearDown(self):
         challenge_teardown()
     
+    def test_anonymous_form(self):
+        """Check we can't display the entry form without logging in."""
+        response = self.client.get(self.entry_form_path)
+        # Check it's some form of redirect
+        assert response.status_code in xrange(300, 400)
+    
+    def test_anonymous_post(self):
+        """Check we can't post an entry without logging in."""
+        form_data = {'title': 'Submission',
+                     'brief_description': 'A submission',
+                     'description': 'A submission of shining wonderment.',
+                     'created_by': User.objects.get(username='alex').id}
+        response = self.client.post(self.entry_form_path, data=form_data)
+        assert response.status_code in xrange(300, 400)
+        assert_equal(Submission.objects.count(), 0)
+    
     def test_display_form(self):
         """Test the new entry form."""
         self.client.login(username='alex', password='alex')
