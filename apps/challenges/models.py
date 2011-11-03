@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models.signals import pre_save
@@ -58,6 +59,21 @@ class Challenge(BaseModel):
 
     def __unicode__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        """Return this challenge's URL.
+        
+        Note that this needs to account both for an Ignite-style URL structure,
+        where there is a single challenge for the entire site, and sites where
+        there are multiple challenges.
+        
+        """
+        try:
+            # Match for a single-challenge site if we can
+            return reverse('challenge_show')
+        except NoReverseMatch:
+            kwargs = {'project': self.project.slug, 'slug': self.slug}
+            return reverse('challenge_show', kwargs=kwargs)
 
 
 class PhaseManager(BaseModelManager):
