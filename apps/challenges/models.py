@@ -120,7 +120,8 @@ class Submission(BaseModel):
         """Challenge description with bleached HTML."""
         return cached_bleach(self.description)
     
-    created_by = models.ManyToManyField(Profile, verbose_name=_(u'Created by'))
+    created_by = models.ForeignKey(Profile)
+    
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     """
     The default value for this will be decided depending on it's project

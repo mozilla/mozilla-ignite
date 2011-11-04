@@ -55,20 +55,32 @@ def _build_request(path=None):
     return request
 
 
-def _create_submissions(count, phase=None):
+def _create_submissions(count, phase=None, creator=None):
     """Create a number of fake submissions. Return their titles.
     
     If a phase is not supplied, assume only one phase exists.
     
+    If a creator is not supplied, try to get a single user's profile, or create
+    a dummy user.
+    
     """
     if phase is None:
         phase = Phase.objects.get()
+    
+    if creator is None:
+        try:
+            user = User.objects.get()
+        except User.DoesNotExist:
+            user = User.objects.create_user('bob', 'bob@example.com', 'bob')
+        creator = user.get_profile()
+    
     titles = ['Submission %d' % i for i in range(1, count + 1)]
     for title in titles:
         Submission.objects.create(title=title,
                                   brief_description='A submission',
                                   description='A really good submission',
-                                  phase=phase)
+                                  phase=phase,
+                                  created_by=creator)
     return titles
 
 
@@ -165,10 +177,11 @@ class CreateEntryTest(test_utils.TestCase):
     
     def test_submit_form(self):
         self.client.login(username='alex', password='alex')
+        alex = User.objects.get(username='alex')
         form_data = {'title': 'Submission',
                      'brief_description': 'A submission',
                      'description': 'A submission of shining wonderment.',
-                     'created_by': User.objects.get(username='alex').id}
+                     'created_by': alex.get_profile()}
         response = self.client.post(self.entry_form_path, data=form_data,
                                     follow=True)
         redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
@@ -179,8 +192,7 @@ class CreateEntryTest(test_utils.TestCase):
                      ['A submission of shining wonderment.'])
         submission = Submission.objects.get()
         assert_equal(submission.challenge.slug, self.challenge_slug)
-        creator_names = submission.created_by.values_list('user__username')
-        assert_equal(list(creator_names), [('alex',)])
+        assert_equal(submission.created_by.user, alex)
     
     def test_invalid_form(self):
         """Test that an empty form submission fails with errors."""
@@ -231,8 +243,8 @@ class ShowEntryTest(test_utils.TestCase):
         s = Submission.objects.create(phase=Phase.objects.get(),
                                       title='A submission',
                                       brief_description='My submission',
-                                      description='My wonderful submission')
-        s.created_by = [alex_profile]
+                                      description='My wonderful submission',
+                                      created_by=alex_profile)
         s.save()
         
         self.submission_path = '/en-US/%s/challenges/%s/entries/%d/' % \

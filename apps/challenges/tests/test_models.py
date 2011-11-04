@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 from django.conf import settings
+from django.contrib.auth.models import User
 from django.test import TestCase
 from mock import Mock, patch
 
@@ -66,11 +67,13 @@ class EntriesToLive(TestCase):
         self.phase = Phase.objects.create(
             name=u'Phase 1', challenge=self.challenge, order=1
         )
+        self.user = User.objects.create_user('bob', 'bob@example.com', 'bob')
         self.submission = Submission.objects.create(
             title=u'A submission to test',
             description=u'<h3>Testing bleach</h3>',
             is_live=True,
-            phase=self.phase
+            phase=self.phase,
+            created_by=self.user.get_profile()
         )
 
     def test_entry_hidden(self):

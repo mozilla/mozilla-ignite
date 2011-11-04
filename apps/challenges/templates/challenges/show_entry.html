@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 {% from 'layout/breadcrumbs.html' import breadcrumbs %}
 {% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
+{% from 'challenges/helpers.html' import created_by %}
+
 
 {% block page_title %}
     {{ _('{title} | Entries | {part} | Mozilla Labs')|f(title=entry.title, part=challenge.title) }}
@@ -25,18 +27,7 @@
 <section class="c4 clearfix">
     <div class="row clearfix entries">
         {{ entry.description_html }}
-        <footer>
-            <p>Entry from:</p>
-            <ul class="db_related clearfix">
-            {% for person in entry.created_by.all() -%}
-            <li>
-                <a href="{{ url('users_profile', username=person.user.username) }}">
-                    <img src="{{ person.avatar_url(32) }}" width="32" height="32">
-                </a>
-            </li>
-            {% endfor -%}
-            </ul>
-        </footer>
+        {{ created_by(entry) }}
     </div>
 </section>
 {% endblock %}
