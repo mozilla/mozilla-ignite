@@ -20,9 +20,6 @@ You've need git and pip installed on the machine you want to install it on
 2. Install the dependancies:
     * pip install -r requirements/dev.txt
     * pip install -r requirements/compiled.txt
-    * git submodule init
-    * git submodule update
-    * cd vendor/
     * git submodule update --init --recursive
 3. Create local settings file
     * cp settings_local.py-dist settings_local.py
