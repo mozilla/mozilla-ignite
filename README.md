@@ -23,8 +23,7 @@ You've need git and pip installed on the machine you want to install it on
     * git submodule init
     * git submodule update
     * cd vendor/
-    * git submodule init
-    * git submodule update
+    * git submodule update --init --recursive
 3. Create local settings file
     * cp settings_local.py-dist settings_local.py
 4. Create local database
