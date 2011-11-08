@@ -1,6 +1,7 @@
 from datetime import datetime
 
 from django.conf import settings
+from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.db import models
 from django.db.models.signals import pre_save
@@ -8,19 +9,30 @@ from django.db.models.signals import pre_save
 from tower import ugettext_lazy as _
 
 from challenges.lib import cached_bleach
-from innovate.models import BaseModel
+from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
 from users.models import Profile
 
 
+class ChallengeManager(BaseModelManager):
+    
+    def get_by_natural_key(self, slug):
+        return self.get(slug=slug)
+
+
 class Challenge(BaseModel):
     """A user participation challenge on a specific project."""
+    
+    objects = ChallengeManager()
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
     slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
     summary = models.TextField(verbose_name=_(u'Summary'),
                                validators=[MaxLengthValidator(200)])
     description = models.TextField(verbose_name=_(u'Description'))
+    
+    def natural_key(self):
+        return (self.slug,)
     
     @property
     def description_html(self):
@@ -47,15 +59,43 @@ class Challenge(BaseModel):
 
     def __unicode__(self):
         return self.title
+    
+    def get_absolute_url(self):
+        """Return this challenge's URL.
+        
+        Note that this needs to account both for an Ignite-style URL structure,
+        where there is a single challenge for the entire site, and sites where
+        there are multiple challenges.
+        
+        """
+        try:
+            # Match for a single-challenge site if we can
+            return reverse('challenge_show')
+        except NoReverseMatch:
+            kwargs = {'project': self.project.slug, 'slug': self.slug}
+            return reverse('challenge_show', kwargs=kwargs)
+
+
+class PhaseManager(BaseModelManager):
+    
+    def get_from_natural_key(self, challenge_slug, phase_name):
+        return self.get(challenge__slug=challenge_slug, name=phase_name)
 
 
 class Phase(BaseModel):
     """A phase of a challenge."""
     
-    challenge = models.ForeignKey(Challenge)
+    objects = PhaseManager()
+    
+    challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
     
-    # TODO: auto-number phases on save
+    def natural_key(self):
+        return self.challenge.natural_key() +  (self.name,)
+    
+    natural_key.dependencies = ['challenges.challenge']
+    
+    # TODO: replace explicit numbering with start and end dates
     order = models.IntegerField()
     
     def __unicode__(self):
@@ -70,8 +110,8 @@ class Submission(BaseModel):
     """A user's entry into a challenge."""
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
-    brief_description = models.TextField(verbose_name=_(u'Brief Description'),
-        validators=[MaxLengthValidator(200)],
+    brief_description = models.CharField(max_length=200,
+        verbose_name=_(u'Brief Description'),
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
     description = models.TextField(verbose_name=_(u'Description'))
     

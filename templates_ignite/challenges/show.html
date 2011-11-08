@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html LANG="{{ LANG }}" dir="{{ DIR }}">
+<head>
+    <title>{% block page_title %}{{ app_name }}{% endblock %}</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ MEDIA_URL }}img/favicon.png" />
+    {% block site_css %}
+    {% endblock %}
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
+    <script type="text/javascript">
+        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
+    </script>
+    <header>
+        <p>Mozilla + US Ignite</p>
+        <div>
+            <a href="#">Sign in</a>
+        </div>
+    </header>
+    <div role="main">
+        <section>
+            <h1>{{ challenge.title }}</h1>
+            {{ challenge.description_html }}
+        </section>
+        
+        <nav id="phases">
+            <ol>
+            {% for phase_number, phase in phases %}
+            <li class="phase">Phase {{ phase_number }}: {{ phase.name }}</li>
+            {% endfor %}
+            </ol>
+        </nav>
+        
+        <section class="phase">
+            <header>
+                <h2>Ideation Challenge</h2>
+                <dl>
+                    <dt>Start date</dt>
+                    <dd>xxxx-xx-xx</dd>
+                    <dt>End date</dt>
+                    <dd>xxxx-xx-xx</dd>
+                    <dt>Time left</dt>
+                    <dd>xxx days</dd>
+                </dl>
+                <a href="{{ url('create_entry') }}">Create submission</a>
+            </header>
+            <h3>Submissions</h3>
+            <ul class="submissions">
+                {% for i in range(1, 5) %}
+                <li>
+                    <h4>Submission {{ i }}</h4>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                    Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                    vehicula. Sed fringilla feugiat nulla.</p>
+                </li>
+                {% endfor %}
+            </ul>
+        </section>
+        
+        <section id="updates">
+            <h2>Recent updates from the blogs</h2>
+            {% for i in range(3) %}
+            <article>
+                <h3>Headline of post</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
+                primis in faucibus orci luctus et ultrices posuere cubilia
+                Curae; Maecenas eros risus, dictum quis dapibus nec,
+                ullamcorper in orci.</p>
+            </article>
+            {% endfor %}
+        </section>
+        
+    </div>
+    <aside>
+        <section>
+            <h2>Get email updates on all things Mozilla</h2>
+        </section>
+        <section>
+            <h2>Follow and Tweet</h2>
+        </section>
+        <section>
+            <h2>Connect with Mozilla</h2>
+        </section>
+    </aside>
+    {% block site_js %}
+    {% endblock %}
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html LANG="{{ LANG }}" dir="{{ DIR }}">
+<head>
+    <title>{% block page_title %}{{ app_name }}{% endblock %}</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <link rel="shortcut icon" type="image/x-icon" href="{{ MEDIA_URL }}img/favicon.png" />
+    {% block site_css %}
+    {% endblock %}
+    <!--[if lt IE 9]>
+    <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
+    <script type="text/javascript">
+        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
+    </script>
+    <header>
+        <p>Mozilla + US Ignite</p>
+        <div>
+            <a href="#">Sign in</a>
+        </div>
+    </header>
+    <div role="main">
+        <h1>Create a submission</h1>
+        
+        <form action="" method="post">
+            {{ csrf()|safe }}
+            <ul>
+                {{ form.as_ul() }}
+            </ul>
+            {#
+            <ul class="db_objects">
+                <li>
+                <label for="id_title">{{ _('Title') }}</label>
+                {{ form.title }}
+                </li>
+                <li>
+                <label for="id_brief_description">{{ _('Summary') }}</label>
+                <span class="hint">{{ _('Think of this as an elevator pitch. Keep it short and sweet - under 200 characters') }}</span>
+                {{ form.brief_description }}
+                </li>
+                <li>
+                <label for="id_description">{{ _('Description') }}</label>
+                {{ form.description }}
+                </li>
+                <li>
+                <label for="id_created_by">{{ _('Created by') }}</label>
+                <span class="hint">{{ _('Hold down "Control", or "Command" on a Mac, to select more than one. And don\'t forget to add yourself!') }}</span>
+                {{ form.created_by }}
+                </li>
+            </ul>
+            #}
+            
+            <button class="submit sans" type="submit">{{ _('Create entry') }}</button>
+        </form>
+    </div>
+    <aside>
+        <section>
+            <h2>Get email updates on all things Mozilla</h2>
+        </section>
+        <section>
+            <h2>Follow and Tweet</h2>
+        </section>
+        <section>
+            <h2>Connect with Mozilla</h2>
+        </section>
+    </aside>
+    {% block site_js %}
+    {% endblock %}
+</body>
+</html>

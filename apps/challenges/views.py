@@ -1,6 +1,7 @@
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.core.urlresolvers import reverse
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 import jingo
 from tower import ugettext as _
@@ -15,8 +16,9 @@ def show(request, project, slug, template_name='challenges/show.html'):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     return jingo.render(request, template_name, {
-        'p11n': challenge,
+        'challenge': challenge,
         'project': project,
+        'phases': list(enumerate(challenge.phases.all(), start=1)),
         'entries': Submission.objects.filter(phase__challenge=challenge),
     })
 
@@ -26,9 +28,16 @@ def entries_all(request, project, slug):
     return show(request, project, slug, template_name='challenges/all.html')
 
 
+@login_required
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
-    phase = get_object_or_404(Phase, challenge__slug=slug)
+    
+    # Quick hack to get around the current inability to obtain current phase
+    try:
+        phase = Phase.objects.filter(challenge__slug=slug)[0]
+    except IndexError:
+        raise Http404
+    
     profile = request.user.get_profile()
     form_errors = False
     if request.method == 'POST':
@@ -38,16 +47,11 @@ def create_entry(request, project, slug):
             entry.phase = phase
             entry.save()
             # double save needed to add in m2m key
-            entry.created_by = form.cleaned_data['created_by']
-            if not profile in form.cleaned_data['created_by']:
-                entry.created_by.add(profile)
+            entry.created_by.add(profile)
             entry.save()
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
-            return HttpResponseRedirect(reverse('challenge_show', kwargs={
-                'project': project.slug,
-                'slug': slug
-            }))
+            return HttpResponseRedirect(phase.challenge.get_absolute_url())
         else:
             form_errors = {}
             # this feels horrible but I think required to create a custom error list
@@ -57,7 +61,7 @@ def create_entry(request, project, slug):
         form = EntryForm()
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
-        'p11n': phase.challenge,
+        'challenge': phase.challenge,
         'form': form,
         'errors': form_errors
     })
@@ -70,6 +74,6 @@ def entry_show(request, project, slug, entry_id):
                               phase__challenge=challenge)
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
-        'p11n': challenge,
+        'challenge': challenge,
         'entry': entry
     })

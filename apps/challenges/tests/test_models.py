@@ -1,7 +1,53 @@
+from datetime import datetime, timedelta
+
+from django.conf import settings
 from django.test import TestCase
+from mock import Mock, patch
 
 from projects.models import Project
 from challenges.models import Challenge, Submission, Phase
+
+
+def _create_project_and_challenge():
+    """Create and return a sample project with a sample challenge."""
+    project = Project.objects.create(name='Project', slug='project',
+                                          allow_participation=True)
+    end_date = datetime.now() + timedelta(days=365)
+    challenge = Challenge.objects.create(title='Challenge',
+                                              slug='challenge',
+                                              end_date=end_date,
+                                              project=project)
+    return project, challenge
+
+
+class PermalinkTest(TestCase):
+    
+    def setUp(self):
+        self.project, self.challenge = _create_project_and_challenge()
+    
+    def test_permalink(self):
+        self.assertEqual(self.challenge.get_absolute_url(),
+                         '/project/challenges/challenge/')
+    
+    def tearDown(self):
+        for model in [Challenge, Project]:
+            model.objects.all().delete()
+
+
+class SingleChallengePermalinkTest(TestCase):
+    
+    urls = 'challenges.tests.single_challenge_urls'
+    
+    def setUp(self):
+        self.project, self.challenge = _create_project_and_challenge()
+    
+    def test_single_challenge_permalink(self):
+        """Test permalink generation on an Ignite-style one-challenge site."""
+        self.assertEqual(self.challenge.get_absolute_url(), '/')
+    
+    def tearDown(self):
+        for model in [Challenge, Project]:
+            model.objects.all().delete()
 
 
 class EntriesToLive(TestCase):

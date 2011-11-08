@@ -3,7 +3,7 @@
 {% from "layout/helpers.html" import sectiontitle, challenge_nav with context %}
 
 {% block page_title %}
-    {{ _('{part} : Participation : Mozilla Labs')|f(part=p11n.title) }}
+    {{ _('{part} : Participation : Mozilla Labs')|f(part=challenge.title) }}
 {% endblock %}
 
 {% block page_id %}participation_detail{% endblock %}
@@ -14,16 +14,16 @@
     (url('innovate_splash'), _('Mozilla Labs Home')),
     (url('projects_programs'), _('Programs')),
     (url('projects_show', slug=project.slug), project.name),
-    last=p11n.title) }} 
+    last=challenge.title) }} 
 {% endblock %}
 
 {% block content %}
-{{ sectiontitle(p11n.title) }}
-{{ challenge_nav(p11n.get_image_src(), p11n.summary, p11n.start_date, p11n.end_date) }}
+{{ sectiontitle(challenge.title) }}
+{{ challenge_nav(challenge.get_image_src(), challenge.summary, challenge.start_date, challenge.end_date) }}
 <section class="c4 clearfix">
     <div class="row clearfix">
         <h2 class="light sans">The brief</h2>
-        {{ p11n.description }}
+        {{ challenge.description }}
         {% if entries %}
         <div class="entries">
         <h3>Entries</h3>
@@ -33,7 +33,7 @@
             <article>
                 <h4>{{ e.title }}</h4>
                 <p>{{ e.brief_description }}</p>
-                <p><a href="{{ url('entry_show', project=project.slug, slug=p11n.slug, entry_id=e.id) }}">Read the full entry</a></p>
+                <p><a href="{{ url('entry_show', project=project.slug, slug=challenge.slug, entry_id=e.id) }}">Read the full entry</a></p>
                 <footer>
                     <p>Entry from:</p>
                     <ul class="db_related clearfix">
@@ -52,7 +52,7 @@
         </ul>
         </div>
         {% endif %}
-        <a href="{{ url('entry_create', project=project.slug, slug=p11n.slug) }}" class="button submit">Participate now</a>
+        <a href="{{ url('entry_create', project=project.slug, slug=challenge.slug) }}" class="button submit">Participate now</a>
     </div>
 </section>
 {% endblock %}
