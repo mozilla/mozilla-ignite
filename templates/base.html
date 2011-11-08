@@ -148,7 +148,7 @@
     {% block site_js %}
       {{ js('innovate_js') }}
     {% endblock %}
-    {% if not waffle.switch('is_dev') %}
+    {% if not waffle.switch('in_dev') %}
     <script type="text/javascript">
         var uvOptions = {};
         (function() {
