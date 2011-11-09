@@ -1,0 +1,22 @@
+body {
+    border-top: 2px solid #686868;
+}
+.busta {
+    margin: 0 auto;
+    width: 1000px;
+    position: relative;
+}
+header .brand {
+    margin-top: 0;
+    padding-top: 1em;
+}
+.tab {
+    position: absolute;
+    top: 0;
+    right: 20px;
+    display: block;
+    text-indent: -9999em;
+    background: transparent url(../img/css/logo.png) no-repeat 0 0;
+    width: 118px;
+    height: 48px;
+}

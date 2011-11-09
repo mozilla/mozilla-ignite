@@ -156,6 +156,10 @@ MINIFY_BUNDLES = {
             'css/innovate/normalise.css',
             'css/innovate/devices.css',
         ),
+        'ignite_devices' : (
+            'css/innovate/normalise.css',
+            'ignite/css/devices.css',
+        ),
     },
     'js': {
         'innovate_js': (
@@ -163,6 +167,11 @@ MINIFY_BUNDLES = {
             'js/common/ext/LAB.min.js',
             'js/common/betafarm.page.js',
             'js/common/core.js',
+        ),
+        'ignite_core': (
+            'js/common/ext/jquery-1.6.1.min.js',
+            'js/common/ext/LAB.min.js',
+            'js/common/lacky.js',
         ),
     }
 }

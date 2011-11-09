@@ -1,30 +1,16 @@
-<!DOCTYPE html>
-<html LANG="{{ LANG }}" dir="{{ DIR }}">
-<head>
-    <title>{% block page_title %}{{ app_name }}{% endblock %}</title>
-    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <link rel="shortcut icon" type="image/x-icon" href="{{ MEDIA_URL }}img/favicon.png" />
-    {% block site_css %}
-    {% endblock %}
-    <!--[if lt IE 9]>
-    <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-</head>
-<body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
-    <script type="text/javascript">
-        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
-    </script>
-    <header>
-        <p>Mozilla + US Ignite</p>
-        <div>
-            <a href="#">Sign in</a>
-        </div>
-    </header>
-    <div role="main">
-        <section>
-            <h1>{{ challenge.title }}</h1>
-            {{ challenge.description_html }}
-        </section>
+{% extends "base.html" %}
+
+{% block page_id %}add_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
+
+{% block content %}
+    <section>
+        <h1>{{ challenge.title }}</h1>
+        {{ challenge.description_html }}
+    </section>
         
         <nav id="phases">
             <ol>
@@ -74,20 +60,4 @@
             </article>
             {% endfor %}
         </section>
-        
-    </div>
-    <aside>
-        <section>
-            <h2>Get email updates on all things Mozilla</h2>
-        </section>
-        <section>
-            <h2>Follow and Tweet</h2>
-        </section>
-        <section>
-            <h2>Connect with Mozilla</h2>
-        </section>
-    </aside>
-    {% block site_js %}
-    {% endblock %}
-</body>
-</html>
+{% endblock %}

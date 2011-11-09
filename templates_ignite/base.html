@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<!--[if (lt IE 9)]><html class="no-js bad-ie" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
+<!--[if (gt IE 8)|!(IE)]><html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
+<head>
+    <title>{% block page_title %}{% endblock %}Mozilla Ignite</title>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <meta name="viewport" content="initial-scale=1.0, width=device-width">
+    {% block site_css %}
+        {{ css('ignite_devices') }}
+    {% endblock %}
+    <!--[if lt IE 9]>
+        <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+</head>
+<body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
+    <script type="text/javascript">
+        document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
+        var ignite = window.ignite || {};
+    </script>
+    <header>
+        <div class="busta clearfix">
+            {% block site_title %}<p class="brand">Mozilla + Us Ignite</p>{% endblock %}
+            <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
+        </div>
+    </header>
+    <div class="busta clearfix" role="main">
+    {% block content %}{% endblock %}
+    </div>
+    <footer>
+        <section class="busta mozilla">
+            <div class="col mail">
+                <h2>Get email updates from all things Mozilla</h2>
+            </div>
+            <div class="col tweet">
+                <h2>Follow and tweet</h2>
+            </div>
+            <div class="col connent">
+                <h2>Connect with Mozilla</h2>
+            </div>
+        </section>
+    </footer>
+    {% block site_js %}
+        {{ js('ignite_core') }}
+    {% endblock %}
+    {% if not waffle.switch('in_dev') %}
+        <script type="text/javascript">
+            var uvOptions = {};
+            (function() {
+                var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
+                uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/s399jcs76KmYlVNnbr8hKQ.js';
+                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
+            })();
+        </script>
+    {% endif %}
+</body>
+</html>
