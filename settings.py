@@ -171,7 +171,7 @@ MINIFY_BUNDLES = {
         'ignite_core': (
             'js/common/ext/jquery-1.6.1.min.js',
             'js/common/ext/LAB.min.js',
-            'js/common/lacky.js',
+            #'js/common/lacky.js',
         ),
     }
 }
@@ -325,6 +325,7 @@ AUTHENTICATION_BACKENDS = (
 
 BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
 BROWSERID_CREATE_USER = True
+BROWSERID_DISABLE_CERT_CHECK = True
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/'
 
