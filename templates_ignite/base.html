@@ -28,6 +28,8 @@
                 <input type="hidden" name="assertion" id="id_assertion" />
                 <a id="browserid" class="login" href="#">{{ _('sign in') }}</a>
             </form>
+            {% else %}
+                <p>User is logged in</p>
             {% endif %}
         </div>
     </header>

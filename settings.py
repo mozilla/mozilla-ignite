@@ -188,7 +188,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 
     'commonware.middleware.FrameOptionsHeader',
-    'innovate.middleware.ProfileMiddleware',
+    'ignite.middleware.ProfileMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 )
@@ -246,6 +246,7 @@ INSTALLED_APPS = (
     'events',
     'activity',
     'challenges',
+    'ignite',
 )
 
 # Tells the extract script what files to look for L10n in and what function
