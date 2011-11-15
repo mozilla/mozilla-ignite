@@ -12,6 +12,7 @@ _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^browserid/', include('django_browserid.urls')),
+    url(r'^logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
     url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
     # The /ideas/ URL will become available in the application phase
     url(r'^ideas/$', redirect_to, kwargs={'url': '/', 'permanent': False}),

@@ -29,7 +29,8 @@
                 <a id="browserid" class="login" href="#">{{ _('sign in') }}</a>
             </form>
             {% else %}
-                <p>User is logged in</p>
+                <p>Logged in as {{ user.email }}</p>
+                <a class="logout" href="{{ url('logout') }}">{{ _('sign out') }}</a>
             {% endif %}
         </div>
     </header>
