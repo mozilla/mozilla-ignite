@@ -20,23 +20,29 @@
             </ol>
         </nav>
         
-        <section class="phase">
+        <section>
             <header>
-                <h2>Ideation Challenge</h2>
-                <dl>
-                    <dt>Start date</dt>
-                    <dd>xxxx-xx-xx</dd>
-                    <dt>End date</dt>
-                    <dd>xxxx-xx-xx</dd>
-                    <dt>Time left</dt>
-                    <dd>xxx days</dd>
-                </dl>
-                <a href="{{ url('create_entry') }}">Create submission</a>
+                <h2>Submissions</h2>
             </header>
-            <h3>Submissions</h3>
+            <nav>
+                <ul class="tags">
+                    {% for tag in ['all', 'manufacturing', 'health', 'education', 'energy'] %}
+                    <li><a href="#">{{ tag }}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="sort">
+                    Sort by:
+                    <ul>
+                        {% for sort in ['newest', 'best liked'] %}
+                        <li><a href="#">{{ sort }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </nav>
             <ul class="submissions">
                 {% for i in range(1, 5) %}
                 <li>
+                    <img src="http://placekitten.com/g/168/105" alt="">
                     <h4>Submission {{ i }}</h4>
                     <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                     Aenean sit amet arcu orci. Maecenas scelerisque consequat
@@ -44,6 +50,7 @@
                 </li>
                 {% endfor %}
             </ul>
+            <a href="#">See all submissions</a>
         </section>
         
         <section id="updates">
