@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 from django.views.generic.simple import redirect_to
+from jingo.views import direct_to_template
 
 
 admin.autodiscover()
@@ -12,7 +13,8 @@ _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^browserid/', include('django_browserid.urls')),
-    url(r'^logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
+    url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
+    url(r'^accounts/login/$', 'jingo.render', kwargs={'template': 'registration/login.html'}, name='login'),
     url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
     # The /ideas/ URL will become available in the application phase
     url(r'^ideas/$', redirect_to, kwargs={'url': '/', 'permanent': False}),

@@ -14,3 +14,5 @@ EXCLUDED_MIDDLEWARE = ('commons.middleware.LocaleURLMiddleware',)
 
 MIDDLEWARE_CLASSES = filter(lambda m: m not in EXCLUDED_MIDDLEWARE,
                             MIDDLEWARE_CLASSES)
+
+TEMPLATE_CONTEXT_PROCESSORS = TEMPLATE_CONTEXT_PROCESSORS + ('ignite.context_processors.browserid_target_processor',)
