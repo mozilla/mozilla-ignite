@@ -8,6 +8,7 @@
     {% block site_css %}
         {{ css('ignite_devices') }}
     {% endblock %}
+    <script src="https://browserid.org/include.js"></script>
     <!--[if lt IE 9]>
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -21,6 +22,15 @@
         <div class="busta clearfix">
             {% block site_title %}<p class="brand">Mozilla + Us Ignite</p>{% endblock %}
             <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
+            {% if not user.is_authenticated() %}
+            <form method="POST" action="{{ url('browserid_verify') }}" id="browserid_form">
+                {{ csrf()|safe }}
+                <input type="hidden" name="assertion" id="id_assertion" />
+                <a id="browserid" class="login" href="#">{{ _('sign in') }}</a>
+            </form>
+            {% else %}
+                <p>User is logged in</p>
+            {% endif %}
         </div>
     </header>
     <div class="busta clearfix" role="main">
@@ -42,6 +52,20 @@
     {% block site_js %}
         {{ js('ignite_core') }}
     {% endblock %}
+    <script>
+    $(function() {
+        $('#browserid').bind('click', function(e) {
+            e.preventDefault();
+            navigator.id.getVerifiedEmail(function(assertion) {
+                if (assertion) {
+                    var $e = $('#id_assertion');
+                    $e.val(assertion.toString());
+                    $e.parent().submit();
+                }
+            });
+        });
+    });
+    </script>
     {% if not waffle.switch('in_dev') %}
         <script type="text/javascript">
             var uvOptions = {};

@@ -171,7 +171,7 @@ MINIFY_BUNDLES = {
         'ignite_core': (
             'js/common/ext/jquery-1.6.1.min.js',
             'js/common/ext/LAB.min.js',
-            'js/common/lacky.js',
+            #'js/common/lacky.js',
         ),
     }
 }
@@ -188,7 +188,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 
     'commonware.middleware.FrameOptionsHeader',
-    'innovate.middleware.ProfileMiddleware',
+    'ignite.middleware.ProfileMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 )
@@ -246,6 +246,7 @@ INSTALLED_APPS = (
     'events',
     'activity',
     'challenges',
+    'ignite',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -325,6 +326,7 @@ AUTHENTICATION_BACKENDS = (
 
 BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
 BROWSERID_CREATE_USER = True
+BROWSERID_DISABLE_CERT_CHECK = True
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/'
 
