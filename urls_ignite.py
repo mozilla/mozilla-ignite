@@ -1,6 +1,8 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
+from django.views.generic.simple import redirect_to
+
 
 admin.autodiscover()
 
@@ -11,6 +13,9 @@ urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
     (r'^browserid/', include('django_browserid.urls')),
     url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
+    # The /ideas/ URL will become available in the application phase
+    url(r'^ideas/$', redirect_to, kwargs={'url': '/', 'permanent': False}),
+    url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
     url(r'^entries/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
 )
 

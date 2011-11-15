@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_id %}add_submission{% endblock %}
 
@@ -40,13 +41,12 @@
                 </div>
             </nav>
             <ul class="submissions">
-                {% for i in range(1, 5) %}
+                {% for entry in entries %}
                 <li>
                     <img src="http://placekitten.com/g/168/105" alt="">
-                    <h4>Submission {{ i }}</h4>
-                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                    Aenean sit amet arcu orci. Maecenas scelerisque consequat
-                    vehicula. Sed fringilla feugiat nulla.</p>
+                    <h4><a href="{{ entry.get_absolute_url() }}">{{ entry.title }}</a></h4>
+                    <p>{{ entry.brief_description }}</p>
+                    {{ created_by(entry, footer=False) }}
                 </li>
                 {% endfor %}
             </ul>

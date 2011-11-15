@@ -1,0 +1,17 @@
+{% macro created_by(submission, footer=True) %}
+{% if footer %}
+<footer>
+{% endif %}
+    {% if submission.created_by.user == user %}
+    <p>{{ _('Created by you') }}</p>
+    {% else %}
+        {% if submission.created_by.name %}
+        <p>{{ _('Created by %(name)s')|format(name=submission.created_by.name) }}</p>
+        {% else %}
+        <p>{{ _('Created by an unnamed user') }}</p>
+        {% endif %}
+    {% endif %}
+{% if footer %}
+</footer>
+{% endif %}
+{% endmacro %}

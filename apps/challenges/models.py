@@ -141,6 +141,22 @@ class Submission(BaseModel):
     def __unicode__(self):
         return self.title
     
+    def get_absolute_url(self):
+        """Return this submission's URL.
+        
+        Note that this needs to account both for an Ignite-style URL structure,
+        where there is a single challenge for the entire site, and sites where
+        there are multiple challenges.
+        
+        """
+        try:
+            # Match for a single-challenge site if we can
+            kwargs = {'entry_id': self.id}
+            return reverse('entry_show', kwargs=kwargs)
+        except NoReverseMatch:
+            kwargs.update({'project': self.project.slug, 'slug': self.slug})
+            return reverse('entry_show', kwargs=kwargs)
+    
     class Meta:
         ordering = ['-id']
 
