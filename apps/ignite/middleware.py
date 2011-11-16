@@ -31,7 +31,7 @@ class ProfileMiddleware(object):
             return
         if request.user.is_authenticated():
             profile = request.user.get_profile()
-            if profile.has_chosen_identifier:
+            if profile.name:
                 return
             msg = _('''<strong>Almost done!</strong>
             Just fill in a bit of profile information and
@@ -41,4 +41,4 @@ class ProfileMiddleware(object):
             messages.success(request, msg)
             # not sure what the user flow will be yet so removing 
             # this for now...
-            return HttpResponseRedirect(reverse('create_entry'))
+            return HttpResponseRedirect(reverse('users_edit'))
