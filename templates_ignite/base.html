@@ -22,16 +22,14 @@
         <div class="busta clearfix">
             {% block site_title %}<p class="brand">Mozilla + Us Ignite</p>{% endblock %}
             <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
+            {% block login %}
             {% if not user.is_authenticated() %}
-            <form method="POST" action="{{ url('browserid_verify') }}" id="browserid_form">
-                {{ csrf()|safe }}
-                <input type="hidden" name="assertion" id="id_assertion" />
-                <a id="browserid" class="login" href="#">{{ _('sign in') }}</a>
-            </form>
+            {% include "registration/_login_form.html" %}
             {% else %}
                 <p>Logged in as {{ user.email }}</p>
                 <a class="logout" href="{{ url('logout') }}">{{ _('sign out') }}</a>
             {% endif %}
+            {% endblock %}
         </div>
     </header>
     <div class="busta clearfix" role="main">
@@ -44,6 +42,7 @@
     {% endif %}
     {% block content %}{% endblock %}
     </div>
+    {% block footer %}
     <footer>
         <section class="busta mozilla">
             <div class="col mail">
@@ -57,6 +56,7 @@
             </div>
         </section>
     </footer>
+    {% endblock %}
     {% block site_js %}
         {{ js('ignite_core') }}
     {% endblock %}
