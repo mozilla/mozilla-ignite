@@ -14,6 +14,9 @@
             <h2>{{ entry.title }}</h2>
         </header>
         {{ entry.description_html }}
+        {% if entry.editable_by(user) %}
+        <p><a href="{{ entry.get_edit_url() }}">Edit this entry</a></p>
+        {% endif %}
         {{ created_by(entry) }}
     </section>
 {% endblock %}

@@ -7,7 +7,7 @@
 {% block section_class %}entries{% endblock %}
 
 {% block content %}
-<h1>Create a submission</h1>
+<h1>{% block page_heading %}Create a submission{% endblock %}</h1>
         
 <form action="" method="post">
     {{ csrf()|safe }}
