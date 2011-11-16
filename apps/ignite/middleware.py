@@ -41,5 +41,4 @@ class ProfileMiddleware(object):
             messages.success(request, msg)
             # not sure what the user flow will be yet so removing 
             # this for now...
-            #return HttpResponseRedirect(reverse('create_entry'))
-            return
+            return HttpResponseRedirect(reverse('create_entry'))
