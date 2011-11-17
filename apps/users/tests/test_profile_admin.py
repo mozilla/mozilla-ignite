@@ -6,6 +6,7 @@ from django.test import TestCase, Client
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
+from commons.middleware import LocaleURLMiddleware
 from users.models import Profile, Link
 
 
@@ -14,6 +15,13 @@ def given_user(fake_auth, user):
     """Context manager to respond to any login call with a specific user."""
     fake_auth.expects_call().returns(user)
     yield
+
+
+# Apply this decorator to a test to turn off the middleware that goes around
+# inserting 'en_US' redirects into all the URLs
+suppress_locale_middleware = fudge.with_patched_object(LocaleURLMiddleware,
+                                                       'process_request',
+                                                       lambda *args: None)
 
 
 class ProfileAdmin(TestCase):
@@ -29,6 +37,7 @@ class ProfileAdmin(TestCase):
             user=self.User
         )
 
+    @suppress_locale_middleware
     @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
     def test_edit_without_links(self, fake):
         redirect = '/profile/%s/' % self.User.username
