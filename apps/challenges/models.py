@@ -128,6 +128,8 @@ class Submission(BaseModel):
     """
     is_live = models.BooleanField(verbose_name=_(u'Visible to the public?'),
         default=True)
+    is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
+        help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
     flagged_offensive = models.BooleanField(verbose_name=_(u'Flagged offensive?'), default=False)
     flagged_offensive_reason=models.CharField(verbose_name=_(u'Reason flagged offensive'),
         blank=True, null=True,max_length=100)

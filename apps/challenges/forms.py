@@ -11,4 +11,5 @@ class EntryForm(forms.ModelForm):
             'title',
             'brief_description',
             'description',
+            'is_draft',
         )
