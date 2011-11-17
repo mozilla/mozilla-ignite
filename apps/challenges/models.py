@@ -41,7 +41,7 @@ class Challenge(BaseModel):
     
     image = models.ImageField(verbose_name=_(u'Project image'),
                               null=True, blank=True,
-                              upload_to=settings.PARTICIPATION_IMAGE_PATH)
+                              upload_to=settings.CHALLENGE_IMAGE_PATH)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'),
                                       default=datetime.now)
     end_date = models.DateTimeField(verbose_name=_(u'End date'))
@@ -114,7 +114,9 @@ class Submission(BaseModel):
         verbose_name=_(u'Brief Description'),
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
     description = models.TextField(verbose_name=_(u'Description'))
-    
+    sketh_note = models.ImageField(verbose_name=_(u'Featured image'), blank=True, null=True,
+        help_text=_(u"This will be used in our summary and list views. You can add more images in your description or link out to sets or images out on the web by adding in an external link"), upload_to=settings.CHALLENGE_IMAGE_PATH)
+
     @property
     def description_html(self):
         """Challenge description with bleached HTML."""
@@ -139,6 +141,11 @@ class Submission(BaseModel):
     @property
     def challenge(self):
         return self.phase.challenge
+    
+    def get_image_src(self):
+        media_url = getattr(settings, 'MEDIA_URL', '')
+        path = lambda f: f and '%s%s' % (media_url, f)
+        return path(self.sketh_note) or path('img/project-default.gif')    
     
     def __unicode__(self):
         return self.title

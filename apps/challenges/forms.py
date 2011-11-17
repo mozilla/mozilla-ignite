@@ -12,4 +12,5 @@ class EntryForm(forms.ModelForm):
             'brief_description',
             'description',
             'is_draft',
+            'sketh_note',
         )

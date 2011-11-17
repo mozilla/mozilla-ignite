@@ -41,7 +41,8 @@ def create_entry(request, project, slug):
     profile = request.user.get_profile()
     form_errors = False
     if request.method == 'POST':
-        form = EntryForm(data=request.POST)
+        form = EntryForm(data=request.POST,
+            files=request.FILES)
         if form.is_valid():
             entry = form.save(commit=False)
             entry.created_by = profile
