@@ -1,12 +1,28 @@
+from contextlib import contextmanager
+
 import fudge
 import logging
 
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
-from users.models import Profile, Link
+from commons.middleware import LocaleURLMiddleware
+from users.models import Profile
 
 log = logging.getLogger(__name__)
+
+@contextmanager
+def given_user(fake_auth, user):
+    """Context manager to respond to any login call with a specific user."""
+    fake_auth.expects_call().returns(user)
+    yield
+
+
+# Apply this decorator to a test to turn off the middleware that goes around
+# inserting 'en_US' redirects into all the URLs
+suppress_locale_middleware = fudge.with_patched_object(LocaleURLMiddleware,
+                                                       'process_request',
+                                                       lambda *args: None)
 
 class ProfileAdmin(TestCase):
     
@@ -22,15 +38,23 @@ class ProfileAdmin(TestCase):
             user=self.User
         )
 
+    @suppress_locale_middleware
     @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
     def test_edit_without_links(self, fake):
         redirect = '/profile/%s/' % self.User.username
-        log.debug(redirect)
         post_data = {
             'name': 'Boozeniges',
             'link_url': 'http://ross-eats.co.uk',
             'link_name': 'ross eats'
         }
-        response = self.client.post('/profile/edit/', post_data, follow=True)
-        log.debug(response.redirect_chain)
-        self.assertRedirects(response, redirect, status_code=301) 
+        
+        with given_user(fake, self.User):
+            self.client.login()
+            response = self.client.post('/profile/edit/', post_data,
+                                        follow=True)
+        
+        try:
+            self.assertRedirects(response, redirect, status_code=301)
+        except AssertionError:
+            print response.redirect_chain
+            raise
