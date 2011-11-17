@@ -106,6 +106,18 @@ class Phase(BaseModel):
         ordering = ('order',)
 
 
+class ExternalLink(BaseModel):
+    name = models.CharField(verbose_name=_(u'Link Name'),
+        max_length=50)
+    url = models.URLField(verbose_name=_(u'URL'),
+        max_length=255, verify_exists=False)
+    profile = models.ForeignKey('users.Profile',
+        blank=True, null=True)
+
+    def __unicode__(self):
+        return u"%s -> %s" % (self.name, self.url)
+
+
 class Submission(BaseModel):
     """A user's entry into a challenge."""
     
