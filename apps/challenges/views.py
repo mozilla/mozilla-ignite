@@ -106,17 +106,25 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
     form_class = EntryForm
     template_name = 'challenges/edit.html'
     
+    def _get_challenge(self):
+        return get_object_or_404(Challenge,
+                                 project__slug=self.kwargs['project'],
+                                 slug=self.kwargs['slug'])
+    
     def get_queryset(self):
-        challenge_entries = Submission.objects.filter(
-                phase__challenge__project__slug=self.kwargs['project'],
-                phase__challenge__slug=self.kwargs['slug'])
-        return challenge_entries
+        return Submission.objects.filter(phase__challenge=self._get_challenge())
     
     def get_object(self, *args, **kwargs):
         obj = super(EditEntryView, self).get_object(*args, **kwargs)
         if not obj.editable_by(self.request.user):
             raise PermissionDenied()
         return obj
+    
+    def get_context_data(self, **kwargs):
+        context = super(EditEntryView, self).get_context_data(**kwargs)
+        context['challenge'] = self._get_challenge()
+        context['project'] = context['challenge'].project
+        return context
     
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):

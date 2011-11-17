@@ -1,15 +1,25 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
 from django.http import Http404
 from django.test.client import Client
-from mock import Mock
+from mock import Mock, patch
 from nose.tools import assert_equal, with_setup
 import test_utils
 
+from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import Challenge, Submission, Phase
 from projects.models import Project
+
+
+# Apply this decorator to a test to turn off the middleware that goes around
+# inserting 'en_US' redirects into all the URLs
+suppress_locale_middleware = patch.object(LocaleURLMiddleware,
+                                          'process_request',
+                                          lambda *args: None)
 
 
 def challenge_setup():
@@ -262,3 +272,37 @@ class ShowEntryTest(test_utils.TestCase):
         bad_path = '/en-US/my-project/challenges/my-challenge/entries/19/'
         response = self.client.get(bad_path)
         assert_equal(response.status_code, 404, response.content)
+
+
+class EditEntryTest(test_utils.TestCase):
+    """Test functionality of the edit entry view."""
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        
+        admin = User.objects.create_user('admin', 'admin@example.com',
+                                         password='admin')
+        admin.is_superuser = True
+        admin.save()
+        
+        alex_profile = User.objects.get(username='alex').get_profile()
+        _create_submissions(1, creator=alex_profile)
+        
+        entry_id = Submission.objects.get().id
+        
+        base_kwargs = {'project': Project.objects.get().slug,
+                       'slug': Challenge.objects.get().slug}
+        
+        view_kwargs = dict(entry_id=entry_id, **base_kwargs)
+        self.view_path = reverse('entry_show', kwargs=view_kwargs)
+        
+        edit_kwargs = dict(pk=entry_id, **base_kwargs)
+        self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
+    
+    @suppress_locale_middleware
+    def test_edit_form(self):
+        self.client.login(username='alex', password='alex')
+        
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)
