@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -121,7 +122,7 @@ def edit(request):
             profile.user = request.user
             profile.save()
             # if the link form is present we have a few more checks to do
-            if hasattr(request.POST, 'link_url'):
+            if 'link_url' in request.POST:
                 # adding in a link non-JS
                 links_form = ProfileLinksForm(data={
                     'url': request.POST['link_url'],
@@ -136,7 +137,7 @@ def edit(request):
                     'username': request.user.username
                 }))
             else:
-                return HttpResponseRedirect(reverse('challenge_show'))
+                return HttpResponseRedirect('/')
     form = ProfileForm(instance=profile)
     links = profile.link_set.all()
     return jingo.render(request, 'users/edit.html', {

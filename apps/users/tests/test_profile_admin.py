@@ -41,6 +41,21 @@ class ProfileAdmin(TestCase):
     @suppress_locale_middleware
     @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
     def test_edit_without_links(self, fake):
+        redirect = '/'
+        post_data = {
+            'name': 'Testniges',
+            'website': 'http://www.ross-eats.co.uk'
+        }
+
+        with given_user(fake, self.User):
+            self.client.login()
+            response = self.client.post('/profile/edit/', post_data, follow=True)
+
+        self.assertRedirects(response, redirect)
+    
+    @suppress_locale_middleware
+    @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
+    def test_edit_with_links(self, fake):
         redirect = '/profile/%s/' % self.User.username
         post_data = {
             'name': 'Boozeniges',
@@ -53,8 +68,4 @@ class ProfileAdmin(TestCase):
             response = self.client.post('/profile/edit/', post_data,
                                         follow=True)
         
-        try:
-            self.assertRedirects(response, redirect, status_code=301)
-        except AssertionError:
-            print response.redirect_chain
-            raise
+        self.assertRedirects(response, redirect)
