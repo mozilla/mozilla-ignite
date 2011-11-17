@@ -306,3 +306,33 @@ class EditEntryTest(test_utils.TestCase):
         
         response = self.client.get(self.edit_path)
         assert_equal(response.status_code, 200)
+    
+    @suppress_locale_middleware
+    def test_edit(self):
+        self.client.login(username='alex', password='alex')
+        data = dict(title=Submission.objects.get().title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission')
+        response = self.client.post(self.edit_path, data)
+        self.assertRedirects(response, self.view_path)
+        assert_equal(Submission.objects.get().description, data['description'])
+    
+    @suppress_locale_middleware
+    def test_anonymous_access(self):
+        """Check that anonymous users can't get at the form."""
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_non_owner_access(self):
+        """Check that non-owners cannot see the edit form."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 403)
+    
+    @suppress_locale_middleware
+    def test_admin_access(self):
+        """Check that administrators can see the edit form."""
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)

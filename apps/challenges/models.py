@@ -152,7 +152,8 @@ class Submission(BaseModel):
         try:
             return reverse(view_name, kwargs=kwargs)
         except NoReverseMatch:
-            kwargs.update({'project': self.project.slug, 'slug': self.slug})
+            kwargs.update({'project': self.challenge.project.slug,
+                           'slug': self.challenge.slug})
             return reverse(view_name, kwargs=kwargs)
     
     def get_absolute_url(self):
