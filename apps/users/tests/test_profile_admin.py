@@ -1,3 +1,5 @@
+from contextlib import contextmanager
+
 import fudge
 
 from django.test import TestCase, Client
@@ -5,6 +7,14 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
 
 from users.models import Profile, Link
+
+
+@contextmanager
+def given_user(fake_auth, user):
+    """Context manager to respond to any login call with a specific user."""
+    fake_auth.expects_call().returns(user)
+    yield
+
 
 class ProfileAdmin(TestCase):
     
@@ -27,5 +37,14 @@ class ProfileAdmin(TestCase):
             'link_url': 'http://ross-eats.co.uk',
             'link_name': 'ross eats'
         }
-        response = self.client.post('/profile/edit/', post_data, follow=True)
-        self.assertRedirects(response, redirect, status_code=301) 
+        
+        with given_user(fake, self.User):
+            self.client.login()
+            response = self.client.post('/profile/edit/', post_data,
+                                        follow=True)
+        
+        try:
+            self.assertRedirects(response, redirect, status_code=301)
+        except AssertionError:
+            print response.redirect_chain
+            raise
