@@ -11,9 +11,26 @@
         
 <form action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
-    <ul>
-        {{ form.as_ul() }}
-    </ul>
-     <button class="submit sans" type="submit">{{ _('Create entry') }}</button>
+    <div>
+        <label for="id_title">Title</label>
+        {{ form.title }}
+    </div>
+    <div>
+        <label for="id_brief_description">Pitch</label>
+        {{ form.brief_description }}
+     </div>
+     <div>
+        <label for="id_summary">Full description</label>
+        {{ form.description }}
+     </div>
+     <div>
+        <label for="is_sketh_note">Submission sketch</label>
+        {{ form.sketh_note }}
+     </div>
+     <div>
+        <label for="id_is_draft">Is draft?</label>
+        {{ form.is_draft }}
+     </div>
+     <input class="submit sans" type="submit" value="{{ _('Create entry') }}" />
 </form>
 {% endblock %}
