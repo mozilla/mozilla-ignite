@@ -8,7 +8,7 @@
 
 {% block content %}
 <h1>Create a submission</h1>
-        
+       
 <form action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <div>
@@ -27,7 +27,16 @@
         <label for="is_sketh_note">Submission sketch</label>
         {{ form.sketh_note }}
      </div>
-     {{ link_form }}
+     <fieldset>
+        <legend>External links</legend>
+        <p>If you've got additional information about your submission elsewhere on the internet (like a youtube video or extra sketch notes on Flickr) please included them here. The more info you provide the better</p>
+        {{ link_form.management_form }}
+        {% for link in link_form.forms %}
+            <div>
+                {{ link }}
+            </div>
+        {% endfor %}
+     </fieldset>
      <div>
         <label for="id_is_draft">Is draft?</label>
         {{ form.is_draft }}
