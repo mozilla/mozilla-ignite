@@ -44,7 +44,7 @@
             <ul class="submissions">
                 {% for entry in entries %}
                 <li>
-                    <img src="http://placekitten.com/g/168/105" alt="">
+                    <img src="{{ entry.get_image_src() }}" alt="">
                     <h4><a href="{{ entry.get_absolute_url() }}">{{ entry.title }}</a></h4>
                     <p>{{ entry.brief_description }}</p>
                     {{ created_by(entry, footer=False) }}

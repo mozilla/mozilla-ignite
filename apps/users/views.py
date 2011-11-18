@@ -1,5 +1,6 @@
 import json
 
+from django.conf import settings
 from django.contrib import auth
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
@@ -120,18 +121,23 @@ def edit(request):
             profile = form.save(commit=False)
             profile.user = request.user
             profile.save()
-            # adding in a link non-JS
-            links_form = ProfileLinksForm(data={
-                'url': request.POST['link_url'],
-                'name': request.POST['link_name']
-            })
-            if links_form.is_valid():
-                link = links_form.save(commit=False)
-                link.profile = profile
-                link.save()
-            return HttpResponseRedirect(reverse('users_profile', kwargs={
-                'username': request.user.username
-            }))
+            # if the link form is present we have a few more checks to do
+            if 'link_url' in request.POST:
+                # adding in a link non-JS
+                links_form = ProfileLinksForm(data={
+                    'url': request.POST['link_url'],
+                    'name': request.POST['link_name']
+                })
+                if links_form.is_valid():
+                    link = links_form.save(commit=False)
+                    link.profile = profile
+                    link.save()
+                # links only valid on betafarn so feels safe to do this...
+                return HttpResponseRedirect(reverse('users_profile', kwargs={
+                    'username': request.user.username
+                }))
+            else:
+                return HttpResponseRedirect('/')
     form = ProfileForm(instance=profile)
     links = profile.link_set.all()
     return jingo.render(request, 'users/edit.html', {

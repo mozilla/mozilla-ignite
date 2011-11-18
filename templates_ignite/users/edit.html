@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block page_title %}Edit personal information | {% endblock %}
+
+{% block page_id %}edit_profile{% endblock %}
+
+{% block section_class %}profile{% endblock %}
+
+{% block content %}
+<h1>{{ _('Tell us about you') }}</h1>
+<p>Blah blah blah - why should you do this?</p>
+<form action="{{ url('users_edit') }}" method="post" enctype="multipart/form-data">
+    {{ csrf()|safe }}
+    <div>
+        <label for="id_name">{{ _('Display name - how do you want to be known?') }}</label>
+        {{ form.name }}
+    </div>
+    <div>
+        <img src="{{ user.get_profile().avatar_url(60) }}" />
+        <p>{{ _('Profile pictures are powered by ') }} <a href="http://gravatar.com">Gravatar.com</a></p>
+    </div>
+    <div>
+        <label for="id_website">{{ _('Where can people find out more about you?') }}</label>
+        {{ form.website }}
+    </div>
+    <div>
+        <label for="id_bio">{{ _('What do you want people to know about you?') }}</label>
+        {{ form.bio }}
+    </div>
+    <input type="submit" value="{{ _('Update') }}" />
+</form>
+{% endblock %}

@@ -300,7 +300,7 @@ USER_AVATAR_PATH = 'img/uploads/avatars/'
 TOPIC_IMAGE_PATH = 'img/uploads/topics/'
 PROJECT_IMAGE_PATH = 'img/uploads/projects/'
 EVENT_IMAGE_PATH = 'img/uploads/events/'
-PARTICIPATION_IMAGE_PATH = 'img/uploads/participation'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.

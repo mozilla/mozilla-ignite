@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from challenges.models import Challenge, Phase, Submission
+from challenges.models import Challenge, Phase, Submission, ExternalLink
 
 
 class PhaseInline(admin.TabularInline):
@@ -16,3 +16,4 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 admin.site.register(Challenge, ChallengeAdmin)
 admin.site.register(Submission)
+admin.site.register(ExternalLink)

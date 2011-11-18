@@ -96,7 +96,12 @@ def _create_submissions(count, phase=None, creator=None):
 
 def _create_users():
     for name in ['alex', 'bob', 'charlie']:
-        User.objects.create_user(name, '%s@example.com' % name, password=name)
+        user = User.objects.create_user(name, '%s@example.com' % name,
+                                        password=name)
+        # Give the user a display name to stop 'complete your profile' redirect
+        profile = user.get_profile()
+        profile.name = '%(name)s %(name)sson' % {'name': name.capitalize()}
+        profile.save()
 
 
 @with_setup(challenge_setup, challenge_teardown)
