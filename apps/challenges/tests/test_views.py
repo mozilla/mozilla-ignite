@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
+from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
 from mock import Mock, patch
@@ -271,10 +272,11 @@ class ShowEntryTest(test_utils.TestCase):
         response = self.client.get(self.submission_path)
         assert_equal(response.status_code, 200)
     
+    @suppress_locale_middleware
     def test_entry_not_found(self):
-        # Just double-check a submission with that ID doesn't exist
-        assert 19 not in Submission.objects.values_list('id', flat=True)
-        bad_path = '/en-US/my-project/challenges/my-challenge/entries/19/'
+        # Get an ID that doesn't exist
+        bad_id = Submission.objects.aggregate(max_id=Max('id'))['max_id'] + 1
+        bad_path = '/my-project/challenges/my-challenge/entries/%d/' % bad_id
         response = self.client.get(bad_path)
         assert_equal(response.status_code, 404, response.content)
 
