@@ -111,7 +111,7 @@ class ExternalLink(BaseModel):
         max_length=50)
     url = models.URLField(verbose_name=_(u'URL'),
         max_length=255, verify_exists=False)
-    profile = models.ForeignKey('users.Profile',
+    submission = models.ForeignKey('challenges.Submission',
         blank=True, null=True)
 
     def __unicode__(self):

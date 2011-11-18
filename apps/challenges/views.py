@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.core.urlresolvers import reverse
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
+from django.forms.formsets import formset_factory
 import jingo
 from tower import ugettext as _
 
-from challenges.forms import EntryForm
-from challenges.models import Challenge, Phase, Submission
+from challenges.forms import EntryForm, EntryLinkForm
+from challenges.models import Challenge, Phase, Submission, ExternalLink
 from projects.models import Project
 
 
@@ -39,15 +39,25 @@ def create_entry(request, project, slug):
         raise Http404
     
     profile = request.user.get_profile()
-    form_errors = False
+    LinkFormSet = formset_factory(EntryLinkForm, extra=2)
+    form_errors = False 
     if request.method == 'POST':
         form = EntryForm(data=request.POST,
             files=request.FILES)
+        link_form = LinkFormSet(request.POST, prefix="externals")
         if form.is_valid():
             entry = form.save(commit=False)
             entry.created_by = profile
             entry.phase = phase
             entry.save()
+            if link_form.is_valid():
+                for link in link_form.cleaned_data:
+                    if all(i in link for i in ("name", "url")): 
+                        ExternalLink.objects.create(
+                            name = link['name'],
+                            url = link['url'],
+                            submission = entry
+                        )
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
@@ -58,10 +68,12 @@ def create_entry(request, project, slug):
                 form_errors[k] =  form.errors[k].as_text()
     else:
         form = EntryForm()
+        link_form = LinkFormSet(prefix='externals')
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
         'challenge': phase.challenge,
         'form': form,
+        'link_form': link_form,
         'errors': form_errors
     })
 
