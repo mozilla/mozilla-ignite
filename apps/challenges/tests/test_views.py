@@ -291,6 +291,11 @@ class EditEntryTest(test_utils.TestCase):
         admin.is_superuser = True
         admin.save()
         
+        # Fill in the profile name to stop nag redirects
+        admin_profile = admin.get_profile()
+        admin_profile.name = 'Admin Adminson'
+        admin_profile.save()
+        
         alex_profile = User.objects.get(username='alex').get_profile()
         _create_submissions(1, creator=alex_profile)
         
