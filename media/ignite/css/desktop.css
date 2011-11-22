@@ -1,0 +1,31 @@
+/**= Desktop only */
+.col {
+    float: left;
+    padding: 10px;
+    width: 33%;
+}
+.col:first-child {
+    padding-left: 0;
+}
+.col img {
+    width: 100%;
+}
+/* Masthead */
+.masthead .brand {
+    float: left;
+}
+.masthead nav {
+    float: right;
+    margin-right: 130px;
+}
+/**= Overrides from devices.css */
+.busta {
+    max-width: 980px;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+/**= Main content */
+/* homepage */
+div[role=main] .browse .col {
+    width: 20%;
+}

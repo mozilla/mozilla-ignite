@@ -1,12 +1,58 @@
+@font-face {
+    font-family: MetaWebPro-Black;
+    src: url(../fonts/MetaWebPro-Black.woff) format('woff');
+}
 body {
-    border-top: 2px solid #686868;
+    background: #ebf7fe;
+    border-top: 0.5em solid #fff; /* 16 * 0.5 = 8 */
+
+}
+a:link, 
+a:visited,
+a:focus,
+a:hover,
+a:active {
+    color: #EF4619;
+    text-decoration: none;
+}
+a:hover,
+a:focus,
+a:active {
+    text-decoration: underline;
+}
+h2 {
+    font-family: "MetaWebPro-Black";
+    font-weight: normal;
+    color: #14233A;
+    font-size: 18px;
+    text-transform: uppercase;
+}
+.box {
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
 }
 .busta {
-    margin: 0 auto;
-    width: 1000px;
+    margin: 0 10px;
     position: relative;
+    overflow: hidden;
 }
-header .brand {
+.columns {
+    overflow: hidden;
+    padding-left: 0;
+    margin-top: 0;
+}
+.col {
+    list-style-type: none;
+}
+/**= Sections */
+/* Masthead */
+.masthead {
+    background: rgba(0, 0, 0, 0.8);
+    border-top: 2px solid #686868;
+    color: #fff;
+}
+.masthead .brand {
     margin-top: 0;
     padding-top: 1em;
 }
@@ -16,7 +62,95 @@ header .brand {
     right: 20px;
     display: block;
     text-indent: -9999em;
-    background: transparent url(../img/css/logo.png) no-repeat 0 0;
+    background: transparent url(../img/css/icons.png) no-repeat 0 0;
     width: 118px;
     height: 48px;
+    overflow: hidden;
+}
+.masthead ul {
+    overflow: hidden;
+    margin: 0;
+    padding-left: 0;
+    text-transform: lowercase;
+}
+.masthead ul li {
+    float: left;
+    border-left: 1px solid #686868;
+}
+.masthead ul li:first-child {
+    border-left: none;
+    padding-left: 0;
+}
+.masthead ul a {
+    padding: 1em;
+    display: block;
+    font-size: 12px;
+}
+.masthead ul li:first-child a {
+    padding-left: 0;
+}
+.masthead ul a:link,
+.masthead ul a:visited,
+.masthead ul a:focus,
+.masthead ul a:hover,
+.masthead ul a:active {
+    color: #FFF;
+}
+/* External links */
+.external {
+    background: url("../img/css/bg_external.png") repeat-x scroll 0 0 #fff;
+}
+.external h2 {
+    padding-top: 40px;
+    background: transparent url(../img/css/icons.png) no-repeat top left;
+    color: #2e2e2d;
+}
+.external .tweet h2 {
+    background-position: 0 -140px;
+}
+.external .mozilla h2 {
+    background-position: 0 -290px;
+}
+.external .learn h2 {
+    background-position: 0 -440px;
+}
+.external ul {
+    padding-left: 0;
+    margin-top: 0;
+}
+.external li {
+    list-style-type: none;
+    border-top: 1px solid #D8DADC;
+    padding: 0.5em 0;
+}
+.external li:first-child {
+    border-top: none;
+    padding-top: 0;
+}
+/* Partners */
+.partners {
+    background: url("../img/css/bg_partners.png") repeat-x scroll 0 0 #ececec;
+}
+.partners h2 {
+    line-height: 100px;
+    float: left;
+    margin: 1em 0; /* 1em = 18px; */
+}
+.partners ul {
+    float: left;
+    margin: 1.1125em 0 1.1125em 20px;
+    padding-left: 0;
+
+}
+.partners li {
+    float: left;
+    margin-right: 20px;
+    list-style-type: none;
+}
+/**= Main content */
+/* homepage */
+div[role=main] header {
+    background: #fff;
+    margin-top: 0.625em; /* 0.625 * 16 = 10 */
+    border-bottom: 0.625em solid #000;
 }
