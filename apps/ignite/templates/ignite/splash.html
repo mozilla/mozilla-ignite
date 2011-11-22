@@ -1,0 +1,81 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_id %}add_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
+
+{% block content %}
+<section>
+    <header>
+        <div class="busta">
+        <h2>{{ challenge.title }}</h2>
+        {{ challenge.description_html }}
+        <nav id="phases">
+            <ol>
+            {% for phase_number, phase in phases %}
+                <li class="phase">Phase {{ phase_number }}: {{ phase.name }}</li>
+            {% endfor %}
+            </ol>
+        </nav>
+        <p><a href="{{ url('create_entry') }}">{{ _('Create submission') }}</a></p>
+
+        </div>
+    </header>
+    <div class="browse">
+    <div class="busta">
+    <h3>Submissions</h3>
+    <ul class="sorting">
+        {% for sort in ['newest', 'best liked'] %}
+            <li><a href="#">{{ sort }}</a></li>
+        {% endfor %}
+    </ul>
+    <nav class="tags">
+        <ul>
+        {% for tag in ['all', 'manufacturing', 'health', 'education', 'energy'] %}
+            <li><a href="#">{{ tag }}</a></li>
+        {% endfor %}
+        </ul>
+    </nav>
+    <ol class="submissions columns">
+    {% for entry in entries %}
+        <li class="box col">
+            <h4>
+            <img src="{{ entry.get_image_src() }}" alt="">
+            <a href="{{ entry.get_absolute_url() }}">{{ entry.title }}</a>
+            </h4>
+            <p>{{ entry.brief_description }}</p>
+            {{ created_by(entry, footer=False) }}
+        </li>
+    {% endfor %}
+    </ol>
+    <footer>
+        <a href="#">See all submissions</a>
+    <footer>
+    </div>
+    </div>
+</section>       
+<section class="busta blogs">
+    <h2>Updates from the blog</h2>
+    <ol class="columns">
+    {% for i in range(3) %}
+        <li class="col box">
+        <article>
+            <h3>Headline of post</h3>
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
+                primis in faucibus orci luctus et ultrices posuere cubilia
+                Curae; Maecenas eros risus, dictum quis dapibus nec,
+                ullamcorper in orci.</p>
+        </article>
+        </li>
+    {% endfor %}
+    </ol>
+    <footer>
+        <a href="#">Read all our news in the Ignite Blog</a>
+    </footer>
+</section>
+{% endblock %}
