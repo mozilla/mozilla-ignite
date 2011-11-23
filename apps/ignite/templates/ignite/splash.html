@@ -1,27 +1,19 @@
 {% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
-{% block page_id %}add_submission{% endblock %}
+{% block page_id %}splash{% endblock %}
 
-{% block section_class %}entries{% endblock %}
+{% block section_class %}content{% endblock %}
 
 {% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
 
 {% block content %}
 <section>
-    <header>
+    <header class="promo">
         <div class="busta">
-        <h2>{{ challenge.title }}</h2>
-        {{ challenge.description_html }}
-        <nav id="phases">
-            <ol>
-            {% for phase_number, phase in phases %}
-                <li class="phase">Phase {{ phase_number }}: {{ phase.name }}</li>
-            {% endfor %}
-            </ol>
-        </nav>
-        <p><a href="{{ url('create_entry') }}">{{ _('Create submission') }}</a></p>
-
+        <h2 class="shout">What will the web look like in the future?</h2>
+        <p class="announce">What apps would you make, if you could make anything?</p>
+        <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
         </div>
     </header>
     <div class="browse">
@@ -64,7 +56,7 @@
     </div>
 </section>       
 <section class="busta blogs">
-    <h2>Updates from the blog</h2>
+    <h2 class="announce">Updates from the blog</h2>
     <ol class="hfeed columns">
     {% for i in range(3) %}
         <li class="col box">

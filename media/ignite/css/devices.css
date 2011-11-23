@@ -29,6 +29,21 @@ h2 {
     font-weight: bold;
     font-size: 24px;
 }
+.shout {
+    font-size: 60px;
+    color: #333;
+    line-height: 0.9;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+}
+.announce {
+    font-size: 24px;
+    color: #333;
+    font-weight: bold;
+}
+.shout + .announce {
+    margin-top: 0;
+}
 .box {
     -moz-box-sizing: border-box;
     -webkit-box-sizing: border-box;
@@ -48,6 +63,21 @@ h2 {
     list-style-type: none;
     overflow: hidden;
 }
+.cta {
+    font-family: "LeagueGothic";
+    color: #fff !important;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    background: #EF4619;
+    background-image: linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
+    background-image: -o-linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
+    background-image: -moz-linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
+    background-image: -webkit-linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
+    padding: 0.4em 24px;
+    font-size: 20px;
+    box-shadow: 2px 2px 0 #ebebeb;
+}
 .frame {
     float: left;
     margin-right: 10px;
@@ -58,6 +88,7 @@ h2 {
     max-height: 102px;
     overflow: hidden;
     position: relative;
+    box-shadow: 3px 3px 3px #ebebeb;
 }
 .frame:before {
     content: "&nbsp";
@@ -74,6 +105,77 @@ h2 {
 .frame img {
     position: relative;
     z-index: 10;
+}
+.sorting {
+    list-style-type: none;
+    float: left;
+    padding-left: 0;
+    font-size: 15px;
+}
+.sorting li {
+    float: left;
+    margin-right: 1px;
+}
+.sorting a {
+    padding: 1em 15px;
+    position: relative;
+    display: block;
+    font-weight: bold;
+    background: rgba(0, 0, 0, 0.2);
+}
+.sorting .current a:before {
+    position: absolute;
+    height: 0;
+    width: 0;
+    display: block;
+    content: "&nbsp;";
+    text-indent: -9999em;
+    bottom: -10px;
+    left: 50%;
+    border-left: 12px solid transparent;
+    border-right: 12px solid transparent;
+    border-top: 12px solid rgba(0, 0, 0, 0.9);
+    margin-left: -6px;
+}
+.sorting a:link,
+.sorting a:visited {
+    color: #fff;
+}
+.sorting a:hover,
+.sorting a:focus,
+.sorting a:visited {
+    background: rgba(0, 0, 0, 0.9);
+    text-decoration: none;
+}
+.tags {
+    clear: left;
+}
+.tags ul {
+    padding-left: 0;
+    overflow: hidden;
+}
+.tags li {
+    float: left;
+    margin-right: 6px;
+    font-size: 12px;
+}
+.tags a {
+    background: rgba(0, 0, 0, 0.2);
+    display: block;
+    padding: 0.4em 12px;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+}
+.tags a:link,
+.tags a:visited {
+    color: #fff;
+}
+.tags a:hover,
+.tags a:focus,
+.tags a:active {
+    background: #EF4619;
+    text-decoration: none;
 }
 /**= Sections */
 /* Masthead */
@@ -125,6 +227,14 @@ h2 {
 .masthead ul a:hover,
 .masthead ul a:active {
     color: #f3f3f3;
+}
+/* Promo box */
+.promo .shout {
+    width: 60%;
+}
+.promo .announce {
+    float: left;
+    margin-right: 20px;
 }
 /* External links */
 .external {
