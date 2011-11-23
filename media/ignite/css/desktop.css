@@ -24,6 +24,11 @@
     padding: 0 10px;
     margin: 0 auto;
 }
+.frame {
+    width: 100%;
+    float: none;
+    margin-right: 0;
+}
 /**= Main content */
 /* homepage */
 div[role=main] .browse .col {

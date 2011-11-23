@@ -2,10 +2,14 @@
     font-family: MetaWebPro-Black;
     src: url(../fonts/MetaWebPro-Black.woff) format('woff');
 }
+@font-face {
+    font-family: LeagueGothic;
+    src: url(../fonts/League_Gothic.woff) format('woff');
+}
 body {
     background: #ebf7fe;
     border-top: 0.5em solid #fff; /* 16 * 0.5 = 8 */
-
+    font-family: Arial, Helvetica, sans-serif;
 }
 a:link, 
 a:visited,
@@ -21,11 +25,9 @@ a:active {
     text-decoration: underline;
 }
 h2 {
-    font-family: "MetaWebPro-Black";
-    font-weight: normal;
-    color: #14233A;
-    font-size: 18px;
-    text-transform: uppercase;
+    color: #333;
+    font-weight: bold;
+    font-size: 24px;
 }
 .box {
     -moz-box-sizing: border-box;
@@ -44,6 +46,34 @@ h2 {
 }
 .col {
     list-style-type: none;
+    overflow: hidden;
+}
+.frame {
+    float: left;
+    margin-right: 10px;
+    padding: 4px;
+    margin-bottom: 0.4em;
+    background: #fff;
+    border:1px solid #dcdcdc;
+    max-height: 102px;
+    overflow: hidden;
+    position: relative;
+}
+.frame:before {
+    content: "&nbsp";
+    height: 4px;
+    background: #fff;
+    width: 100%;
+    display: block;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    z-index: 20;
+    text-indent: -9999em;
+}
+.frame img {
+    position: relative;
+    z-index: 10;
 }
 /**= Sections */
 /* Masthead */
@@ -84,7 +114,7 @@ h2 {
 .masthead ul a {
     padding: 1em;
     display: block;
-    font-size: 12px;
+    font-size: 11px;
 }
 .masthead ul li:first-child a {
     padding-left: 0;
@@ -94,16 +124,21 @@ h2 {
 .masthead ul a:focus,
 .masthead ul a:hover,
 .masthead ul a:active {
-    color: #FFF;
+    color: #f3f3f3;
 }
 /* External links */
 .external {
     background: url("../img/css/bg_external.png") repeat-x scroll 0 0 #fff;
+    font-family: Georgia;
 }
 .external h2 {
     padding-top: 40px;
+    font-family: "MetaWebPro-Black";
     background: transparent url(../img/css/icons.png) no-repeat top left;
     color: #2e2e2d;
+    text-transform: uppercase;
+    font-size: 18px;
+    font-weight: normal;
 }
 .external .tweet h2 {
     background-position: 0 -140px;
@@ -114,14 +149,18 @@ h2 {
 .external .learn h2 {
     background-position: 0 -440px;
 }
+.external p {
+    font-size: 14px;
+    color: #454545;
+}
 .external ul {
     padding-left: 0;
-    margin-top: 0;
 }
 .external li {
     list-style-type: none;
     border-top: 1px solid #D8DADC;
     padding: 0.5em 0;
+    font-size: 14px;
 }
 .external li:first-child {
     border-top: none;
@@ -153,4 +192,60 @@ div[role=main] header {
     background: #fff;
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
+}
+section footer {
+    border-top: 6px solid #000;
+    padding: 1em 0;
+    overflow: hidden;
+}
+section footer a {
+    font-size: 20px;
+    font-family: "LeagueGothic";
+    text-transform: uppercase;
+    float: right;
+}
+.browse footer {
+    border-bottom: 6px solid #000;
+}
+.browse h3 {
+    float: left;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    padding: 1em 15px;
+}
+.hentry {
+    font-size: 12px;
+    line-height: 2.2;
+    color: #5c5c5c;
+}
+.hentry address {
+    display: inline;
+    font-style: normal;
+}
+.hentry footer {
+    border-top: none;
+    padding: 0;
+}
+.hentry .entry-title {
+    font-size: 15px;
+    color: #454545;
+    margin-bottom: 0;
+}
+.hentry a[rel=bookmark] {
+    text-transform: lowercase;
+}
+.hentry a[rel=bookmark] span {
+    position: absolute;
+    left: -9999em;
+    height: 1px;
+    overflow: hidden;
+}
+.submissions {
+    font-size: 11px;
+}
+.submissions h4 {
+    font-weight: normal;
+    font-size: 15px;
+    margin: 0;
 }

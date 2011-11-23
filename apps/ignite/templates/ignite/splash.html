@@ -42,34 +42,44 @@
     <ol class="submissions columns">
     {% for entry in entries %}
         <li class="box col">
-            <h4>
-            <img src="{{ entry.get_image_src() }}" alt="">
-            <a href="{{ entry.get_absolute_url() }}">{{ entry.title }}</a>
-            </h4>
+            <article>
+             <a href="{{ entry.get_absolute_url() }}">
+                <h4>
+                <div class="frame box">
+                <img src="{{ entry.get_image_src() }}" alt="">
+                </div>
+                {{ entry.title }}
+                </h4>
+            </a>
             <p>{{ entry.brief_description }}</p>
-            {{ created_by(entry, footer=False) }}
+            <address>{{ created_by(entry, footer=False) }}</address>
+            </article>
         </li>
     {% endfor %}
     </ol>
     <footer>
         <a href="#">See all submissions</a>
-    <footer>
+    </footer>
     </div>
     </div>
 </section>       
 <section class="busta blogs">
     <h2>Updates from the blog</h2>
-    <ol class="columns">
+    <ol class="hfeed columns">
     {% for i in range(3) %}
         <li class="col box">
-        <article>
-            <h3>Headline of post</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+        <article class="hentry">
+            <h3 class="entry-title">Headline of post</h3>
+            <footer>
+            <span class="updated"><span class="value-title" title="ISO-formatted time"></span>16th November 2011</span> by <address class="author hcard"><span class="fn">Briney McGinty</span></address></p>
+            </footer>
+            <p class="entry-summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                 Aenean sit amet arcu orci. Maecenas scelerisque consequat
                 vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
                 primis in faucibus orci luctus et ultrices posuere cubilia
                 Curae; Maecenas eros risus, dictum quis dapibus nec,
                 ullamcorper in orci.</p>
+                <a href="#" rel="bookmark">Read more <span>on Headline of post</span></a>
         </article>
         </li>
     {% endfor %}
