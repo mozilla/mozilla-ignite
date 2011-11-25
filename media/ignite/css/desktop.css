@@ -29,8 +29,21 @@
     float: none;
     margin-right: 0;
 }
+.shout {
+    font-size: 60px;
+}
+.account {
+    font-size: 24px;
+}
+.partners h2 {
+    line-height: 100px;
+    margin-bottom: 1em;
+}
+.partners ul {
+    margin: 1.1125em 0 1.1125em 20px;
+}
 /**= Main content */
 /* homepage */
-div[role=main] .browse .col {
+#splash .entre .col {
     width: 20%;
 }

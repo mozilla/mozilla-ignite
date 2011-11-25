@@ -6,16 +6,13 @@
 
 {% block section_class %}entries{% endblock %}
 
-{% block content %}
-<section>
-    <header class="promo">
-        <div class="busta">
-        <h1 class="shout">Create a submission</h1>
-        </div>
-    </header>
-    <div>   
-    {{ form.errors }}
-<form class="busta" action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
+{% block header %}
+<h1 class="shout">Create a submission</h1>
+{% endblock %}
+
+{% block content %}   
+{{ form.errors }}
+<form action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <div>
         <label for="id_title" class="announce">Give your idea a title</label>
@@ -49,6 +46,4 @@
      </div>
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
 </form>
-</div>
-</section>
 {% endblock %}

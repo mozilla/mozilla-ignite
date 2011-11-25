@@ -51,7 +51,18 @@
         </ul>
     </section>
     {% endif %}
-    {% block content %}{% endblock %}
+    <section>
+    <header class="promo">
+        <div class="busta">
+            {% block header %}{% endblock %}
+        </div>
+    </header>
+    <div class="entre">
+        <div class="busta">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    </section>
     </div>
     {% block footer %}
     <aside>

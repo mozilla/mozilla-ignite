@@ -7,40 +7,36 @@
 
 {% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
 
+{% block header %}
+<h2 class="shout">What will the web look like in the future?</h2>
+<p class="announce">What apps would you make, if you could make anything?</p>
+<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+{% endblock %}
+
 {% block content %}
-<section>
-    <header class="promo">
-        <div class="busta">
-        <h2 class="shout">What will the web look like in the future?</h2>
-        <p class="announce">What apps would you make, if you could make anything?</p>
-        <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
-        </div>
-    </header>
-    <div class="browse">
-    <div class="busta">
-    <h3>Submissions</h3>
-    <ul class="sorting">
-        <li><a class="current" href="#">Most recent</a></li>
-        <li><a href="#">Most popular</a></li>
-    </ul>
-    <nav class="tags">
-        <ul>
-            <li><a class="current" href="#">all</a></li>
+<h3>Submissions</h3>
+<ul class="sorting">
+    <li><a class="current" href="#">Most recent</a></li>
+    <li><a href="#">Most popular</a></li>
+</ul>
+<nav class="tags">
+    <ul>
+        <li><a class="current" href="#">all</a></li>
         {% for tag in ['manufacturing', 'health', 'education', 'energy'] %}
             <li><a href="#">{{ tag }}</a></li>
         {% endfor %}
-        </ul>
-    </nav>
-    <ol class="submissions columns">
-    {% for entry in entries %}
-        <li class="box col">
-            <article>
-             <a href="{{ entry.get_absolute_url() }}">
+    </ul>
+</nav>
+<ol class="submissions columns">
+{% for entry in entries %}
+    <li class="box col">
+        <article>
+            <a href="{{ entry.get_absolute_url() }}">
                 <h4>
-                <div class="frame box">
-                <img src="{{ entry.get_image_src() }}" alt="">
-                </div>
-                {{ entry.title }}
+                    <div class="frame box">
+                    <img src="{{ entry.get_image_src() }}" alt="">
+                    </div>
+                    {{ entry.title }}
                 </h4>
             </a>
             <p>{{ entry.brief_description }}</p>

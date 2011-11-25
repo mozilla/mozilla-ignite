@@ -30,14 +30,14 @@ h2 {
     font-size: 24px;
 }
 .shout {
-    font-size: 60px;
+    font-size: 30px;
     color: #333;
     line-height: 0.9;
     font-weight: bold;
     margin-bottom: 0.5em;
 }
 .announce {
-    font-size: 24px;
+    font-size: 20px;
     color: #333;
     font-weight: bold;
 }
@@ -315,13 +315,12 @@ textarea {
     background: url("../img/css/bg_partners.png") repeat-x scroll 0 0 #ececec;
 }
 .partners h2 {
-    line-height: 100px;
     float: left;
-    margin: 1em 0; /* 1em = 18px; */
+    margin: 1em 0 0; /* 1em = 18px; */
 }
 .partners ul {
     float: left;
-    margin: 1.1125em 0 1.1125em 20px;
+    margin: 0;
     padding-left: 0;
 
 }
@@ -348,10 +347,10 @@ section footer a {
     text-transform: uppercase;
     float: right;
 }
-.browse footer {
+#splash .entre footer {
     border-bottom: 6px solid #000;
 }
-.browse h3 {
+#splash .entre h3 {
     float: left;
     background: #fff;
     color: #333;
