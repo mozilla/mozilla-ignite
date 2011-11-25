@@ -24,10 +24,16 @@ a:focus,
 a:active {
     text-decoration: underline;
 }
+h1 {
+    margin-top: 0;
+}
 h2 {
     color: #333;
     font-weight: bold;
     font-size: 24px;
+}
+p {
+    margin-top: 0;
 }
 .shout {
     font-size: 30px;
@@ -54,10 +60,14 @@ h2 {
     position: relative;
     overflow: hidden;
 }
+.entre {
+    padding: 2em 0;
+}
 .columns {
     overflow: hidden;
     padding-left: 0;
     margin-top: 0;
+    clear: both;
 }
 .col {
     list-style-type: none;
@@ -107,7 +117,25 @@ textarea {
     background-image: -webkit-linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
     padding: 0.4em 24px;
     font-size: 20px;
-    box-shadow: 2px 2px 0 #ebebeb;
+    box-shadow: 0 2px 0 #ebebeb;
+    display: inline-block;
+}
+.do {
+    margin-bottom: 1em;
+    font-size: 12px;
+    color: #333 !important;
+    font-family: Arial;
+    text-transform: none;
+    border: 1px solid #dcdcdc;
+    padding: 1em 24px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+    border-radius: 20px;
+    background-image: linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-image: -o-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-image: -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
 }
 .frame {
     float: left;
@@ -189,7 +217,7 @@ textarea {
 }
 .tags li {
     float: left;
-    margin-right: 6px;
+    margin: 0 6px 0.5em 0;
     font-size: 12px;
 }
 .tags a {
@@ -268,6 +296,7 @@ textarea {
 }
 .promo .announce {
     float: left;
+    clear: left;
     margin-right: 20px;
 }
 /* External links */
@@ -330,11 +359,15 @@ textarea {
     list-style-type: none;
 }
 /**= Main content */
+div[role=main] {
+    background: #fff;
+}
 /* homepage */
 div[role=main] header {
     background: #fff;
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
+    padding: 1em 0;
 }
 section footer {
     border-top: 6px solid #000;
@@ -391,4 +424,87 @@ section footer a {
     font-weight: normal;
     font-size: 15px;
     margin: 0;
+}
+/* Single submission */
+.widgets {
+    background: #fff;
+    padding: 1em;
+    border: 1px solid #979696;
+    border-width: 1px 0;
+    font-size: 12px;
+    color: #333;
+}
+.widgets p {
+    margin-bottom: 0;
+}
+#show_submission .promo .cta {
+    float: left;
+}
+#show_submission .sketh {
+    overflow: visible;
+    max-height: none;
+    margin: 1em 0;
+    width: 100%;
+}
+#show_submission .entre address {
+    border: 10px solid #000;
+    border-width: 10px 0;
+    padding: 1em 0 1em 100px;
+    position: relative;
+    font-style: normal;
+    min-height: 90px;
+}
+#show_submission .description {
+    font-size: 18px;
+    color: #5c5c5c;
+    margin-bottom: 2em;
+}
+#show_submission .entre address a {
+    font-weight: bold;
+    font-size: 14px;
+}
+#show_submission .entre address p {
+    font-size: 12px;
+    color: #5c5c5c;
+}
+#show_submission .entre address .frame {
+    width: auto;
+    position: absolute;
+    left: 0;
+    top: 10px;
+}
+#show_submission aside section {
+    padding: 1em 0 1em 10px;
+    border: 1px solid #979696;
+    border-width: 1px 0 0;
+    overflow: hidden;
+}
+#show_submission aside section:last-child {
+    border-top: 10px solid #000;
+}
+#show_submission .entre aside h2 {
+    font-weight: normal;
+    color: #5c5c5c;
+    font-size: 12px;
+    margin-top: 0;
+}
+#show_submission aside section .do {
+    float: none;
+}
+#show_submission aside section .do {
+    float: none;
+}
+.browser ul {
+    padding-left: 0;
+    font-size: 12px;
+}
+.browser li {
+    width: 50%;
+    padding-right: 10px;
+    float: left;
+    text-align: right;
+}
+.browser img,
+.browser .frame {
+    width: 100%;
 }

@@ -32,7 +32,7 @@
 .shout {
     font-size: 60px;
 }
-.account {
+.announce {
     font-size: 24px;
 }
 .partners h2 {
@@ -46,4 +46,15 @@
 /* homepage */
 #splash .entre .col {
     width: 20%;
+}
+/* single submission */
+#show_submission h1 {
+    float: left;
+    width: 67%;
+}
+#show_submission .do {
+    float: right;
+}
+#show_submission .entre div.col {
+    width: 67%;
 }
