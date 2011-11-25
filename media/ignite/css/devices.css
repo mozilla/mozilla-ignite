@@ -7,7 +7,7 @@
     src: url(../fonts/League_Gothic.woff) format('woff');
 }
 body {
-    background: #ebf7fe;
+    background: #ebf7fe url(../img/css/header_artwork.png) no-repeat top center;
     border-top: 0.5em solid #fff; /* 16 * 0.5 = 8 */
     font-family: Arial, Helvetica, sans-serif;
 }
