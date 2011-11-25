@@ -63,8 +63,39 @@ h2 {
     list-style-type: none;
     overflow: hidden;
 }
+/* forms */
+label {
+    display: block;
+    margin-bottom: 0.5em;
+}
+input[type=text],
+textarea {
+    width: 100%;
+    margin-bottom: 0.5em;
+}
+input[type=text],
+input[type=checkbox],
+textarea { 
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    padding: 0.2em;
+    font-size: 16px;
+}
+.inline_field {
+    margin: 0.5em 0;
+}
+.inline_field label,
+.inline_field  input {
+    display: inline-block;
+    width: auto;
+    margin-right: 0.2em;
+    margin-bottom: 0;
+    vertical-align: middle;
+}
 .cta {
     font-family: "LeagueGothic";
+    text-transform: uppercase;
     color: #fff !important;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -88,7 +119,7 @@ h2 {
     max-height: 102px;
     overflow: hidden;
     position: relative;
-    box-shadow: 3px 3px 3px #ebebeb;
+    box-shadow: 0 3px 3px #bdbdbd;
 }
 .frame:before {
     content: "&nbsp";
@@ -111,6 +142,7 @@ h2 {
     float: left;
     padding-left: 0;
     font-size: 15px;
+    margin-bottom: 2em;
 }
 .sorting li {
     float: left;
@@ -123,7 +155,7 @@ h2 {
     font-weight: bold;
     background: rgba(0, 0, 0, 0.2);
 }
-.sorting .current a:before {
+.sorting a.current:before {
     position: absolute;
     height: 0;
     width: 0;
@@ -143,7 +175,8 @@ h2 {
 }
 .sorting a:hover,
 .sorting a:focus,
-.sorting a:visited {
+.sorting a:visited,
+.sorting .current {
     background: rgba(0, 0, 0, 0.9);
     text-decoration: none;
 }
@@ -173,7 +206,8 @@ h2 {
 }
 .tags a:hover,
 .tags a:focus,
-.tags a:active {
+.tags a:active,
+.tags .current {
     background: #EF4619;
     text-decoration: none;
 }

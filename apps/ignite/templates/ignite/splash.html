@@ -20,13 +20,13 @@
     <div class="busta">
     <h3>Submissions</h3>
     <ul class="sorting">
-        {% for sort in ['newest', 'best liked'] %}
-            <li><a href="#">{{ sort }}</a></li>
-        {% endfor %}
+        <li><a class="current" href="#">Most recent</a></li>
+        <li><a href="#">Most popular</a></li>
     </ul>
     <nav class="tags">
         <ul>
-        {% for tag in ['all', 'manufacturing', 'health', 'education', 'energy'] %}
+            <li><a class="current" href="#">all</a></li>
+        {% for tag in ['manufacturing', 'health', 'education', 'energy'] %}
             <li><a href="#">{{ tag }}</a></li>
         {% endfor %}
         </ul>
