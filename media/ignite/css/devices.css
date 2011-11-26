@@ -77,6 +77,9 @@ p {
 label {
     display: block;
     margin-bottom: 0.5em;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
 }
 input[type=text],
 textarea {
@@ -91,6 +94,19 @@ textarea {
     box-sizing: border-box;
     padding: 0.2em;
     font-size: 16px;
+}
+fieldset {
+    border: none;
+    padding-left: 0;
+}
+legend span {
+    padding-bottom: 0.5em;
+    display: block;
+    margin-left: -2px;
+}
+.hint {
+    font-size: 14px;
+    margin-top: -0.5em;
 }
 .inline_field {
     margin: 0.5em 0;
@@ -151,6 +167,10 @@ textarea {
     display: block;
     fomt-weight: bold;
     font-size: 14px;
+}
+.errors {
+    background: #FFBABA;
+    border-bottom-color: #D8000C;
 }
 .frame {
     float: left;

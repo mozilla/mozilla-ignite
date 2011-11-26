@@ -10,29 +10,41 @@
 <h1 class="shout">Create a submission</h1>
 {% endblock %}
 
+{% block alerts %}
+<section class="alerts errors">
+    <div class="busta">
+    <h2>{{ _('Opps! We came accross a few errors') }}</h2>
+    {{ form.errors }}
+    </div>
+</section>
+{% endblock %}
+
 {% block content %}   
-{{ form.errors }}
 <form action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <div>
-        <label for="id_title" class="announce">Give your idea a title</label>
+        <label for="id_title" class="announce">{{ _('Title') }}</label>
+        <p class="hint" id="info_title">{{ _('Give your idea a name') }}</p>
         {{ form.title }}
     </div>
     <div>
-        <label for="id_brief_description" class="announce">Provide a brief summary</label>
+        <label for="id_brief_description" class="announce">{{ _('Summary') }}</label>
+        <p class="hint" id="info_brief_description">{{ _('Sum up your picth in 140 characters or less') }}</p>
         {{ form.brief_description }}
      </div>
      <div>
-        <label for="id_description" class="announce">Tell us all about your idea</label>
-        {{ form.description }}
-     </div>
-     <div>
-        <label for="id_sketh_note" class="announce">Upload a napkin sketch</label>
+        <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
+        <p class="hint" id="info_annouce">{{ _('If your idea makes more sense on paper then please include a diagram') }}</p>
         {{ form.sketh_note }}
      </div>
+     <div>
+        <label for="id_description" class="announce">{{ _('Full description') }}</label>
+        <p class="hint" id="info_description">{{ _('Take some time to provide us with a more detailed description. You can use basic HTML.') }}</p>
+        {{ form.description }}
+     </div> 
      <fieldset>
-        <legend>Tell us about external resources on your idea</legend>
-        <p>If you've got additional information about your submission elsewhere on the internet (like a youtube video or extra sketch notes on Flickr) please included them here. The more information you provide the better.</p>
+        <legend><span class="announce">{{ _('External links') }}</span></legend>
+        <p class="hint">If you've got additional information about your submission elsewhere on the internet (like a youtube video or extra napkin sketches on Flickr) please include them here. The more information you provide the better.</p>
         {{ link_form.management_form }}
         {% for link in link_form.forms %}
             <div class="inline_field">
@@ -41,8 +53,8 @@
         {% endfor %}
      </fieldset>
      <div class="inline_field">
-        <label for="id_is_draft" class="announce">Is draft?</label>
         {{ form.is_draft }}
+        <label for="id_is_draft" class="announce">Is draft?</label> 
      </div>
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
 </form>

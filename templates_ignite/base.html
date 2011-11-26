@@ -50,6 +50,7 @@
             {% block header %}{% endblock %}
         </div>
     </header>
+    {% block alerts %}
     {% if messages %}
     <section class="alerts">
         <ul class="busta">
@@ -59,6 +60,7 @@
         </ul>
     </section>
     {% endif %}
+    {% endblock %}
     <div class="entre">
         <div class="busta">
             {% block content %}{% endblock %}
