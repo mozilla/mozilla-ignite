@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block page_title %}Create submission | {% endblock %}
+{% block page_title %}{% if errors %}{{ _('Errors in your idea') }} | {% endif %}{{ _('Create idea') }} | {% endblock %}
 
 {% block page_id %}create_submission{% endblock %}
 
@@ -11,12 +11,16 @@
 {% endblock %}
 
 {% block alerts %}
+{% if errors %}
 <section class="alerts errors">
-    <div class="busta">
-    <h2>{{ _('Opps! We came accross a few errors') }}</h2>
-    {{ form.errors }}
-    </div>
+    <h2 class="busta">{{ _('Opps! We came across a few errors') }}</h2>
+    <ul class="busta">
+    {% for error in errors %}
+    <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
+    {% endfor %}
+    </ul>
 </section>
+{% endif %}
 {% endblock %}
 
 {% block content %}   
@@ -54,7 +58,7 @@
      </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}
-        <label for="id_is_draft" class="announce">Is draft?</label> 
+        <label for="id_is_draft" class="announce">{{ _('Is draft?') }}</label> 
      </div>
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
 </form>

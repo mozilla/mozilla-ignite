@@ -10,6 +10,13 @@ from challenges.forms import EntryForm, EntryLinkForm
 from challenges.models import Challenge, Phase, Submission, ExternalLink
 from projects.models import Project
 
+challenge_humanised = {
+    'title': 'Title',
+    'brief_description': 'Summary',
+    'description': 'Full description',
+    'sketh_note': 'Napkin sketch',
+}
+
 
 def show(request, project, slug, template_name='challenges/show.html'):
     """Show an individual project challenge."""
@@ -65,7 +72,8 @@ def create_entry(request, project, slug):
             form_errors = {}
             # this feels horrible but I think required to create a custom error list
             for k in form.errors.keys():
-                form_errors[k] =  form.errors[k].as_text()
+                humanised_key = challenge_humanised[k]
+                form_errors[humanised_key] =  form.errors[k].as_text()
     else:
         form = EntryForm()
         link_form = LinkFormSet(prefix='externals')

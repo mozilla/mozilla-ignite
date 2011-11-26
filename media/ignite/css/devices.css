@@ -158,10 +158,19 @@ legend span {
     background: #FFFF99;
     border-bottom: 5px solid #EBEA00;
     font-size: 12px;
-    color #222;
+    color: #333;
+}
+.alerts h2 {
+    margin-bottom: 0.5em;
 }
 .alerts ul {
     list-style-type: none;
+}
+.alerts li {
+    margin-top: 0.4em;
+}
+.alerts li:first-child {
+    margin-top: 0;
 }
 .alerts strong {
     display: block;
