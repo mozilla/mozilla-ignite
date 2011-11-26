@@ -33,30 +33,32 @@
                     {% if not user.is_authenticated() %}
                         <li>{% include "registration/_login_form.html" %}</li>
                     {% else %} 
-                        <li><a class="logout" href="{{ url('logout') }}">{{ _('Log in') }}</a></li>
+                        <li><a class="logout" href="{{ url('logout') }}">{{ _('Log out') }}</a></li>
                     {% endif %}
                     {% endblock %}
                 </ul>
             </nav>
-            <p style="clear: both">Signed in as {{ user.get_profile().display_name }}</p>
+            {% if user.is_authenticated() %}
+                <p style="clear: both">Signed in as {{ user.get_profile().display_name }}</p>
+            {% endif %}
         </div>
     </header>
     <div role="main">
-    {% if messages %}
-    <section class="busta>
-        <ul class=" messages">
-            {% for message in messages %}
-                <li>{{ message|safe }}</li>
-            {% endfor %}
-        </ul>
-    </section>
-    {% endif %}
     <section>
     <header class="promo">
         <div class="busta">
             {% block header %}{% endblock %}
         </div>
     </header>
+    {% if messages %}
+    <section class="alerts">
+        <ul class="busta">
+            {% for message in messages %}
+                <li>{{ message|safe }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
     <div class="entre">
         <div class="busta">
             {% block content %}{% endblock %}

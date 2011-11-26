@@ -137,6 +137,21 @@ textarea {
     background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
 }
+.alerts {
+    padding: 1em 0;
+    background: #FFFF99;
+    border-bottom: 5px solid #EBEA00;
+    font-size: 12px;
+    color #222;
+}
+.alerts ul {
+    list-style-type: none;
+}
+.alerts strong {
+    display: block;
+    fomt-weight: bold;
+    font-size: 14px;
+}
 .frame {
     float: left;
     margin-right: 10px;
