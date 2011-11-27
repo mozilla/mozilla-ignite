@@ -86,6 +86,9 @@ textarea {
     width: 100%;
     margin-bottom: 0.5em;
 }
+input[type=file] {
+    margin-bottom: 0.5em;
+}
 input[type=text],
 input[type=checkbox],
 textarea { 
@@ -110,6 +113,9 @@ legend span {
 }
 .inline_field {
     margin: 0.5em 0;
+}
+.inline_field .hint {
+    margin: 0;
 }
 .inline_field label,
 .inline_field  input {

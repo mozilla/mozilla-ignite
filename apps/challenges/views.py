@@ -52,19 +52,18 @@ def create_entry(request, project, slug):
         form = EntryForm(data=request.POST,
             files=request.FILES)
         link_form = LinkFormSet(request.POST, prefix="externals")
-        if form.is_valid():
+        if form.is_valid() and link_form.is_valid():
             entry = form.save(commit=False)
             entry.created_by = profile
             entry.phase = phase
             entry.save()
-            if link_form.is_valid():
-                for link in link_form.cleaned_data:
-                    if all(i in link for i in ("name", "url")): 
-                        ExternalLink.objects.create(
-                            name = link['name'],
-                            url = link['url'],
-                            submission = entry
-                        )
+            for link in link_form.cleaned_data:
+                if all(i in link for i in ("name", "url")): 
+                    ExternalLink.objects.create(
+                        name = link['name'],
+                        url = link['url'],
+                        submission = entry
+                    )
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
@@ -74,6 +73,8 @@ def create_entry(request, project, slug):
             for k in form.errors.keys():
                 humanised_key = challenge_humanised[k]
                 form_errors[humanised_key] =  form.errors[k].as_text()
+            if not link_form.is_valid():
+                form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
     else:
         form = EntryForm()
         link_form = LinkFormSet(prefix='externals')

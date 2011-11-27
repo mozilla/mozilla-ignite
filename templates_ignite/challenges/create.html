@@ -52,13 +52,17 @@
         {{ link_form.management_form }}
         {% for link in link_form.forms %}
             <div class="inline_field">
-                {{ link }}
+                {% for field in link %}
+                    {{ field.label_tag() }}
+                    {{ field }}
+                {% endfor %}
             </div>
         {% endfor %}
      </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}
-        <label for="id_is_draft" class="announce">{{ _('Is draft?') }}</label> 
+        <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
+        <p class="hint" id="info_is_draft">{{ _("Not ready for the world to see your idea yet? Save as draft and it will go public when you're ready") }}</p>
      </div>
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
 </form>
