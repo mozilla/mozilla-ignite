@@ -162,8 +162,8 @@ class Submission(BaseModel):
     def __unicode__(self):
         return self.title
     
-    def get_absolute_url(self):
-        """Return this submission's URL.
+    def _lookup_url(self, view_name, kwargs):
+        """Look up a URL related to this submission.
         
         Note that this needs to account both for an Ignite-style URL structure,
         where there is a single challenge for the entire site, and sites where
@@ -171,12 +171,27 @@ class Submission(BaseModel):
         
         """
         try:
-            # Match for a single-challenge site if we can
-            kwargs = {'entry_id': self.id}
-            return reverse('entry_show', kwargs=kwargs)
+            return reverse(view_name, kwargs=kwargs)
         except NoReverseMatch:
-            kwargs.update({'project': self.project.slug, 'slug': self.slug})
-            return reverse('entry_show', kwargs=kwargs)
+            kwargs.update({'project': self.challenge.project.slug,
+                           'slug': self.challenge.slug})
+            return reverse(view_name, kwargs=kwargs)
+    
+    def get_absolute_url(self):
+        """Return this submission's URL."""
+        return self._lookup_url('entry_show', {'entry_id': self.id})
+    
+    def get_edit_url(self):
+        """Return the URL to edit this submission."""
+        return self._lookup_url('entry_edit', {'pk': self.id})
+    
+    def editable_by(self, user):
+        """Return True if the user provided can edit this entry."""
+        return user.is_superuser or self.owned_by(user)
+    
+    def owned_by(self, user):
+        """Return True if user provided owns this entry."""
+        return user == self.created_by.user
     
     class Meta:
         ordering = ['-id']

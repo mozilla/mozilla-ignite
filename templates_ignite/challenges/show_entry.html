@@ -13,7 +13,13 @@
 {% block content %}
     <article>
         <h1 class="shout">{{ entry.title }}</h1>
-        <a href="#" class="cta do">Edit your idea</a>
+        {% if entry.editable_by(user) %}
+        {% if entry.owned_by(user) %}
+        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+        {% else %}
+        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a>
+        {% endif %}
+        {% endif %}
         <div class="columns">
         <div class="col box">
             <div class="widgets">

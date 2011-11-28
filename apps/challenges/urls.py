@@ -8,4 +8,6 @@ urlpatterns = patterns('challenges.views',
     url(PATH_PREFIX + r'entries/add/$', 'create_entry', name='entry_create'),
     url(PATH_PREFIX + r'entries/(?P<entry_id>\d+)/$', 'entry_show',
         name='entry_show'),
+    url(PATH_PREFIX + r'entries/(?P<pk>\d+)/edit/$', 'entry_edit',
+        name='entry_edit'),
     )

@@ -1,15 +1,26 @@
 from datetime import datetime, timedelta
 
+from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
-from mock import Mock
+from mock import Mock, patch
 from nose.tools import assert_equal, with_setup
 import test_utils
 
+from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import Challenge, Submission, Phase
 from projects.models import Project
+
+
+# Apply this decorator to a test to turn off the middleware that goes around
+# inserting 'en_US' redirects into all the URLs
+suppress_locale_middleware = patch.object(LocaleURLMiddleware,
+                                          'process_request',
+                                          lambda *args: None)
 
 
 def challenge_setup():
@@ -86,7 +97,12 @@ def _create_submissions(count, phase=None, creator=None):
 
 def _create_users():
     for name in ['alex', 'bob', 'charlie']:
-        User.objects.create_user(name, '%s@example.com' % name, password=name)
+        user = User.objects.create_user(name, '%s@example.com' % name,
+                                        password=name)
+        # Give the user a display name to stop 'complete your profile' redirect
+        profile = user.get_profile()
+        profile.name = '%(name)s %(name)sson' % {'name': name.capitalize()}
+        profile.save()
 
 
 @with_setup(challenge_setup, challenge_teardown)
@@ -137,6 +153,12 @@ class ChallengeEntryTest(test_utils.TestCase):
                      list(reversed(submission_titles)))
 
 
+# Add this dictionary to a form for no external links
+BLANK_EXTERNALS = {'externals-TOTAL_FORMS': '1',
+                   'externals-INITIAL_FORMS': '0',
+                   'externals-MAX_NUM_FORMS': ''}
+
+
 class CreateEntryTest(test_utils.TestCase):
     """Tests related to posting a new entry."""
     
@@ -182,6 +204,8 @@ class CreateEntryTest(test_utils.TestCase):
                      'brief_description': 'A submission',
                      'description': 'A submission of shining wonderment.',
                      'created_by': alex.get_profile()}
+        
+        form_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.entry_form_path, data=form_data,
                                     follow=True)
         redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
@@ -197,10 +221,11 @@ class CreateEntryTest(test_utils.TestCase):
     def test_invalid_form(self):
         """Test that an empty form submission fails with errors."""
         self.client.login(username='alex', password='alex')
-        response = self.client.post(self.entry_form_path, data={})
+        response = self.client.post(self.entry_form_path, data=BLANK_EXTERNALS)
         # Not so fussed about authors: we'll be re-working that soon enough
-        assert all(k in response.context['errors']
-                   for k in ['title', 'description'])
+        
+        for k in ['Title', 'Summary']:
+            assert k in response.context['errors'], 'Missing error key %s' % k
         assert_equal(Submission.objects.count(), 0)
 
 
@@ -256,9 +281,111 @@ class ShowEntryTest(test_utils.TestCase):
         response = self.client.get(self.submission_path)
         assert_equal(response.status_code, 200)
     
+    @suppress_locale_middleware
     def test_entry_not_found(self):
-        # Just double-check a submission with that ID doesn't exist
-        assert 19 not in Submission.objects.values_list('id', flat=True)
-        bad_path = '/en-US/my-project/challenges/my-challenge/entries/19/'
+        # Get an ID that doesn't exist
+        bad_id = Submission.objects.aggregate(max_id=Max('id'))['max_id'] + 1
+        bad_path = '/my-project/challenges/my-challenge/entries/%d/' % bad_id
         response = self.client.get(bad_path)
         assert_equal(response.status_code, 404, response.content)
+
+
+class EditEntryTest(test_utils.TestCase):
+    """Test functionality of the edit entry view."""
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        
+        admin = User.objects.create_user('admin', 'admin@example.com',
+                                         password='admin')
+        admin.is_superuser = True
+        admin.save()
+        
+        # Fill in the profile name to stop nag redirects
+        admin_profile = admin.get_profile()
+        admin_profile.name = 'Admin Adminson'
+        admin_profile.save()
+        
+        alex_profile = User.objects.get(username='alex').get_profile()
+        _create_submissions(1, creator=alex_profile)
+        
+        entry_id = Submission.objects.get().id
+        
+        base_kwargs = {'project': Project.objects.get().slug,
+                       'slug': Challenge.objects.get().slug}
+        
+        view_kwargs = dict(entry_id=entry_id, **base_kwargs)
+        self.view_path = reverse('entry_show', kwargs=view_kwargs)
+        
+        edit_kwargs = dict(pk=entry_id, **base_kwargs)
+        self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
+    
+    @suppress_locale_middleware
+    def test_edit_form(self):
+        self.client.login(username='alex', password='alex')
+        
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)
+    
+    @suppress_locale_middleware
+    def test_edit(self):
+        self.client.login(username='alex', password='alex')
+        data = dict(title=Submission.objects.get().title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission')
+        response = self.client.post(self.edit_path, data)
+        self.assertRedirects(response, self.view_path)
+        assert_equal(Submission.objects.get().description, data['description'])
+    
+    @suppress_locale_middleware
+    def test_anonymous_access(self):
+        """Check that anonymous users can't get at the form."""
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_anonymous_edit(self):
+        """Check that anonymous users can't post to the form."""
+        data = dict(title=Submission.objects.get().title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission')
+        response = self.client.post(self.edit_path, data)
+        assert_equal(response.status_code, 302)
+        assert 'seriously' not in Submission.objects.get().description
+    
+    @suppress_locale_middleware
+    def test_non_owner_access(self):
+        """Check that non-owners cannot see the edit form."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 403)
+    
+    @suppress_locale_middleware
+    def test_non_owner_edit(self):
+        """Check that users cannot edit each other's submissions."""
+        self.client.login(username='bob', password='bob')
+        data = dict(title=Submission.objects.get().title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission')
+        response = self.client.post(self.edit_path, data)
+        assert_equal(response.status_code, 403)
+        assert 'seriously' not in Submission.objects.get().description
+    
+    @suppress_locale_middleware
+    def test_admin_access(self):
+        """Check that administrators can see the edit form."""
+        self.client.login(username='admin', password='admin')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)
+    
+    @suppress_locale_middleware
+    def test_admin_edit(self):
+        """Check that administrators can edit submissions."""
+        self.client.login(username='admin', password='admin')
+        data = dict(title=Submission.objects.get().title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission')
+        response = self.client.post(self.edit_path, data)
+        self.assertRedirects(response, self.view_path)
+        assert_equal(Submission.objects.get().description, data['description'])

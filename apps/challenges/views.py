@@ -1,8 +1,15 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
+from django.core.urlresolvers import reverse
+from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
-from django.forms.formsets import formset_factory
+from django.utils.decorators import method_decorator
+from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.edit import UpdateView
 import jingo
 from tower import ugettext as _
 
@@ -16,6 +23,9 @@ challenge_humanised = {
     'description': 'Full description',
     'sketh_note': 'Napkin sketch',
 }
+
+
+LOGGER = logging.getLogger(__name__)
 
 
 def show(request, project, slug, template_name='challenges/show.html'):
@@ -97,3 +107,51 @@ def entry_show(request, project, slug, entry_id):
         'challenge': challenge,
         'entry': entry
     })
+
+
+class JingoTemplateMixin(TemplateResponseMixin):
+    """View mixin to render through Jingo rather than Django's renderer."""
+    
+    def render_to_response(self, context, **response_kwargs):
+        """Render using Jingo and return the response."""
+        template_names = self.get_template_names()
+        if len(template_names) > 1:
+            LOGGER.info('Jingo only works with a single template name; '
+                        'discarding ' + ', '.join(template_names[1:]))
+        template_name = template_names[0]
+        
+        return jingo.render(self.request, template_name, context,
+                            **response_kwargs)
+
+
+class EditEntryView(UpdateView, JingoTemplateMixin):
+    
+    form_class = EntryForm
+    template_name = 'challenges/edit.html'
+    
+    def _get_challenge(self):
+        return get_object_or_404(Challenge,
+                                 project__slug=self.kwargs['project'],
+                                 slug=self.kwargs['slug'])
+    
+    def get_queryset(self):
+        return Submission.objects.filter(phase__challenge=self._get_challenge())
+    
+    def get_object(self, *args, **kwargs):
+        obj = super(EditEntryView, self).get_object(*args, **kwargs)
+        if not obj.editable_by(self.request.user):
+            raise PermissionDenied()
+        return obj
+    
+    def get_context_data(self, **kwargs):
+        context = super(EditEntryView, self).get_context_data(**kwargs)
+        context['challenge'] = self._get_challenge()
+        context['project'] = context['challenge'].project
+        return context
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(EditEntryView, self).dispatch(*args, **kwargs)
+
+
+entry_edit = EditEntryView.as_view()
