@@ -125,6 +125,16 @@ legend span {
     margin-bottom: 0;
     vertical-align: middle;
 }
+.image_form {
+    overflow: hidden;
+}
+.image_form img {
+    float: left;
+    margin: -0.5em 10px 0.5em 0;
+}
+.image_form .announce {
+    margin-bottom: 0.5em;
+}
 .cta {
     font-family: "LeagueGothic";
     text-transform: uppercase;
