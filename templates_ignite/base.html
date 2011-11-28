@@ -39,9 +39,9 @@
                 </ul>
             </nav>
             {% if user.is_authenticated() %}
-                <p style="clear: both">Signed in as {{ user.get_profile().display_name }}</p>
-                <a href="{{ url('users_profile', username=user.username) }}">View profile</a>
-                <a href="{{ url('users_edit') }}">Edit profile</a>
+                <p style="clear: both; float: left; margin-right: 20px;">Signed in as {{ user.get_profile().display_name }}</p>
+                <a style="float: left; text-transform: lowercase; margin-right: 20px;" href="{{ url('users_profile', username=user.username) }}">View profile</a>
+                <a style="float: left; text-transform: lowercase;" href="{{ url('users_edit') }}">Edit profile</a>
             {% endif %}
         </div>
     </header>
