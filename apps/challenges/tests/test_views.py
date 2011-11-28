@@ -153,6 +153,12 @@ class ChallengeEntryTest(test_utils.TestCase):
                      list(reversed(submission_titles)))
 
 
+# Add this dictionary to a form for no external links
+BLANK_EXTERNALS = {'externals-TOTAL_FORMS': '1',
+                   'externals-INITIAL_FORMS': '0',
+                   'externals-MAX_NUM_FORMS': ''}
+
+
 class CreateEntryTest(test_utils.TestCase):
     """Tests related to posting a new entry."""
     
@@ -198,6 +204,8 @@ class CreateEntryTest(test_utils.TestCase):
                      'brief_description': 'A submission',
                      'description': 'A submission of shining wonderment.',
                      'created_by': alex.get_profile()}
+        
+        form_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.entry_form_path, data=form_data,
                                     follow=True)
         redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
@@ -213,10 +221,11 @@ class CreateEntryTest(test_utils.TestCase):
     def test_invalid_form(self):
         """Test that an empty form submission fails with errors."""
         self.client.login(username='alex', password='alex')
-        response = self.client.post(self.entry_form_path, data={})
+        response = self.client.post(self.entry_form_path, data=BLANK_EXTERNALS)
         # Not so fussed about authors: we'll be re-working that soon enough
-        assert all(k in response.context['errors']
-                   for k in ['title', 'description'])
+        
+        for k in ['Title', 'Summary']:
+            assert k in response.context['errors'], 'Missing error key %s' % k
         assert_equal(Submission.objects.count(), 0)
 
 
