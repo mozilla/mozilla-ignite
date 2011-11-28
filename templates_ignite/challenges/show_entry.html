@@ -13,7 +13,13 @@
 {% block content %}
     <article>
         <h1 class="shout">{{ entry.title }}</h1>
-        <a href="#" class="cta do">Edit your idea</a>
+        {% if entry.editable_by(user) %}
+        {% if entry.owned_by(user) %}
+        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+        {% else %}
+        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a>
+        {% endif %}
+        {% endif %}
         <div class="columns">
         <div class="col box">
             <div class="widgets">
@@ -25,9 +31,6 @@
             <div class="description">
             {{ entry.description_html }}
             </div>
-            {% if entry.editable_by(user) %}
-            <p><a href="{{ entry.get_edit_url() }}">Edit this entry</a></p>
-            {% endif %}
             <address>
                 <p><a href="{{ entry.created_by.get_absolute_url }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>

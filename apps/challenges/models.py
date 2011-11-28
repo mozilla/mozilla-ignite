@@ -187,7 +187,11 @@ class Submission(BaseModel):
     
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
-        return user.is_superuser or user == self.created_by.user
+        return user.is_superuser or self.owned_by(user)
+    
+    def owned_by(self, user):
+        """Return True if user provided owns this entry."""
+        return user == self.created_by.user
     
     class Meta:
         ordering = ['-id']
