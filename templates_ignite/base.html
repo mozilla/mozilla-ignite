@@ -8,6 +8,7 @@
     {% block site_css %}
         {{ css('ignite_devices') }}
     {% endblock %}
+    <link rel="stylesheet" media="all and (min-width:30em)" href="{{ MEDIA_URL }}/ignite/css/desktop.css" />
     <script src="https://browserid.org/include.js"></script>
     <!--[if lt IE 9]>
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -18,44 +19,91 @@
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
         var ignite = window.ignite || {};
     </script>
-    <header>
+    <header class="masthead">
         <div class="busta clearfix">
-            {% block site_title %}<p class="brand">Mozilla + Us Ignite</p>{% endblock %}
+            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}">Mozilla + Us Ignite</a></p>{% endblock %}
             <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
-            {% block login %}
-            {% if not user.is_authenticated() %}
-            {% include "registration/_login_form.html" %}
-            {% else %}
-                <p>Signed in as {{ user.get_profile().display_name }}</p>
-                <a class="logout" href="{{ url('logout') }}">{{ _('sign out') }}</a>
+            <nav>
+                <ul>
+                    <li><a href="#">{{ _('About the challenge') }}</a></li>
+                    <li><a href="#">{{ _('Submissions') }}</a></li>
+                    <li><a href="#">{{ _('Judges') }}</a></li>
+                    <li><a href="#">{{ _('Blog') }}</a></li>
+                    {% block login %}
+                    {% if not user.is_authenticated() %}
+                        <li>{% include "registration/_login_form.html" %}</li>
+                    {% else %} 
+                        <li><a class="logout" href="{{ url('logout') }}">{{ _('Log out') }}</a></li>
+                    {% endif %}
+                    {% endblock %}
+                </ul>
+            </nav>
+            {% if user.is_authenticated() %}
+                <p style="clear: both">Signed in as {{ user.get_profile().display_name }}</p>
             {% endif %}
-            {% endblock %}
         </div>
     </header>
-    <div class="busta clearfix" role="main">
+    <div role="main">
+    <section>
+    <header class="promo">
+        <div class="busta">
+            {% block header %}{% endblock %}
+        </div>
+    </header>
+    {% block alerts %}
     {% if messages %}
-        <ul class="messages">
+    <section class="alerts">
+        <ul class="busta">
             {% for message in messages %}
                 <li>{{ message|safe }}</li>
             {% endfor %}
         </ul>
+    </section>
     {% endif %}
-    {% block content %}{% endblock %}
+    {% endblock %}
+    <div class="entre">
+        <div class="busta">
+            {% block content %}{% endblock %}
+        </div>
+    </div>
+    </section>
     </div>
     {% block footer %}
-    <footer>
-        <section class="busta mozilla">
-            <div class="col mail">
-                <h2>Get email updates from all things Mozilla</h2>
-            </div>
-            <div class="col tweet">
+    <aside>
+        <section class="external">
+            <div class="busta">
+            <div class="col box tweet">
                 <h2>Follow and tweet</h2>
+                <p>What becomes possible at 1<abbr title="Gigabit per second">GBps</abbr>? What's the future of the web? Tweet your ideas with the tags <a href="https://twitter.com/#!/search?q=%23mozignite">#mozignite</a> and <a href="https://twitter.com/#!/search?q=%23usignite">#usignite</a>. (And we might just give you a treat)</p>
             </div>
-            <div class="col connent">
+            <div class="col box learn">
+                <h2>Learn more</h2>
+                <ul>
+                    <li><a href="mailto:ben@mozillafoundation.org">Contact us</a></li>
+                    <li><a href="http://www.geni.org">Visit <abbr title="Global Environment for Network Innovations">GENI</abbr> website</a></li>
+                    <li><a href="http://www.nsf.gov/cise/usignite/">Visit <abbr title="United States">US</abbr> Ignite website</a></li>
+                </ul>
+            </div>
+            <div class="col box mozilla">
                 <h2>Connect with Mozilla</h2>
+                <ul>
+                    <li><a href="http://www.mozilla.org/about/mission.html">Learn about Mozilla's mission</a></li>
+                    <li><a href="https://donate.mozilla.org/join/">Join Mozilla</a></li>
+                    <li><a href="http://www.facebook.com/mozilladrumbeat/">Like us on Facebook</a></li>
+                </ul>
+            </div>
             </div>
         </section>
-    </footer>
+        <section class="partners">
+            <div class="busta">
+            <h2>Our partners</h2>
+            <ul>
+                <li><a href="http://www.nsf.gov"><img src="{{ MEDIA_URL }}ignite/img/partners/nsf.png" width="120" height="100" alt="National Science Foundation" /></a></li>
+                <li><a href="http://www.geni.net"><img src="{{ MEDIA_URL }}ignite/img/partners/geni.png" width="120" height="100" alt="geni - exploring networks of the future" /></a></li>
+            </ul>
+            </div>
+        </section>
+    </aside>
     {% endblock %}
     {% block site_js %}
         {{ js('ignite_core') }}

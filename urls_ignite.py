@@ -15,7 +15,7 @@ urlpatterns = patterns('',
     (r'^browserid/', include('django_browserid.urls')),
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
     url(r'^accounts/login/$', 'jingo.render', kwargs={'template': 'registration/login.html'}, name='login'),
-    url(r'^$', 'challenges.views.show', kwargs=_ignite_kwargs, name='challenge_show'),
+    url(r'^$', 'ignite.views.splash', kwargs=_ignite_kwargs, name='challenge_show'),
     (r'', include('users.urls')),
     # The /ideas/ URL will become available in the application phase
     url(r'^ideas/$', redirect_to, kwargs={'url': '/', 'permanent': False}),

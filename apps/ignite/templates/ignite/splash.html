@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_id %}splash{% endblock %}
+
+{% block section_class %}content{% endblock %}
+
+{% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
+
+{% block header %}
+<h2 class="shout">What will the web look like in the future?</h2>
+<p class="announce">What apps would you make, if you could make anything?</p>
+<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+{% endblock %}
+
+{% block content %}
+<h3>Submissions</h3>
+<ul class="sorting">
+    <li><a class="current" href="#">Most recent</a></li>
+    <li><a href="#">Most popular</a></li>
+</ul>
+<nav class="tags">
+    <ul>
+        <li><a class="current" href="#">all</a></li>
+        {% for tag in ['manufacturing', 'health', 'education', 'energy'] %}
+            <li><a href="#">{{ tag }}</a></li>
+        {% endfor %}
+    </ul>
+</nav>
+<ol class="submissions columns">
+{% for entry in entries %}
+    <li class="box col">
+        <article>
+            <a href="{{ entry.get_absolute_url() }}">
+                <h4>
+                    <div class="frame box">
+                    <img src="{{ entry.get_image_src() }}" alt="">
+                    </div>
+                    {{ entry.title }}
+                </h4>
+            </a>
+            <p>{{ entry.brief_description }}</p>
+            <address>{{ created_by(entry, footer=False) }}</address>
+            </article>
+        </li>
+    {% endfor %}
+    </ol>
+    <footer>
+        <a href="#">See all submissions</a>
+    </footer>
+    </div>
+    </div>
+</section>       
+<section class="busta blogs">
+    <h2 class="announce">Updates from the blog</h2>
+    <ol class="hfeed columns">
+    {% for i in range(3) %}
+        <li class="col box">
+        <article class="hentry">
+            <h3 class="entry-title">Headline of post</h3>
+            <footer>
+            <span class="updated"><span class="value-title" title="ISO-formatted time"></span>16th November 2011</span> by <address class="author hcard"><span class="fn">Briney McGinty</span></address></p>
+            </footer>
+            <p class="entry-summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
+                primis in faucibus orci luctus et ultrices posuere cubilia
+                Curae; Maecenas eros risus, dictum quis dapibus nec,
+                ullamcorper in orci.</p>
+                <a href="#" rel="bookmark">Read more <span>on Headline of post</span></a>
+        </article>
+        </li>
+    {% endfor %}
+    </ol>
+    <footer>
+        <a href="#">Read all our news in the Ignite Blog</a>
+    </footer>
+</section>
+{% endblock %}

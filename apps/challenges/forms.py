@@ -1,6 +1,6 @@
 from django import forms
 
-from challenges.models import Submission
+from challenges.models import Submission, ExternalLink
 
 
 class EntryForm(forms.ModelForm):
@@ -13,4 +13,13 @@ class EntryForm(forms.ModelForm):
             'description',
             'is_draft',
             'sketh_note',
+        )
+
+class EntryLinkForm(forms.ModelForm):
+
+    class Meta:
+        model = ExternalLink
+        fields = (
+            'name',
+            'url',
         )

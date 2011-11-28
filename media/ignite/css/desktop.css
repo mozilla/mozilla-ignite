@@ -1,0 +1,60 @@
+/**= Desktop only */
+.col {
+    float: left;
+    padding: 10px;
+    width: 33%;
+}
+.col:first-child {
+    padding-left: 0;
+}
+.col img {
+    width: 100%;
+}
+/* Masthead */
+.masthead .brand {
+    float: left;
+}
+.masthead nav {
+    float: right;
+    margin-right: 130px;
+}
+/**= Overrides from devices.css */
+.busta {
+    max-width: 980px;
+    padding: 0 10px;
+    margin: 0 auto;
+}
+.frame {
+    width: 100%;
+    float: none;
+    margin-right: 0;
+}
+.shout {
+    font-size: 60px;
+}
+.announce {
+    font-size: 24px;
+}
+.partners h2 {
+    line-height: 100px;
+    margin-bottom: 1em;
+}
+.partners ul {
+    margin: 1.1125em 0 1.1125em 20px;
+}
+/**= Main content */
+/* homepage */
+#splash .entre .col {
+    width: 20%;
+}
+/* single submission */
+#show_submission h1 {
+    float: left;
+    width: 67%;
+}
+#show_submission .do {
+    float: right;
+}
+#show_submission .entre div.col {
+    width: 67%;
+}

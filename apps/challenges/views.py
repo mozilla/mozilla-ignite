@@ -4,17 +4,25 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
-from django.views.generic.edit import UpdateView
 from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.edit import UpdateView
 import jingo
 from tower import ugettext as _
 
-from challenges.forms import EntryForm
-from challenges.models import Challenge, Phase, Submission
+from challenges.forms import EntryForm, EntryLinkForm
+from challenges.models import Challenge, Phase, Submission, ExternalLink
 from projects.models import Project
+
+challenge_humanised = {
+    'title': 'Title',
+    'brief_description': 'Summary',
+    'description': 'Full description',
+    'sketh_note': 'Napkin sketch',
+}
 
 
 LOGGER = logging.getLogger(__name__)
@@ -48,15 +56,24 @@ def create_entry(request, project, slug):
         raise Http404
     
     profile = request.user.get_profile()
-    form_errors = False
+    LinkFormSet = formset_factory(EntryLinkForm, extra=2)
+    form_errors = False 
     if request.method == 'POST':
         form = EntryForm(data=request.POST,
             files=request.FILES)
-        if form.is_valid():
+        link_form = LinkFormSet(request.POST, prefix="externals")
+        if form.is_valid() and link_form.is_valid():
             entry = form.save(commit=False)
             entry.created_by = profile
             entry.phase = phase
             entry.save()
+            for link in link_form.cleaned_data:
+                if all(i in link for i in ("name", "url")): 
+                    ExternalLink.objects.create(
+                        name = link['name'],
+                        url = link['url'],
+                        submission = entry
+                    )
             msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
@@ -64,13 +81,18 @@ def create_entry(request, project, slug):
             form_errors = {}
             # this feels horrible but I think required to create a custom error list
             for k in form.errors.keys():
-                form_errors[k] =  form.errors[k].as_text()
+                humanised_key = challenge_humanised[k]
+                form_errors[humanised_key] =  form.errors[k].as_text()
+            if not link_form.is_valid():
+                form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
     else:
         form = EntryForm()
+        link_form = LinkFormSet(prefix='externals')
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
         'challenge': phase.challenge,
         'form': form,
+        'link_form': link_form,
         'errors': form_errors
     })
 

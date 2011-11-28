@@ -6,13 +6,17 @@
 
 {% block section_class %}profile{% endblock %}
 
+{% block header %}
+<h1 class="shout">{{ _('Tell us about you') }}</h1>
+<p class="announce">Blah blah blah - why should you do this?</p>
+{% endblock %}
+
 {% block content %}
-<h1>{{ _('Tell us about you') }}</h1>
-<p>Blah blah blah - why should you do this?</p>
 <form action="{{ url('users_edit') }}" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <div>
-        <label for="id_name">{{ _('Display name - how do you want to be known?') }}</label>
+        <label class="announce" for="id_name">{{ _('Display name') }}</label>
+        <p class="hint" id="name_info">{{ _('How do you want to be known?') }}</p>
         {{ form.name }}
     </div>
     <div>
@@ -20,13 +24,15 @@
         <p>{{ _('Profile pictures are powered by ') }} <a href="http://gravatar.com">Gravatar.com</a></p>
     </div>
     <div>
-        <label for="id_website">{{ _('Where can people find out more about you?') }}</label>
+        <label class="announce" for="id_website">{{ _('Website') }}</label>
+        <p class="hint" id="website_info">{{ _('Where can people find out more about you?') }}</p>
         {{ form.website }}
     </div>
     <div>
-        <label for="id_bio">{{ _('What do you want people to know about you?') }}</label>
+        <label class="announce" for="id_bio">{{ _('Personal bio') }}</label>
+        <p class="hint" id="bio_info">{{ _('What do you want people to know about you?') }}</p>
         {{ form.bio }}
     </div>
-    <input type="submit" value="{{ _('Update') }}" />
+    <input class="cta" type="submit" value="{{ _('Update') }}" />
 </form>
 {% endblock %}
