@@ -45,6 +45,18 @@ def entries_all(request, project, slug):
     return show(request, project, slug, template_name='challenges/all.html')
 
 
+def extract_form_errors(form, link_form):
+    form_errors = {}
+    # this feels horrible but I think required to create a custom error list
+    for k in form.errors.keys():
+        humanised_key = challenge_humanised[k]
+        form_errors[humanised_key] =  form.errors[k].as_text()
+    if not link_form.is_valid():
+        form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
+    
+    return form_errors
+
+
 @login_required
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
@@ -78,13 +90,7 @@ def create_entry(request, project, slug):
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
         else:
-            form_errors = {}
-            # this feels horrible but I think required to create a custom error list
-            for k in form.errors.keys():
-                humanised_key = challenge_humanised[k]
-                form_errors[humanised_key] =  form.errors[k].as_text()
-            if not link_form.is_valid():
-                form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
+            form_errors = extract_form_errors(form, link_form)
     else:
         form = EntryForm()
         link_form = LinkFormSet(prefix='externals')
@@ -193,7 +199,9 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
     
     def form_invalid(self, form, link_form):
         """Display the form with errors."""
-        context = self.get_context_data(form=form, link_form=link_form)
+        form_errors = extract_form_errors(form, link_form)
+        context = self.get_context_data(form=form, link_form=link_form,
+                                        errors=form_errors)
         return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
