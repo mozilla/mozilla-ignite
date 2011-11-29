@@ -334,6 +334,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
         assert_equal(Submission.objects.get().description, data['description'])
@@ -350,6 +351,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 302)
         assert 'seriously' not in Submission.objects.get().description
@@ -368,6 +370,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 403)
         assert 'seriously' not in Submission.objects.get().description
@@ -386,6 +389,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
         assert_equal(Submission.objects.get().description, data['description'])
