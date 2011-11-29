@@ -68,6 +68,8 @@
         <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
         <p class="hint" id="info_is_draft">{{ _("Not ready for the world to see your idea yet? Save as draft and it will go public when you're ready") }}</p>
      </div>
+     {% block submit %}
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
+     {% endblock %}
 </form>
 {% endblock %}
