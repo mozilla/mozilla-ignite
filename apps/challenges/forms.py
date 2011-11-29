@@ -1,4 +1,5 @@
 from django import forms
+from django.forms.models import inlineformset_factory
 
 from challenges.models import Submission, ExternalLink
 
@@ -23,3 +24,6 @@ class EntryLinkForm(forms.ModelForm):
             'name',
             'url',
         )
+
+
+InlineLinkFormSet = inlineformset_factory(Submission, ExternalLink, can_delete=False)

@@ -13,7 +13,7 @@ from django.views.generic.edit import UpdateView
 import jingo
 from tower import ugettext as _
 
-from challenges.forms import EntryForm, EntryLinkForm
+from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
 from challenges.models import Challenge, Phase, Submission, ExternalLink
 from projects.models import Project
 
@@ -127,6 +127,7 @@ class JingoTemplateMixin(TemplateResponseMixin):
 class EditEntryView(UpdateView, JingoTemplateMixin):
     
     form_class = EntryForm
+    link_form_class = InlineLinkFormSet
     template_name = 'challenges/edit.html'
     
     def _get_challenge(self):
@@ -142,6 +143,58 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
         if not obj.editable_by(self.request.user):
             raise PermissionDenied()
         return obj
+    
+    # The following two methods are analogous to Django's generic form methods
+    
+    def get_link_form(self, link_form_class):
+        return link_form_class(**self.get_link_form_kwargs())
+    
+    def get_link_form_kwargs(self):
+        form_kwargs = super(EditEntryView, self).get_form_kwargs()
+        # Initial data doesn't apply to formsets
+        del form_kwargs['initial']
+        form_kwargs.update(instance=self.object, prefix='externals')
+        return form_kwargs
+    
+    def get_forms(self):
+        """Return the forms available to this view as a dictionary."""
+        form = self.get_form(self.get_form_class())
+        link_form = self.get_link_form(self.link_form_class)
+        return {'form': form, 'link_form': link_form}
+    
+    def get(self, request, *args, **kwargs):
+        """Respond to a GET request by displaying the edit form."""
+        self.object = self.get_object()
+        
+        context = self.get_context_data(**self.get_forms())
+        return self.render_to_response(context)
+    
+    def post(self, request, *args, **kwargs):
+        """Handle a POST request.
+        
+        If the forms are both valid, save them and redirect to the success URL.
+        If either form is invalid, render the form with the errors displayed.
+        
+        """
+        self.object = self.get_object()
+        
+        forms = self.get_forms()
+        form, link_form = forms['form'], forms['link_form']
+        
+        if form.is_valid() and link_form.is_valid():
+            return self.form_valid(form, link_form)
+        else:
+            return self.form_invalid(form, link_form)
+    
+    def form_valid(self, form, link_form):
+        response = super(EditEntryView, self).form_valid(form)
+        link_form.save()
+        return response
+    
+    def form_invalid(self, form, link_form):
+        """Display the form with errors."""
+        context = self.get_context_data(form=form, link_form=link_form)
+        return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
         context = super(EditEntryView, self).get_context_data(**kwargs)
