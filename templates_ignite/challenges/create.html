@@ -52,7 +52,11 @@
         {{ link_form.management_form }}
         {% for link in link_form.forms %}
             <div class="inline_field">
-                {% for field in link %}
+                {% for field in link.hidden_fields() %}
+                {{ field }}
+                {% endfor %}
+                
+                {% for field in link.visible_fields() %}
                     {{ field.label_tag() }}
                     {{ field }}
                 {% endfor %}
