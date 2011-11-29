@@ -11,6 +11,8 @@ from django.shortcuts import get_object_or_404
 from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
+from challenges.models import Submission
+from settings import INSTALLED_APPS
 
 import jingo
 
@@ -54,10 +56,13 @@ def profile(request, username):
     """Display profile page for user specified by ``username``."""
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
+    if 'challenges' in INSTALLED_APPS:
+        submissions = Submission.objects.filter(created_by=profile)
     return jingo.render(request, 'users/profile.html', {
         'profile': profile,
         'social_links': profile.link_set.all() or False,
-        'projects': profile.project_set.all() or False
+        'projects': profile.project_set.all() or False,
+        'submissions': submissions or False
     })
 
 

@@ -26,6 +26,7 @@ a:active {
 }
 h1 {
     margin-top: 0;
+    color: #333;
 }
 h2 {
     color: #333;
@@ -34,6 +35,8 @@ h2 {
 }
 p {
     margin-top: 0;
+    font-size: 12px;
+    color: #5c5c5c;
 }
 .shout {
     font-size: 30px;
@@ -156,6 +159,7 @@ legend span {
     margin-bottom: 1em;
     font-size: 12px;
     color: #333 !important;
+    float: right;
     font-family: Arial;
     text-transform: none;
     border: 1px solid #dcdcdc;
@@ -168,6 +172,9 @@ legend span {
     background-image: -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+}
+aside .do {
+    float: none;
 }
 .alerts {
     padding: 1em 0;
@@ -309,6 +316,7 @@ legend span {
 .masthead .brand {
     margin-top: 0;
     padding-top: 1em;
+    color: #fff;
 }
 .tab {
     position: absolute;
@@ -423,7 +431,7 @@ div[role=main] {
     background: #fff;
 }
 /* homepage */
-div[role=main] header {
+div[role=main] .promo {
     background: #fff;
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
@@ -567,4 +575,36 @@ section footer a {
 .browser img,
 .browser .frame {
     width: 100%;
+}
+/* Profile page */
+#user_profile .entre  {
+    width: 67%;
+    padding-left: 110px;
+    padding-top: 0;
+    position: relative;
+}
+#user_profile .vcard {
+    margin-bottom: 1.5em;
+}
+#user_profile .vcard .frame {
+    width: 90px;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#user_profile .do {
+    margin-top: -2em;
+}
+#user_profile .columns {
+    border-bottom: 1px solid #dcdcdc;
+}
+#user_profile .entre h2 {
+    font-size: 15px;
+    margin-bottom: 0;
+}
+#user_profile .vcard .fn {
+    margin: 0
+}
+#user_profile .vcard .url {
+    font-size: 11px;
 }
