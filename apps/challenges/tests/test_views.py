@@ -473,3 +473,22 @@ class EditLinkTest(test_utils.TestCase):
         
         self.assertRedirects(response, self.view_path)
         self.assertEqual(ExternalLink.objects.count(), 0)
+    
+    @suppress_locale_middleware
+    def test_add_links(self):
+        """Test adding links to a submission without any."""
+        ExternalLink.objects.all().delete()
+        
+        form_data = self._base_form()
+        link_forms = [{'name': 'Cheese', 'url': 'http://cheese.com/'},
+                      {'name': 'Pie', 'url': 'http://en.wikipedia.org/wiki/Pie'}]
+        form_data.update(_build_links(0, *link_forms))
+        
+        response = self.client.post(self.edit_path, form_data)
+        
+        self.assertRedirects(response, self.view_path)
+        self.assertEqual(ExternalLink.objects.count(), 2)
+        
+        cheese_link = ExternalLink.objects.get(name='Cheese')
+        self.assertEqual(cheese_link.url, 'http://cheese.com/')
+        self.assertEqual(cheese_link.submission, Submission.objects.get())
