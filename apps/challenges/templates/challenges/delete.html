@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% from "layout/breadcrumbs.html" import breadcrumbs %}
+{% from "layout/helpers.html" import sectiontitle %}
+
+{% block page_title %}
+    {% if not  errors %}
+        {{ _('Delete entry on {part} : Participation : Mozilla Labs')|f(part=challenge.title) }}
+    {% else %}
+        {{ _('Entry failed: Delete entry on {part} : Participation : Mozilla Labs')|f(part=challenge.title) }} 
+    {% endif %}
+{% endblock %}
+
+{% block page_id %}challenge_delete{% endblock %}
+{% block section_class %}projects{% endblock %}
+
+{% block breadcrumbs %}
+{{ breadcrumbs(
+    (url('innovate_splash'), _('Mozilla Labs Home')),
+    (url('projects_programs'), _('Programs')),
+    (url('projects_show', slug=project.slug), project.name),
+    (challenge.get_absolute_url(), challenge.title),
+    last=_('Delete entry')) }}
+{% endblock %}
+
+{% block content %}
+{{ sectiontitle(_('Delete entry on {part}')|f(part=challenge.title)) }}
+<section id="profile_edit" class="w6 clearfix">
+    <div class="paper c3">
+        {% if errors %}
+        <p>Errors</p>
+        <ul class="db_objects errorlist">
+            {% for i, v in errors.iteritems() %}
+            <li>
+                <a href="#id_{{ i }}">{{ i|title|replace('_', ' ') }} - {{ v|lower|replace('*', '') }}</a></li>
+            </li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        <form action="" method="post">
+            {{ csrf()|safe }}
+            <button class="submit sans" type="submit">{{ _('Delete entry') }}</button>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -492,3 +492,65 @@ class EditLinkTest(test_utils.TestCase):
         cheese_link = ExternalLink.objects.get(name='Cheese')
         self.assertEqual(cheese_link.url, 'http://cheese.com/')
         self.assertEqual(cheese_link.submission, Submission.objects.get())
+
+
+class DeleteEntryTest(test_utils.TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        
+        alex_profile = User.objects.get(username='alex').get_profile()
+        _create_submissions(1, creator=alex_profile)
+        
+        submission = Submission.objects.get()
+        
+        base_kwargs = {'project': Project.objects.get().slug,
+                       'slug': Challenge.objects.get().slug}
+        
+        view_kwargs = dict(entry_id=submission.id, **base_kwargs)
+        self.view_path = reverse('entry_show', kwargs=view_kwargs)
+        
+        delete_kwargs = dict(pk=submission.id, **base_kwargs)
+        self.delete_path = reverse('entry_delete', kwargs=delete_kwargs)
+    
+    @suppress_locale_middleware
+    def test_anonymous_delete_form(self):
+        """Check that anonymous users can't get at the form."""
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_anonymous_delete(self):
+        """Check that anonymous users can't delete entries."""
+        response = self.client.post(self.delete_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_non_owner_access(self):
+        """Check that non-owners cannot see the delete form."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 403)
+    
+    @suppress_locale_middleware
+    def test_non_owner_delete(self):
+        """Check that users cannot delete each other's submissions."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 403)
+        assert Submission.objects.exists()
+    
+    @suppress_locale_middleware
+    def test_delete_form(self):
+        self.client.login(username='alex', password='alex')
+        
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 200)
+    
+    @suppress_locale_middleware
+    def test_delete(self):
+        self.client.login(username='alex', password='alex')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 302)
+        assert_equal(Submission.objects.count(), 0)

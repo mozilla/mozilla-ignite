@@ -9,7 +9,8 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.edit import UpdateView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import UpdateView, DeleteView
 import jingo
 from tower import ugettext as _
 
@@ -130,11 +131,12 @@ class JingoTemplateMixin(TemplateResponseMixin):
                             **response_kwargs)
 
 
-class EditEntryView(UpdateView, JingoTemplateMixin):
+class SingleSubmissionMixin(SingleObjectMixin):
+    """Mixin for views operating on a single submission.
     
-    form_class = EntryForm
-    link_form_class = InlineLinkFormSet
-    template_name = 'challenges/edit.html'
+    This mixin handles looking up the submission and checking user permissions.
+    
+    """
     
     def _get_challenge(self):
         return get_object_or_404(Challenge,
@@ -145,10 +147,31 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
         return Submission.objects.filter(phase__challenge=self._get_challenge())
     
     def get_object(self, *args, **kwargs):
-        obj = super(EditEntryView, self).get_object(*args, **kwargs)
-        if not obj.editable_by(self.request.user):
+        obj = super(SingleSubmissionMixin, self).get_object(*args, **kwargs)
+        if not self._check_permission(obj, self.request.user):
             raise PermissionDenied()
         return obj
+    
+    def _check_permission(self, submission, user):
+        """Check the given user is allowed to use this view.
+        
+        Return True if the operation is allowed; otherwise return False.
+        
+        Inheriting views should override this with the appropriate permission
+        checks.
+        
+        """
+        return True
+
+
+class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
+    
+    form_class = EntryForm
+    link_form_class = InlineLinkFormSet
+    template_name = 'challenges/edit.html'
+    
+    def _check_permission(self, submission, user):
+        return submission.editable_by(user)
     
     # The following two methods are analogous to Django's generic form methods
     
@@ -216,3 +239,25 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
 
 
 entry_edit = EditEntryView.as_view()
+
+
+class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
+    
+    template_name = 'challenges/delete.html'
+    success_url = '/'
+    
+    def _check_permission(self, submission, user):
+        return submission.deletable_by(user)
+    
+    def get_context_data(self, **kwargs):
+        context = super(DeleteEntryView, self).get_context_data(**kwargs)
+        context['challenge'] = self._get_challenge()
+        context['project'] = context['challenge'].project
+        return context
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DeleteEntryView, self).dispatch(*args, **kwargs)
+
+
+entry_delete = DeleteEntryView.as_view()

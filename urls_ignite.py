@@ -21,6 +21,7 @@ urlpatterns = patterns('',
     url(r'^ideas/$', redirect_to, kwargs={'url': '/', 'permanent': False}),
     url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
     url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
+    url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
     url(r'^entries/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
 )
 
