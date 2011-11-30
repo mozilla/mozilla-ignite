@@ -38,6 +38,7 @@
         {% endif %}
         <form action="" method="post">
             {{ csrf()|safe }}
+            <a href={{ object.get_absolute_url() }} class="back">{{ _('No, take me back') }}</a>
             <button class="submit sans" type="submit">{{ _('Delete entry') }}</button>
         </form>
     </div>

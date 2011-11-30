@@ -28,7 +28,8 @@
     {{ csrf()|safe }}
     <p>Are you <em>certain</em> you want to remove your idea?</p>
     {% block submit %}
-    <input class="cta" type="submit" value="{{ _('Delete idea permanently') }}" />
+    <a href={{ object.get_absolute_url() }} class="back">{{ _('No, take me back') }}</a>
+    <input class="cta" type="submit" value="{{ _('Delete this idea permanently') }}" />
     {% endblock %}
 </form>
 {% endblock %}
