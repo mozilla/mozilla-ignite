@@ -314,9 +314,12 @@ aside .do {
     color: #fff;
 }
 .masthead .brand {
-    margin-top: 0;
-    padding-top: 1em;
+    margin: 20px 0;
+    padding: 0;
     color: #fff;
+}
+.masthead .brand  img {
+    display: block;
 }
 .tab {
     position: absolute;
@@ -333,7 +336,6 @@ aside .do {
     overflow: hidden;
     margin: 0;
     padding-left: 0;
-    text-transform: lowercase;
 }
 .masthead ul li {
     float: left;
@@ -346,7 +348,7 @@ aside .do {
 .masthead ul a {
     padding: 1em;
     display: block;
-    font-size: 11px;
+    font-size: 12px;
 }
 .masthead ul li:first-child a {
     padding-left: 0;
@@ -414,6 +416,10 @@ aside .do {
 .partners h2 {
     float: left;
     margin: 1em 0 0; /* 1em = 18px; */
+    font-family: "MetaWebPro-Black";
+    font-weight: normal;
+    text-transform: uppercase;
+    font-size: 18px;
 }
 .partners ul {
     float: left;
