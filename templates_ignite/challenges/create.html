@@ -24,7 +24,7 @@
 {% endblock %}
 
 {% block content %}   
-<form action="{{ url('create_entry') }}" method="post" enctype="multipart/form-data">
+<form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <div>
         <label for="id_title" class="announce">{{ _('Title') }}</label>
@@ -52,7 +52,11 @@
         {{ link_form.management_form }}
         {% for link in link_form.forms %}
             <div class="inline_field">
-                {% for field in link %}
+                {% for field in link.hidden_fields() %}
+                {{ field }}
+                {% endfor %}
+                
+                {% for field in link.visible_fields() %}
                     {{ field.label_tag() }}
                     {{ field }}
                 {% endfor %}
@@ -64,6 +68,8 @@
         <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
         <p class="hint" id="info_is_draft">{{ _("Not ready for the world to see your idea yet? Save as draft and it will go public when you're ready") }}</p>
      </div>
+     {% block submit %}
      <input class="cta" type="submit" value="{{ _('Create idea') }}" />
+     {% endblock %}
 </form>
 {% endblock %}

@@ -185,9 +185,15 @@ class Submission(BaseModel):
         """Return the URL to edit this submission."""
         return self._lookup_url('entry_edit', {'pk': self.id})
     
+    def get_delete_url(self):
+        """Return the URL to delete this submission."""
+        return self._lookup_url('entry_delete', {'pk': self.id})
+    
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
         return user.is_superuser or self.owned_by(user)
+    
+    deletable_by = editable_by
     
     def owned_by(self, user):
         """Return True if user provided owns this entry."""

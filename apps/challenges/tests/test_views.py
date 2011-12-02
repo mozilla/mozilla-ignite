@@ -12,7 +12,7 @@ import test_utils
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
-from challenges.models import Challenge, Submission, Phase
+from challenges.models import Challenge, Submission, Phase, ExternalLink
 from projects.models import Project
 
 
@@ -55,7 +55,7 @@ def challenge_setup():
 
 def challenge_teardown():
     """Tear down any data created by these tests."""
-    for model in [Submission, Phase, Challenge, Project, User]:
+    for model in [ExternalLink, Submission, Phase, Challenge, Project, User]:
         model.objects.all().delete()
 
 
@@ -157,6 +157,23 @@ class ChallengeEntryTest(test_utils.TestCase):
 BLANK_EXTERNALS = {'externals-TOTAL_FORMS': '1',
                    'externals-INITIAL_FORMS': '0',
                    'externals-MAX_NUM_FORMS': ''}
+
+
+def _build_links(initial_count, *forms):
+    prefix = 'externals'
+    form_data = {}
+    form_data.update({'%s-TOTAL_FORMS' % prefix: str(len(forms)),
+                      '%s-INITIAL_FORMS' % prefix: str(initial_count),
+                      '%s-MAX_NUM_FORMS' % prefix: ''})
+    for i, form in enumerate(forms):
+        for key, value in form.iteritems():
+            form_data['%s-%s-%s' % (prefix, i, key)] = value
+    
+    return form_data
+
+
+def _form_from_link(link_object):
+    return dict((k, getattr(link_object, k)) for k in ['id', 'name', 'url'])
 
 
 class CreateEntryTest(test_utils.TestCase):
@@ -334,6 +351,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
         assert_equal(Submission.objects.get().description, data['description'])
@@ -350,6 +368,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 302)
         assert 'seriously' not in Submission.objects.get().description
@@ -368,6 +387,7 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 403)
         assert 'seriously' not in Submission.objects.get().description
@@ -386,6 +406,151 @@ class EditEntryTest(test_utils.TestCase):
         data = dict(title=Submission.objects.get().title,
                     brief_description='A submission',
                     description='A really, seriously good submission')
+        data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
         assert_equal(Submission.objects.get().description, data['description'])
+
+
+class EditLinkTest(test_utils.TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        
+        alex_profile = User.objects.get(username='alex').get_profile()
+        _create_submissions(1, creator=alex_profile)
+        
+        submission = Submission.objects.get()
+        
+        base_kwargs = {'project': Project.objects.get().slug,
+                       'slug': Challenge.objects.get().slug}
+        
+        view_kwargs = dict(entry_id=submission.id, **base_kwargs)
+        self.view_path = reverse('entry_show', kwargs=view_kwargs)
+        
+        edit_kwargs = dict(pk=submission.id, **base_kwargs)
+        self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
+        
+        ExternalLink.objects.create(submission=submission, name='Foo',
+                                    url='http://example.com/')
+        ExternalLink.objects.create(submission=submission, name='Foo',
+                                    url='http://example.net/')
+        
+        self.client.login(username='alex', password='alex')
+    
+    def _base_form(self):
+        submission = Submission.objects.get()
+        return {'title': submission.title,
+                'brief_description': submission.brief_description,
+                'description': submission.description}
+    
+    @suppress_locale_middleware
+    def test_preserve_links(self):
+        """Test submission when the links are not changed."""
+        form_data = self._base_form()
+        links = ExternalLink.objects.all()
+        form_data.update(_build_links(2, *map(_form_from_link, links)))
+        
+        response = self.client.post(self.edit_path, form_data)
+        
+        self.assertRedirects(response, self.view_path)
+        self.assertEqual(ExternalLink.objects.count(), 2)
+    
+    @suppress_locale_middleware
+    def test_remove_links(self):
+        """Test submission with blank link boxes.
+        
+        All the links should be deleted, as the forms are blank.
+        
+        """
+        form_data = self._base_form()
+        links = ExternalLink.objects.all()
+        link_forms = [{'id': link.id} for link in links]
+        form_data.update(_build_links(2, *link_forms))
+        
+        response = self.client.post(self.edit_path, form_data)
+        
+        self.assertRedirects(response, self.view_path)
+        self.assertEqual(ExternalLink.objects.count(), 0)
+    
+    @suppress_locale_middleware
+    def test_add_links(self):
+        """Test adding links to a submission without any."""
+        ExternalLink.objects.all().delete()
+        
+        form_data = self._base_form()
+        link_forms = [{'name': 'Cheese', 'url': 'http://cheese.com/'},
+                      {'name': 'Pie', 'url': 'http://en.wikipedia.org/wiki/Pie'}]
+        form_data.update(_build_links(0, *link_forms))
+        
+        response = self.client.post(self.edit_path, form_data)
+        
+        self.assertRedirects(response, self.view_path)
+        self.assertEqual(ExternalLink.objects.count(), 2)
+        
+        cheese_link = ExternalLink.objects.get(name='Cheese')
+        self.assertEqual(cheese_link.url, 'http://cheese.com/')
+        self.assertEqual(cheese_link.submission, Submission.objects.get())
+
+
+class DeleteEntryTest(test_utils.TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        _create_users()
+        
+        alex_profile = User.objects.get(username='alex').get_profile()
+        _create_submissions(1, creator=alex_profile)
+        
+        submission = Submission.objects.get()
+        
+        base_kwargs = {'project': Project.objects.get().slug,
+                       'slug': Challenge.objects.get().slug}
+        
+        view_kwargs = dict(entry_id=submission.id, **base_kwargs)
+        self.view_path = reverse('entry_show', kwargs=view_kwargs)
+        
+        delete_kwargs = dict(pk=submission.id, **base_kwargs)
+        self.delete_path = reverse('entry_delete', kwargs=delete_kwargs)
+    
+    @suppress_locale_middleware
+    def test_anonymous_delete_form(self):
+        """Check that anonymous users can't get at the form."""
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_anonymous_delete(self):
+        """Check that anonymous users can't delete entries."""
+        response = self.client.post(self.delete_path)
+        assert_equal(response.status_code, 302)
+    
+    @suppress_locale_middleware
+    def test_non_owner_access(self):
+        """Check that non-owners cannot see the delete form."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 403)
+    
+    @suppress_locale_middleware
+    def test_non_owner_delete(self):
+        """Check that users cannot delete each other's submissions."""
+        self.client.login(username='bob', password='bob')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 403)
+        assert Submission.objects.exists()
+    
+    @suppress_locale_middleware
+    def test_delete_form(self):
+        self.client.login(username='alex', password='alex')
+        
+        response = self.client.get(self.delete_path)
+        assert_equal(response.status_code, 200)
+    
+    @suppress_locale_middleware
+    def test_delete(self):
+        self.client.login(username='alex', password='alex')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 302)
+        assert_equal(Submission.objects.count(), 0)

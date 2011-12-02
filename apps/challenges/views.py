@@ -9,11 +9,12 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.edit import UpdateView
+from django.views.generic.detail import SingleObjectMixin
+from django.views.generic.edit import UpdateView, DeleteView
 import jingo
 from tower import ugettext as _
 
-from challenges.forms import EntryForm, EntryLinkForm
+from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
 from challenges.models import Challenge, Phase, Submission, ExternalLink
 from projects.models import Project
 
@@ -43,6 +44,18 @@ def show(request, project, slug, template_name='challenges/show.html'):
 def entries_all(request, project, slug):
     """Show all entries (submissions) to a challenge."""
     return show(request, project, slug, template_name='challenges/all.html')
+
+
+def extract_form_errors(form, link_form):
+    form_errors = {}
+    # this feels horrible but I think required to create a custom error list
+    for k in form.errors.keys():
+        humanised_key = challenge_humanised[k]
+        form_errors[humanised_key] =  form.errors[k].as_text()
+    if not link_form.is_valid():
+        form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
+    
+    return form_errors
 
 
 @login_required
@@ -78,13 +91,7 @@ def create_entry(request, project, slug):
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
         else:
-            form_errors = {}
-            # this feels horrible but I think required to create a custom error list
-            for k in form.errors.keys():
-                humanised_key = challenge_humanised[k]
-                form_errors[humanised_key] =  form.errors[k].as_text()
-            if not link_form.is_valid():
-                form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
+            form_errors = extract_form_errors(form, link_form)
     else:
         form = EntryForm()
         link_form = LinkFormSet(prefix='externals')
@@ -124,10 +131,12 @@ class JingoTemplateMixin(TemplateResponseMixin):
                             **response_kwargs)
 
 
-class EditEntryView(UpdateView, JingoTemplateMixin):
+class SingleSubmissionMixin(SingleObjectMixin):
+    """Mixin for views operating on a single submission.
     
-    form_class = EntryForm
-    template_name = 'challenges/edit.html'
+    This mixin handles looking up the submission and checking user permissions.
+    
+    """
     
     def _get_challenge(self):
         return get_object_or_404(Challenge,
@@ -138,10 +147,85 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
         return Submission.objects.filter(phase__challenge=self._get_challenge())
     
     def get_object(self, *args, **kwargs):
-        obj = super(EditEntryView, self).get_object(*args, **kwargs)
-        if not obj.editable_by(self.request.user):
+        obj = super(SingleSubmissionMixin, self).get_object(*args, **kwargs)
+        if not self._check_permission(obj, self.request.user):
             raise PermissionDenied()
         return obj
+    
+    def _check_permission(self, submission, user):
+        """Check the given user is allowed to use this view.
+        
+        Return True if the operation is allowed; otherwise return False.
+        
+        Inheriting views should override this with the appropriate permission
+        checks.
+        
+        """
+        return True
+
+
+class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
+    
+    form_class = EntryForm
+    link_form_class = InlineLinkFormSet
+    template_name = 'challenges/edit.html'
+    
+    def _check_permission(self, submission, user):
+        return submission.editable_by(user)
+    
+    # The following two methods are analogous to Django's generic form methods
+    
+    def get_link_form(self, link_form_class):
+        return link_form_class(**self.get_link_form_kwargs())
+    
+    def get_link_form_kwargs(self):
+        form_kwargs = super(EditEntryView, self).get_form_kwargs()
+        # Initial data doesn't apply to formsets
+        del form_kwargs['initial']
+        form_kwargs.update(instance=self.object, prefix='externals')
+        return form_kwargs
+    
+    def get_forms(self):
+        """Return the forms available to this view as a dictionary."""
+        form = self.get_form(self.get_form_class())
+        link_form = self.get_link_form(self.link_form_class)
+        return {'form': form, 'link_form': link_form}
+    
+    def get(self, request, *args, **kwargs):
+        """Respond to a GET request by displaying the edit form."""
+        self.object = self.get_object()
+        
+        context = self.get_context_data(**self.get_forms())
+        return self.render_to_response(context)
+    
+    def post(self, request, *args, **kwargs):
+        """Handle a POST request.
+        
+        If the forms are both valid, save them and redirect to the success URL.
+        If either form is invalid, render the form with the errors displayed.
+        
+        """
+        self.object = self.get_object()
+        
+        forms = self.get_forms()
+        form, link_form = forms['form'], forms['link_form']
+        
+        if form.is_valid() and link_form.is_valid():
+            return self.form_valid(form, link_form)
+        else:
+            return self.form_invalid(form, link_form)
+    
+    def form_valid(self, form, link_form):
+        response = super(EditEntryView, self).form_valid(form)
+        link_form.save()
+        return response
+    
+    def form_invalid(self, form, link_form):
+        """Display the form with errors."""
+        form_errors = extract_form_errors(form, link_form)
+        context = self.get_context_data(form=form, link_form=link_form,
+                                        errors=form_errors)
+        return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
         context = super(EditEntryView, self).get_context_data(**kwargs)
@@ -155,3 +239,25 @@ class EditEntryView(UpdateView, JingoTemplateMixin):
 
 
 entry_edit = EditEntryView.as_view()
+
+
+class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
+    
+    template_name = 'challenges/delete.html'
+    success_url = '/'
+    
+    def _check_permission(self, submission, user):
+        return submission.deletable_by(user)
+    
+    def get_context_data(self, **kwargs):
+        context = super(DeleteEntryView, self).get_context_data(**kwargs)
+        context['challenge'] = self._get_challenge()
+        context['project'] = context['challenge'].project
+        return context
+    
+    @method_decorator(login_required)
+    def dispatch(self, *args, **kwargs):
+        return super(DeleteEntryView, self).dispatch(*args, **kwargs)
+
+
+entry_delete = DeleteEntryView.as_view()

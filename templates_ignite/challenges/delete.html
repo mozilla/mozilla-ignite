@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{{ _('Delete idea') }} | {% endblock %}
+
+{% block page_id %}delete_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+<h1 class="shout">{% block page_heading %}Delete a submission{% endblock %}</h1>
+{% endblock %}
+
+{% block alerts %}
+{% if errors %}
+<section class="alerts errors">
+    <h2 class="busta">{{ _('Opps! We came across a few errors') }}</h2>
+    <ul class="busta">
+    {% for error in errors %}
+    <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
+    {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block content %}   
+<form action="" method="post" enctype="multipart/form-data">
+    {{ csrf()|safe }}
+    <p>Are you <em>certain</em> you want to remove your idea?</p>
+    {% block submit %}
+    <a href={{ object.get_absolute_url() }} class="back">{{ _('No, take me back') }}</a>
+    <input class="cta" type="submit" value="{{ _('Delete this idea permanently') }}" />
+    {% endblock %}
+</form>
+{% endblock %}

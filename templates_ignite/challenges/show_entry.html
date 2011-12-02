@@ -16,8 +16,10 @@
         {% if entry.editable_by(user) %}
         {% if entry.owned_by(user) %}
         <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+        <a href="{{ entry.get_delete_url() }}" class="cta do">Delete your idea</a>
         {% else %}
         <a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a>
+        <a href="{{ entry.get_delete_url() }}" class="cta do">Delete this idea</a>
         {% endif %}
         {% endif %}
         <div class="columns">
