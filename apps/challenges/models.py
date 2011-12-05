@@ -135,6 +135,9 @@ class Submission(BaseModel):
         return cached_bleach(self.description)
     
     created_by = models.ForeignKey(Profile)
+    created_on = models.DateTimeField(
+        default=datetime.utcnow()
+    )
     
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     """

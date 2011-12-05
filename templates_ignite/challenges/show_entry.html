@@ -25,11 +25,13 @@
         <div class="columns">
         <div class="col box">
             <div class="widgets">
-                <p>Submitted on...</p>
+                <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
             </div>
+            {% if entry.sketh_note %}
             <div class="frame box sketh">
                 <img src="{{ MEDIA_URL }}/{{ entry.sketh_note }}" alt="" />
             </div>
+            {% endif %}
             <div class="description">
             {{ entry.description_html }}
             </div>

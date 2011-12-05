@@ -531,7 +531,7 @@ section footer a {
 #show_submission .description {
     font-size: 18px;
     color: #5c5c5c;
-    margin-bottom: 2em;
+    margin: 1em 0 2em;
 }
 #show_submission .entre address a {
     font-weight: bold;
