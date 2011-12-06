@@ -18,6 +18,9 @@
     float: right;
     margin-right: 130px;
 }
+.user_tools {
+    float: right;
+}
 /**= Overrides from devices.css */
 .busta {
     max-width: 980px;
@@ -51,9 +54,6 @@
 #show_submission h1 {
     float: left;
     width: 67%;
-}
-#show_submission .do {
-    float: right;
 }
 #show_submission .entre div.col {
     width: 67%;

@@ -14,7 +14,9 @@
 <a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
 {% endif %}
 {% if user.get_profile() == profile %}
-<a href="{{ url('users_edit') }}" class="cta do">{{ _('Edit your profile') }}</a>
+<ul class="user_tools">
+<li><a href="{{ url('users_edit') }}" class="cta do">{{ _('Edit your profile') }}</a></li>
+</ul>
 {% endif %}
 <div class="frame box">
     <img src="{{ profile.avatar_url(80) }}" alt="" width="80" height="80" />

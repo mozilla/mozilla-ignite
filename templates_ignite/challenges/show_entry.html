@@ -14,13 +14,15 @@
     <article>
         <h1 class="shout">{{ entry.title }}</h1>
         {% if entry.editable_by(user) %}
+        <ul class="user_tools">
         {% if entry.owned_by(user) %}
-        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
-        <a href="{{ entry.get_delete_url() }}" class="cta do">Delete your idea</a>
+            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a></li>
+            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your idea</a></li>
         {% else %}
-        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a>
-        <a href="{{ entry.get_delete_url() }}" class="cta do">Delete this idea</a>
+            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a></li>
+            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this idea</a></li>
         {% endif %}
+        </ul>
         {% endif %}
         <div class="columns">
         <div class="col box">
@@ -49,8 +51,8 @@
             </section>
             <section>
                 <form action="" method="get">
-                    {{ csrf|safe() }}
-                    <input type="submit" class="cta do" value="{{ _('Give this a thumbs up') }}" />
+                    {{ csrf()|safe }}
+                    <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
             </section>
             <section>

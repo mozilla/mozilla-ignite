@@ -65,6 +65,10 @@ p {
 }
 .entre {
     padding: 2em 0;
+    background: transparent url(../img/css/grid.png) repeat-x 0 0;
+}
+.promo .entre {
+    background: none;
 }
 .columns {
     overflow: hidden;
@@ -156,10 +160,8 @@ legend span {
     display: inline-block;
 }
 .do {
-    margin-bottom: 1em;
     font-size: 12px;
     color: #333 !important;
-    float: right;
     font-family: Arial;
     text-transform: none;
     border: 1px solid #dcdcdc;
@@ -173,8 +175,18 @@ legend span {
     background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
 }
-aside .do {
-    float: none;
+.thumb {
+    background: transparent url(../img/css/thumbs_up.png) no-repeat 10px 50%;
+    background-image: url(../img/css/thumbs_up.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-position: 10px 50%, 0 0;
+    padding-left: 40px;
+}
+.user_tools {
+    list-style-type: none;
+}
+.user_tools li {
+    float: left;
+    margin-left: 10px;
 }
 .alerts {
     padding: 1em 0;
@@ -368,6 +380,13 @@ aside .do {
     float: left;
     clear: left;
     margin-right: 20px;
+    padding-left: 40px;
+    background: transparent url(../img/css/arrow.png) no-repeat 0 50%;
+}
+.promo .back {
+    margin-bottom: 0.5em;
+    padding-left: 20px;
+    background: transparent url(../img/css/back.png) no-repeat 0 50%;
 }
 /* External links */
 .external {
@@ -453,6 +472,8 @@ section footer a {
     font-family: "LeagueGothic";
     text-transform: uppercase;
     float: right;
+    padding-right: 40px;
+    background: transparent url(../img/css/arrow.png) no-repeat 100% 50%;
 }
 #splash .entre footer {
     border-bottom: 6px solid #000;
@@ -562,12 +583,6 @@ section footer a {
     font-size: 12px;
     margin-top: 0;
 }
-#show_submission aside section .do {
-    float: none;
-}
-#show_submission aside section .do {
-    float: none;
-}
 .browser ul {
     padding-left: 0;
     font-size: 12px;
@@ -583,7 +598,7 @@ section footer a {
     width: 100%;
 }
 /* Profile page */
-#user_profile .entre  {
+#user_profile .promo .entre  {
     width: 67%;
     padding-left: 110px;
     padding-top: 0;
@@ -598,8 +613,8 @@ section footer a {
     top: 0;
     left: 0;
 }
-#user_profile .do {
-    margin-top: -2em;
+#user_profile .user_tools {
+    margin-top: -1.5em;
 }
 #user_profile .columns {
     border-bottom: 1px solid #dcdcdc;
