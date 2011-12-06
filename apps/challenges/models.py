@@ -118,6 +118,13 @@ class ExternalLink(BaseModel):
         return u"%s -> %s" % (self.name, self.url)
 
 
+class Category(BaseModel):
+    name = models.CharField(verbose_name=_(u'Name'), max_length=60, unique=True)
+    slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
+
+    def __unicode__(self):
+        return self.name
+
 class Submission(BaseModel):
     """A user's entry into a challenge."""
     
