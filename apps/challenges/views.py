@@ -109,10 +109,20 @@ def entry_show(request, project, slug, entry_id):
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
                               phase__challenge=challenge)
+    try:
+        previous = entry.get_previous_by_created_on()
+    except Submission.DoesNotExist:
+        previous = False
+    try:
+        next = entry.get_next_by_created_on()
+    except Submission.DoesNotExist:
+        next = False
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
-        'entry': entry
+        'entry': entry,
+        'previous': previous or False,
+        'next': next or False,
     })
 
 

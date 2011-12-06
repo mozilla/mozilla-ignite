@@ -68,8 +68,12 @@
                 <nav class="browser">
                 <h2>More ideas</h2>
                 <ul>
-                    <li class="box"><a href="#"><div class="frame box"><img src="" alt="" /></div>Previous</a></li>
-                    <li class="box"><a href="#"><div class="frame box"><img src="" alt="" /></div>Next</a></li>
+                {% if previous %}
+                    <li class="box"><a href="{{ previous.get_absolute_url() }}"><div class="frame box"><img src="{{ previous.get_image_src() }}" alt="" /></div>Previous</a></li>
+                {% endif %}
+                {% if next %}
+                    <li class="box"><a href="{{ next.get_absolute_url() }}"><div class="frame box"><img src="{{ next.get_image_src() }}" alt="" /></div>Next</a></li>
+                {% endif %}
                 </ul>
                 </nav>
             </section>
