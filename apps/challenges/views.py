@@ -23,7 +23,7 @@ challenge_humanised = {
     'brief_description': 'Summary',
     'description': 'Full description',
     'sketh_note': 'Napkin sketch',
-    'category': 'Tags',
+    'categories': 'Tags',
 }
 
 

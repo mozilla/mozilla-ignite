@@ -117,8 +117,26 @@ class ExternalLink(BaseModel):
     def __unicode__(self):
         return u"%s -> %s" % (self.name, self.url)
 
+class CategoryManager(BaseModelManager):
+    
+    def get_active_categories(self):
+        
+        filtered_cats = []
+        for cat in Category.objects.all():
+            cat_submissions = cat.submission_set.all()
+            if cat_submissions.count():
+                filtered_cats.append(cat)
+
+        if len(filtered_cats) == 0:
+            return False
+        else:
+            return filtered_cats
+
 
 class Category(BaseModel):
+    
+    objects = CategoryManager()
+    
     name = models.CharField(verbose_name=_(u'Name'), max_length=60, unique=True)
     slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
 
@@ -135,6 +153,7 @@ class Submission(BaseModel):
     description = models.TextField(verbose_name=_(u'Description'))
     sketh_note = models.ImageField(verbose_name=_(u'Featured image'), blank=True, null=True,
         help_text=_(u"This will be used in our summary and list views. You can add more images in your description or link out to sets or images out on the web by adding in an external link"), upload_to=settings.CHALLENGE_IMAGE_PATH)
+    categories = models.ManyToManyField(Category, blank=True, null=True)
 
     @property
     def description_html(self):

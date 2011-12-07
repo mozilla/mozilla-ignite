@@ -7,7 +7,7 @@ from challenges.models import Submission, ExternalLink, Category
 
 class EntryForm(forms.ModelForm):
 
-    category = forms.ModelMultipleChoiceField(
+    categories = forms.ModelMultipleChoiceField(
         queryset=Category.objects.all(), 
         widget=forms.CheckboxSelectMultiple
     )
@@ -21,7 +21,7 @@ class EntryForm(forms.ModelForm):
             'description',
             'is_draft',
             'sketh_note',
-            'category',
+            'categories',
         )
 
 

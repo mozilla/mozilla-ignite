@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404
 import jingo
 
-from challenges.models import Submission
+from challenges.models import Submission, Category
 from projects.models import Project
 
 
@@ -14,4 +14,5 @@ def splash(request, project, slug, template_name='challenges/show.html'):
         'project': project,
         'phases': list(enumerate(challenge.phases.all(), start=1)),
         'entries': Submission.objects.filter(phase__challenge=challenge)[:10],
+        'categories': Category.objects.get_active_categories(),
     })

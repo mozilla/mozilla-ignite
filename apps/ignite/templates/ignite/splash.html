@@ -22,9 +22,11 @@
 <nav class="tags">
     <ul>
         <li><a class="current" href="#">all</a></li>
-        {% for tag in ['manufacturing', 'health', 'education', 'energy'] %}
-            <li><a href="#">{{ tag }}</a></li>
+        {% if categories %}
+        {% for cat in categories %}
+            <li><a href="#">{{ cat.name }}</a></li>
         {% endfor %}
+        {% endif %}
     </ul>
 </nav>
 <ol class="submissions columns">
