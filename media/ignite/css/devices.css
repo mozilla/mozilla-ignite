@@ -65,6 +65,7 @@ p {
 .entre {
     padding: 2em 0;
     background: transparent url(../img/css/grid.png) repeat-x 0 0;
+    position: relative;
 }
 .promo .entre {
     background: none;
