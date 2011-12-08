@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html{% block schema_org %}{% endblock %}>
 <!--[if (lt IE 9)]><html class="no-js bad-ie" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
 <!--[if (gt IE 8)|!(IE)]><html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
 <head>
@@ -13,6 +13,7 @@
     <!--[if lt IE 9]>
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    {% block social_meta %}{% endblock %}
 </head>
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
     <script type="text/javascript">
@@ -118,6 +119,7 @@
     {% block site_js %}
         {{ js('ignite_core') }}
     {% endblock %}
+    {% block page_js %}{% endblock %}
     <script>
     $(function() {
         $('#browserid').bind('click', function(e) {

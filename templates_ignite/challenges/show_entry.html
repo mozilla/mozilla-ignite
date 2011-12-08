@@ -1,8 +1,24 @@
 {% extends "base.html" %}
 
+{% block schema_org %} itemscope itemtype="http://schema.org/Product"{% endblock %}
+
 {% block page_id %}show_submission{% endblock %}
 
 {% block section_class %}entries{% endblock %}
+
+{% block social_meta %}
+<!-- google+/schema.org -->
+<meta itemprop="name" content="{{ entry.title }}">
+<meta itemprop="description" content="{{ entry.brief_description }}">
+<meta itemprop="image" content="http://www.mozillaignite.org{{ entry.get_image_src() }}">
+<!-- facebook -->
+<meta property="og:title" content="{{ entry.title }}" />
+<meta property="og:type" content="website" />
+<meta property="og:url" content="http://www.mozillaignite.org{{ entry.get_absolute_url() }}" />
+<meta property="og:image" content="http://www.mozillaignite.org{{ entry.get_image_src() }}" />
+<meta property="og:site_name" content="Mozilla Ignite" />
+<meta property="fb:admins" content="100003097810098" />
+{% endblock %}
 
 {% block header %}
 <a href="#" class="back announce">See all submissions</a>
@@ -47,7 +63,19 @@
         </div>
         <aside class="col box">
             <section class="widgets">
-                <p>Share...</p>
+                <h2>Share</h2>
+                <ul class="share">
+                <li>
+                <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="mozilla" data-related="USignite">Tweet</a>
+                </li>
+                <li>
+                <div class="g-plusone" data-size="medium" data-url="http://www.mozillaignite.org{{ entry.get_absolute_url() }}"></div>
+                </li>
+                <li>
+                <iframe src="//www.facebook.com/plugins/like.php?href=http%3A%2F%2Fwww.mozillaignite.org{{ entry.get_absolute_url() }}&amp;send=false&amp;layout=button_count&amp;width=90&amp;show_faces=false&amp;action=like&amp;colorscheme=light&amp;font&amp;height=21" scrolling="no" frameborder="0" style="border:none; overflow:hidden; width:90px; height:21px;" allowTransparency="true"></iframe>
+                </li>
+
+                </ul>
             </section>
             <section>
                 <form action="" method="get">
@@ -80,4 +108,15 @@
         </aside>
         </div>
     </article>
+{% endblock %}
+{% block page_js %}
+<script type="text/javascript">
+    (function() {
+        var po = document.createElement('script'); 
+        po.type = 'text/javascript'; 
+        po.async = true;
+        po.src = 'https://apis.google.com/js/plusone.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(po, s);
+    })();
+</script>
 {% endblock %}
