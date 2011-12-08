@@ -1,13 +1,13 @@
 {% extends 'base.html' %}
 
-{% block page_title %}{{ _('Delete idea') }} | {% endblock %}
+{% block page_title %}{{ _('Delete') }} | {{ object.title }} | {% endblock %}
 
 {% block page_id %}delete_submission{% endblock %}
 
 {% block section_class %}entries{% endblock %}
 
 {% block header %}
-<h1 class="shout">{% block page_heading %}Delete a submission{% endblock %}</h1>
+<h1 class="shout">{% block page_heading %}{{ _('Delete your submission') }}{% endblock %}</h1>
 {% endblock %}
 
 {% block alerts %}
@@ -26,10 +26,11 @@
 {% block content %}   
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
-    <p>Are you <em>certain</em> you want to remove your idea?</p>
+    <p class="announce">{{ _('Are you <em>certain</em> you want to remove your submission?') }}</p>
+    <p>{{ _("If you're not happy with your submission at the moment you can just edit it to be in draft mode and it won't be visible to other users while you decide on how to make it better.") }}</p>
     {% block submit %}
-    <a href={{ object.get_absolute_url() }} class="back">{{ _('No, take me back') }}</a>
-    <input class="cta" type="submit" value="{{ _('Delete this idea permanently') }}" />
+    <a href={{ object.get_absolute_url() }} class="back">{{ _('OK, take me back') }}</a> or
+    <input class="cta" type="submit" value="{{ _('Delete this submission permanently') }}" />
     {% endblock %}
 </form>
 {% endblock %}

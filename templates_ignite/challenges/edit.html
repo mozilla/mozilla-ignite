@@ -1,10 +1,10 @@
 {% extends "challenges/create.html" %}
 
-{% block page_title %}Edit submission | {% endblock %}
+{% block page_title %}{{ _('Edit') }} | {{ form.title.value() }} | {% endblock %}
 
 {% block page_id %}edit_submission{% endblock %}
 
-{% block page_heading %}Edit your submission{% endblock %}
+{% block page_heading %}{{ _('Edit your submission') }}{% endblock %}
 
 {% block submit %}
 <input class="cta" type="submit" value="{{ _('Save idea') }}" />

@@ -2,17 +2,19 @@
 
 {% block schema_org %} itemscope itemtype="http://schema.org/Product"{% endblock %}
 
+{% block page_title %}{{ entry.title }} | {{ _('Submissions') }} | {% endblock %}
+
 {% block page_id %}show_submission{% endblock %}
 
 {% block section_class %}entries{% endblock %}
 
 {% block social_meta %}
 <!-- google+/schema.org -->
-<meta itemprop="name" content="{{ entry.title }}">
-<meta itemprop="description" content="{{ entry.brief_description }}">
-<meta itemprop="image" content="http://www.mozillaignite.org{{ entry.get_image_src() }}">
+<meta itemprop="name" content="{{ entry.title }} | {{ _('Submissions') }} | {{ app_name }}" />
+<meta itemprop="description" content="{{ entry.brief_description }}" />
+<meta itemprop="image" content="http://www.mozillaignite.org{{ entry.get_image_src() }}" />
 <!-- facebook -->
-<meta property="og:title" content="{{ entry.title }}" />
+<meta property="og:title" content="{{ entry.title }} | {{ _('Submissions') }} | {{ app_name }}" />
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://www.mozillaignite.org{{ entry.get_absolute_url() }}" />
 <meta property="og:image" content="http://www.mozillaignite.org{{ entry.get_image_src() }}" />
@@ -32,11 +34,11 @@
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
-            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a></li>
-            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your idea</a></li>
+            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
+            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
         {% else %}
-            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this idea</a></li>
-            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this idea</a></li>
+            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this submission</a></li>
+            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>
         {% endif %}
         </ul>
         {% endif %}
