@@ -53,11 +53,11 @@
             <div class="description">
             {{ entry.description_html }}
             </div>
-            <address>
-                <p><a href="{{ entry.created_by.get_absolute_url }}">{{ entry.created_by.name }}</a></p>
+            <address class="vcard">
+                <p><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
                 <div class="frame box">
-                    <img src="{{ entry.created_by.get_gravatar_url(80) }}" width="80" height="80" alt="" />
+                    <img class="photo" src="{{ entry.created_by.get_gravatar_url(80) }}" width="80" height="80" alt="" />
                 </div>
             </address>
         </div>
