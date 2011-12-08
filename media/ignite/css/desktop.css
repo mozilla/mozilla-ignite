@@ -50,6 +50,9 @@
 #splash .entre .col {
     width: 20%;
 }
+#splash .entre .col:nth-child(6n) {
+    clear: left;
+}
 /* single submission */
 #show_submission h1 {
     float: left;
