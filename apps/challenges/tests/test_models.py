@@ -116,10 +116,22 @@ class CategoryManager(TestCase):
             challenge=self.challenge
         )
         self.user = User.objects.create_user('bob', 'bob@bob.com', 'bob')
-        self.category = Category.objects.create(
+        self.c1 = Category.objects.create(
             name=u'Testing',
             slug=u'testing'
         )
+        self.c2 = Category.objects.create(
+            name=u'Ross',
+            slug=u'ross'
+        )
+        self.submission = Submission.objects.create(
+            title=u'Category',
+            brief_description=u'Blah',
+            description=u'Foot',
+            phase=self.phase,
+            created_by=self.user.get_profile()
+        )
+
 
     def test_initial_return(self):
         """
@@ -131,13 +143,6 @@ class CategoryManager(TestCase):
         """
         Test that we return only categories with submissions in
         """
-        self.submission = Submission.objects.create(
-            title=u'Category',
-            brief_description=u'Blah',
-            description=u'Foo',
-            phase=self.phase,
-            created_by=self.user.get_profile(),
-            categories=[self.category]
-        )
+        self.submission.categories.add(self.c1)
         self.cats = Category.objects.get_active_categories()
         self.assertEqual(len(self.cats), 1)
