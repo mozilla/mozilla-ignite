@@ -1,6 +1,6 @@
 # This is an example settings_local.py file.
 # Copy it and add your local settings here.
-
+import os
 # This might be better implemented as a module name, as with Django's
 # DJANGO_SETTINGS_MODULE environment variable, but Python doesn't like
 # importing '*' from a module determined at runtime
