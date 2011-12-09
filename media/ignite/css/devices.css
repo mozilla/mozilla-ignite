@@ -23,6 +23,12 @@ a:focus,
 a:active {
     text-decoration: underline;
 }
+address {
+    font-style: normal;
+}
+aside {
+    position: relative;
+}
 h1 {
     margin-top: 0;
     color: #333;
@@ -174,6 +180,7 @@ legend span {
     font-size: 20px;
     box-shadow: 0 2px 0 #ebebeb;
     display: inline-block;
+    letter-spacing: 0.6px;
 }
 .do {
     font-size: 12px;
@@ -190,6 +197,7 @@ legend span {
     background-image: -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    letter-spacing: 0
 }
 .thumb {
     background: transparent url(../img/css/thumbs_up.png) no-repeat 10px 50%;
@@ -278,7 +286,7 @@ legend span {
     position: relative;
     display: block;
     font-weight: bold;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.4);
 }
 .sorting a.current:before {
     position: absolute;
@@ -318,7 +326,7 @@ legend span {
     font-size: 12px;
 }
 .tags a {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.4);
     display: block;
     padding: 0.4em 12px;
     -moz-border-radius: 4px;
@@ -626,22 +634,18 @@ section footer a {
 }
 /* Profile page */
 #user_profile .promo .entre  {
-    width: 67%;
-    padding-left: 110px;
     padding-top: 0;
     position: relative;
 }
 #user_profile .vcard {
     margin-bottom: 1.5em;
+    padding-left: 110px;
 }
 #user_profile .vcard .frame {
     width: 90px;
     position: absolute;
     top: 0;
     left: 0;
-}
-#user_profile .user_tools {
-    margin-top: -1.5em;
 }
 #user_profile .columns {
     border-bottom: 1px solid #dcdcdc;

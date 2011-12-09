@@ -1,14 +1,21 @@
 /**= Desktop only */
+.columns {
+    margin-left: -10px;
+}
 .col {
     float: left;
     padding: 10px;
     width: 33%;
 }
-.col:first-child {
-    padding-left: 0;
-}
 .col img {
     width: 100%;
+}
+#user_profile .user_tools {
+    margin-top: -1.5em;
+}
+#user_profile .promo .entre  {
+    width: 67%;
+    padding-left: 110px;
 }
 /* Masthead */
 .masthead .brand {
@@ -75,4 +82,7 @@
 }
 #show_submission .entre div.col {
     width: 67%;
+}
+#user_profile .vcard {
+    padding-left: 0;
 }

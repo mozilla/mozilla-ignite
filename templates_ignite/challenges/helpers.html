@@ -6,7 +6,7 @@
     <p>{{ _('Created by you') }}</p>
     {% else %}
         {% if submission.created_by.name %}
-        <p>{{ _('Created by %(name)s')|format(name=submission.created_by.name) }}</p>
+        <p>{{ _('Created by') }} <a href="{{ url('users_profile', username=submission.created_by.user.username) }}" class="fn url">{{ submission.created_by.name }}</a></p>
         {% else %}
         <p>{{ _('Created by an unnamed user') }}</p>
         {% endif %}
