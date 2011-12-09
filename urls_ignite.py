@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
+from django.http import HttpResponseRedirect
 from django.views.generic.simple import redirect_to
 from jingo.views import direct_to_template
 
@@ -23,6 +24,8 @@ urlpatterns = patterns('',
     url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
     url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
     url(r'^entries/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
+    # quick redirect to send all requests to /blog/ to the blog itself
+    url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),
 )
 
 # Handle 404 and 500 errors
