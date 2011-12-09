@@ -10,6 +10,9 @@
 .col img {
     width: 100%;
 }
+#disqus_thread img {
+    width: auto;
+}
 #user_profile .user_tools {
     margin-top: -1.5em;
 }
