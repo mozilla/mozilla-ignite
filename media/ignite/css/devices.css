@@ -132,6 +132,22 @@ legend span {
     margin-bottom: 0;
     vertical-align: middle;
 }
+.stacked_field ul {
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.stacked_field label {
+    font-weight: normal;
+    font-size: 14px;
+    color: #5c5c5c;
+    float: left;
+    clear: left;
+    padding: 0.2em 10px 0.2em 0;
+}
+.stacked_field input {
+    margin-right: 10px;
+}
 .image_form {
     overflow: hidden;
 }

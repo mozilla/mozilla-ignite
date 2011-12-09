@@ -2,19 +2,26 @@ from django import forms
 from django.forms.models import inlineformset_factory
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink
+from challenges.models import Submission, ExternalLink, Category
 
 
 class EntryForm(forms.ModelForm):
-    
+
+    categories = forms.ModelMultipleChoiceField(
+        queryset=Category.objects.all(), 
+        widget=forms.CheckboxSelectMultiple
+    )
+     
     class Meta:
         model = Submission
+ 
         fields = (
             'title',
             'brief_description',
             'description',
             'is_draft',
             'sketh_note',
+            'categories',
         )
 
 

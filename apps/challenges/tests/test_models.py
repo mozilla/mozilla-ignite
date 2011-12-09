@@ -6,7 +6,7 @@ from django.test import TestCase
 from mock import Mock, patch
 
 from projects.models import Project
-from challenges.models import Challenge, Submission, Phase
+from challenges.models import Challenge, Submission, Phase, Category
 
 
 def _create_project_and_challenge():
@@ -94,3 +94,55 @@ class EntriesToLive(TestCase):
         """
         self.assertEqual(self.submission.description_html,
                          '&lt;h3&gt;Testing bleach&lt;/h3&gt;')
+
+
+class CategoryManager(TestCase):
+    
+    def setUp(self):
+        self.project = Project.objects.create(
+            name=u'Test Project',
+            allow_participation=True
+        )
+        self.challenge = Challenge.objects.create(
+            title=u'Testing categories',
+            end_date=u'2020-11-30 12:23:28',
+            description=u'Blah',
+            project=self.project,
+            moderate=False
+        )
+        self.phase = Phase.objects.create(
+            name=u'Phase 1',
+            order=1,
+            challenge=self.challenge
+        )
+        self.user = User.objects.create_user('bob', 'bob@bob.com', 'bob')
+        self.c1 = Category.objects.create(
+            name=u'Testing',
+            slug=u'testing'
+        )
+        self.c2 = Category.objects.create(
+            name=u'Ross',
+            slug=u'ross'
+        )
+        self.submission = Submission.objects.create(
+            title=u'Category',
+            brief_description=u'Blah',
+            description=u'Foot',
+            phase=self.phase,
+            created_by=self.user.get_profile()
+        )
+
+
+    def test_initial_return(self):
+        """
+        Test that with no categories containing submissions returns nothing
+        """
+        self.assertEqual(Category.objects.get_active_categories(), False)
+
+    def test_results_after_submission(self):
+        """
+        Test that we return only categories with submissions in
+        """
+        self.submission.categories.add(self.c1)
+        self.cats = Category.objects.get_active_categories()
+        self.assertEqual(len(self.cats), 1)

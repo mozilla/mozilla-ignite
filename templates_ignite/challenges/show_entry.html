@@ -89,8 +89,9 @@
                 <nav class="tags">
                 <h2>Tagged as</h2>
                 <ul>
-                    <li><a href="#">Horses</a></li>
-                    <li><a href="#">Cheese</a></li>
+                    {% for category in entry.categories.all() %}
+                        <li><a href="#">{{ category }}</a></li>
+                    {% endfor %}
                 </ul>
                 </nav>
             </section>

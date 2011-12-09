@@ -63,6 +63,10 @@
             </div>
         {% endfor %}
      </fieldset>
+     <fieldset class="stacked_field">
+        <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
+        {{ form.categories }}
+     </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}
         <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
