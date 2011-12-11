@@ -202,7 +202,13 @@ legend span {
 .thumb {
     background: transparent url(../img/css/thumbs_up.png) no-repeat 10px 50%;
     background-image: url(../img/css/thumbs_up.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-position: 10px 50%, 0 0;
+    background-position: 12px 50%, 0 0;
+    padding-left: 40px;
+}
+.cancel {
+    background: transparent url(../img/css/cancel.png) no-repeat 10px 50%;
+    background-image: url(../img/css/cancel.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-position: 16px 50%, 0 0;
     padding-left: 40px;
 }
 .user_tools {
@@ -677,4 +683,7 @@ section footer a {
 }
 #user_profile .vcard .url {
     font-size: 11px;
+}
+#dsq-content-stub {
+    margin-top: 1em;
 }

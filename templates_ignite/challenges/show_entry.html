@@ -87,11 +87,17 @@
                 </ul>
             </section>
             <section>
-                {{ user_vote }}
+                {% if user_vote and user_vote.is_upvote %}
+                <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST">
+                    {{ csrf()|safe }}
+                    <input type="submit" class="cancel cta do" value="{{ _('Clear my vote') }}" />
+                </form>
+                {% else %}
                 <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST">
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
+                {% endif %}
             </section>
             <section>
                 <nav class="tags">
