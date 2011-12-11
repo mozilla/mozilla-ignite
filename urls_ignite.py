@@ -4,12 +4,20 @@ from django.contrib import admin
 from django.http import HttpResponseRedirect
 from django.views.generic.simple import redirect_to
 from jingo.views import direct_to_template
+from voting.views import vote_on_object
 
+from challenges.models import Submission
 
 admin.autodiscover()
 
 _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
                   'slug': settings.IGNITE_CHALLENGE_SLUG}
+
+vote_dict = {
+    'model': Submission,
+    'template_object_name': 'submission',
+    'allow_xmlhttprequest': True,
+}
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
@@ -23,6 +31,8 @@ urlpatterns = patterns('',
     url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
     url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
     url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
+    url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
+        vote_on_object, vote_dict, name='entry_vote'),
     url(r'^entries/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     # quick redirect to send all requests to /blog/ to the blog itself
     url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),

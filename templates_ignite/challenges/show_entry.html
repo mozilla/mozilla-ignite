@@ -30,7 +30,7 @@
 
 {% block content %}
     <article>
-        <h1 class="shout">{{ entry.title }}</h1>
+        <h1 class="shout">{{ entry.title }}</h1> 
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
@@ -46,6 +46,10 @@
         <div class="col box">
             <div class="widgets">
                 <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
+                <ul class="popularity">
+                    <li class="comment"><a href="http://www.mozillaignite.org{{ entry.get_absolute_url() }}#disqus_thread" data-disqus-identifier="{{ entry.get_absolute_url() }}">View comments</a></li>
+                    <li>Votes: {{ votes }}</li>
+                </ul>
             </div>
             {% if entry.sketh_note %}
             <div class="frame box sketh">
@@ -83,7 +87,8 @@
                 </ul>
             </section>
             <section>
-                <form action="" method="get">
+                {{ user_vote }}
+                <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST">
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
@@ -127,6 +132,18 @@
         dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
+</script>
+<script type="text/javascript">
+    var disqus_shortname = 'mozillaignite',
+        disqus_developer = 1,
+        disqus_url = 'http://www.mozillaignite.org' + '{{ entry.get_absolute_url() }}',
+        disqus_identifier = '{{ entry.get_absolute_url() }}';
+    (function () {
+        var s = document.createElement('script'); s.async = true;
+        s.type = 'text/javascript';
+        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+    }());
 </script>
 <script type="text/javascript">
     (function() {

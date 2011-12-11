@@ -563,9 +563,27 @@ section footer a {
     border-width: 1px 0;
     font-size: 12px;
     color: #333;
+    overflow: hidden;
 }
 .widgets p {
     margin-bottom: 0;
+    float: left;
+}
+.widgets .popularity {
+    float: right;
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+}
+.widgets .popularity li {
+    float: left;
+    padding-left: 30px;
+    margin-left: 20px;
+    background: transparent url(../img/css/thumbs_up_icon.png) no-repeat 5px 50%;
+}
+.widgets .popularity .comment {
+    background-image: url(../img/css/comments_icon.png);
 }
 #show_submission .promo .cta {
     float: left;
