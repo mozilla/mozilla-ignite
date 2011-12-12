@@ -171,7 +171,8 @@ MINIFY_BUNDLES = {
         'ignite_core': (
             'js/common/ext/jquery-1.6.1.min.js',
             'js/common/ext/LAB.min.js',
-            #'js/common/lacky.js',
+            'ignite/js/common/core.js',
+            'js/common/lacky.js',
         ),
     }
 }

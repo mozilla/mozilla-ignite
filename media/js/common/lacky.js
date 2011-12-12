@@ -1,9 +1,11 @@
 /**
  * @namespace Functions used to set up an app page
- * @requires jQuery, LAB.js, betafarm.areas, betafarm.data (set in template)
+ * @requires jQuery, LAB.js
+ * @param {Object} config - contents to the media location and build_id
+ * @param {Object} file_map - file mappings object defining files needed for each site, single page
  * @returns {Object} two helper methods - prepare() and furnish()
  */
-betafarm.page = function() {
+lacky = function(config, file_map) {
     var prepare, furnish;
     /**
      * Public function to load dependacies and run fucntions for a specific page
@@ -23,7 +25,7 @@ betafarm.page = function() {
      * });
      */
     furnish = function(context,o) {
-        var obj, context,  bd = betafarm.data;
+        var obj, context;
         // if no context is defined we know we're looking at the <body>
         if (!context) { 
             context = document.getElementsByTagName('body')[0];
@@ -32,7 +34,7 @@ betafarm.page = function() {
             context = document.getElementById(context) || $(context);
         }
         // if we sent an object use that otherwise use the one in betafarm.areas
-        obj = o || betafarm.areas[context.id];
+        obj = o || file_map[context.id];
         if (obj) {
             // cache these objects for later re-use
             var req = obj.requires,
@@ -57,13 +59,13 @@ betafarm.page = function() {
                 // cascade from a potential local to the default if we get an error
                 $.ajax({
                     dataType:'script',
-                    url: bd.MEDIA_URL + 'js/l10n/en-US/' + txt[0],
+                    url: config.MEDIA_URL + 'js/l10n/en-US/' + txt[0],
                     success:function() {
                         $(context).trigger('locale_loaded');
                     },
                     error:function(data) {
                         $.ajax({
-                            url: bd.MEDIA_URL + 'js/l10n/' + txt[0],
+                            url: config.MEDIA_URL + 'js/l10n/' + txt[0],
                             dataType: 'script',
                             success:function() {
                                  $(context).trigger('locale_loaded');
@@ -83,9 +85,11 @@ betafarm.page = function() {
      * @memberOf betafarm.page
      * @param {Object} common
      */
-    prepare = function(common) {
+    prepare = function() {
         // i will be 0 indexed
-        var len = common.length - 1;
+        var common = file_map.common,
+            len = common.length - 1;
+        console.log(common);
         /**
          * i: the current iteration
          * v: each object in common (above)
@@ -107,4 +111,4 @@ betafarm.page = function() {
         furnish : furnish
     }
 
-}();
+};

@@ -120,6 +120,21 @@ legend span {
     display: block;
     margin-left: -2px;
 }
+.loader {
+    margin: 0;
+    padding: 1em 0 1em 40px;
+    background: transparent url(../img/css/preloader.gif) no-repeat 6px 50%;
+    font-weight: bold;
+    border: 1px solid #fff;
+    border-width: 1px 0;
+    display: none;
+}
+.loading .loader {
+    display: block;
+}
+.loading form {
+    display: none;
+}
 .hint {
     font-size: 14px;
     margin-top: -0.5em;
