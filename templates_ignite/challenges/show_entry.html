@@ -48,7 +48,7 @@
                 <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
                 <ul class="popularity">
                     <li class="comment"><a href="http://www.mozillaignite.org{{ entry.get_absolute_url() }}#disqus_thread" data-disqus-identifier="{{ entry.get_absolute_url() }}">View comments</a></li>
-                    <li>Votes: {{ votes }}</li>
+                    <li>Votes: <span class="total_votes">{{ votes }}</span></li>
                 </ul>
             </div>
             {% if entry.sketh_note %}
@@ -88,12 +88,12 @@
             </section>
             <section>
                 {% if user_vote and user_vote.is_upvote %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST">
+                <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="cancel cta do" value="{{ _('Clear my vote') }}" />
                 </form>
                 {% else %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST">
+                <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
@@ -127,6 +127,7 @@
     </article>
 {% endblock %}
 {% block page_js %}
+<script src="{{ MEDIA_URL }}ignite/js/include/voting.js" type="text/javascript" />
 <script type="text/javascript">
     var disqus_shortname = 'mozillaignite',
         disqus_developer = 1,
