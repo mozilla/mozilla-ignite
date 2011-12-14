@@ -148,6 +148,11 @@ class CategoryManager(TestCase):
         self.cats = Category.objects.get_active_categories()
         self.assertEqual(len(self.cats), 1)
 
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submisson]:
+            model.objects.all().delete()
+
+
 
 class Phases(TestCase):
 
@@ -174,7 +179,7 @@ class Phases(TestCase):
        current = Phase.objects.get_current_phase(self.challenge.slug)
        self.assertEqual(len(current), 1)
        self.assertEqual(current[0].name, 'Phase 1')
-
+    
     def tearDown(self):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()
