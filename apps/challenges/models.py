@@ -1,4 +1,5 @@
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -81,6 +82,16 @@ class PhaseManager(BaseModelManager):
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
+    def get_current_phase(self, slug):
+        now = datetime.now()
+        return self.filter(
+            challenge__slug=slug
+        ).filter(
+            start_date__lte=now
+        ).filter(
+            end_date__gte=now
+        )
+
 
 class Phase(BaseModel):
     """A phase of a challenge."""
@@ -89,14 +100,21 @@ class Phase(BaseModel):
     
     challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
+    start_date = models.DateTimeField(verbose_name=_(u'Start date'),
+                                      default=datetime.now())
+    end_date = models.DateTimeField(verbose_name=_(u'End date'),
+                                        default=datetime.now() + relativedelta( months = +6 ))
+
     
     def natural_key(self):
         return self.challenge.natural_key() +  (self.name,)
     
     natural_key.dependencies = ['challenges.challenge']
     
-    # TODO: replace explicit numbering with start and end dates
     order = models.IntegerField()
+    
+    def days_remaining(self):
+        return self.end_date - datetime.now()
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.challenge.title)
