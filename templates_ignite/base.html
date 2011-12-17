@@ -8,8 +8,7 @@
     {% block site_css %}
         {{ css('ignite_devices') }}
     {% endblock %}
-    <link rel="stylesheet" media="all and (min-width:30em)" href="{{ MEDIA_URL }}/ignite/css/desktop.css" />
-    <script src="https://browserid.org/include.js"></script>
+    <link rel="stylesheet" media="all and (min-width:30em)" href="{{ MEDIA_URL }}ignite/css/desktop.css" />
     <!--[if lt IE 9]>
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -19,6 +18,10 @@
     <script type="text/javascript">
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
         var ignite = window.ignite || {};
+        ignite.data = {
+            MEDIA_URL : {{ MEDIA_URL }},
+            JS_BUILD_ID: 'foo'
+        };
     </script>
     <header class="masthead">
         <div class="busta clearfix">
@@ -120,20 +123,6 @@
         {{ js('ignite_core') }}
     {% endblock %}
     {% block page_js %}{% endblock %}
-    <script>
-    $(function() {
-        $('#browserid').bind('click', function(e) {
-            e.preventDefault();
-            navigator.id.getVerifiedEmail(function(assertion) {
-                if (assertion) {
-                    var $e = $('#id_assertion');
-                    $e.val(assertion.toString());
-                    $e.parent().submit();
-                }
-            });
-        });
-    });
-    </script>
     {% if not waffle.switch('in_dev') %}
         <script type="text/javascript">
             var uvOptions = {};

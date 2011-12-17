@@ -13,6 +13,7 @@ from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView, DeleteView
 import jingo
 from tower import ugettext as _
+from voting.models import Vote
 
 from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
 from challenges.models import Challenge, Phase, Submission, ExternalLink
@@ -110,6 +111,11 @@ def entry_show(request, project, slug, entry_id):
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
                               phase__challenge=challenge)
+    # Sidebar
+    ## Voting
+    user_vote = Vote.objects.get_for_user(entry, request.user)
+    votes = Vote.objects.get_score(entry)
+    ## Previous/next modules
     try:
         previous = entry.get_previous_by_created_on()
     except Submission.DoesNotExist:
@@ -124,6 +130,8 @@ def entry_show(request, project, slug, entry_id):
         'entry': entry,
         'previous': previous or False,
         'next': next or False,
+        'user_vote': user_vote,
+        'votes': votes['score'],
     })
 
 

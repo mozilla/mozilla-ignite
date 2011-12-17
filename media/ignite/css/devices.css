@@ -120,6 +120,21 @@ legend span {
     display: block;
     margin-left: -2px;
 }
+.loader {
+    margin: 0;
+    padding: 1em 0 1em 40px;
+    background: transparent url(../img/css/preloader.gif) no-repeat 6px 50%;
+    font-weight: bold;
+    border: 1px solid #fff;
+    border-width: 1px 0;
+    display: none;
+}
+.loading .loader {
+    display: block;
+}
+.loading form {
+    display: none;
+}
 .hint {
     font-size: 14px;
     margin-top: -0.5em;
@@ -215,7 +230,13 @@ legend span {
 .thumb {
     background: transparent url(../img/css/thumbs_up.png) no-repeat 10px 50%;
     background-image: url(../img/css/thumbs_up.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-position: 10px 50%, 0 0;
+    background-position: 12px 50%, 0 0;
+    padding-left: 40px;
+}
+.cancel {
+    background: transparent url(../img/css/cancel.png) no-repeat 10px 50%;
+    background-image: url(../img/css/cancel.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-position: 16px 50%, 0 0;
     padding-left: 40px;
 }
 .user_tools {
@@ -583,9 +604,31 @@ section footer a {
     border-width: 1px 0;
     font-size: 12px;
     color: #333;
+    overflow: hidden;
 }
 .widgets p {
     margin-bottom: 0;
+    float: left;
+}
+.widgets .popularity {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    list-style-type: none;
+    padding-top: 0.5em;
+    clear: left;
+}
+.widgets .popularity li {
+    float: left;
+    padding-left: 30px;
+    margin-left: 20px;
+    background: transparent url(../img/css/thumbs_up_icon.png) no-repeat 5px 50%;
+}
+.widgets .popularity li:first-child {
+    margin-left: 0;
+}
+.widgets .popularity .comment {
+    background-image: url(../img/css/comments_icon.png);
 }
 #show_submission .promo .cta {
     float: left;
@@ -679,4 +722,7 @@ section footer a {
 }
 #user_profile .vcard .url {
     font-size: 11px;
+}
+#dsq-content-stub {
+    margin-top: 1em;
 }
