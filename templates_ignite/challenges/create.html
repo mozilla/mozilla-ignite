@@ -36,10 +36,20 @@
         <p class="hint" id="info_brief_description">{{ _('Sum up your picth in 140 characters or less') }}</p>
         {{ form.brief_description }}
      </div>
-     <div>
+     <div class="image_field">
         <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
         <p class="hint" id="info_annouce">{{ _('If your idea makes more sense on paper then please include a diagram') }}</p>
-        {{ form.sketh_note }}
+        {% if form.sketh_note.value() %}
+            <div class="frame box">
+                <img src="{{ MEDIA_URL }}{{ form.sketh_note.value() }}" alt="" />
+            </div>
+            <input id="sketh_note-clear_id" type="checkbox" name="sketh_note-clear" />
+            <label for="sketh_note-clear_id">{{ _('Delete the current image') }}</label>
+            <p>{{ _("If you don't like what you've currently got upload a different image") }}</p>
+            <input type="file" id="id_sketh_note" name="sketh_note" />
+        {% else %}
+            {{ form.sketh_note }}
+        {% endif %}
      </div>
      <div>
         <label for="id_description" class="announce">{{ _('Full description') }}</label>

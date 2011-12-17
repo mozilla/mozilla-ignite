@@ -138,6 +138,19 @@ legend span {
     margin-bottom: 0;
     vertical-align: middle;
 }
+.image_field {
+    overflow: hidden;
+}
+.image_field .frame {
+    float: left;
+    width: 25%;
+    margin-right: 10px;
+    max-height: none;
+}
+.image_field input {
+    float: left;
+    margin-right: 5px;
+}
 .stacked_field ul {
     margin: 0;
     padding: 0;
