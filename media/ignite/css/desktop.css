@@ -57,6 +57,9 @@
     float: none;
     margin-right: 0;
 }
+.submissions .frame {
+    width: 100%;
+}
 .shout {
     font-size: 60px;
 }

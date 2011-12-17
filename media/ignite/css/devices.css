@@ -212,7 +212,10 @@ legend span {
 }
 .user_tools li {
     float: left;
-    margin-left: 10px;
+    margin: 0 0 1em 10px;
+}
+.user_tools li:last-child {
+    margin-bottom: 0;
 }
 .alerts {
     padding: 1em 0;
@@ -269,6 +272,7 @@ legend span {
 .frame img {
     position: relative;
     z-index: 10;
+    width: 100%;
 }
 .sorting {
     list-style-type: none;
@@ -554,6 +558,9 @@ section footer a {
     font-weight: normal;
     font-size: 15px;
     margin: 0;
+}
+.submissions .frame {
+    width: 50%;
 }
 /* Single submission */
 .widgets {
