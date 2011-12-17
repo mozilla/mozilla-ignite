@@ -64,9 +64,8 @@ def extract_form_errors(form, link_form):
 def create_entry(request, project, slug):
     project = get_object_or_404(Project, slug=project)
     
-    # Quick hack to get around the current inability to obtain current phase
     try:
-        phase = Phase.objects.filter(challenge__slug=slug)[0]
+        phase = Phase.objects.get_current_phase(slug)[0]
     except IndexError:
         raise Http404
     

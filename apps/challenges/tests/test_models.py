@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta
+from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -146,3 +147,40 @@ class CategoryManager(TestCase):
         self.submission.categories.add(self.c1)
         self.cats = Category.objects.get_active_categories()
         self.assertEqual(len(self.cats), 1)
+
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submisson]:
+            model.objects.all().delete()
+
+
+
+class Phases(TestCase):
+
+    def setUp(self):
+        self.project, self.challenge = _create_project_and_challenge()
+        
+        self.p1 = Phase.objects.create(
+            name=u'Phase 1',
+            order=1,
+            challenge=self.challenge,
+            start_date = datetime.now(),
+            end_date = datetime.now() + relativedelta( months = +1 )
+        )
+        self.p2 = Phase.objects.create(
+            name=u'Phase 2',
+            order=2,
+            challenge=self.challenge,
+            start_date = datetime.now() + relativedelta( months = +2 ),
+            end_date = datetime.now() + relativedelta( months = +3 )
+        )
+ 
+    
+    def test_get_current_open(self):
+       current = Phase.objects.get_current_phase(self.challenge.slug)
+       self.assertEqual(len(current), 1)
+       self.assertEqual(current[0].name, 'Phase 1')
+    
+    def tearDown(self):
+        for model in [Challenge, Project, Phase]:
+            model.objects.all().delete()
+
