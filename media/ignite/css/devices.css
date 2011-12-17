@@ -591,17 +591,21 @@ section footer a {
     float: left;
 }
 .widgets .popularity {
-    float: right;
     overflow: hidden;
     margin: 0;
     padding: 0;
     list-style-type: none;
+    padding-top: 0.5em;
+    clear: left;
 }
 .widgets .popularity li {
     float: left;
     padding-left: 30px;
     margin-left: 20px;
     background: transparent url(../img/css/thumbs_up_icon.png) no-repeat 5px 50%;
+}
+.widgets .popularity li:first-child {
+    margin-left: 0;
 }
 .widgets .popularity .comment {
     background-image: url(../img/css/comments_icon.png);

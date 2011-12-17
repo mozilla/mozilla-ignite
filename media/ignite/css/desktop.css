@@ -70,6 +70,11 @@
 .partners ul {
     margin: 1.1125em 0 1.1125em 20px;
 }
+.widgets .popularity {
+    float: right;
+    padding: 0;
+    clear: none;
+}
 /**= Main content */
 /* homepage */
 #splash .entre .col {
