@@ -12,7 +12,7 @@ import test_utils
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
-from challenges.models import Challenge, Submission, Phase, ExternalLink
+from challenges.models import Challenge, Submission, Phase, Category, ExternalLink
 from projects.models import Project
 
 
@@ -52,10 +52,15 @@ def challenge_setup():
     ph.order = 1
     ph.save()
 
+    cat = Category()
+    cat.name = 'Beer'
+    cat.slug = 'beer'
+    cat.save()
+
 
 def challenge_teardown():
     """Tear down any data created by these tests."""
-    for model in [ExternalLink, Submission, Phase, Challenge, Project, User]:
+    for model in [ExternalLink, Submission, Phase, Challenge, Category, Project, User]:
         model.objects.all().delete()
 
 
@@ -84,14 +89,17 @@ def _create_submissions(count, phase=None, creator=None):
         except User.DoesNotExist:
             user = User.objects.create_user('bob', 'bob@example.com', 'bob')
         creator = user.get_profile()
+
+    category = Category.objects.all()[0]
     
     titles = ['Submission %d' % i for i in range(1, count + 1)]
     for title in titles:
-        Submission.objects.create(title=title,
+        foo = Submission.objects.create(title=title,
                                   brief_description='A submission',
                                   description='A really good submission',
                                   phase=phase,
                                   created_by=creator)
+        foo.categories.add(category)
     return titles
 
 
@@ -422,7 +430,7 @@ class EditLinkTest(test_utils.TestCase):
         _create_submissions(1, creator=alex_profile)
         
         submission = Submission.objects.get()
-        
+        print submission.categories.value()
         base_kwargs = {'project': Project.objects.get().slug,
                        'slug': Challenge.objects.get().slug}
         
@@ -470,7 +478,9 @@ class EditLinkTest(test_utils.TestCase):
         form_data.update(_build_links(2, *link_forms))
         
         response = self.client.post(self.edit_path, form_data)
-        
+        print '###'
+        print response 
+        print '###'
         self.assertRedirects(response, self.view_path)
         self.assertEqual(ExternalLink.objects.count(), 0)
     
