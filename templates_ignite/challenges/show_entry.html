@@ -88,6 +88,8 @@
                 </ul>
             </section>
             <section>
+                <h2>Vote</h2>
+                {% if user.is_authenticated() %}
                 {% if user_vote and user_vote.is_upvote %}
                 <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
@@ -98,6 +100,9 @@
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
+                {% endif %}
+                {% else %}
+                <p>If you would like to vote up this submission then please login or register to Mozilla Ignite.</p>
                 {% endif %}
             </section>
             <section>
