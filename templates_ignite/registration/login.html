@@ -1,9 +1,13 @@
 {% extends "base.html" %}
 
+{% block page_title %}Please login or register | {% endblock %}
+
+{% block page_id %}create_account{% endblock %}
+
+{% block section_class %}register{% endblock %}
+
 {% block login %}{% endblock %}
 
-{% block content %}
+{% block header %}
 {% include "registration/_login_form.html" %}
 {% endblock %}
-
-{% block footer %}{% endblock %}
