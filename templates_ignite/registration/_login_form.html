@@ -1,8 +1,5 @@
-<h1 class="shout">Please login or register</h1>
-<p>Before you create a submission to Mozilla Ignite you'll need to login or create an account on the site, but don't worry we've made this as easy a process as possible.</p>
-<p>Using a new identity service from Mozilla called browserID all you need do is provide us with an email address and we'll create the account for you. If you want to know more about browserID you can read all about it at <a href="https://browserid.org/about/">browserID.org</a></p>
-<form method="POST" action="{{ browserid_target }}" id="browserid_form">
+<form method="POST" action="{{ browserid_target }}" class="browserid_form">
     {{ csrf()|safe }}
-    <input type="hidden" name="assertion" id="id_assertion" />
-    <a id="browserid" class="cta login" href="#">{{ _('Log me in') }}</a> or <a id="browserid" class="cta login" href="#">{{ _('Create an account') }}</a> 
+    <input type="hidden" name="assertion" class="id_assertion" />
+    <a class="login" href="#">{{ _('Log in') }}</a>
 </form>

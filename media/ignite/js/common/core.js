@@ -12,13 +12,14 @@ ignite.media_url = function(loc) {
 ignite.areas = {
     common : [
         {
-            elm : '#browserid',
+            elm : 'form.browserid_form',
             requires : 'https://browserid.org/include.js',
             onload : function() {
-                $('#browserid').bind('click', function(e) {
+                var form = $('form.browserid_form');
+                form.find('a.login').bind('click', function(e) {
                     e.preventDefault();
                     navigator.id.getVerifiedEmail(function(assertion) {
-                        var $e = $('#id_assertion');
+                        var $e = form.find('input.id_assertion');
                         $e.val(assertion.toString());
                         $e.parent().submit();
                     });
