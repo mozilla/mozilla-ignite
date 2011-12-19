@@ -456,6 +456,10 @@ legend span {
     padding-left: 40px;
     background: transparent url(../img/css/arrow.png) no-repeat 0 50%;
 }
+.promo .break {
+    background: none;
+    padding-left: 0;
+}
 .promo .back {
     margin-bottom: 0.5em;
     padding-left: 20px;

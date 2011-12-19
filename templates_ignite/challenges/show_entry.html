@@ -26,6 +26,7 @@
 <a href="#" class="back announce">See all submissions</a>
 <p class="announce">What apps would you make, if you could make anything?</p>
 <a href="{{ url('create_entry') }}" class="cta">Create submission</a>
+<p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit your idea</p>  
 {% endblock %}
 
 {% block content %}
@@ -51,7 +52,6 @@
                     <li>Votes: <span class="total_votes">{{ votes }}</span></li>
                 </ul>
             </div>
-            <p> You have {{ entry.phase.days_remaining().days }} days remaining to submit your idea</p>
             {% if entry.sketh_note %}
             <div class="frame box sketh">
                 <img src="{{ MEDIA_URL }}/{{ entry.sketh_note }}" alt="" />
