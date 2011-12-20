@@ -656,6 +656,10 @@ section footer a {
     color: #5c5c5c;
     margin: 1em 0 2em;
 }
+#show_submission .description ul,
+#show_submission .description ol {
+    font-size: 12px;
+}
 #show_submission .entre address a {
     font-weight: bold;
     font-size: 14px;
@@ -670,13 +674,13 @@ section footer a {
     left: 0;
     top: 10px;
 }
-#show_submission aside section {
+#show_submission .entre aside section {
     padding: 1em 0 1em 10px;
     border: 1px solid #979696;
     border-width: 1px 0 0;
     overflow: hidden;
 }
-#show_submission aside section:last-child {
+#show_submission .entre aside section:last-child {
     border-top: 10px solid #000;
 }
 #show_submission .entre aside h2 {
