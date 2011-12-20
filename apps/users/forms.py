@@ -12,6 +12,11 @@ class ProfileForm(forms.ModelForm):
     class Meta:
         model = Profile
         fields = ('name', 'website', 'avatar', 'bio')
+        widgets = {
+            'name': forms.TextInput(attrs={'aria-describedby':'name_info'}),
+            'website' : forms.TextInput(attrs={'aria-describedby':'website_info'}),
+            'bio': forms.Textarea(attrs={'aria-describedby':'bio_info'}),
+        }
 
 
 class ProfileLinksForm(forms.ModelForm):
