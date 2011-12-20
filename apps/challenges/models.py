@@ -1,5 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from markdown import markdown
 
 from django.conf import settings
 from django.core.urlresolvers import reverse, NoReverseMatch
@@ -176,7 +177,7 @@ class Submission(BaseModel):
     @property
     def description_html(self):
         """Challenge description with bleached HTML."""
-        return cached_bleach(self.description)
+        return cached_bleach(markdown(self.description))
     
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(
