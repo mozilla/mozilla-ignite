@@ -32,6 +32,16 @@ ignite.areas = {
         onload : function() {
             ignite.up_votes.init();
         }
+    },
+    create_submission : {
+        requires: [ignite.media_url('js/include/ext/pagedown/Markdown.Converter.js'),ignite.media_url('/js/include/ext/pagedown/Markdown.Editor.js')],
+        onload : function() {
+            var ed = $('#wmd-input'),
+            convertor = new Markdown.Converter(),
+            editor = new Markdown.Editor(convertor);
+            ed.before('<div id="wmd-button-bar"></div>');
+            editor.run();
+        }
     }
 };
 /* Initing the sites global JavaScript */

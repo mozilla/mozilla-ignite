@@ -25,7 +25,7 @@ class EntryForm(forms.ModelForm):
             'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
             'description': forms.Textarea(attrs={
                 'aria-describedby':'info_description',
-                'class':'pagedown_editor',
+                'id':'wmd-input',
             }),
             'categories': forms.CheckboxSelectMultiple(),
             'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),

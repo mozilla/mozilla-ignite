@@ -730,3 +730,56 @@ section footer a {
 #dsq-content-stub {
     margin-top: 1em;
 }
+/* page-down editor */
+.wmd-region {
+    position: relative;
+}
+#wmd-input {
+    padding-top: 90px;
+}
+#wmd-button-bar {
+    overflow: hidden;
+}
+#wmd-button-bar ul {
+    margin: 10px 10px 0 10px;
+    padding: 0;
+    overflow: hidden;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+#wmd-button-bar li {
+    float: left;
+    height: 20px;
+    width: 20px;
+    padding: 4px;
+    margin: 0 10px 10px 0;
+    cursor: pointer;
+    list-style-type: none;
+    border: 1px solid #ebebeb;
+    -moz-border-radius: 4px;
+}
+#wmd-button-bar span {
+    background: transparent url(../img/css/wmd-buttons.png) no-repeat 0 0;
+    display: block;
+    width: 20px;
+    height: 20px;
+}
+#wmd-button-bar .wmd-spacer {
+    width: 1px;
+    padding: 0;
+    border: none;
+    background: #ebebeb;
+    -moz-border-radius: 0;
+    margin-top: 4px;
+}
+.wmd-prompt-dialog {
+    background: #fff;
+    padding: 10px;
+    border: 0.625em solid #000000;
+    border-width: 0.625em 10px;
+}
+.wmd-prompt-dialog b {
+    font-size: 24px;
+    color: #333;
+}
