@@ -430,7 +430,6 @@ class EditLinkTest(test_utils.TestCase):
         _create_submissions(1, creator=alex_profile)
         
         submission = Submission.objects.get()
-        print submission.categories.value()
         base_kwargs = {'project': Project.objects.get().slug,
                        'slug': Challenge.objects.get().slug}
         

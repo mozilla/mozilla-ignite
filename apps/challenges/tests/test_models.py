@@ -76,6 +76,13 @@ class EntriesToLive(TestCase):
             phase=self.phase,
             created_by=self.user.get_profile()
         )
+        self.submission_marked = Submission.objects.create(
+            title=u'A submission with markdown',
+            description=u'I **really** like cake',
+            is_live=True,
+            phase=self.phase,
+            created_by=self.user.get_profile()
+        )
 
     def test_entry_hidden(self):
         """
@@ -96,6 +103,12 @@ class EntriesToLive(TestCase):
         self.assertEqual(self.submission.description_html,
                          '&lt;h3&gt;Testing bleach&lt;/h3&gt;')
 
+    def test_markdown_conversion(self):
+        """
+        Check that we're converting markdown before outputting
+        """
+        self.assertEqual(self.submission_marked.description_html,
+            '<p>I <strong>really</strong> like cake</p>')
 
 class CategoryManager(TestCase):
     
@@ -149,7 +162,7 @@ class CategoryManager(TestCase):
         self.assertEqual(len(self.cats), 1)
 
     def tearDown(self):
-        for model in [Challenge, Project, Phase, User, Category, Submisson]:
+        for model in [Challenge, Project, Phase, User, Category, Submission]:
             model.objects.all().delete()
 
 
