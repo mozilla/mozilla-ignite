@@ -32,7 +32,7 @@
             <nav>
                 <ul>
                     <li><a href="#">{{ _('About the challenge') }}</a></li>
-                    <li><a href="#">{{ _('Submissions') }}</a></li>
+                    <li><a href="{{ url('entries_all') }}">{{ _('Submissions') }}</a></li>
                     <li><a href="#">{{ _('Judges') }}</a></li>
                     <li><a href="/blog/">{{ _('Blog') }}</a></li>
                     {% block login %}
