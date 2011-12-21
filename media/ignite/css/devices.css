@@ -555,13 +555,6 @@ section footer a {
 #splash .entre footer {
     border-bottom: 6px solid #000;
 }
-#splash .entre h3 {
-    float: left;
-    background: #fff;
-    color: #333;
-    font-size: 15px;
-    padding: 1em 15px;
-}
 .hentry {
     font-size: 12px;
     line-height: 2.2;
@@ -588,6 +581,13 @@ section footer a {
     left: -9999em;
     height: 1px;
     overflow: hidden;
+}
+.box_title {
+    float: left;
+    background: #fff;
+    color: #333;
+    font-size: 15px;
+    padding: 1em 15px;
 }
 .submissions {
     font-size: 11px;

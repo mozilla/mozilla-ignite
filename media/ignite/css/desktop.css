@@ -80,10 +80,10 @@
 }
 /**= Main content */
 /* homepage */
-#splash .entre .col {
+.submissions .col {
     width: 20%;
 }
-#splash .entre .col:nth-child(6n) {
+.submissions .col:nth-child(5n + 1) {
     clear: left;
 }
 /* single submission */

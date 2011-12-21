@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_title %}{{ _('All submissions') }} | {% endblock %}
+
+{% block page_id %}all_submissions{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+<h1 class="shout">Submissions</h1>
+<p class="announce">What apps would you make, if you could make anything?</p>
+<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+{% endblock %}
+
+{% block content %}
+<h2 class="box_title">Submissions</h2>
+<ul class="sorting">
+    <li><a class="current" href="#">Most recent</a></li>
+    <li><a href="#">Most popular</a></li>
+</ul>
+<nav class="tags">
+    <ul>
+        <li><a class="current" href="#">all</a></li>
+        {% if categories %}
+        {% for cat in categories %}
+            <li><a href="#">{{ cat.name }}</a></li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+</nav>
+<ol class="submissions columns">
+{% for entry in entries %}
+    <li class="box col">
+        <article>
+            <a href="{{ entry.get_absolute_url() }}">
+                <h4>
+                    <div class="frame box">
+                    <img src="{{ entry.get_image_src() }}" alt="">
+                    </div>
+                    {{ entry.title }}
+                </h4>
+            </a>
+            <p>{{ entry.brief_description }}</p>
+            <address>{{ created_by(entry, footer=False) }}</address>
+            </article>
+        </li>
+    {% endfor %}
+    </ol>
+    <footer>
+        <a href="#">See all submissions</a>
+    </footer>
+    </div>
+    </div>
+</section>       
+{% endblock %}
