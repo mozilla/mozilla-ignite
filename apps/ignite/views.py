@@ -13,6 +13,8 @@ def splash(request, project, slug, template_name='challenges/show.html'):
         phase__challenge=challenge
     ).exclude(
         is_draft=True
+    ).extra(
+        order_by="?"
     )
     return jingo.render(request, 'ignite/splash.html', {
         'challenge': challenge,
