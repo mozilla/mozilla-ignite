@@ -30,7 +30,7 @@
     </ul>
 </nav>
 <ol class="submissions columns">
-{% for entry in entries %}
+{% for entry in entries.object_list %}
     <li class="box col">
         <article>
             <a href="{{ entry.get_absolute_url() }}">
@@ -47,9 +47,29 @@
         </li>
     {% endfor %}
     </ol>
-    <footer>
-        <a href="#">See all submissions</a>
+    {% if entries.paginator.num_pages > 1 %}
+    <footer class="pagination">
+    <nav>
+    {% if entries.has_previous() %}
+        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
+    {% endif %} 
+    <ol>
+    {% for i in range(entries.paginator.num_pages) %}
+    <li>
+        {% if i + 1 == entries.number %}
+            <span>{{ i + 1 }}</span>
+        {% else %}
+            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ol>
+    {% if entries.has_next() %}
+        <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
+    {% endif %}
+    </nav>
     </footer>
+    {% endif %}
     </div>
     </div>
 </section>       

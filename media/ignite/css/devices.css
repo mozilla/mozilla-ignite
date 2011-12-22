@@ -600,6 +600,43 @@ section footer a {
 .submissions .frame {
     width: 50%;
 }
+.pagination {
+    border-bottom: 6px solid #000000;
+}
+.pagination nav {
+    overflow: hidden;
+    float: right;
+}
+.pagination ol {
+    overflow: hidden;
+    margin: 0;
+    padding: 0;
+    float: left;
+}
+.pagination li {
+    float: left;
+    list-style-type: none;
+}
+.pagination a {
+    font-size: 11px;
+    font-family: Arial;
+    float: left;
+    background: none;
+    text-transform: none;
+    display: block;
+    padding: 2px 4px;
+}
+.pagination span {
+    background: #EF4619;
+    color: #fff;
+    padding: 2px 4px;
+    display: block;
+    font-size: 11px;
+    margin: 0 5px;
+}
+.pagination li a {
+    margin: 0 5px;
+}
 /* Single submission */
 .widgets {
     background: #fff;

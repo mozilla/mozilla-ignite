@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
@@ -16,7 +17,7 @@ from tower import ugettext as _
 from voting.models import Vote
 
 from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
-from challenges.models import Challenge, Phase, Submission, ExternalLink
+from challenges.models import Challenge, Phase, Submission, Category, ExternalLink
 from projects.models import Project
 
 challenge_humanised = {
@@ -35,11 +36,26 @@ def show(request, project, slug, template_name='challenges/show.html'):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
+    """ Pagination options """
+    entry_set = Submission.objects.filter(phase__challenge=challenge)
+    paginator = Paginator(entry_set, 25)
+
+    try:
+        page = int(request.GET.get('page', '1'))
+    except ValueError:
+        page = 1
+
+    try:
+        entries = paginator.page(page)
+    except (EmptyPage, InvalidPage):
+        entries = paginator.page(paginator.num_pages)
+
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
         'phases': list(enumerate(challenge.phases.all(), start=1)),
-        'entries': Submission.objects.filter(phase__challenge=challenge),
+        'entries': entries,
+        'categories': Category.objects.get_active_categories(),
     })
 
 
