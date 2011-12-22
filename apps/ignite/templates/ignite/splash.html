@@ -24,7 +24,7 @@
         <li><a class="current" href="{{ url('entries_all') }}">all</a></li>
         {% if categories %}
         {% for cat in categories %}
-            <li><a href="#">{{ cat.name }}</a></li>
+            <li><a href="{{ url('entries_for_category', category=cat.slug ) }}">{{ cat.name }}</a></li>
         {% endfor %}
         {% endif %}
     </ul>

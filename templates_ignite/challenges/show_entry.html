@@ -110,7 +110,7 @@
                 <h2>Tagged as</h2>
                 <ul>
                     {% for category in entry.categories.all() %}
-                        <li><a href="#">{{ category }}</a></li>
+                        <li><a href="{{ url('entries_for_category', category=category.slug ) }}">{{ category }}</a></li>
                     {% endfor %}
                 </ul>
                 </nav>

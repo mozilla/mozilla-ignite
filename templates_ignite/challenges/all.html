@@ -8,7 +8,11 @@
 {% block section_class %}entries{% endblock %}
 
 {% block header %}
+{% if not category %}
 <h1 class="shout">Submissions</h1>
+{% else %}
+<h1 class="shout">Submissions in {{ category }}</h1>
+{% endif %}
 <p class="announce">What apps would you make, if you could make anything?</p>
 <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
 {% endblock %}
@@ -21,10 +25,10 @@
 </ul>
 <nav class="tags">
     <ul>
-        <li><a class="current" href="#">all</a></li>
+        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">all</a></li>
         {% if categories %}
         {% for cat in categories %}
-            <li><a href="#">{{ cat.name }}</a></li>
+            <li><a{% if category==cat.slug %} class="current"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
         {% endfor %}
         {% endif %}
     </ul>

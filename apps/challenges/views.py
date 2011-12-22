@@ -32,12 +32,14 @@ challenge_humanised = {
 LOGGER = logging.getLogger(__name__)
 
 
-def show(request, project, slug, template_name='challenges/show.html'):
+def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     """ Pagination options """
     entry_set = Submission.objects.filter(phase__challenge=challenge)
+    if category:
+        entry_set = entry_set.filter(categories__name=category)
     paginator = Paginator(entry_set, 25)
 
     try:
@@ -56,12 +58,18 @@ def show(request, project, slug, template_name='challenges/show.html'):
         'phases': list(enumerate(challenge.phases.all(), start=1)),
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
+        'category': category,
     })
 
 
 def entries_all(request, project, slug):
     """Show all entries (submissions) to a challenge."""
     return show(request, project, slug, template_name='challenges/all.html')
+
+
+def entries_category(request, project, slug, category):
+    """Show all entries to a specific category"""
+    return show(request, project, slug, template_name='challenges/all.html', category=category)
 
 
 def extract_form_errors(form, link_form):
