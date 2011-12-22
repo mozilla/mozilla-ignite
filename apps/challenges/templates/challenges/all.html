@@ -26,7 +26,7 @@
     <div class="row clearfix">
     {% if entries %}
     <ul class="db_objects entries">
-    {% for e in entries %}
+    {% for e in entries.object_list %}
     <li class="obj">
         <article>
             <h2 class="light sans">{{ e.title }}</h2>

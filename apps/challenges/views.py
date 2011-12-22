@@ -42,7 +42,7 @@ def show(request, project, slug, template_name='challenges/show.html'):
 
     try:
         page = int(request.GET.get('page', '1'))
-    except ValueError:
+    except (ValueError, TypeError):
         page = 1
 
     try:

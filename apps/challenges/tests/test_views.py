@@ -135,7 +135,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
-        assert_equal(len(response.context['entries']), 0)
+        assert_equal(len(response.context['entries'].object_list), 0)
     
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
@@ -143,7 +143,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
-        assert_equal([s.title for s in response.context['entries']],
+        assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
     def test_entries_view(self):
@@ -157,7 +157,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         response = self.client.get('/en-US/my-project/challenges/my-challenge/entries/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
-        assert_equal([s.title for s in response.context['entries']],
+        assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
 
 
