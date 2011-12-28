@@ -343,3 +343,7 @@ CACHE_BACKEND = 'caching.backends.locmem://'
 CACHE_COUNT_TIMEOUT = 60
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
+
+SITE_FEED_URLS = {
+    'splash': 'http://www.ross-eats.co.uk/feed/',
+}
