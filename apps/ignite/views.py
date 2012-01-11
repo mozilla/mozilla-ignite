@@ -19,7 +19,7 @@ def splash(request, project, slug, template_name='challenges/show.html'):
     )
     blogs = BlogEntry.objects.filter(
         page='splash'
-    )
+    ).order_by("-updated",)
 
     return jingo.render(request, 'ignite/splash.html', {
         'challenge': challenge,
