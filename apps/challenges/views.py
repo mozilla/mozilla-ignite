@@ -39,7 +39,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     """ Pagination options """
     entry_set = Submission.objects.filter(phase__challenge=challenge)
     if category:
-        entry_set = entry_set.filter(categories__name=category)
+        entry_set = entry_set.filter(category__name=category)
     paginator = Paginator(entry_set, 25)
 
     try:
