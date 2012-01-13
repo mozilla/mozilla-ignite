@@ -161,6 +161,10 @@ class Category(BaseModel):
 
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        
+        verbose_name_plural = 'Categories'
 
 class Submission(BaseModel):
     """A user's entry into a challenge."""
