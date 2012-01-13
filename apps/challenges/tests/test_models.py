@@ -69,19 +69,22 @@ class EntriesToLive(TestCase):
             name=u'Phase 1', challenge=self.challenge, order=1
         )
         self.user = User.objects.create_user('bob', 'bob@example.com', 'bob')
+        self.category = Category.objects.create(name='Misc', slug='misc')
         self.submission = Submission.objects.create(
             title=u'A submission to test',
             description=u'<h3>Testing bleach</h3>',
             is_live=True,
             phase=self.phase,
-            created_by=self.user.get_profile()
+            created_by=self.user.get_profile(),
+            category=self.category
         )
         self.submission_marked = Submission.objects.create(
             title=u'A submission with markdown',
             description=u'I **really** like cake',
             is_live=True,
             phase=self.phase,
-            created_by=self.user.get_profile()
+            created_by=self.user.get_profile(),
+            category=self.category
         )
 
     def test_entry_hidden(self):
@@ -138,14 +141,6 @@ class CategoryManager(TestCase):
             name=u'Ross',
             slug=u'ross'
         )
-        self.submission = Submission.objects.create(
-            title=u'Category',
-            brief_description=u'Blah',
-            description=u'Foot',
-            phase=self.phase,
-            created_by=self.user.get_profile()
-        )
-
 
     def test_initial_return(self):
         """
@@ -157,7 +152,15 @@ class CategoryManager(TestCase):
         """
         Test that we return only categories with submissions in
         """
-        self.submission.categories.add(self.c1)
+        Submission.objects.create(
+            title=u'Category',
+            brief_description=u'Blah',
+            description=u'Foot',
+            phase=self.phase,
+            created_by=self.user.get_profile(),
+            category=self.c1
+        )
+        
         self.cats = Category.objects.get_active_categories()
         self.assertEqual(len(self.cats), 1)
 
