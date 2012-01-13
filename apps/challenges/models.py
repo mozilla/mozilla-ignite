@@ -161,6 +161,10 @@ class Category(BaseModel):
 
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        
+        verbose_name_plural = 'Categories'
 
 class Submission(BaseModel):
     """A user's entry into a challenge."""
@@ -172,7 +176,8 @@ class Submission(BaseModel):
     description = models.TextField(verbose_name=_(u'Description'))
     sketh_note = models.ImageField(verbose_name=_(u'Featured image'), blank=True, null=True,
         help_text=_(u"This will be used in our summary and list views. You can add more images in your description or link out to sets or images out on the web by adding in an external link"), upload_to=settings.CHALLENGE_IMAGE_PATH)
-    categories = models.ManyToManyField(Category, blank=True, null=True)
+    
+    category = models.ForeignKey(Category)
 
     @property
     def description_html(self):

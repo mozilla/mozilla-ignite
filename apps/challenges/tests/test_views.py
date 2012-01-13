@@ -98,8 +98,8 @@ def _create_submissions(count, phase=None, creator=None):
                                   brief_description='A submission',
                                   description='A really good submission',
                                   phase=phase,
-                                  created_by=creator)
-        foo.categories.add(category)
+                                  created_by=creator,
+                                  category=category)
     return titles
 
 
@@ -189,6 +189,7 @@ class CreateEntryTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
+        self.category_id = Category.objects.get().id
         self.project_slug, self.challenge_slug = (Project.objects.get().slug,
                                                   Challenge.objects.get().slug)
         self.entry_form_path = '/en-US/%s/challenges/%s/entries/add/' % \
@@ -209,7 +210,8 @@ class CreateEntryTest(test_utils.TestCase):
         form_data = {'title': 'Submission',
                      'brief_description': 'A submission',
                      'description': 'A submission of shining wonderment.',
-                     'created_by': User.objects.get(username='alex').id}
+                     'created_by': User.objects.get(username='alex').id,
+                     'category': self.category_id}
         response = self.client.post(self.entry_form_path, data=form_data)
         assert response.status_code in xrange(300, 400)
         assert_equal(Submission.objects.count(), 0)
@@ -228,7 +230,8 @@ class CreateEntryTest(test_utils.TestCase):
         form_data = {'title': 'Submission',
                      'brief_description': 'A submission',
                      'description': 'A submission of shining wonderment.',
-                     'created_by': alex.get_profile()}
+                     'created_by': alex.get_profile(),
+                     'category': self.category_id}
         
         form_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.entry_form_path, data=form_data,
@@ -294,7 +297,8 @@ class ShowEntryTest(test_utils.TestCase):
                                       title='A submission',
                                       brief_description='My submission',
                                       description='My wonderful submission',
-                                      created_by=alex_profile)
+                                      created_by=alex_profile,
+                                      category=Category.objects.get())
         s.save()
         
         self.submission_path = '/en-US/%s/challenges/%s/entries/%d/' % \
@@ -346,6 +350,14 @@ class EditEntryTest(test_utils.TestCase):
         edit_kwargs = dict(pk=entry_id, **base_kwargs)
         self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
     
+    def _edit_data(self, submission=None):
+        if submission is None:
+            submission = Submission.objects.get()
+        return dict(title=submission.title,
+                    brief_description='A submission',
+                    description='A really, seriously good submission',
+                    category=submission.category.id)
+    
     @suppress_locale_middleware
     def test_edit_form(self):
         self.client.login(username='alex', password='alex')
@@ -356,9 +368,7 @@ class EditEntryTest(test_utils.TestCase):
     @suppress_locale_middleware
     def test_edit(self):
         self.client.login(username='alex', password='alex')
-        data = dict(title=Submission.objects.get().title,
-                    brief_description='A submission',
-                    description='A really, seriously good submission')
+        data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
@@ -373,9 +383,7 @@ class EditEntryTest(test_utils.TestCase):
     @suppress_locale_middleware
     def test_anonymous_edit(self):
         """Check that anonymous users can't post to the form."""
-        data = dict(title=Submission.objects.get().title,
-                    brief_description='A submission',
-                    description='A really, seriously good submission')
+        data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 302)
@@ -392,9 +400,7 @@ class EditEntryTest(test_utils.TestCase):
     def test_non_owner_edit(self):
         """Check that users cannot edit each other's submissions."""
         self.client.login(username='bob', password='bob')
-        data = dict(title=Submission.objects.get().title,
-                    brief_description='A submission',
-                    description='A really, seriously good submission')
+        data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         assert_equal(response.status_code, 403)
@@ -411,9 +417,7 @@ class EditEntryTest(test_utils.TestCase):
     def test_admin_edit(self):
         """Check that administrators can edit submissions."""
         self.client.login(username='admin', password='admin')
-        data = dict(title=Submission.objects.get().title,
-                    brief_description='A submission',
-                    description='A really, seriously good submission')
+        data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
@@ -450,7 +454,8 @@ class EditLinkTest(test_utils.TestCase):
         submission = Submission.objects.get()
         return {'title': submission.title,
                 'brief_description': submission.brief_description,
-                'description': submission.description}
+                'description': submission.description,
+                'category': submission.category.id}
     
     @suppress_locale_middleware
     def test_preserve_links(self):

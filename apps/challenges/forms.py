@@ -1,12 +1,15 @@
 from django import forms
-from django.forms.models import inlineformset_factory
+from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink
+from challenges.models import Submission, ExternalLink, Category
 
 
 class EntryForm(forms.ModelForm):
-     
+    
+    # Need to specify this explicitly here to remove the empty option
+    category = ModelChoiceField(queryset=Category.objects.all(),
+                                empty_label=None, widget=forms.RadioSelect())
     class Meta:
         model = Submission
  
@@ -16,9 +19,9 @@ class EntryForm(forms.ModelForm):
             'description',
             'is_draft',
             'sketh_note',
-            'categories',
+            'category',
         )
-
+        
         widgets = {
             'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
             'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
@@ -27,7 +30,6 @@ class EntryForm(forms.ModelForm):
                 'aria-describedby':'info_description',
                 'id':'wmd-input',
             }),
-            'categories': forms.CheckboxSelectMultiple(),
             'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
         }
 

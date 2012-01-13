@@ -107,12 +107,8 @@
             </section>
             <section>
                 <nav class="tags">
-                <h2>Tagged as</h2>
-                <ul>
-                    {% for category in entry.categories.all() %}
-                        <li><a href="{{ url('entries_for_category', category=category.slug ) }}">{{ category }}</a></li>
-                    {% endfor %}
-                </ul>
+                <h2>Category</h2>
+                <p><a href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
             <section>
