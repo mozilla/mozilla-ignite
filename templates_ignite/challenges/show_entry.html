@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block header %}
-<a href="#" class="back announce">See all submissions</a>
+<a href="{{ url('entries_all') }}" class="back announce">See all submissions</a>
 <p class="announce">What apps would you make, if you could make anything?</p>
 <a href="{{ url('create_entry') }}" class="cta">Create submission</a>
 <p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit your idea</p>  
