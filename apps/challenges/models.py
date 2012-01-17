@@ -166,6 +166,7 @@ class Category(BaseModel):
         
         verbose_name_plural = 'Categories'
 
+
 class Submission(BaseModel):
     """A user's entry into a challenge."""
     
@@ -242,11 +243,16 @@ class Submission(BaseModel):
         """Return the URL to delete this submission."""
         return self._lookup_url('entry_delete', {'pk': self.id})
     
+    # Permission shortcuts, for use in templates
+    
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
-        return user.is_superuser or self.owned_by(user)
+        return user.has_perm('challenges.edit_submission', obj=self)
     
-    deletable_by = editable_by
+    def deletable_by(self, user):
+        """Return True if the user provided can delete this entry."""
+        return user.has_perm('challenges.delete_submission', obj=self)
+    
     
     def owned_by(self, user):
         """Return True if user provided owns this entry."""

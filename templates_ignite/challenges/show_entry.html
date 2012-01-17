@@ -32,6 +32,7 @@
 {% block content %}
     <article>
         <h1 class="shout">{{ entry.title }}</h1> 
+        {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
