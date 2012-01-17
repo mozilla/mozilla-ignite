@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from markdown import markdown
 
 from django.conf import settings
+from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.db import models
@@ -253,6 +254,9 @@ class Submission(BaseModel):
         """Return True if the user provided can delete this entry."""
         return user.has_perm('challenges.delete_submission', obj=self)
     
+    def judgeable_by(self, user):
+        """Return True if the user provided is allowed to judge this entry."""
+        return user.has_perm('challenges.judge_submission', obj=self)
     
     def owned_by(self, user):
         """Return True if user provided owns this entry."""
@@ -273,3 +277,68 @@ def submission_saved_handler(sender, instance, **kwargs):
 
 
 pre_save.connect(submission_saved_handler, sender=Submission)
+
+
+class JudgingCriterion(models.Model):
+    """A numeric rating criterion for judging submissions."""
+    
+    question = models.CharField(max_length=250, unique=True)
+    min_value = models.IntegerField(default=0)
+    max_value = models.IntegerField(default=10)
+    
+    phases = models.ManyToManyField(Phase, blank=True,
+                                    related_name='judgement_criteria')
+    
+    def __unicode__(self):
+        return self.question
+    
+    def clean(self):
+        if self.min_value > self.max_value:
+            raise ValidationError('Invalid value range %d..%d' %
+                                  (self.min_value, self.max_value))
+    
+    @property
+    def range(self):
+        """Return the valid range of values for this criterion."""
+        return xrange(self.min_value, self.max_value + 1)
+    
+    class Meta:
+        
+        verbose_name_plural = 'Judging criteria'
+
+
+class Judgement(models.Model):
+    """A judge's rating of a submission."""
+    
+    submission = models.ForeignKey(Submission)
+    judge = models.ForeignKey(Profile)
+    
+    # answers comes through in a foreign key from JudgingAnswer
+    notes = models.TextField(blank=True)
+    
+    def __unicode__(self):
+        return ' - '.join([unicode(self.submission), unicode(self.judge)])
+    
+    class Meta:
+        unique_together = (('submission', 'judge'),)
+
+
+class JudgingAnswer(models.Model):
+    """A judge's answer to an individual judging criterion."""
+    
+    judgement = models.ForeignKey(Judgement, related_name='answers')
+    criterion = models.ForeignKey(JudgingCriterion)
+    rating = models.IntegerField()
+    
+    def __unicode__(self):
+        return ' - '.join([unicode(self.judgement), unicode(self.criterion)])
+    
+    class Meta:
+        unique_together = (('judgement', 'criterion'),)
+    
+    def clean(self):
+        criterion = self.criterion
+        if self.rating not in self.criterion.range:
+            raise ValidationError('Rating %d is outside the range %d to %d' %
+                                  (self.rating, self.criterion.min_value,
+                                   self.criterion.max_value))

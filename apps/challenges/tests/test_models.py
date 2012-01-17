@@ -3,11 +3,13 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from mock import Mock, patch
 
 from projects.models import Project
-from challenges.models import Challenge, Submission, Phase, Category
+from challenges.models import Challenge, Submission, Phase, Category, \
+                              JudgingCriterion
 
 
 def _create_project_and_challenge():
@@ -200,3 +202,26 @@ class Phases(TestCase):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()
 
+
+class Criteria(TestCase):
+    
+    def test_value_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=5)
+        self.assertEqual(list(c.range), [0, 1, 2, 3, 4, 5])
+    
+    def test_good_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=5)
+        c.clean()
+    
+    def test_bad_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=5, max_value=0)
+        self.assertRaises(ValidationError, c.clean)
+    
+    def test_single_unit_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=0)
+        # A range of 0 to 0 is valid, if not very useful
+        c.clean()
