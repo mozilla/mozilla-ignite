@@ -323,7 +323,8 @@ DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'challenges.auth.SubmissionBackend'
 )
 
 BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
