@@ -1,4 +1,5 @@
 from django import forms
+from django.forms import widgets
 from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
@@ -121,10 +122,30 @@ class JudgingForm(forms.ModelForm):
         self.fields.update(new_fields)
     
     def _field_from_criterion(self, criterion):
-        return forms.IntegerField(label=criterion.question,
+        return MinMaxIntegerField(label=criterion.question,
                                   min_value=criterion.min_value,
-                                  max_value=criterion.max_value)
+                                  max_value=criterion.max_value,
+                                  widget=RangeInput())
     
     class Meta:
         model = Judgement
         exclude = ('submission', 'judge')
+
+
+class NumberInput(widgets.Input):
+    
+    input_type = 'number'
+
+
+class RangeInput(widgets.Input):
+    
+    input_type = 'range'
+
+
+class MinMaxIntegerField(forms.IntegerField):
+    """An integer field that supports passing min/max values to its widget."""
+    
+    widget = NumberInput
+    
+    def widget_attrs(self, widget):
+        return {'min': self.min_value, 'max': self.max_value}
