@@ -63,3 +63,17 @@ def test_judging_form_with_data():
     
     form = JudgingForm(instance=judgement, criteria=phase_criteria)
     assert all('criterion_%s' % c.pk in form.initial for c in phase_criteria)
+
+
+@with_setup(judging_setup, judging_teardown)
+def test_rating_out_of_range():
+    criteria = Phase.objects.get().judgement_criteria.all()
+    # Quick sanity check that the criteria exist
+    assert len(criteria) > 0
+    
+    criteria_keys = ['criterion_%s' % c.pk for c in criteria]
+    data = {'notes': 'Blah', criteria_keys[0]: 5, criteria_keys[1]: 5,
+            criteria_keys[2]: 15}
+    
+    form = JudgingForm(data, criteria=criteria)
+    assert_equal(form.errors.keys(), [criteria_keys[2]])
