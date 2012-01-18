@@ -16,8 +16,10 @@ import jingo
 from tower import ugettext as _
 from voting.models import Vote
 
-from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
-from challenges.models import Challenge, Phase, Submission, Category, ExternalLink
+from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet, \
+                             JudgingForm
+from challenges.models import Challenge, Phase, Submission, Category, \
+                              ExternalLink, Judgement, JudgingCriterion
 from projects.models import Project
 
 challenge_humanised = {
@@ -138,6 +140,7 @@ def entry_show(request, project, slug, entry_id):
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
+    
     ## Previous/next modules
     try:
         previous = entry.get_previous_by_created_on()
@@ -147,6 +150,21 @@ def entry_show(request, project, slug, entry_id):
         next = entry.get_next_by_created_on()
     except Submission.DoesNotExist:
         next = False
+    
+    # Judging
+    if entry.judgeable_by(request.user):
+        try:
+            judgement = Judgement.objects.get(judge=request.user.get_profile(),
+                                              submission=entry)
+            criteria = [a.criterion for a in judgement.answers.all()]
+        except Judgement.DoesNotExist:
+            judgement = None
+            criteria = entry.phase.judgement_criteria.all()
+            
+        judging_form = JudgingForm(instance=judgement, criteria=criteria)
+    else:
+        judging_form = None
+    
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -155,6 +173,7 @@ def entry_show(request, project, slug, entry_id):
         'next': next or False,
         'user_vote': user_vote,
         'votes': votes['score'],
+        'judging_form': judging_form,
     })
 
 

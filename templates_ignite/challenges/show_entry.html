@@ -125,6 +125,16 @@
                 </ul>
                 </nav>
             </section>
+            {% if judging_form %}
+            <section>
+                <nav class="judging">
+                <h2>Rate this submission</h2>
+                <form method="POST" action="">
+                    {{ judging_form.as_p() }}
+                </form>
+                </nav>
+            </section>
+            {% endif %}
         </aside>
         </div>
     </article>

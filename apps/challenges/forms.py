@@ -2,7 +2,9 @@ from django import forms
 from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink, Category
+from challenges.models import Submission, ExternalLink, Category, \
+                              Judgement, JudgingCriterion, JudgingAnswer
+
 
 
 class EntryForm(forms.ModelForm):
@@ -89,3 +91,40 @@ class EntryLinkForm(AutoDeleteForm):
 
 InlineLinkFormSet = inlineformset_factory(Submission, ExternalLink,
                                           can_delete=False, form=EntryLinkForm)
+
+
+class JudgingForm(forms.ModelForm):
+    """A form for judges to rate submissions.
+    
+    The form is generated dynamically using a list of JudgingCriterion objects,
+    each of which is a question about some aspect of the submission. Each of
+    these criteria has a numeric range (0 to 10 by default).
+    
+    """
+    
+    def __init__(self, *args, **kwargs):
+        criteria = kwargs.pop('criteria')
+        initial = kwargs.pop('initial', {})
+        instance = kwargs.get('instance')
+        # Having to do this a bit backwards because we need to retrieve any
+        # existing ratings to pass into the superclass constructor, but can't
+        # add the extra fields until after the constructor has been called
+        new_fields = {}
+        for criterion in criteria:
+            key = 'criterion_%s' % criterion.pk
+            new_fields[key] = self._field_from_criterion(criterion)
+            if instance:
+                initial[key] = instance.answers.get(criterion=criterion).rating
+        
+        super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
+        
+        self.fields.update(new_fields)
+    
+    def _field_from_criterion(self, criterion):
+        return forms.IntegerField(label=criterion.question,
+                                  min_value=criterion.min_value,
+                                  max_value=criterion.max_value)
+    
+    class Meta:
+        model = Judgement
+        exclude = ('submission', 'judge')
