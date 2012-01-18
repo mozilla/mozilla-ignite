@@ -305,6 +305,7 @@ class JudgingCriterion(models.Model):
     class Meta:
         
         verbose_name_plural = 'Judging criteria'
+        ordering = ('id',)
 
 
 class Judgement(models.Model):
