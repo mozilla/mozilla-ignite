@@ -19,6 +19,11 @@ class ChallengeAdmin(admin.ModelAdmin):
     inlines = (PhaseInline,)
 
 
+class JudgingCriterionAdmin(admin.ModelAdmin):
+    
+    list_display = ('question', 'min_value', 'max_value')
+
+
 class JudgingAnswerInline(admin.StackedInline):
     
     model = JudgingAnswer
@@ -27,6 +32,7 @@ class JudgingAnswerInline(admin.StackedInline):
 class JudgementAdmin(admin.ModelAdmin):
     
     inlines = (JudgingAnswerInline,)
+    list_display = ('__unicode__', 'submission', 'judge')
 
 
 admin.site.register(Challenge, ChallengeAdmin)
@@ -35,5 +41,5 @@ admin.site.register(ExternalLink)
 admin.site.register(Phase)
 admin.site.register(Category, CategoryAdmin)
 
-admin.site.register(JudgingCriterion)
+admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
