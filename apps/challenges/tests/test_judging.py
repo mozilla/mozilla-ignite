@@ -120,3 +120,34 @@ def test_save_form_create():
     answers = JudgingAnswer.objects.filter(judgement=judgement)
     for criterion, rating in zip(criteria, [3, 5, 7]):
         assert_equal(answers.get(criterion=criterion).rating, rating)
+
+
+@with_setup(judging_setup, judging_teardown)
+def test_save_form_update():
+    """Test updating an existing judgement."""
+    
+    criteria = Phase.objects.get().judgement_criteria.all()
+    # Quick sanity check
+    assert len(criteria) == 3
+    
+    judge_profile = User.objects.get(username='alex').get_profile()
+    submission = Submission.objects.get()
+    
+    judgement = Judgement.objects.create(submission=submission,
+                                         judge=judge_profile,
+                                         notes='Old notes')
+    
+    for criterion in criteria:
+        JudgingAnswer.objects.create(judgement=judgement, criterion=criterion,
+                                     rating=1)
+    
+    criteria_keys = ['criterion_%s' % c.pk for c in criteria]
+    data = {'notes': 'Blah', criteria_keys[0]: 3, criteria_keys[1]: 5,
+            criteria_keys[2]: 7}
+    
+    form = JudgingForm(data, criteria=criteria, instance=judgement)
+    assert form.is_valid()
+    form.save(submission=submission, judge=judge_profile)
+    
+    assert_equal(list(judgement.answers.values_list('rating', flat=True)),
+                 [3, 5, 7])
