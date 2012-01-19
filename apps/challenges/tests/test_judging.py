@@ -86,10 +86,13 @@ def test_save_without_criteria():
     judge_profile = User.objects.get(username='alex').get_profile()
     submission = Submission.objects.get()
     
-    form = JudgingForm({'notes': 'Blah'}, criteria=[])
+    new_judgement = Judgement(judge=judge_profile, submission=submission)
+    form = JudgingForm({'notes': 'Blah'}, criteria=[], instance=new_judgement)
     
     assert form.is_valid()
-    judgement = form.save(judge=judge_profile, submission=submission)
+    judgement = form.save()
+    
+    assert judgement is new_judgement
     
     assert_equal(Judgement.objects.count(), 1)
     assert_equal(Judgement.objects.get().notes, 'Blah')
@@ -110,10 +113,11 @@ def test_save_form_create():
     data = {'notes': 'Blah', criteria_keys[0]: 3, criteria_keys[1]: 5,
             criteria_keys[2]: 7}
     
-    form = JudgingForm(data, criteria=criteria)
+    new_judgement = Judgement(judge=judge_profile, submission=submission)
+    form = JudgingForm(data, criteria=criteria, instance=new_judgement)
     
     assert form.is_valid()
-    judgement = form.save(judge=judge_profile, submission=submission)
+    judgement = form.save()
     
     assert_equal(Judgement.objects.count(), 1)
     assert_equal(Judgement.objects.get().notes, 'Blah')
@@ -147,7 +151,7 @@ def test_save_form_update():
     
     form = JudgingForm(data, criteria=criteria, instance=judgement)
     assert form.is_valid()
-    form.save(submission=submission, judge=judge_profile)
+    form.save()
     
     assert_equal(list(judgement.answers.values_list('rating', flat=True)),
                  [3, 5, 7])

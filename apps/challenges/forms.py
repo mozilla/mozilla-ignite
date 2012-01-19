@@ -115,7 +115,12 @@ class JudgingForm(forms.ModelForm):
             key = 'criterion_%s' % criterion.pk
             new_fields[key] = self._field_from_criterion(criterion)
             if instance:
-                initial[key] = instance.answers.get(criterion=criterion).rating
+                try:
+                    answer = instance.answers.get(criterion=criterion)
+                    initial[key] = answer.rating
+                except JudgingAnswer.DoesNotExist:
+                    # No answer for this question yet
+                    pass
         
         super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
         
@@ -136,11 +141,8 @@ class JudgingForm(forms.ModelForm):
         return dict((extract_key(k), v) for k, v in self.cleaned_data.items()
                     if k.startswith('criterion_'))
     
-    def save(self, judge, submission):
-        judgement = super(JudgingForm, self).save(commit=False)
-        judgement.judge = judge
-        judgement.submission = submission
-        judgement.save()
+    def save(self):
+        judgement = super(JudgingForm, self).save()
         
         for key, value in self.answer_data.items():
             # If this fails, we want to fall over fairly horribly
