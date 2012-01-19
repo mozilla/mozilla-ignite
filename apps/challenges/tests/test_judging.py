@@ -68,8 +68,8 @@ def test_judging_form_with_data():
 @with_setup(judging_setup, judging_teardown)
 def test_rating_out_of_range():
     criteria = Phase.objects.get().judgement_criteria.all()
-    # Quick sanity check that the criteria exist
-    assert len(criteria) > 0
+    # Quick sanity check
+    assert len(criteria) == 3
     
     criteria_keys = ['criterion_%s' % c.pk for c in criteria]
     data = {'notes': 'Blah', criteria_keys[0]: 5, criteria_keys[1]: 5,
@@ -77,3 +77,46 @@ def test_rating_out_of_range():
     
     form = JudgingForm(data, criteria=criteria)
     assert_equal(form.errors.keys(), [criteria_keys[2]])
+
+
+@with_setup(judging_setup, judging_teardown)
+def test_save_without_criteria():
+    """Test saving a new judgement with an empty list of criteria."""
+    
+    judge_profile = User.objects.get(username='alex').get_profile()
+    submission = Submission.objects.get()
+    
+    form = JudgingForm({'notes': 'Blah'}, criteria=[])
+    
+    assert form.is_valid()
+    judgement = form.save(judge=judge_profile, submission=submission)
+    
+    assert_equal(Judgement.objects.count(), 1)
+    assert_equal(Judgement.objects.get().notes, 'Blah')
+    assert_equal(JudgingAnswer.objects.count(), 0)
+
+
+@with_setup(judging_setup, judging_teardown)
+def test_save_form_create():
+    """Test saving a new judgement."""
+    criteria = Phase.objects.get().judgement_criteria.all()
+    # Quick sanity check
+    assert len(criteria) == 3
+    
+    judge_profile = User.objects.get(username='alex').get_profile()
+    submission = Submission.objects.get()
+    
+    criteria_keys = ['criterion_%s' % c.pk for c in criteria]
+    data = {'notes': 'Blah', criteria_keys[0]: 3, criteria_keys[1]: 5,
+            criteria_keys[2]: 7}
+    
+    form = JudgingForm(data, criteria=criteria)
+    
+    assert form.is_valid()
+    judgement = form.save(judge=judge_profile, submission=submission)
+    
+    assert_equal(Judgement.objects.count(), 1)
+    assert_equal(Judgement.objects.get().notes, 'Blah')
+    answers = JudgingAnswer.objects.filter(judgement=judgement)
+    for criterion, rating in zip(criteria, [3, 5, 7]):
+        assert_equal(answers.get(criterion=criterion).rating, rating)

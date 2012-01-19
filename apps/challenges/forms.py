@@ -127,6 +127,35 @@ class JudgingForm(forms.ModelForm):
                                   max_value=criterion.max_value,
                                   widget=RangeInput())
     
+    @property
+    def answer_data(self):
+        """The cleaned data from this form related to criteria answers."""
+        # criterion_15 -> 15
+        # criterion_foo_bang -> foo_bang, if you're feeling so inclined
+        extract_key = lambda k: k.split('_', 1)[1]
+        return dict((extract_key(k), v) for k, v in self.cleaned_data.items()
+                    if k.startswith('criterion_'))
+    
+    def save(self, judge, submission):
+        judgement = super(JudgingForm, self).save(commit=False)
+        judgement.judge = judge
+        judgement.submission = submission
+        judgement.save()
+        
+        for key, value in self.answer_data.items():
+            # If this fails, we want to fall over fairly horribly
+            criterion = JudgingCriterion.objects.get(pk=key)
+            kwargs = {'judgement': judgement, 'criterion': criterion}
+            try:
+                answer = JudgingAnswer.objects.get(**kwargs)
+            except JudgingAnswer.DoesNotExist:
+                answer = JudgingAnswer(**kwargs)
+            
+            answer.rating = value
+            answer.save()
+        
+        return judgement
+    
     class Meta:
         model = Judgement
         exclude = ('submission', 'judge')
