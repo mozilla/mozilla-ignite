@@ -129,8 +129,10 @@
             <section>
                 <nav class="judging">
                 <h2>Rate this submission</h2>
-                <form method="POST" action="">
+                <form method="POST" action="{{ entry.get_judging_url() }}">
+                    {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
+                    <input type="submit" value="Submit thy judgement">
                 </form>
                 </nav>
             </section>

@@ -11,7 +11,8 @@ from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import ProcessFormView, UpdateView, \
+                                      DeleteView, ModelFormMixin
 import jingo
 from tower import ugettext as _
 from voting.models import Vote
@@ -131,7 +132,7 @@ def create_entry(request, project, slug):
     })
 
 
-def entry_show(request, project, slug, entry_id):
+def entry_show(request, project, slug, entry_id, judging_form=None):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
@@ -152,18 +153,10 @@ def entry_show(request, project, slug, entry_id):
         next = False
     
     # Judging
-    if entry.judgeable_by(request.user):
-        try:
-            judgement = Judgement.objects.get(judge=request.user.get_profile(),
-                                              submission=entry)
-            criteria = [a.criterion for a in judgement.answers.all()]
-        except Judgement.DoesNotExist:
-            judgement = None
-            criteria = entry.phase.judgement_criteria.all()
-            
-        judging_form = JudgingForm(instance=judgement, criteria=criteria)
-    else:
+    if not entry.judgeable_by(request.user):
         judging_form = None
+    elif judging_form is None:
+        judging_form = _get_judging_form(user=request.user, entry=entry)
     
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
@@ -175,6 +168,18 @@ def entry_show(request, project, slug, entry_id):
         'votes': votes['score'],
         'judging_form': judging_form,
     })
+
+
+def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
+    try:
+        judgement = Judgement.objects.get(judge=user.get_profile(),
+                                          submission=entry)
+        criteria = [a.criterion for a in judgement.answers.all()]
+    except Judgement.DoesNotExist:
+        judgement = None
+        criteria = entry.phase.judgement_criteria.all()
+    
+    return form_class(data, instance=judgement, criteria=criteria)
 
 
 class JingoTemplateMixin(TemplateResponseMixin):
@@ -223,6 +228,34 @@ class SingleSubmissionMixin(SingleObjectMixin):
         
         """
         return True
+
+
+class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMixin, ProcessFormView):
+    
+    form_class = JudgingForm
+    
+    def _check_permission(self, submission, user):
+        return submission.judgeable_by(user)
+    
+    def get_form(self, form_class):
+        return _get_judging_form(data=self.request.POST, user=self.request.user,
+                                 entry=self.get_object(), form_class=form_class)
+    
+    def get(self, request, *args, **kwargs):
+        # Redirect back to the entry view
+        # Strictly speaking, this view shouldn't accept GET requests, but in
+        # case someone submits theform, gets errors and reloads this URL,
+        # redirecting back to the entry seems the sanest choice
+        return HttpResponseRedirect(self.get_object().get_absolute_url())
+    
+    def form_invalid(self, form):
+        # Show the entry page with the form (and errors)
+        return entry_show(self.request, self.kwargs['project'],
+                          self.kwargs['slug'], self.kwargs['pk'],
+                          judging_form=form)
+
+
+entry_judge = EntryJudgementView.as_view()
 
 
 class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):

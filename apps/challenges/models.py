@@ -244,6 +244,10 @@ class Submission(BaseModel):
         """Return the URL to delete this submission."""
         return self._lookup_url('entry_delete', {'pk': self.id})
     
+    def get_judging_url(self):
+        """Return the URL to judge this submission."""
+        return self._lookup_url('entry_judge', {'pk': self.id})
+    
     # Permission shortcuts, for use in templates
     
     def editable_by(self, user):
@@ -319,6 +323,9 @@ class Judgement(models.Model):
     
     def __unicode__(self):
         return ' - '.join([unicode(self.submission), unicode(self.judge)])
+    
+    def get_absolute_url(self):
+        return self.submission.get_absolute_url()
     
     class Meta:
         unique_together = (('submission', 'judge'),)
