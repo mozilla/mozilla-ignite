@@ -3,10 +3,12 @@ from django.test import Client
 from django.test.client import RequestFactory
 
 from projects.models import Project
+from ignite.tests.decorators import ignite_skip
 from innovate import urls
 from innovate.views import handle404, handle500
 
 
+@ignite_skip
 def test_routes():
     c = Client()
     for pattern in urls.urlpatterns:
@@ -19,6 +21,7 @@ def test_routes():
         assert response.status_code == 200
 
 
+@ignite_skip
 def test_featured():
     project = Project.objects.create(
         name=u'Test Project',

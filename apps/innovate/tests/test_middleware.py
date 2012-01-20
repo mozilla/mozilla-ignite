@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 from django.test import TestCase, Client
 
 from nose.plugins.skip import SkipTest
+from ignite.tests.decorators import ignite_skip
 
 
 def get_users(filter_f=None):
@@ -99,6 +100,7 @@ class MiddlewareTests(TestCase):
             location = response.get('location', None)
             self.assertEqual('http://testserver/', location)
 
+    @ignite_skip
     @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
     def test_user_with_chosen_id(self, fake):
         with user_with_chosen_id(fake):

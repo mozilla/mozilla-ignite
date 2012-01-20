@@ -1,6 +1,7 @@
 from django.test import TestCase, Client
 from django.contrib.auth.models import User
 
+from ignite.tests.decorators import ignite_skip
 from users.models import Profile, Link
 from projects.models import Project
 
@@ -18,6 +19,7 @@ class ProfileData(TestCase):
             user=self.User
         )
 
+    @ignite_skip
     def test_social_links(self):
         user_slug = '/en-US/profile/%s/' % self.profile.user.username
         response = self.client.get(user_slug)
@@ -31,7 +33,8 @@ class ProfileData(TestCase):
 
         response = self.client.get(user_slug)
         self.assertNotEqual(response.context['social_links'], False)
-
+    
+    @ignite_skip
     def test_project_links(self):
         user_slug = '/en-US/profile/%s/' % self.profile.user.username
         response = self.client.get(user_slug)
