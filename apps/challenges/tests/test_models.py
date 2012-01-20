@@ -10,6 +10,7 @@ from mock import Mock, patch
 from projects.models import Project
 from challenges.models import Challenge, Submission, Phase, Category, \
                               JudgingCriterion
+from ignite.tests.decorators import ignite_skip
 
 
 def _create_project_and_challenge():
@@ -29,6 +30,7 @@ class PermalinkTest(TestCase):
     def setUp(self):
         self.project, self.challenge = _create_project_and_challenge()
     
+    @ignite_skip
     def test_permalink(self):
         self.assertEqual(self.challenge.get_absolute_url(),
                          '/project/challenges/challenge/')

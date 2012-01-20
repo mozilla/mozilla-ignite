@@ -2,7 +2,6 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
@@ -13,6 +12,7 @@ import test_utils
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import Challenge, Submission, Phase, Category, ExternalLink
+from ignite.tests.decorators import ignite_skip
 from projects.models import Project
 
 
@@ -32,7 +32,8 @@ def challenge_setup():
     challenge_teardown()  # In case other tests didn't clean up
     
     p = Project()
-    p.name, p.slug = 'My Project', 'my-project'
+    p.name = 'My Project'
+    p.slug = getattr(settings, 'IGNITE_PROJECT_SLUG', 'my-project')
     p.description = 'My super awesome project of awesomeness.'
     p.long_description = 'Did I mention how awesome it was?'
     p.allow_participation = True
@@ -40,7 +41,8 @@ def challenge_setup():
     
     c = Challenge()
     c.project = p
-    c.title, c.slug = 'My Challenge', 'my-challenge'
+    c.title, 'My Challenge'
+    c.slug = getattr(settings, 'IGNITE_CHALLENGE_SLUG', 'my-challenge')
     c.summary = 'Are you up to it?'
     c.description = 'This is a challenge of supreme challengingness.'
     c.end_date = datetime.now() + timedelta(days=365)
@@ -113,6 +115,7 @@ def _create_users():
         profile.save()
 
 
+@ignite_skip
 @with_setup(challenge_setup, challenge_teardown)
 def test_show_challenge():
     """Test the view to show an individual challenge."""
@@ -130,6 +133,7 @@ class ChallengeEntryTest(test_utils.TestCase):
     def tearDown(self):
         challenge_teardown()
     
+    @ignite_skip
     def test_no_entries(self):
         """Test that challenges display ok without any entries."""
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
@@ -137,6 +141,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         # Make sure the entries are present and in reverse creation order
         assert_equal(len(response.context['entries'].object_list), 0)
     
+    @ignite_skip
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
         submission_titles = _create_submissions(3)
@@ -146,6 +151,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
+    @ignite_skip
     def test_entries_view(self):
         """Test the dedicated entries view.
         
@@ -199,12 +205,14 @@ class CreateEntryTest(test_utils.TestCase):
     def tearDown(self):
         challenge_teardown()
     
+    @ignite_skip
     def test_anonymous_form(self):
         """Check we can't display the entry form without logging in."""
         response = self.client.get(self.entry_form_path)
         # Check it's some form of redirect
         assert response.status_code in xrange(300, 400)
     
+    @ignite_skip
     def test_anonymous_post(self):
         """Check we can't post an entry without logging in."""
         form_data = {'title': 'Submission',
@@ -216,6 +224,7 @@ class CreateEntryTest(test_utils.TestCase):
         assert response.status_code in xrange(300, 400)
         assert_equal(Submission.objects.count(), 0)
     
+    @ignite_skip
     def test_display_form(self):
         """Test the new entry form."""
         self.client.login(username='alex', password='alex')
@@ -224,6 +233,7 @@ class CreateEntryTest(test_utils.TestCase):
         # Check nothing gets created
         assert_equal(Submission.objects.count(), 0)
     
+    @ignite_skip
     def test_submit_form(self):
         self.client.login(username='alex', password='alex')
         alex = User.objects.get(username='alex')
@@ -246,6 +256,7 @@ class CreateEntryTest(test_utils.TestCase):
         assert_equal(submission.challenge.slug, self.challenge_slug)
         assert_equal(submission.created_by.user, alex)
     
+    @ignite_skip
     def test_invalid_form(self):
         """Test that an empty form submission fails with errors."""
         self.client.login(username='alex', password='alex')
@@ -257,6 +268,7 @@ class CreateEntryTest(test_utils.TestCase):
         assert_equal(Submission.objects.count(), 0)
 
 
+@ignite_skip
 @with_setup(challenge_setup, challenge_teardown)
 def test_challenge_not_found():
     """Test behaviour when a challenge doesn't exist."""
@@ -269,6 +281,7 @@ def test_challenge_not_found():
         assert_equal(response.status_code, 404)
 
 
+@ignite_skip
 @with_setup(challenge_setup, challenge_teardown)
 def test_wrong_project():
     """Test behaviour when the project and challenge don't match."""
@@ -301,11 +314,9 @@ class ShowEntryTest(test_utils.TestCase):
                                       category=Category.objects.get())
         s.save()
         
-        self.submission_path = '/en-US/%s/challenges/%s/entries/%d/' % \
-                               (Project.objects.get().slug,
-                                Challenge.objects.get().slug,
-                                Submission.objects.get().id)
+        self.submission_path = s.get_absolute_url()
     
+    @suppress_locale_middleware
     def test_show_entry(self):
         response = self.client.get(self.submission_path)
         assert_equal(response.status_code, 200)
@@ -339,16 +350,9 @@ class EditEntryTest(test_utils.TestCase):
         alex_profile = User.objects.get(username='alex').get_profile()
         _create_submissions(1, creator=alex_profile)
         
-        entry_id = Submission.objects.get().id
-        
-        base_kwargs = {'project': Project.objects.get().slug,
-                       'slug': Challenge.objects.get().slug}
-        
-        view_kwargs = dict(entry_id=entry_id, **base_kwargs)
-        self.view_path = reverse('entry_show', kwargs=view_kwargs)
-        
-        edit_kwargs = dict(pk=entry_id, **base_kwargs)
-        self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
+        entry = Submission.objects.get()
+        self.view_path = entry.get_absolute_url()
+        self.edit_path = entry.get_edit_url()
     
     def _edit_data(self, submission=None):
         if submission is None:
@@ -434,14 +438,8 @@ class EditLinkTest(test_utils.TestCase):
         _create_submissions(1, creator=alex_profile)
         
         submission = Submission.objects.get()
-        base_kwargs = {'project': Project.objects.get().slug,
-                       'slug': Challenge.objects.get().slug}
-        
-        view_kwargs = dict(entry_id=submission.id, **base_kwargs)
-        self.view_path = reverse('entry_show', kwargs=view_kwargs)
-        
-        edit_kwargs = dict(pk=submission.id, **base_kwargs)
-        self.edit_path = reverse('entry_edit', kwargs=edit_kwargs)
+        self.view_path = submission.get_absolute_url()
+        self.edit_path = submission.get_edit_url()
         
         ExternalLink.objects.create(submission=submission, name='Foo',
                                     url='http://example.com/')
@@ -522,11 +520,8 @@ class DeleteEntryTest(test_utils.TestCase):
         base_kwargs = {'project': Project.objects.get().slug,
                        'slug': Challenge.objects.get().slug}
         
-        view_kwargs = dict(entry_id=submission.id, **base_kwargs)
-        self.view_path = reverse('entry_show', kwargs=view_kwargs)
-        
-        delete_kwargs = dict(pk=submission.id, **base_kwargs)
-        self.delete_path = reverse('entry_delete', kwargs=delete_kwargs)
+        self.view_path = submission.get_absolute_url()
+        self.delete_path = submission.get_delete_url()
     
     @suppress_locale_middleware
     def test_anonymous_delete_form(self):
