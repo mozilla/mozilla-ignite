@@ -155,12 +155,14 @@ class JudgingViewTest(TestCase):
     
     @ignite_only
     def test_no_judge_form(self):
+        """Test the form doesn't show if the user doesn't have permission."""
         submission = Submission.objects.get()
         response = self.client.get(submission.get_absolute_url())
         assert response.context['judging_form'] is None
     
     @ignite_only
     def test_judge_form(self):
+        """Test displaying the judge form."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
         response = self.client.get(submission.get_absolute_url())
@@ -173,6 +175,7 @@ class JudgingViewTest(TestCase):
     
     @ignite_only
     def test_submit_judge_form(self):
+        """Test judging an unjudged submission."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
         response = self.client.get(submission.get_absolute_url())
