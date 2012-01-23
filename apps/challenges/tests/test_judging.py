@@ -166,4 +166,27 @@ class JudgingViewTest(TestCase):
         response = self.client.get(submission.get_absolute_url())
         judging_form = response.context['judging_form']
         assert 'notes' in judging_form.fields
-        assert any(key.startswith('criterion_') for key in judging_form.fields)
+        criteria = submission.phase.judgement_criteria.all()
+        expected_keys = set(['criterion_%s' % c.pk for c in criteria])
+        expected_keys.add('notes')
+        self.assertEqual(set(judging_form.fields.keys()), expected_keys)
+    
+    @ignite_only
+    def test_submit_judge_form(self):
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        judging_form = response.context['judging_form']
+        post_data = {'notes': 'This submission is acceptable to me.'}
+        for key in judging_form.fields:
+            if key.startswith('criterion_'):
+                post_data[key] = '5'
+        post_response = self.client.post(submission.get_judging_url(),
+                                         data=post_data)
+        self.assertRedirects(post_response, submission.get_absolute_url())
+        
+        judgement = Judgement.objects.get()
+        self.assertEqual(judgement.judge.user.username, 'alex')
+        self.assertEqual(judgement.submission, submission)
+        for answer in judgement.answers.all():
+            self.assertEqual(answer.rating, 5)

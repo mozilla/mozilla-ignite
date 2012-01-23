@@ -176,7 +176,7 @@ def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
                                           submission=entry)
         criteria = [a.criterion for a in judgement.answers.all()]
     except Judgement.DoesNotExist:
-        judgement = None
+        judgement = Judgement(judge=user.get_profile(), submission=entry)
         criteria = entry.phase.judgement_criteria.all()
     
     return form_class(data, instance=judgement, criteria=criteria)
