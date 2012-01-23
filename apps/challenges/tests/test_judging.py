@@ -190,3 +190,34 @@ class JudgingViewTest(TestCase):
         self.assertEqual(judgement.submission, submission)
         for answer in judgement.answers.all():
             self.assertEqual(answer.rating, 5)
+    
+    @ignite_only
+    def test_amend_judgement(self):
+        """Test posting the judgement form when a judgement already exists."""
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        judge = User.objects.get(username='alex').get_profile()
+        
+        judgement = Judgement.objects.create(submission=submission, judge=judge,
+                                             notes='Blah blah blah')
+        for criterion in submission.phase.judgement_criteria.all():
+            JudgingAnswer.objects.create(judgement=judgement,
+                                         criterion=criterion, rating=1)
+        
+        response = self.client.get(submission.get_absolute_url())
+        judging_form = response.context['judging_form']
+        post_data = {'notes': 'I actually quite like this submission.'}
+        ratings = [6, 7, 8]
+        for key in judging_form.fields:
+            if key.startswith('criterion_'):
+                post_data[key] = str(ratings.pop())
+        post_response = self.client.post(submission.get_judging_url(),
+                                         data=post_data)
+        self.assertRedirects(post_response, submission.get_absolute_url())
+        
+        new_judgement = Judgement.objects.get()
+        self.assertEqual(new_judgement.judge.user.username, 'alex')
+        self.assertEqual(new_judgement.submission, submission)
+        assert 'quite like' in new_judgement.notes
+        ratings = new_judgement.answers.values_list('rating', flat=True)
+        self.assertEqual(set(ratings), set([6, 7, 8]))
