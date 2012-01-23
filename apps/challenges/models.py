@@ -250,17 +250,28 @@ class Submission(BaseModel):
     
     # Permission shortcuts, for use in templates
     
+    def _permission_check(self, user, permission_name):
+        """Check whether a user has a given permission on this object.
+        
+        This has to check both the general object and specific object cases,
+        because Django doesn't do the intelligent thing here and fall back on
+        the general case when a backend doesn't support per-object permissions.
+        
+        """
+        return any(user.has_perm(permission_name, obj=obj)
+                   for obj in [None, self])
+    
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
-        return user.has_perm('challenges.edit_submission', obj=self)
+        return self._permission_check(user, 'challenges.edit_submission')
     
     def deletable_by(self, user):
         """Return True if the user provided can delete this entry."""
-        return user.has_perm('challenges.delete_submission', obj=self)
+        return self._permission_check(user, 'challenges.delete_submission')
     
     def judgeable_by(self, user):
         """Return True if the user provided is allowed to judge this entry."""
-        return user.has_perm('challenges.judge_submission', obj=self)
+        return self._permission_check(user, 'challenges.judge_submission')
     
     def owned_by(self, user):
         """Return True if user provided owns this entry."""

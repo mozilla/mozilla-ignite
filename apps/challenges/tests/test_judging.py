@@ -8,6 +8,7 @@ from challenges.models import Phase, Submission, JudgingCriterion, Judgement, \
                               JudgingAnswer
 from challenges.tests.test_views import challenge_setup, challenge_teardown, \
                                         _create_submissions, _create_users
+from ignite.tests.decorators import ignite_only
 
 
 def judging_setup():
@@ -145,3 +146,24 @@ class JudgingFormTest(TestCase):
         
         assert_equal(list(judgement.answers.values_list('rating', flat=True)),
                      [3, 5, 7])
+
+
+class JudgingViewTest(TestCase):
+    
+    def setUp(self):
+        judging_setup()
+    
+    @ignite_only
+    def test_no_judge_form(self):
+        submission = Submission.objects.get()
+        response = self.client.get(submission.get_absolute_url())
+        assert response.context['judging_form'] is None
+    
+    @ignite_only
+    def test_judge_form(self):
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        judging_form = response.context['judging_form']
+        assert 'notes' in judging_form.fields
+        assert any(key.startswith('criterion_') for key in judging_form.fields)
