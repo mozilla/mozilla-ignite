@@ -73,6 +73,16 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
+            {% if judging_form %}
+            <section>
+                <h2>Rate this submission</h2>
+                <form method="POST" action="{{ entry.get_judging_url() }}">
+                    {{ csrf()|safe }}
+                    {{ judging_form.as_p() }}
+                    <input type="submit" class="cta do" value="Submit thy judgement" />
+                </form>
+            </section>
+            {% endif %}
             <section class="widgets">
                 <h2>Share</h2>
                 <ul class="share">
@@ -124,19 +134,7 @@
                 {% endif %}
                 </ul>
                 </nav>
-            </section>
-            {% if judging_form %}
-            <section>
-                <nav class="judging">
-                <h2>Rate this submission</h2>
-                <form method="POST" action="{{ entry.get_judging_url() }}">
-                    {{ csrf()|safe }}
-                    {{ judging_form.as_p() }}
-                    <input type="submit" value="Submit thy judgement">
-                </form>
-                </nav>
-            </section>
-            {% endif %}
+            </section> 
         </aside>
         </div>
     </article>
