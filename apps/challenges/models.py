@@ -362,3 +362,20 @@ class JudgingAnswer(models.Model):
             raise ValidationError('Rating %d is outside the range %d to %d' %
                                   (self.rating, self.criterion.min_value,
                                    self.criterion.max_value))
+
+
+class JudgeAssignment(models.Model):
+    """An assignment of a specific judge to a submission."""
+    
+    # Note that submission is using a unique ForeignKey rather than being a
+    # OneToOneField, because there's every chance this will change to having
+    # multiple judges per submission, particularly in subsequent phases, and
+    # the extra convenience now isn't worth the finicky refactoring later.
+    
+    submission = models.ForeignKey(Submission, unique=True)
+    judge = models.ForeignKey(Profile)
+    
+    created_on = models.DateTimeField(default=datetime.utcnow)
+    
+    def __unicode__(self):
+        return unicode(self.submission)
