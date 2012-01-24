@@ -365,7 +365,7 @@ legend span {
 }
 .tags a {
     background: rgba(0, 0, 0, 0.4);
-    display: block;
+    display: inline-block;
     padding: 0.4em 12px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
