@@ -10,6 +10,7 @@ class PhaseInline(admin.TabularInline):
 
 class CategoryAdmin(admin.ModelAdmin):
     
+    model = Category
     prepopulated_fields = {"slug": ("name",)}
 
 
