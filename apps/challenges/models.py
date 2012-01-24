@@ -46,7 +46,7 @@ class Challenge(BaseModel):
                               null=True, blank=True,
                               upload_to=settings.CHALLENGE_IMAGE_PATH)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'),
-                                      default=datetime.now)
+                                      default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'))
     moderate = models.BooleanField(verbose_name=_(u'Moderate entries'),
                                    default=False)
@@ -85,7 +85,7 @@ class PhaseManager(BaseModelManager):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
     def get_current_phase(self, slug):
-        now = datetime.now()
+        now = datetime.utcnow()
         return self.filter(
             challenge__slug=slug
         ).filter(
@@ -95,6 +95,9 @@ class PhaseManager(BaseModelManager):
         )
 
 
+def in_six_months():
+    return datetime.utcnow() + relativedelta(months=6)
+
 class Phase(BaseModel):
     """A phase of a challenge."""
     
@@ -103,9 +106,9 @@ class Phase(BaseModel):
     challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'),
-                                      default=datetime.now())
+                                      default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'),
-                                        default=datetime.now() + relativedelta( months = +6 ))
+                                    default=in_six_months)
 
     
     def natural_key(self):
@@ -116,7 +119,7 @@ class Phase(BaseModel):
     order = models.IntegerField()
     
     def days_remaining(self):
-        return self.end_date - datetime.now()
+        return self.end_date - datetime.utcnow()
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.challenge.title)
@@ -187,9 +190,7 @@ class Submission(BaseModel):
         return cached_bleach(markdown(self.description))
     
     created_by = models.ForeignKey(Profile)
-    created_on = models.DateTimeField(
-        default=datetime.utcnow()
-    )
+    created_on = models.DateTimeField(default=datetime.utcnow)
     
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     """
