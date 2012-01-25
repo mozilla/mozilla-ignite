@@ -10,7 +10,18 @@ from challenges.models import Submission, JudgeAssignment
 
 
 def count_of(thing_list, thing_name, plural_name=None, colon=False):
-    """Return a string representing a count of things, given in thing_list."""
+    """Return a string representing a count of things, given in thing_list.
+    
+    Example:
+    
+    >>> count_of([1, 2, 3], 'number')
+    '3 numbers'
+    >>> count_of([1], 'number')
+    '1 number'
+    >>> count_of(['salmon', 'carp'], 'fish', 'fishies')
+    '2 fishies'
+    
+    """
     if plural_name is None:
         plural_name = thing_name + 's'
     format = '%d ' + (thing_name if len(thing_list) == 1 else plural_name)
