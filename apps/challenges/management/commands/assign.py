@@ -1,10 +1,12 @@
+import sys
+from itertools import cycle, izip
 from optparse import make_option
 
 from django.contrib.auth.models import User, Permission
 from django.core.management.base import NoArgsCommand
 from django.db.models import Q
 
-from challenges.models import Submission
+from challenges.models import Submission, JudgeAssignment
 
 
 def count_of(thing_list, thing_name, plural_name=None, colon=False):
@@ -52,5 +54,16 @@ class Command(NoArgsCommand):
                 for judge in judges:
                     print '    %s [%s]' % (judge.get_profile().display_name,
                                            judge.username)
-        if not dry_run:
-            print 'This would now do some stuff'
+        if submissions and not judges:
+            print "You don't have any judges assigned"
+            sys.exit(1)
+        
+        judge_profiles = [j.get_profile() for j in judges.order_by('?')]
+        pairings = izip(submissions, cycle(judge_profiles))
+        for submission, judge in pairings:
+            if verbose:
+                print '"%s" goes to %s' % \
+                      (submission.title, judge.display_name)
+            assignment = JudgeAssignment(submission=submission, judge=judge)
+            if not dry_run:
+                assignment.save()
