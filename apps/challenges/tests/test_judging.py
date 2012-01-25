@@ -11,12 +11,13 @@ from challenges.tests.test_views import challenge_setup, challenge_teardown, \
 from ignite.tests.decorators import ignite_only
 
 
-def judging_setup():
+def judging_setup(create_criteria=True, submission_count=1):
     challenge_setup()
-    questions = ['How %s is this idea?' % adjective
-                 for adjective in ['awesome', 'sane', 'badass']]
-    for question in questions:
-        Phase.objects.get().judgement_criteria.create(question=question)
+    if create_criteria:
+        questions = ['How %s is this idea?' % adjective
+                     for adjective in ['awesome', 'sane', 'badass']]
+        for question in questions:
+            Phase.objects.get().judgement_criteria.create(question=question)
     
     _create_users()
     submission_type = ContentType.objects.get_for_model(Submission)
@@ -26,7 +27,7 @@ def judging_setup():
     alex = User.objects.get(username='alex')
     alex.user_permissions.add(judge_permission)
     
-    _create_submissions(1, creator=alex.get_profile())
+    _create_submissions(submission_count, creator=alex.get_profile())
 
 
 class JudgingFormTest(TestCase):
