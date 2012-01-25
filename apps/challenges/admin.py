@@ -24,10 +24,23 @@ class SubmissionAdmin(admin.ModelAdmin):
     
     model = Submission
     list_display = ('title', 'created_by', 'category', 'phase', 'is_live',
-                    'is_winner')
+                    'is_winner', 'judge_assignment', 'judgement_count')
     list_filter = ('category', 'is_live', 'is_winner')
+    list_select_related = True  # For the judgement fields
     
     inlines = (JudgeAssignmentInline,)
+    
+    def judge_assignment(self, submission):
+        """Return the names of all judges assigned to this submission."""
+        assignments = submission.judgeassignment_set.all()
+        if not assignments:
+            return 'No judge'
+        else:
+            return ', '.join(a.judge.display_name for a in assignments)
+    
+    def judgement_count(self, submission):
+        return submission.judgement_set.count()
+
 
 class ChallengeAdmin(admin.ModelAdmin):
     
