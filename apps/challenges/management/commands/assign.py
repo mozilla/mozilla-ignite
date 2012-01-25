@@ -26,6 +26,7 @@ class Command(NoArgsCommand):
     
     def handle_noargs(self, verbosity, dry_run, **options):
         verbosity = int(verbosity)  # Django doesn't do this by default
+        verbose, quiet = verbosity >= 2, verbosity < 1
         
         # Running this check manually because we don't want to include
         # superusers unless they've been given explicit permission
@@ -37,17 +38,17 @@ class Command(NoArgsCommand):
         is_assigned = Q(judgeassignment__isnull=False)
         
         submissions = Submission.objects.exclude(is_judged | is_assigned)
-        if verbosity >= 1:
+        if not quiet:
             print count_of(submissions, 'submission',
                            colon=verbosity >= 2 and len(submissions))
-            if verbosity >= 2:
+            if verbose:
                 for submission in submissions:
                     print '    %s' % submission.title
         
-        if verbosity >= 1:
+        if not quiet:
             print count_of(judges, 'judge',
                            colon=verbosity >= 2 and len(judges))
-            if verbosity >= 2:
+            if verbose:
                 for judge in judges:
                     print '    %s [%s]' % (judge.get_profile().display_name,
                                            judge.username)
