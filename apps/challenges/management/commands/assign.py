@@ -1,6 +1,7 @@
 import sys
 from itertools import cycle, izip
 from optparse import make_option
+import random
 
 from django.contrib.auth.models import User, Permission
 from django.core.management.base import NoArgsCommand
@@ -30,6 +31,24 @@ def count_of(thing_list, thing_name, plural_name=None, colon=False):
     return format % len(thing_list)
 
 
+def get_judge_profiles():
+    """Return the profiles of all current judges."""
+    # Running this check manually because we don't want to include
+    # superusers unless they've been given explicit permission
+    judge_permission = Permission.objects.get(codename='judge_submission')
+    judges = User.objects.filter(Q(user_permissions=judge_permission) |
+                                 Q(groups__permissions=judge_permission))
+    return [j.get_profile() for j in judges]
+
+
+def get_submissions():
+    """Return the submissions eligible for assignment."""
+    is_judged = Q(judgement__isnull=False)
+    is_assigned = Q(judgeassignment__isnull=False)
+    
+    return Submission.objects.exclude(is_judged | is_assigned)
+
+
 class Command(NoArgsCommand):
     help = u'Assign unrated entries to random judges.'
     
@@ -41,16 +60,7 @@ class Command(NoArgsCommand):
         verbosity = int(verbosity)  # Django doesn't do this by default
         verbose, quiet = verbosity >= 2, verbosity < 1
         
-        # Running this check manually because we don't want to include
-        # superusers unless they've been given explicit permission
-        judge_permission = Permission.objects.get(codename='judge_submission')
-        judges = User.objects.filter(Q(user_permissions=judge_permission) |
-                                     Q(groups__permissions=judge_permission))
-        
-        is_judged = Q(judgement__isnull=False)
-        is_assigned = Q(judgeassignment__isnull=False)
-        
-        submissions = Submission.objects.exclude(is_judged | is_assigned)
+        submissions = get_submissions()
         if not quiet:
             print count_of(submissions, 'submission',
                            colon=verbosity >= 2 and len(submissions))
@@ -58,18 +68,19 @@ class Command(NoArgsCommand):
                 for submission in submissions:
                     print '    %s' % submission.title
         
+        judge_profiles = get_judge_profiles()
         if not quiet:
-            print count_of(judges, 'judge',
-                           colon=verbosity >= 2 and len(judges))
+            print count_of(judge_profiles, 'judge',
+                           colon=verbosity >= 2 and len(judge_profiles))
             if verbose:
-                for judge in judges:
-                    print '    %s [%s]' % (judge.get_profile().display_name,
-                                           judge.username)
-        if submissions and not judges:
+                for judge in judge_profiles:
+                    print '    %s [%s]' % (judge.display_name,
+                                           judge.user.username)
+        if submissions and not judge_profiles:
             print "You don't have any judges assigned"
             sys.exit(1)
         
-        judge_profiles = [j.get_profile() for j in judges.order_by('?')]
+        random.shuffle(judge_profiles)
         pairings = izip(submissions, cycle(judge_profiles))
         for submission, judge in pairings:
             if verbose:
