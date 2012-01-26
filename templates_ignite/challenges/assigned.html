@@ -11,6 +11,9 @@
 <h1 class="shout">Submissions assigned to you</h1>
 {% endblock %}
 
+{# No need to display the judge call on this page #}
+{% block judgecall %}{% endblock %}
+
 {% block content %}
 <ol class="submissions columns">
 {% for entry in entries %}

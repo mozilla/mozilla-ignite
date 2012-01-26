@@ -59,6 +59,17 @@
         <div class="busta">
             {% block header %}{% endblock %}
         </div>
+        <div class="busta styleme" style="background-color: #ffff00;">
+        {% if perms.challenges.judge_submission and assignment_count %}
+        {% block judgecall %}
+        {% trans count=assignment_count, url=url('entries_assigned') %}
+        <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
+        {% pluralize %}
+        <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
+        {% endtrans %}
+        {% endblock %}
+        {% endif %}
+        </div>
     </div>
     {% block alerts %}
     {% if messages %}
