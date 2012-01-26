@@ -17,10 +17,11 @@ import jingo
 from tower import ugettext as _
 from voting.models import Vote
 
-from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet, \
-                             JudgingForm
-from challenges.models import Challenge, Phase, Submission, Category, \
-                              ExternalLink, Judgement, JudgingCriterion
+from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
+                              JudgingForm)
+from challenges.models import (Challenge, Phase, Submission, Category,
+                               ExternalLink, Judgement, JudgingCriterion,
+                               JudgeAssignment)
 from projects.models import Project
 
 challenge_humanised = {
@@ -155,8 +156,13 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # Judging
     if not entry.judgeable_by(request.user):
         judging_form = None
-    elif judging_form is None:
-        judging_form = _get_judging_form(user=request.user, entry=entry)
+        judge_assigned = False
+    else:
+        if judging_form is None:
+            judging_form = _get_judging_form(user=request.user, entry=entry)
+        assignments = JudgeAssignment.objects
+        judge_assigned = assignments.filter(judge__user=request.user,
+                                            submission=entry).exists()
     
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
@@ -167,6 +173,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'user_vote': user_vote,
         'votes': votes['score'],
         'judging_form': judging_form,
+        'judge_assigned': judge_assigned,
     })
 
 
