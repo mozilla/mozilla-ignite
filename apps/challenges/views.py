@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import ProcessFormView, UpdateView, \
                                       DeleteView, ModelFormMixin
@@ -34,6 +35,9 @@ challenge_humanised = {
 
 
 LOGGER = logging.getLogger(__name__)
+
+judge_required = permission_required('challenges.judge_submission')
+
 
 class JingoTemplateMixin(TemplateResponseMixin):
     """View mixin to render through Jingo rather than Django's renderer."""
@@ -83,6 +87,23 @@ def show(request, project, slug, template_name='challenges/show.html', category=
 def entries_all(request, project, slug):
     """Show all entries (submissions) to a challenge."""
     return show(request, project, slug, template_name='challenges/all.html')
+
+
+class AssignedEntriesView(ListView, JingoTemplateMixin):
+    """Show entries assigned to be judged by the current user."""
+    
+    template_name = 'challenges/assigned.html'
+    context_object_name = 'entries'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        submissions = Submission.objects.filter(phase__challenge=self.challenge)
+        return submissions.filter(judgeassignment__judge__user=self.request.user)
+
+
+entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 
 def entries_category(request, project, slug, category):
