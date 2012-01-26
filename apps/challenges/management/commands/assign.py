@@ -49,6 +49,26 @@ def get_submissions():
     return Submission.objects.exclude(is_judged | is_assigned)
 
 
+def get_assignments(submissions, judge_profiles, commit):
+    """Assign the given submissions evenly between the given judges.
+    
+    Return a list of JudgeAssignment objects.
+    
+    Pass commit=False to prevent saving the new objects.
+    
+    """
+    judge_profiles = list(judge_profiles)
+    random.shuffle(judge_profiles)
+    pairings = izip(submissions, cycle(judge_profiles))
+    assignments = []
+    for submission, judge in pairings:
+        assignment = JudgeAssignment(submission=submission, judge=judge)
+        if commit:
+            assignment.save()
+        assignments.append(assignment)
+    return assignments
+
+
 class Command(NoArgsCommand):
     help = u'Assign unrated entries to random judges.'
     
@@ -80,12 +100,9 @@ class Command(NoArgsCommand):
             print "You don't have any judges assigned"
             sys.exit(1)
         
-        random.shuffle(judge_profiles)
-        pairings = izip(submissions, cycle(judge_profiles))
-        for submission, judge in pairings:
-            if verbose:
-                print '"%s" goes to %s' % \
-                      (submission.title, judge.display_name)
-            assignment = JudgeAssignment(submission=submission, judge=judge)
-            if not dry_run:
-                assignment.save()
+        assignments = get_assignments(submissions, judge_profiles,
+                                      commit=not dry_run)
+        if verbose:
+            for assignment in assignment:
+                print '"%s" goes to %s' % (assignment.submission.title,
+                                           assignment.judge.display_name)

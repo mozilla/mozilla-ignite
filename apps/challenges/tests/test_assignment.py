@@ -1,14 +1,24 @@
+from collections import defaultdict
+
 from django.contrib.auth.models import User, Group, Permission
 from django.test import TestCase
 from django.core.cache import cache
 
 from challenges.tests.test_judging import judging_setup
 from challenges.management.commands.assign import (get_judge_profiles,
-                                                   get_submissions)
+                                                   get_submissions,
+                                                   get_assignments)
 from challenges.models import Submission, Judgement, JudgeAssignment
 
 
 class AssignmentTest(TestCase):
+    
+    def assertEvenAssignment(self, assignments):
+        counts = defaultdict(lambda: 0)
+        for assignment in assignments:
+            counts[assignment.judge] += 1
+        # No judge has more than one submission more than any other
+        self.assertTrue(max(counts.values()) - min(counts.values()) <= 1)
     
     def setUp(self):
         judging_setup(create_criteria=False, submission_count=5)
@@ -71,3 +81,19 @@ class AssignmentTest(TestCase):
                                        judge=alex_profile)
         self.assertEqual(set(s.title for s in get_submissions()),
                          set(['Submission %d' % n for n in [1, 3, 5]]))
+    
+    def test_assignments(self):
+        assignments = get_assignments(submissions=get_submissions(),
+                                      judge_profiles=get_judge_profiles(),
+                                      commit=False)
+        self.assertEvenAssignment(assignments)
+        # Check nothing has been saved
+        self.assertEqual(JudgeAssignment.objects.count(), 0)
+    
+    def test_assignment_commit(self):
+        assignments = get_assignments(submissions=get_submissions(),
+                                      judge_profiles=get_judge_profiles(),
+                                      commit=True)
+        self.assertEvenAssignment(assignments)
+        self.assertEqual(JudgeAssignment.objects.count(),
+                         Submission.objects.count())
