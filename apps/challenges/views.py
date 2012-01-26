@@ -35,6 +35,20 @@ challenge_humanised = {
 
 LOGGER = logging.getLogger(__name__)
 
+class JingoTemplateMixin(TemplateResponseMixin):
+    """View mixin to render through Jingo rather than Django's renderer."""
+    
+    def render_to_response(self, context, **response_kwargs):
+        """Render using Jingo and return the response."""
+        template_names = self.get_template_names()
+        if len(template_names) > 1:
+            LOGGER.info('Jingo only works with a single template name; '
+                        'discarding ' + ', '.join(template_names[1:]))
+        template_name = template_names[0]
+        
+        return jingo.render(self.request, template_name, context,
+                            **response_kwargs)
+
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
@@ -187,21 +201,6 @@ def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
         criteria = entry.phase.judgement_criteria.all()
     
     return form_class(data, instance=judgement, criteria=criteria)
-
-
-class JingoTemplateMixin(TemplateResponseMixin):
-    """View mixin to render through Jingo rather than Django's renderer."""
-    
-    def render_to_response(self, context, **response_kwargs):
-        """Render using Jingo and return the response."""
-        template_names = self.get_template_names()
-        if len(template_names) > 1:
-            LOGGER.info('Jingo only works with a single template name; '
-                        'discarding ' + ', '.join(template_names[1:]))
-        template_name = template_names[0]
-        
-        return jingo.render(self.request, template_name, context,
-                            **response_kwargs)
 
 
 class SingleSubmissionMixin(SingleObjectMixin):
