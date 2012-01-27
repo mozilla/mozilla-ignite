@@ -6,6 +6,10 @@ class SubmissionBackend(object):
     supports_object_permissions = True
     supports_anonymous_user = True
     
+    def authenticate(self):
+        """This backend doesn't provide any authentication functionality."""
+        return None
+    
     def has_perm(self, user_obj, perm, obj=None):
         if perm in OWNER_PERMISSIONS:
             # Owners can edit and delete their own submissions
