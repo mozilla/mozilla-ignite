@@ -1,4 +1,4 @@
-from challenges.models import JudgeAssignment
+from challenges.models import Submission
 
 def assigned_submissions_processor(request):
     """Add the number of assigned submissions to the request context."""
@@ -11,5 +11,8 @@ def assigned_submissions_processor(request):
     if not user.has_perm('challenges.judge_submission'):
         return {}
     profile = user.get_profile()
-    assignment_count = JudgeAssignment.objects.filter(judge=profile).count()
-    return {'assignment_count': assignment_count}
+    
+    # Count the submissions assigned but not judged
+    assigned = (Submission.objects.filter(judgeassignment__judge=profile)
+                                  .exclude(judgement__judge=profile))
+    return {'assignment_count': assigned.count()}
