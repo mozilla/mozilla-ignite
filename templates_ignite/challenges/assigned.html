@@ -28,6 +28,11 @@
                 </h4>
             </a>
             <p>{{ entry.brief_description }}</p>
+            {% if entry.has_judged %}
+            <p>You have judged this submission</p>
+            {% else %}
+            <p>You haven&rsquo;t judged this submission yet</p>
+            {% endif %}
             <address>{{ created_by(entry, footer=False) }}</address>
             </article>
         </li>

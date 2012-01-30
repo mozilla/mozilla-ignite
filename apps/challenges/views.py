@@ -99,8 +99,17 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
                                            slug=self.kwargs['slug'])
-        submissions = Submission.objects.filter(phase__challenge=self.challenge)
-        return submissions.filter(judgeassignment__judge__user=self.request.user)
+        
+        ss = Submission.objects
+        submissions = (ss.filter(phase__challenge=self.challenge)
+                         .filter(judgeassignment__judge__user=self.request.user)
+                         .select_related('judgement__judge__user'))
+        
+        # Add a custom attribute for whether user has judged this submission
+        for submission in submissions:
+            submission.has_judged = any(j.judge.user == self.request.user
+                                        for j in submission.judgement_set.all())
+        return submissions
 
 
 entries_assigned = judge_required(AssignedEntriesView.as_view())
