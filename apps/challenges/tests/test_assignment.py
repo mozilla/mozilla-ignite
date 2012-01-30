@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 from django.contrib.auth.models import User, Group, Permission
-from django.test import TestCase
+from test_utils import TestCase
+from django.test.client import RequestFactory
 from django.core.cache import cache
 
 from challenges.tests.test_judging import judging_setup
@@ -9,6 +10,15 @@ from challenges.management.commands.assign import (get_judge_profiles,
                                                    get_submissions,
                                                    get_assignments)
 from challenges.models import Submission, Judgement, JudgeAssignment
+from ignite.tests.decorators import ignite_only
+
+
+def assignment_setup():
+    judging_setup(create_criteria=False, submission_count=5)
+    judging_permission = Permission.objects.get(codename='judge_submission')
+    charlie = User.objects.get(username='charlie')
+    charlie.user_permissions.add(judging_permission)
+    cache.clear()
 
 
 class AssignmentTest(TestCase):
@@ -21,12 +31,9 @@ class AssignmentTest(TestCase):
         self.assertTrue(max(counts.values()) - min(counts.values()) <= 1)
     
     def setUp(self):
-        judging_setup(create_criteria=False, submission_count=5)
+        assignment_setup()
         self.judging_permission = Permission.objects.get(
                                       codename='judge_submission')
-        charlie = User.objects.get(username='charlie')
-        charlie.user_permissions.add(self.judging_permission)
-        cache.clear()
     
     def test_get_judges(self):
         self.assertEqual(set([j.user.username for j in get_judge_profiles()]),
@@ -97,3 +104,59 @@ class AssignmentTest(TestCase):
         self.assertEvenAssignment(assignments)
         self.assertEqual(JudgeAssignment.objects.count(),
                          Submission.objects.count())
+
+
+class AssignmentContextTest(TestCase):
+    
+    def setUp(self):
+        assignment_setup()
+        self.judge_profile = User.objects.get(username='alex').get_profile()
+    
+    @ignite_only
+    def test_anonymous_context(self):
+        response = self.client.get('/')
+        assert response.context.get('assignment_count') is None
+    
+    @ignite_only
+    def test_judge_context(self):
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        assert response.context.get('assignment_count') is 0
+    
+    @ignite_only
+    def test_assigned_submission(self):
+        for submission in Submission.objects.all()[:2]:
+            JudgeAssignment.objects.create(submission=submission,
+                                           judge=self.judge_profile)
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        self.assertEqual(response.context.get('assignment_count'), 2)
+    
+    @ignite_only
+    def test_assigned_and_judged(self):
+        """Check that submissions don't count if the judge has judged them."""
+        assigned, judged = Submission.objects.all()[:2]
+        for submission in [assigned, judged]:
+            JudgeAssignment.objects.create(submission=submission,
+                                           judge=self.judge_profile)
+        Judgement.objects.create(submission=submission,
+                                 judge=self.judge_profile,
+                                 notes='Blah blah blah notes')
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        self.assertEqual(response.context.get('assignment_count'), 1)
+    
+    @ignite_only
+    def test_assigned_and_judged_by_other(self):
+        """Check that other judges' judgements don't discount the entry."""
+        assigned, judged = Submission.objects.all()[:2]
+        other_judge = User.objects.get(username='bob').get_profile()
+        for submission in [assigned, judged]:
+            JudgeAssignment.objects.create(submission=submission,
+                                           judge=self.judge_profile)
+        Judgement.objects.create(submission=submission,
+                                 judge=other_judge,
+                                 notes='Blah blah blah notes')
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        self.assertEqual(response.context.get('assignment_count'), 2)
