@@ -1,7 +1,24 @@
 from django.contrib import admin
+from django.contrib.auth.models import User, Permission
+from django.contrib.auth.admin import UserAdmin
+from django.db.models import Q
 
 from challenges.models import Challenge, Phase, Submission, ExternalLink, Category
 from challenges.models import JudgingCriterion, JudgingAnswer, Judgement, JudgeAssignment
+
+
+class JudgeAwareUserAdmin(UserAdmin):
+    
+    def is_judge(self, user):
+        judge_permission = Permission.objects.get(codename='judge_submission')
+        judges = User.objects.filter(Q(user_permissions=judge_permission) |
+                                     Q(groups__permissions=judge_permission))
+        return user in judges
+    
+    # Enable the pretty tick boxes in the Django admin
+    is_judge.boolean = True
+    
+    list_display = UserAdmin.list_display + ('is_judge',)
 
 
 class PhaseInline(admin.TabularInline):
@@ -63,6 +80,8 @@ class JudgementAdmin(admin.ModelAdmin):
     inlines = (JudgingAnswerInline,)
     list_display = ('__unicode__', 'submission', 'judge')
 
+admin.site.unregister(User)
+admin.site.register(User, JudgeAwareUserAdmin)
 
 admin.site.register(Challenge, ChallengeAdmin)
 admin.site.register(Submission, SubmissionAdmin)
