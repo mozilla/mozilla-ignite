@@ -103,7 +103,7 @@ class AssignmentTest(TestCase):
                                       commit=True)
         self.assertEvenAssignment(assignments)
         self.assertEqual(JudgeAssignment.objects.count(),
-                         Submission.objects.count())
+                         Submission.objects.count() * 2)
 
 
 class AssignmentContextTest(TestCase):
