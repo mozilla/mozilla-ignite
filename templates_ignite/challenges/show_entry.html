@@ -76,6 +76,11 @@
             {% if judging_form %}
             <section>
                 <h2>Rate this submission</h2>
+                {% if judge_assigned %}
+                <p>This submission has been assigned to you</p>
+                {% else %}
+                <p>This submission has not been assigned to you</p>
+                {% endif %}
                 <form method="POST" action="{{ entry.get_judging_url() }}">
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}

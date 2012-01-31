@@ -1,7 +1,7 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -10,6 +10,7 @@ from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import ProcessFormView, UpdateView, \
                                       DeleteView, ModelFormMixin
@@ -17,10 +18,11 @@ import jingo
 from tower import ugettext as _
 from voting.models import Vote
 
-from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet, \
-                             JudgingForm
-from challenges.models import Challenge, Phase, Submission, Category, \
-                              ExternalLink, Judgement, JudgingCriterion
+from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
+                              JudgingForm)
+from challenges.models import (Challenge, Phase, Submission, Category,
+                               ExternalLink, Judgement, JudgingCriterion,
+                               JudgeAssignment)
 from projects.models import Project
 
 challenge_humanised = {
@@ -33,6 +35,23 @@ challenge_humanised = {
 
 
 LOGGER = logging.getLogger(__name__)
+
+judge_required = permission_required('challenges.judge_submission')
+
+
+class JingoTemplateMixin(TemplateResponseMixin):
+    """View mixin to render through Jingo rather than Django's renderer."""
+    
+    def render_to_response(self, context, **response_kwargs):
+        """Render using Jingo and return the response."""
+        template_names = self.get_template_names()
+        if len(template_names) > 1:
+            LOGGER.info('Jingo only works with a single template name; '
+                        'discarding ' + ', '.join(template_names[1:]))
+        template_name = template_names[0]
+        
+        return jingo.render(self.request, template_name, context,
+                            **response_kwargs)
 
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
@@ -68,6 +87,32 @@ def show(request, project, slug, template_name='challenges/show.html', category=
 def entries_all(request, project, slug):
     """Show all entries (submissions) to a challenge."""
     return show(request, project, slug, template_name='challenges/all.html')
+
+
+class AssignedEntriesView(ListView, JingoTemplateMixin):
+    """Show entries assigned to be judged by the current user."""
+    
+    template_name = 'challenges/assigned.html'
+    context_object_name = 'entries'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        
+        ss = Submission.objects
+        submissions = (ss.filter(phase__challenge=self.challenge)
+                         .filter(judgeassignment__judge__user=self.request.user)
+                         .select_related('judgement__judge__user'))
+        
+        # Add a custom attribute for whether user has judged this submission
+        for submission in submissions:
+            submission.has_judged = any(j.judge.user == self.request.user
+                                        for j in submission.judgement_set.all())
+        return submissions
+
+
+entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 
 def entries_category(request, project, slug, category):
@@ -155,8 +200,13 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # Judging
     if not entry.judgeable_by(request.user):
         judging_form = None
-    elif judging_form is None:
-        judging_form = _get_judging_form(user=request.user, entry=entry)
+        judge_assigned = False
+    else:
+        if judging_form is None:
+            judging_form = _get_judging_form(user=request.user, entry=entry)
+        assignments = JudgeAssignment.objects
+        judge_assigned = assignments.filter(judge__user=request.user,
+                                            submission=entry).exists()
     
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
@@ -167,6 +217,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'user_vote': user_vote,
         'votes': votes['score'],
         'judging_form': judging_form,
+        'judge_assigned': judge_assigned,
     })
 
 
@@ -180,21 +231,6 @@ def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
         criteria = entry.phase.judgement_criteria.all()
     
     return form_class(data, instance=judgement, criteria=criteria)
-
-
-class JingoTemplateMixin(TemplateResponseMixin):
-    """View mixin to render through Jingo rather than Django's renderer."""
-    
-    def render_to_response(self, context, **response_kwargs):
-        """Render using Jingo and return the response."""
-        template_names = self.get_template_names()
-        if len(template_names) > 1:
-            LOGGER.info('Jingo only works with a single template name; '
-                        'discarding ' + ', '.join(template_names[1:]))
-        template_name = template_names[0]
-        
-        return jingo.render(self.request, template_name, context,
-                            **response_kwargs)
 
 
 class SingleSubmissionMixin(SingleObjectMixin):

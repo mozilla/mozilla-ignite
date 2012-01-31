@@ -5,18 +5,19 @@ from test_utils import TestCase
 
 from challenges.forms import JudgingForm
 from challenges.models import Phase, Submission, JudgingCriterion, Judgement, \
-                              JudgingAnswer
+                              JudgingAnswer, JudgeAssignment
 from challenges.tests.test_views import challenge_setup, challenge_teardown, \
                                         _create_submissions, _create_users
 from ignite.tests.decorators import ignite_only
 
 
-def judging_setup():
+def judging_setup(create_criteria=True, submission_count=1):
     challenge_setup()
-    questions = ['How %s is this idea?' % adjective
-                 for adjective in ['awesome', 'sane', 'badass']]
-    for question in questions:
-        Phase.objects.get().judgement_criteria.create(question=question)
+    if create_criteria:
+        questions = ['How %s is this idea?' % adjective
+                     for adjective in ['awesome', 'sane', 'badass']]
+        for question in questions:
+            Phase.objects.get().judgement_criteria.create(question=question)
     
     _create_users()
     submission_type = ContentType.objects.get_for_model(Submission)
@@ -26,7 +27,7 @@ def judging_setup():
     alex = User.objects.get(username='alex')
     alex.user_permissions.add(judge_permission)
     
-    _create_submissions(1, creator=alex.get_profile())
+    _create_submissions(submission_count, creator=alex.get_profile())
 
 
 class JudgingFormTest(TestCase):
@@ -193,6 +194,36 @@ class JudgingViewTest(TestCase):
         self.assertEqual(judgement.submission, submission)
         for answer in judgement.answers.all():
             self.assertEqual(answer.rating, 5)
+    
+    @ignite_only
+    def test_judge_not_assigned(self):
+        """Test behaviour when the current user is not assigned this entry."""
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        assert response.context['judge_assigned'] is False
+    
+    @ignite_only
+    def test_judge_assigned(self):
+        """Test behaviour when the current user is assigned this entry."""
+        submission = Submission.objects.get()
+        user_profile = User.objects.get(username='alex').get_profile()
+        JudgeAssignment.objects.create(submission=submission,
+                                       judge=user_profile)
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        assert response.context['judge_assigned'] is True
+    
+    @ignite_only
+    def test_another_judge_assigned(self):
+        """Test behaviour when the someone else is assigned this entry."""
+        submission = Submission.objects.get()
+        user_profile = User.objects.get(username='charlie').get_profile()
+        JudgeAssignment.objects.create(submission=submission,
+                                       judge=user_profile)
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        assert response.context['judge_assigned'] is False
     
     @ignite_only
     def test_amend_judgement(self):
