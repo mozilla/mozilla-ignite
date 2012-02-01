@@ -200,9 +200,6 @@ class Submission(BaseModel):
         default=True)
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
-    flagged_offensive = models.BooleanField(verbose_name=_(u'Flagged offensive?'), default=False)
-    flagged_offensive_reason=models.CharField(verbose_name=_(u'Reason flagged offensive'),
-        blank=True, null=True,max_length=100)
     
     phase = models.ForeignKey(Phase)
     
@@ -280,6 +277,20 @@ class Submission(BaseModel):
     
     class Meta:
         ordering = ['-id']
+
+
+EXCLUSION_REASONS = (('offensive', 'Offensive'),
+                     ('irrelevant', 'Irrelevant'),
+                     ('other', 'Other reason'))
+
+
+class ExclusionFlag(models.Model):
+    """Flags to exclude a submission from judging."""
+    
+    submission = models.ForeignKey(Submission)
+    
+    reason = models.CharField(max_length=50, choices=EXCLUSION_REASONS)
+    notes = models.TextField(blank=True)
 
 
 def submission_saved_handler(sender, instance, **kwargs):
