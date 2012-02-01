@@ -171,8 +171,17 @@ class Category(BaseModel):
         verbose_name_plural = 'Categories'
 
 
+class SubmissionManager(BaseModelManager):
+    
+    def eligible(self):
+        """Return all eligible submissions (i.e. those not excluded)."""
+        return self.filter(exclusionflag__isnull=True)
+
+
 class Submission(BaseModel):
     """A user's entry into a challenge."""
+    
+    objects = SubmissionManager()
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
     brief_description = models.CharField(max_length=200,

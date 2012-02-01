@@ -3,13 +3,15 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from mock import Mock, patch
 
 from projects.models import Project
 from challenges.models import Challenge, Submission, Phase, Category, \
-                              JudgingCriterion
+                              JudgingCriterion, ExclusionFlag
+from challenges.tests.fixtures import challenge_setup, create_submissions
 from ignite.tests.decorators import ignite_skip
 
 
@@ -227,3 +229,20 @@ class Criteria(TestCase):
                              min_value=0, max_value=0)
         # A range of 0 to 0 is valid, if not very useful
         c.clean()
+
+
+class TestSubmissions(TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        create_submissions(3)
+        cache.clear()
+    
+    def test_no_exclusions(self):
+        self.assertEqual(Submission.objects.eligible().count(), 3)
+    
+    def test_exclusion(self):
+        excluded = Submission.objects.all()[0]
+        ExclusionFlag.objects.create(submission=excluded, reason='other',
+                                     notes='Blah blah blah')
+        self.assertEqual(Submission.objects.eligible().count(), 2)
