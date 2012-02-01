@@ -291,6 +291,9 @@ class ExclusionFlag(models.Model):
     
     reason = models.CharField(max_length=50, choices=EXCLUSION_REASONS)
     notes = models.TextField(blank=True)
+    
+    def __unicode__(self):
+        return '%s (%s)' % (unicode(self.submission), self.reason)
 
 
 def submission_saved_handler(sender, instance, **kwargs):
