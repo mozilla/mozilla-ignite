@@ -9,7 +9,8 @@ from challenges.tests.test_judging import judging_setup
 from challenges.management.commands.assign import (get_judge_profiles,
                                                    get_submissions,
                                                    get_assignments)
-from challenges.models import Submission, Judgement, JudgeAssignment
+from challenges.models import (Submission, Judgement, JudgeAssignment,
+                               ExclusionFlag)
 from ignite.tests.decorators import ignite_only
 
 
@@ -58,6 +59,13 @@ class AssignmentTest(TestCase):
     
     def test_submissions(self):
         self.assertEqual(len(get_submissions()), 5)
+    
+    def test_no_excluded_submissions(self):
+        excluded = Submission.objects.get(title='Submission 3')
+        ExclusionFlag.objects.create(submission=excluded, reason='other')
+        
+        self.assertEqual(set(s.title for s in get_submissions()),
+                         set(['Submission %d' % n for n in [1, 2, 4, 5]]))
     
     def test_no_judged_submissions(self):
         """Test judged submissions aren't included for assignment."""
