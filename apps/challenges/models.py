@@ -288,17 +288,11 @@ class Submission(BaseModel):
         ordering = ['-id']
 
 
-EXCLUSION_REASONS = (('offensive', 'Offensive'),
-                     ('irrelevant', 'Irrelevant'),
-                     ('other', 'Other reason'))
-
-
 class ExclusionFlag(models.Model):
     """Flags to exclude a submission from judging."""
     
     submission = models.ForeignKey(Submission)
     
-    reason = models.CharField(max_length=50, choices=EXCLUSION_REASONS)
     notes = models.TextField(blank=True)
     
     def __unicode__(self):

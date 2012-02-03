@@ -97,8 +97,7 @@ class ExclusionFlagAdmin(admin.ModelAdmin):
     
     model = ExclusionFlag
     
-    list_display = ('submission', 'reason', 'notes')
-    list_filter = ('reason',)
+    list_display = ('submission', 'notes')
 
 
 admin.site.unregister(User)
