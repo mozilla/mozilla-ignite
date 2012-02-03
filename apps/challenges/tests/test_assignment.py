@@ -4,6 +4,7 @@ from django.contrib.auth.models import User, Group, Permission
 from test_utils import TestCase
 from django.test.client import RequestFactory
 from django.core.cache import cache
+from django.conf import settings
 
 from challenges.tests.test_judging import judging_setup
 from challenges.management.commands.assign import (get_judge_profiles,
@@ -102,8 +103,10 @@ class AssignmentTest(TestCase):
                                       judge_profiles=get_judge_profiles(),
                                       commit=True)
         self.assertEvenAssignment(assignments)
+        expected_submissions = (settings.JUDGES_PER_SUBMISSION *
+                                Submission.objects.count())
         self.assertEqual(JudgeAssignment.objects.count(),
-                         Submission.objects.count() * 2)
+                         expected_submissions)
 
 
 class AssignmentContextTest(TestCase):

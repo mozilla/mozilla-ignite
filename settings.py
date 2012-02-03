@@ -343,3 +343,5 @@ CACHE_BACKEND = 'caching.backends.locmem://'
 CACHE_COUNT_TIMEOUT = 60
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
+
+JUDGES_PER_SUBMISSION = 2
