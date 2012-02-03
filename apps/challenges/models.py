@@ -285,6 +285,10 @@ class Submission(BaseModel):
         return any(user.has_perm(permission_name, obj=obj)
                    for obj in [None, self])
     
+    def visible_to(self, user):
+        """Return True if the user provided can see this entry."""
+        return self._permission_check(user, 'challenges.view_submission')
+    
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
         return self._permission_check(user, 'challenges.edit_submission')

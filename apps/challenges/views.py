@@ -5,6 +5,7 @@ from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
@@ -59,7 +60,8 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     """ Pagination options """
-    entry_set = Submission.objects.filter(phase__challenge=challenge)
+    entry_set = Submission.objects.visible(request.user)
+    entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
         entry_set = entry_set.filter(category__name=category)
     paginator = Paginator(entry_set, 25)
@@ -182,19 +184,30 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
                               phase__challenge=challenge)
+    
+    if not entry.visible_to(request.user):
+        raise Http404
+    
     # Sidebar
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
     
     ## Previous/next modules
+    # We can't use Django's built-in methods here, because we need to restrict
+    # to entries the current user is allowed to see
+    entries = Submission.objects.visible(request.user)
     try:
-        previous = entry.get_previous_by_created_on()
-    except Submission.DoesNotExist:
+        previous_entries = entries.filter(Q(created_on__lt=entry.created_on) |
+                                          Q(pk__lt=entry.pk))
+        previous = previous_entries.order_by('-created_on')[0]
+    except IndexError:
         previous = False
     try:
-        next = entry.get_next_by_created_on()
-    except Submission.DoesNotExist:
+        next_entries = entries.filter(Q(created_on__gt=entry.created_on) |
+                                      Q(pk__gt=entry.pk))
+        next = next_entries.order_by('created_on')[0]
+    except IndexError:
         next = False
     
     # Judging
