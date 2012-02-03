@@ -296,7 +296,7 @@ class ExclusionFlag(models.Model):
     notes = models.TextField(blank=True)
     
     def __unicode__(self):
-        return '%s (%s)' % (unicode(self.submission), self.reason)
+        return unicode(self.submission)
 
 
 def submission_saved_handler(sender, instance, **kwargs):
