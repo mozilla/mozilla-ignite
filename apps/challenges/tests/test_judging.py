@@ -175,6 +175,23 @@ class JudgingViewTest(TestCase):
         self.assertEqual(set(judging_form.fields.keys()), expected_keys)
     
     @ignite_only
+    def test_non_eliminated_entry(self):
+        """Test that non-eliminated entries are not marked as eliminated."""
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        self.assertEqual(response.context['excluded'], False)
+    
+    @ignite_only
+    def test_eliminated_entry(self):
+        """Test that eliminated entries are shown properly."""
+        submission = Submission.objects.get()
+        submission.exclusionflag_set.create(notes='This entry sucks')
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        self.assertEqual(response.context['excluded'], True)
+    
+    @ignite_only
     def test_submit_judge_form(self):
         """Test judging an unjudged submission."""
         submission = Submission.objects.get()
