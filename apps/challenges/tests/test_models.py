@@ -11,7 +11,8 @@ from mock import Mock, patch
 from projects.models import Project
 from challenges.models import Challenge, Submission, Phase, Category, \
                               JudgingCriterion, ExclusionFlag
-from challenges.tests.fixtures import challenge_setup, create_submissions
+from challenges.tests.fixtures import (challenge_setup, create_submissions,
+                                       create_users)
 from ignite.tests.decorators import ignite_skip
 
 
@@ -245,3 +246,41 @@ class TestSubmissions(TestCase):
         excluded = Submission.objects.all()[0]
         ExclusionFlag.objects.create(submission=excluded, notes='Blah blah')
         self.assertEqual(Submission.objects.eligible().count(), 2)
+    
+class DraftSubmissionTest(TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        create_users()
+        alex_profile = User.objects.get(username='alex').get_profile()
+        create_submissions(5, creator=alex_profile)
+        
+        self.draft_submission = Submission.objects.all()[0]
+        self.draft_submission.is_draft = True
+        self.draft_submission.save()
+        
+        cache.clear()
+    
+    def test_draft_not_public(self):
+        assert self.draft_submission not in Submission.objects.visible()
+    
+    def test_non_draft_visible(self):
+        """Test live submissions are visible to anyone and everyone."""
+        alex, bob = [User.objects.get(username=u) for u in ['alex', 'bob']]
+        s = Submission.objects.all()[3]
+        assert s in Submission.objects.visible()
+        for user in [alex, bob]:
+            assert s in Submission.objects.visible(user=user)
+            assert user.has_perm('challenges.view_submission', obj=s)
+    
+    def test_draft_not_visible_to_user(self):
+        bob = User.objects.get(username='bob')
+        assert self.draft_submission not in Submission.objects.visible(user=bob)
+        assert not bob.has_perm('challenges.view_submission',
+                                obj=self.draft_submission)
+    
+    def test_draft_visible_to_author(self):
+        alex = User.objects.get(username='alex')
+        assert self.draft_submission in Submission.objects.visible(user=alex)
+        assert alex.has_perm('challenges.view_submission',
+                             obj=self.draft_submission)

@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from markdown import markdown
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
@@ -176,6 +177,22 @@ class SubmissionManager(BaseModelManager):
     def eligible(self):
         """Return all eligible submissions (i.e. those not excluded)."""
         return self.filter(exclusionflag__isnull=True)
+    
+    # Note: normally anything mutable wouldn't go into a default, but we can be
+    # sure this method doesn't modify the anonymous user
+    def visible(self, user=AnonymousUser()):
+        """Return all submissions that are visible.
+        
+        If a user is provided, return all submissions visible to that user; if
+        not, return all submissions visible to the general public.
+        
+        """
+        if user.is_superuser:
+            return self.all()
+        criteria = models.Q(is_draft=False)
+        if not user.is_anonymous():
+            criteria |= models.Q(created_by__user=user)
+        return self.filter(criteria)
 
 
 class Submission(BaseModel):
