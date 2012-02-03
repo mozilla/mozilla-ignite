@@ -62,7 +62,7 @@ class AssignmentTest(TestCase):
     
     def test_no_excluded_submissions(self):
         excluded = Submission.objects.get(title='Submission 3')
-        ExclusionFlag.objects.create(submission=excluded, reason='other')
+        ExclusionFlag.objects.create(submission=excluded)
         
         self.assertEqual(set(s.title for s in get_submissions()),
                          set(['Submission %d' % n for n in [1, 2, 4, 5]]))

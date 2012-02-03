@@ -243,6 +243,5 @@ class TestSubmissions(TestCase):
     
     def test_exclusion(self):
         excluded = Submission.objects.all()[0]
-        ExclusionFlag.objects.create(submission=excluded, reason='other',
-                                     notes='Blah blah blah')
+        ExclusionFlag.objects.create(submission=excluded, notes='Blah blah')
         self.assertEqual(Submission.objects.eligible().count(), 2)
