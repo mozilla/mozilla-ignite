@@ -3,12 +3,12 @@ from itertools import cycle, izip
 from optparse import make_option
 import random
 
+from django.conf import settings
 from django.contrib.auth.models import User, Permission
 from django.core.management.base import NoArgsCommand
 from django.db.models import Q
 
 from challenges.models import Submission, JudgeAssignment
-
 
 def count_of(thing_list, thing_name, plural_name=None, colon=False):
     """Return a string representing a count of things, given in thing_list.
@@ -59,13 +59,22 @@ def get_assignments(submissions, judge_profiles, commit):
     """
     judge_profiles = list(judge_profiles)
     random.shuffle(judge_profiles)
-    pairings = izip(submissions, cycle(judge_profiles))
+    assert len(judge_profiles) >= settings.JUDGES_PER_SUBMISSION
+    judge_sequences = [cycle(judge_profiles) for _ in
+                       range(settings.JUDGES_PER_SUBMISSION)]
+    # Offset each judge sequence by 1
+    for offset, sequence in enumerate(judge_sequences):
+        for _ in xrange(offset):
+            sequence.next()
+    
+    pairings = izip(submissions, izip(*judge_sequences))
     assignments = []
-    for submission, judge in pairings:
-        assignment = JudgeAssignment(submission=submission, judge=judge)
-        if commit:
-            assignment.save()
-        assignments.append(assignment)
+    for submission, judge_list in pairings:
+        for judge in judge_list:
+            assignment = JudgeAssignment(submission=submission, judge=judge)
+            if commit:
+                assignment.save()
+            assignments.append(assignment)
     return assignments
 
 
@@ -96,13 +105,14 @@ class Command(NoArgsCommand):
                 for judge in judge_profiles:
                     print '    %s [%s]' % (judge.display_name,
                                            judge.user.username)
-        if submissions and not judge_profiles:
-            print "You don't have any judges assigned"
+        if submissions and len(judge_profiles) < settings.JUDGES_PER_SUBMISSION:
+            print "You don't have enough judges assigned: you need %d" % \
+                  settings.JUDGES_PER_SUBMISSION
             sys.exit(1)
         
         assignments = get_assignments(submissions, judge_profiles,
                                       commit=not dry_run)
         if verbose:
-            for assignment in assignment:
+            for assignment in assignments:
                 print '"%s" goes to %s' % (assignment.submission.title,
                                            assignment.judge.display_name)
