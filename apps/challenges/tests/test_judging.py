@@ -6,8 +6,8 @@ from test_utils import TestCase
 from challenges.forms import JudgingForm
 from challenges.models import Phase, Submission, JudgingCriterion, Judgement, \
                               JudgingAnswer, JudgeAssignment
-from challenges.tests.test_views import challenge_setup, challenge_teardown, \
-                                        _create_submissions, _create_users
+from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
+                                       create_submissions, create_users)
 from ignite.tests.decorators import ignite_only
 
 
@@ -19,7 +19,7 @@ def judging_setup(create_criteria=True, submission_count=1):
         for question in questions:
             Phase.objects.get().judgement_criteria.create(question=question)
     
-    _create_users()
+    create_users()
     submission_type = ContentType.objects.get_for_model(Submission)
     judge_permission, _ = Permission.objects.get_or_create(
                                         codename='judge_submission',
@@ -27,7 +27,7 @@ def judging_setup(create_criteria=True, submission_count=1):
     alex = User.objects.get(username='alex')
     alex.user_permissions.add(judge_permission)
     
-    _create_submissions(submission_count, creator=alex.get_profile())
+    create_submissions(submission_count, creator=alex.get_profile())
 
 
 class JudgingFormTest(TestCase):
@@ -173,6 +173,23 @@ class JudgingViewTest(TestCase):
         expected_keys = set(['criterion_%s' % c.pk for c in criteria])
         expected_keys.add('notes')
         self.assertEqual(set(judging_form.fields.keys()), expected_keys)
+    
+    @ignite_only
+    def test_non_eliminated_entry(self):
+        """Test that non-eliminated entries are not marked as eliminated."""
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        self.assertEqual(response.context['excluded'], False)
+    
+    @ignite_only
+    def test_eliminated_entry(self):
+        """Test that eliminated entries are shown properly."""
+        submission = Submission.objects.get()
+        submission.exclusionflag_set.create(notes='This entry sucks')
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url())
+        self.assertEqual(response.context['excluded'], True)
     
     @ignite_only
     def test_submit_judge_form(self):

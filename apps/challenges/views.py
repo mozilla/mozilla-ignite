@@ -216,6 +216,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'next': next or False,
         'user_vote': user_vote,
         'votes': votes['score'],
+        'excluded': entry.exclusionflag_set.exists(),
         'judging_form': judging_form,
         'judge_assigned': judge_assigned,
     })

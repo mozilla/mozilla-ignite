@@ -3,8 +3,9 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Q
 
-from challenges.models import Challenge, Phase, Submission, ExternalLink, Category
-from challenges.models import JudgingCriterion, JudgingAnswer, Judgement, JudgeAssignment
+from challenges.models import (Challenge, Phase, Submission, ExternalLink,
+                               Category, ExclusionFlag, JudgingCriterion,
+                               JudgingAnswer, Judgement, JudgeAssignment)
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -37,15 +38,21 @@ class JudgeAssignmentInline(admin.StackedInline):
     max_num = 1
 
 
+class ExclusionFlagInline(admin.StackedInline):
+    model = ExclusionFlag
+    extra = 1
+
+
 class SubmissionAdmin(admin.ModelAdmin):
     
     model = Submission
     list_display = ('title', 'created_by', 'category', 'phase', 'is_live',
-                    'is_winner', 'judge_assignment', 'judgement_count')
+                    'is_winner', 'excluded', 'judge_assignment',
+                    'judgement_count')
     list_filter = ('category', 'is_live', 'is_winner')
     list_select_related = True  # For the judgement fields
     
-    inlines = (JudgeAssignmentInline,)
+    inlines = (JudgeAssignmentInline, ExclusionFlagInline)
     
     def judge_assignment(self, submission):
         """Return the names of all judges assigned to this submission."""
@@ -54,6 +61,11 @@ class SubmissionAdmin(admin.ModelAdmin):
             return 'No judge'
         else:
             return ', '.join(a.judge.display_name for a in assignments)
+    
+    def excluded(self, submission):
+        return submission.exclusionflag_set.exists()
+    
+    excluded.boolean = True
     
     def judgement_count(self, submission):
         return submission.judgement_set.count()
@@ -80,6 +92,14 @@ class JudgementAdmin(admin.ModelAdmin):
     inlines = (JudgingAnswerInline,)
     list_display = ('__unicode__', 'submission', 'judge')
 
+
+class ExclusionFlagAdmin(admin.ModelAdmin):
+    
+    model = ExclusionFlag
+    
+    list_display = ('submission', 'notes')
+
+
 admin.site.unregister(User)
 admin.site.register(User, JudgeAwareUserAdmin)
 
@@ -88,6 +108,7 @@ admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(ExternalLink)
 admin.site.register(Phase)
 admin.site.register(Category, CategoryAdmin)
+admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 
 admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)

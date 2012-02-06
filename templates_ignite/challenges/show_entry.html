@@ -75,6 +75,12 @@
         <aside class="col box">
             {% if judging_form %}
             <section>
+                {% if excluded %}
+                {# For the love of all that is holy, style me #}
+                <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
+                    {% trans %}This entry has been eliminated from the contest.{% endtrans %}
+                </p>
+                {% endif %}
                 <h2>Rate this submission</h2>
                 {% if judge_assigned %}
                 <p>This submission has been assigned to you</p>

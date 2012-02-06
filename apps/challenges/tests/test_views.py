@@ -12,6 +12,8 @@ import test_utils
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import Challenge, Submission, Phase, Category, ExternalLink
+from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
+                                       create_users, create_submissions)
 from ignite.tests.decorators import ignite_skip
 from projects.models import Project
 
@@ -23,96 +25,11 @@ suppress_locale_middleware = patch.object(LocaleURLMiddleware,
                                           lambda *args: None)
 
 
-def challenge_setup():
-    """Set up some sample data to test with.
-    
-    This is a bit clearer and hopefully more flexible than using fixtures.
-    
-    """
-    challenge_teardown()  # In case other tests didn't clean up
-    
-    p = Project()
-    p.name = 'My Project'
-    p.slug = getattr(settings, 'IGNITE_PROJECT_SLUG', 'my-project')
-    p.description = 'My super awesome project of awesomeness.'
-    p.long_description = 'Did I mention how awesome it was?'
-    p.allow_participation = True
-    p.save()
-    
-    c = Challenge()
-    c.project = p
-    c.title, 'My Challenge'
-    c.slug = getattr(settings, 'IGNITE_CHALLENGE_SLUG', 'my-challenge')
-    c.summary = 'Are you up to it?'
-    c.description = 'This is a challenge of supreme challengingness.'
-    c.end_date = datetime.now() + timedelta(days=365)
-    c.save()
-    
-    ph = Phase()
-    ph.challenge = c
-    ph.name = 'Phase 1'
-    ph.order = 1
-    ph.save()
-
-    cat = Category()
-    cat.name = 'Beer'
-    cat.slug = 'beer'
-    cat.save()
-
-
-def challenge_teardown():
-    """Tear down any data created by these tests."""
-    for model in [ExternalLink, Submission, Phase, Challenge, Category, Project, User]:
-        model.objects.all().delete()
-
-
 def _build_request(path=None):
     request = Mock()
     request.path = path
     request._messages = []  # Stop messaging code trying to iterate a Mock
     return request
-
-
-def _create_submissions(count, phase=None, creator=None):
-    """Create a number of fake submissions. Return their titles.
-    
-    If a phase is not supplied, assume only one phase exists.
-    
-    If a creator is not supplied, try to get a single user's profile, or create
-    a dummy user.
-    
-    """
-    if phase is None:
-        phase = Phase.objects.get()
-    
-    if creator is None:
-        try:
-            user = User.objects.get()
-        except User.DoesNotExist:
-            user = User.objects.create_user('bob', 'bob@example.com', 'bob')
-        creator = user.get_profile()
-
-    category = Category.objects.all()[0]
-    
-    titles = ['Submission %d' % i for i in range(1, count + 1)]
-    for title in titles:
-        foo = Submission.objects.create(title=title,
-                                  brief_description='A submission',
-                                  description='A really good submission',
-                                  phase=phase,
-                                  created_by=creator,
-                                  category=category)
-    return titles
-
-
-def _create_users():
-    for name in ['alex', 'bob', 'charlie']:
-        user = User.objects.create_user(name, '%s@example.com' % name,
-                                        password=name)
-        # Give the user a display name to stop 'complete your profile' redirect
-        profile = user.get_profile()
-        profile.name = '%(name)s %(name)sson' % {'name': name.capitalize()}
-        profile.save()
 
 
 @ignite_skip
@@ -144,7 +61,7 @@ class ChallengeEntryTest(test_utils.TestCase):
     @ignite_skip
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
-        submission_titles = _create_submissions(3)
+        submission_titles = create_submissions(3)
         response = self.client.get('/en-US/my-project/challenges/my-challenge/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
@@ -159,7 +76,7 @@ class ChallengeEntryTest(test_utils.TestCase):
         being practically identical to the one above.
         
         """
-        submission_titles = _create_submissions(4)
+        submission_titles = create_submissions(4)
         response = self.client.get('/en-US/my-project/challenges/my-challenge/entries/')
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
@@ -200,7 +117,7 @@ class CreateEntryTest(test_utils.TestCase):
                                                   Challenge.objects.get().slug)
         self.entry_form_path = '/en-US/%s/challenges/%s/entries/add/' % \
                                (self.project_slug, self.challenge_slug)
-        _create_users()
+        create_users()
     
     def tearDown(self):
         challenge_teardown()
@@ -304,7 +221,7 @@ class ShowEntryTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
-        _create_users()
+        create_users()
         alex_profile = User.objects.get(username='alex').get_profile()
         s = Submission.objects.create(phase=Phase.objects.get(),
                                       title='A submission',
@@ -335,7 +252,7 @@ class EditEntryTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
-        _create_users()
+        create_users()
         
         admin = User.objects.create_user('admin', 'admin@example.com',
                                          password='admin')
@@ -348,7 +265,7 @@ class EditEntryTest(test_utils.TestCase):
         admin_profile.save()
         
         alex_profile = User.objects.get(username='alex').get_profile()
-        _create_submissions(1, creator=alex_profile)
+        create_submissions(1, creator=alex_profile)
         
         entry = Submission.objects.get()
         self.view_path = entry.get_absolute_url()
@@ -432,10 +349,10 @@ class EditLinkTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
-        _create_users()
+        create_users()
         
         alex_profile = User.objects.get(username='alex').get_profile()
-        _create_submissions(1, creator=alex_profile)
+        create_submissions(1, creator=alex_profile)
         
         submission = Submission.objects.get()
         self.view_path = submission.get_absolute_url()
@@ -510,10 +427,10 @@ class DeleteEntryTest(test_utils.TestCase):
     
     def setUp(self):
         challenge_setup()
-        _create_users()
+        create_users()
         
         alex_profile = User.objects.get(username='alex').get_profile()
-        _create_submissions(1, creator=alex_profile)
+        create_submissions(1, creator=alex_profile)
         
         submission = Submission.objects.get()
         

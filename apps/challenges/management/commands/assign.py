@@ -46,7 +46,7 @@ def get_submissions():
     is_judged = Q(judgement__isnull=False)
     is_assigned = Q(judgeassignment__isnull=False)
     
-    return Submission.objects.exclude(is_judged | is_assigned)
+    return Submission.objects.eligible().exclude(is_judged | is_assigned)
 
 
 def get_assignments(submissions, judge_profiles, commit):
