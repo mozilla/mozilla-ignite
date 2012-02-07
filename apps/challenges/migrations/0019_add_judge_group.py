@@ -15,8 +15,13 @@ class Migration(DataMigration):
         Group, Permission = orm['auth.Group'], orm['auth.Permission']
         
         ContentType = orm['contenttypes.ContentType']
-        submissions = ContentType.objects.get(app_label='challenges',
-                                              model='submission')
+        try:
+            submissions = ContentType.objects.get(app_label='challenges',
+                                                  model='submission')
+        except ContentType.DoesNotExist:
+            submissions = ContentType.objects.create(app_label='challenges',
+                                                     model='submission',
+                                                     name='submission')
         
         judge_group, _ = Group.objects.get_or_create(name='Judges')
         judge_perm, _ = Permission.objects.get_or_create(
