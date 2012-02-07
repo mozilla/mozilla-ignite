@@ -228,11 +228,6 @@ class Submission(BaseModel):
     created_on = models.DateTimeField(default=datetime.utcnow)
     
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
-    """
-    The default value for this will be decided depending on it's project
-    """
-    is_live = models.BooleanField(verbose_name=_(u'Visible to the public?'),
-        default=True)
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
     
@@ -329,19 +324,6 @@ class ExclusionFlag(models.Model):
     
     def __unicode__(self):
         return unicode(self.submission)
-
-
-def submission_saved_handler(sender, instance, **kwargs):
-    """
-    Check if parent participation is set to moderate and set _is_live to False
-    """
-    if not isinstance(instance, Submission):
-        return
-    # check submissions we want to moderate don't go direct to live
-    instance.is_live = not instance.challenge.moderate
-
-
-pre_save.connect(submission_saved_handler, sender=Submission)
 
 
 class JudgingCriterion(models.Model):

@@ -46,10 +46,10 @@ class ExclusionFlagInline(admin.StackedInline):
 class SubmissionAdmin(admin.ModelAdmin):
     
     model = Submission
-    list_display = ('title', 'created_by', 'category', 'phase', 'is_live',
+    list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
                     'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
-    list_filter = ('category', 'is_live', 'is_winner')
+    list_filter = ('category', 'is_draft', 'is_winner')
     list_select_related = True  # For the judgement fields
     
     inlines = (JudgeAssignmentInline, ExclusionFlagInline)
