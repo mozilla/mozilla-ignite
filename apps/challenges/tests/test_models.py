@@ -79,7 +79,6 @@ class EntriesToLive(TestCase):
         self.submission = Submission.objects.create(
             title=u'A submission to test',
             description=u'<h3>Testing bleach</h3>',
-            is_live=True,
             phase=self.phase,
             created_by=self.user.get_profile(),
             category=self.category
@@ -87,18 +86,11 @@ class EntriesToLive(TestCase):
         self.submission_marked = Submission.objects.create(
             title=u'A submission with markdown',
             description=u'I **really** like cake',
-            is_live=True,
             phase=self.phase,
             created_by=self.user.get_profile(),
             category=self.category
         )
 
-    def test_entry_hidden(self):
-        """
-        The user wants the entry to go live but it needs moderating first
-        """
-        self.assertEqual(self.submission.is_live, False)
-    
     def test_phase_unicode(self):
         """Test the string representation of a phase."""
         self.assertEqual(unicode(self.phase),
@@ -118,6 +110,7 @@ class EntriesToLive(TestCase):
         """
         self.assertEqual(self.submission_marked.description_html,
             '<p>I <strong>really</strong> like cake</p>')
+
 
 class CategoryManager(TestCase):
     
