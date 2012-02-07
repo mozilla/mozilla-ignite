@@ -51,24 +51,27 @@ class ChallengeEntryTest(test_utils.TestCase):
         challenge_teardown()
     
     @ignite_skip
+    @suppress_locale_middleware
     def test_no_entries(self):
         """Test that challenges display ok without any entries."""
-        response = self.client.get('/en-US/my-project/challenges/my-challenge/')
+        response = self.client.get(Challenge.objects.get().get_absolute_url())
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal(len(response.context['entries'].object_list), 0)
     
     @ignite_skip
+    @suppress_locale_middleware
     def test_challenge_entries(self):
         """Test that challenge entries come through to the challenge view."""
         submission_titles = create_submissions(3)
-        response = self.client.get('/en-US/my-project/challenges/my-challenge/')
+        response = self.client.get(Challenge.objects.get().get_entries_url())
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
-    @ignite_skip
+    # @ignite_skip
+    @suppress_locale_middleware
     def test_entries_view(self):
         """Test the dedicated entries view.
         
@@ -77,11 +80,26 @@ class ChallengeEntryTest(test_utils.TestCase):
         
         """
         submission_titles = create_submissions(4)
-        response = self.client.get('/en-US/my-project/challenges/my-challenge/entries/')
+        response = self.client.get(Challenge.objects.get().get_entries_url())
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
+    
+    # @ignite_skip
+    @suppress_locale_middleware
+    def test_hidden_entries(self):
+        """Test that draft entries are not visible on the entries page."""
+        create_submissions(3)
+        submissions = Submission.objects.all()
+        hidden_submission = submissions[0]
+        hidden_submission.is_draft = True
+        hidden_submission.save()
+        
+        response = self.client.get(Challenge.objects.get().get_entries_url())
+        # Check the draft submission is hidden
+        assert_equal(set(response.context['entries'].object_list),
+                     set(submissions[1:]))
 
 
 # Add this dictionary to a form for no external links

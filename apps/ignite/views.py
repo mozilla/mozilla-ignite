@@ -9,13 +9,10 @@ def splash(request, project, slug, template_name='challenges/show.html'):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
-    entries = Submission.objects.filter(
-        phase__challenge=challenge
-    ).exclude(
-        is_draft=True
-    ).extra(
-        order_by="?"
-    )
+    entries = (Submission.objects.visible()
+                                 .filter(phase__challenge=challenge)
+                                 .order_by("?"))
+    
     return jingo.render(request, 'ignite/splash.html', {
         'challenge': challenge,
         'project': project,

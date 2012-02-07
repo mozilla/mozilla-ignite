@@ -15,4 +15,9 @@ class SubmissionBackend(object):
             # Owners can edit and delete their own submissions
             if obj is not None and user_obj == obj.created_by.user:
                 return True
+        if perm == 'challenges.view_submission' and obj is not None:
+            # Live, non-draft submissions are visible to anyone. Other
+            # submissions are visible only to admins and their owners
+            return ((obj.is_live and not obj.is_draft) or
+                    user_obj == obj.created_by.user)
         return False

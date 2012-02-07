@@ -3,6 +3,7 @@ from dateutil.relativedelta import relativedelta
 from markdown import markdown
 
 from django.conf import settings
+from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
@@ -63,20 +64,29 @@ class Challenge(BaseModel):
     def __unicode__(self):
         return self.title
     
-    def get_absolute_url(self):
-        """Return this challenge's URL.
+    def _lookup_url(self, view_name, kwargs=None):
+        """Look up a URL related to this challenge.
         
         Note that this needs to account both for an Ignite-style URL structure,
         where there is a single challenge for the entire site, and sites where
         there are multiple challenges.
         
         """
+        if kwargs is None:
+            kwargs = {}
         try:
-            # Match for a single-challenge site if we can
-            return reverse('challenge_show')
+            return reverse(view_name, kwargs=kwargs)
         except NoReverseMatch:
-            kwargs = {'project': self.project.slug, 'slug': self.slug}
-            return reverse('challenge_show', kwargs=kwargs)
+            kwargs.update({'project': self.project.slug, 'slug': self.slug})
+            return reverse(view_name, kwargs=kwargs)
+    
+    def get_absolute_url(self):
+        """Return this challenge's URL."""
+        return self._lookup_url('challenge_show')
+    
+    def get_entries_url(self):
+        """Return the URL for this challenge's entry list."""
+        return self._lookup_url('entries_all')
 
 
 class PhaseManager(BaseModelManager):
@@ -176,6 +186,22 @@ class SubmissionManager(BaseModelManager):
     def eligible(self):
         """Return all eligible submissions (i.e. those not excluded)."""
         return self.filter(exclusionflag__isnull=True)
+    
+    # Note: normally anything mutable wouldn't go into a default, but we can be
+    # sure this method doesn't modify the anonymous user
+    def visible(self, user=AnonymousUser()):
+        """Return all submissions that are visible.
+        
+        If a user is provided, return all submissions visible to that user; if
+        not, return all submissions visible to the general public.
+        
+        """
+        if user.is_superuser:
+            return self.all()
+        criteria = models.Q(is_draft=False)
+        if not user.is_anonymous():
+            criteria |= models.Q(created_by__user=user)
+        return self.filter(criteria)
 
 
 class Submission(BaseModel):
@@ -224,7 +250,7 @@ class Submission(BaseModel):
     def __unicode__(self):
         return self.title
     
-    def _lookup_url(self, view_name, kwargs):
+    def _lookup_url(self, view_name, kwargs=None):
         """Look up a URL related to this submission.
         
         Note that this needs to account both for an Ignite-style URL structure,
@@ -232,6 +258,8 @@ class Submission(BaseModel):
         there are multiple challenges.
         
         """
+        if kwargs is None:
+            kwargs = {}
         try:
             return reverse(view_name, kwargs=kwargs)
         except NoReverseMatch:
@@ -267,6 +295,10 @@ class Submission(BaseModel):
         """
         return any(user.has_perm(permission_name, obj=obj)
                    for obj in [None, self])
+    
+    def visible_to(self, user):
+        """Return True if the user provided can see this entry."""
+        return self._permission_check(user, 'challenges.view_submission')
     
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
