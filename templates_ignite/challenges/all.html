@@ -42,11 +42,13 @@
                 </h4>
             </a>
             {% if entry.editable_by(user) %}
+            {% if entry.is_draft %}
             <div class="alerts inline">
                 <p><strong>Idea in draft</strong></p>
                 <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
                 <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
             </div>
+            {% endif %}
             {% endif %}
             <p>{{ entry.brief_description }}</p>
             <address>{{ created_by(entry, footer=False) }}</address>

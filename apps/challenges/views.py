@@ -162,7 +162,10 @@ def create_entry(request, project, slug):
                         url = link['url'],
                         submission = entry
                     )
-            msg = _('Your entry has been posted successfully and is now available for public review')
+            if entry.is_draft:
+                msg = _('<strong>Your entry has been saved as draft.</strong> When you want the world to see it then uncheck the "Save as draft?" option from your idea editting page')
+            else:
+                msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_absolute_url())
         else:
