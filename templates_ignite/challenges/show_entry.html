@@ -118,6 +118,10 @@
             <section>
                 <h2>Vote</h2>
                 {% if user.is_authenticated() %}
+                {% if entry.editable_by(user) %}
+                    <p><strong>Looking for more votes?</strong></p>
+                    <p>Use the social media sharing buttons above, or just get your friends to head to <em>http://www.mozillaignite.org{{ entry.get_absolute_url() }}</em></p>
+                {% else %}
                 {% if user_vote and user_vote.is_upvote %}
                 <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
@@ -128,6 +132,7 @@
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
+                {% endif %}
                 {% endif %}
                 {% else %}
                 <p>If you would like to vote up this submission then please login or register to Mozilla Ignite.</p>
