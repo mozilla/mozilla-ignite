@@ -205,13 +205,13 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
                                           Q(pk__lt=entry.pk))
         previous = previous_entries.order_by('-created_on')[0]
     except IndexError:
-        previous = False
+        previous = entries.order_by('-created_on')[0]
     try:
         next_entries = entries.filter(Q(created_on__gt=entry.created_on) |
                                       Q(pk__gt=entry.pk))
         next = next_entries.order_by('created_on')[0]
     except IndexError:
-        next = False
+        next = entries.order_by('created_on')[0]
     
     # Judging
     if not entry.judgeable_by(request.user):
