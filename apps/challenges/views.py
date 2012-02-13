@@ -167,7 +167,7 @@ def create_entry(request, project, slug):
             else:
                 msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
-            return HttpResponseRedirect(phase.challenge.get_absolute_url())
+            return HttpResponseRedirect(phase.challenge.get_entries_url())
         else:
             form_errors = extract_form_errors(form, link_form)
     else:
