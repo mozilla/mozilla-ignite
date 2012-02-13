@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
-{% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} |{% else %}{{ _('All submissions') }} |{% endif %}{% endblock %}
+{% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} | {% else %}{{ _('All submissions') }} | {% endif %}{% endblock %}
 
 {% block page_id %}all_submissions{% endblock %}
 
