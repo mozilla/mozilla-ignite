@@ -1,8 +1,9 @@
 ignite.idea_links = function() {
     var links = $('fieldset.external_links'),
-        add_link_set;
+        add_link_set,
+        delete_link_set;
     add_link_set = function() {
-        var add_link = $('<a href="#" class="add_link">Add another link</a>').appendTo(links),
+        var add_link = $('<a href="#" class="cta do add_link">Add another link</a>').appendTo(links),
             total_links = $('#id_externals-TOTAL_FORMS');
         add_link.click(function() {
             var rows = links.find('div.inline_field'),
@@ -29,7 +30,32 @@ ignite.idea_links = function() {
             return false;
         });
     };
+    delete_link_set = function() {
+        links.bind('click', function(event) {
+            var that = $(event.target);
+            if (that.is('.delete_link')) {
+                var row = that.closest('div.inline_field'),
+                    elm = row.detach();
+                /*
+                 * Looping through labels so not to blank the hidden inputs
+                 */
+                elm.find('label').map(function() {
+                    $(this).next('input').attr('value', '');
+                });
+                that.remove();
+                elm.appendTo(links);
+                return false;
+            }
+        });
+        links.find('div.inline_field').each(function() {
+            var that = $(this);
+            if (that.find('input:first').attr('value')) {
+                that.append('<a href="#" class="cta do delete_link">Remove link</a>');
+            } 
+        });
+    };
     return {
-        'add_link_set': add_link_set
+        'add_link_set': add_link_set,
+        'delete_link_set': delete_link_set
     };
 }();
