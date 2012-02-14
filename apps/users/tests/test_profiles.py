@@ -24,6 +24,20 @@ class ProfileData(TestCase):
             name='Frank McTestcase'
         )
 
+    def test_anonymous_profile(self):
+        """Test the profile page displays properly to an anonymous user."""
+        response = self.client.get('/profile/%s/' % self.profile.user.username,
+                                   follow=True)
+        self.assertEqual(response.context['profile'], self.profile)
+
+    def test_current_user_profile(self):
+        """Test the profile page displays properly to its owner."""
+        self.assertTrue(self.client.login(username='testaccount',
+                                          password='password1'))
+        response = self.client.get('/profile/%s/' % self.profile.user.username,
+                                   follow=True)
+        self.assertEqual(response.context['profile'], self.profile)
+
     @ignite_skip
     def test_social_links(self):
         user_slug = '/en-US/profile/%s/' % self.profile.user.username
