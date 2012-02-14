@@ -1,5 +1,7 @@
-from django.test import TestCase, Client
+from django.test import Client
 from django.contrib.auth.models import User
+# This test class gives us access to the Jinja2 template context
+from test_utils import TestCase
 
 from ignite.tests.decorators import ignite_skip
 from users.models import Profile, Link
