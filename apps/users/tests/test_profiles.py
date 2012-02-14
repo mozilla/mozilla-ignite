@@ -10,13 +10,16 @@ class ProfileData(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.User = User.objects.create(
+        self.User = User.objects.create_user(
             username=u'testaccount',
-            password=u'password1',
-            is_active=True
+            email=u'testaccount@example.com',
+            password=u'password1'
         )
+        
+        # Fill in the minimum of profile details to stop the nagware kicking in
         self.profile = Profile.objects.create(
-            user=self.User
+            user=self.User,
+            name='Frank McTestcase'
         )
 
     @ignite_skip
