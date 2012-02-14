@@ -13,7 +13,7 @@
 {% if profile.website %}
 <a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
 {% endif %}
-{% if user.get_profile() == profile %}
+{% if profile.user == user %}
 <ul class="user_tools">
 <li><a href="{{ url('users_edit') }}" class="cta do">{{ _('Edit your profile') }}</a></li>
 </ul>
