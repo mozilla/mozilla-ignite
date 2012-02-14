@@ -38,10 +38,9 @@ class ProfileData(TestCase):
                                    follow=True)
         self.assertEqual(response.context['profile'], self.profile)
 
-    @ignite_skip
     def test_social_links(self):
-        user_slug = '/en-US/profile/%s/' % self.profile.user.username
-        response = self.client.get(user_slug)
+        user_slug = '/profile/%s/' % self.profile.user.username
+        response = self.client.get(user_slug, follow=True)
         self.assertEqual(response.context['social_links'], False)
 
         Link.objects.create(
@@ -50,13 +49,12 @@ class ProfileData(TestCase):
             profile=self.profile
         )
 
-        response = self.client.get(user_slug)
+        response = self.client.get(user_slug, follow=True)
         self.assertNotEqual(response.context['social_links'], False)
-    
-    @ignite_skip
+
     def test_project_links(self):
-        user_slug = '/en-US/profile/%s/' % self.profile.user.username
-        response = self.client.get(user_slug)
+        user_slug = '/profile/%s/' % self.profile.user.username
+        response = self.client.get(user_slug, follow=True)
         self.assertEqual(response.context['projects'], False)
 
         p = Project.objects.create(
@@ -68,5 +66,5 @@ class ProfileData(TestCase):
 
         p.team_members.add(self.profile)
 
-        response = self.client.get(user_slug)
+        response = self.client.get(user_slug, follow=True)
         self.assertNotEqual(response.context['projects'], False)
