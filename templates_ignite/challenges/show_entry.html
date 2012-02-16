@@ -66,6 +66,15 @@
             {% endif %}
             <div class="description">
             {{ entry.description_html }}
+            {% if links %}
+            <h2>External links</h2>
+            <p>More information on the idea can be found online at:</p>
+            <ul>
+            {% for link in links %}
+            <li><a href="{{ link.url }}">{{ link.name }}</a></li>
+            {% endfor %}
+            </ul> 
+            {% endif %}
             </div>
             <address class="vcard">
                 <p><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>

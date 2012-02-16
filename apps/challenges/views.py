@@ -228,6 +228,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'project': project,
         'challenge': challenge,
         'entry': entry,
+        'links': entry.externallink_set.all() or False,
         'previous': previous or False,
         'next': next or False,
         'user_vote': user_vote,
