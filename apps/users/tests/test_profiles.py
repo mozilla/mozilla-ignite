@@ -1,5 +1,7 @@
-from django.test import TestCase, Client
+from django.test import Client
 from django.contrib.auth.models import User
+# This test class gives us access to the Jinja2 template context
+from test_utils import TestCase
 
 from ignite.tests.decorators import ignite_skip
 from users.models import Profile, Link
@@ -10,19 +12,35 @@ class ProfileData(TestCase):
 
     def setUp(self):
         self.client = Client()
-        self.User = User.objects.create(
+        self.User = User.objects.create_user(
             username=u'testaccount',
-            password=u'password1',
-            is_active=True
+            email=u'testaccount@example.com',
+            password=u'password1'
         )
+        
+        # Fill in the minimum of profile details to stop the nagware kicking in
         self.profile = Profile.objects.create(
-            user=self.User
+            user=self.User,
+            name='Frank McTestcase'
         )
 
-    @ignite_skip
+    def test_anonymous_profile(self):
+        """Test the profile page displays properly to an anonymous user."""
+        response = self.client.get('/profile/%s/' % self.profile.user.username,
+                                   follow=True)
+        self.assertEqual(response.context['profile'], self.profile)
+
+    def test_current_user_profile(self):
+        """Test the profile page displays properly to its owner."""
+        self.assertTrue(self.client.login(username='testaccount',
+                                          password='password1'))
+        response = self.client.get('/profile/%s/' % self.profile.user.username,
+                                   follow=True)
+        self.assertEqual(response.context['profile'], self.profile)
+
     def test_social_links(self):
-        user_slug = '/en-US/profile/%s/' % self.profile.user.username
-        response = self.client.get(user_slug)
+        user_slug = '/profile/%s/' % self.profile.user.username
+        response = self.client.get(user_slug, follow=True)
         self.assertEqual(response.context['social_links'], False)
 
         Link.objects.create(
@@ -31,13 +49,12 @@ class ProfileData(TestCase):
             profile=self.profile
         )
 
-        response = self.client.get(user_slug)
+        response = self.client.get(user_slug, follow=True)
         self.assertNotEqual(response.context['social_links'], False)
-    
-    @ignite_skip
+
     def test_project_links(self):
-        user_slug = '/en-US/profile/%s/' % self.profile.user.username
-        response = self.client.get(user_slug)
+        user_slug = '/profile/%s/' % self.profile.user.username
+        response = self.client.get(user_slug, follow=True)
         self.assertEqual(response.context['projects'], False)
 
         p = Project.objects.create(
@@ -49,5 +66,5 @@ class ProfileData(TestCase):
 
         p.team_members.add(self.profile)
 
-        response = self.client.get(user_slug)
+        response = self.client.get(user_slug, follow=True)
         self.assertNotEqual(response.context['projects'], False)
