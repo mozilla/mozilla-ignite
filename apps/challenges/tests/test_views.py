@@ -181,8 +181,8 @@ class CreateEntryTest(test_utils.TestCase):
         form_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.entry_form_path, data=form_data,
                                     follow=True)
-        redirect_target = '/en-US/%s/challenges/%s/' % (self.project_slug,
-                                                        self.challenge_slug)
+        redirect_target = '/en-US/%s/challenges/%s/entries/' % \
+                          (self.project_slug, self.challenge_slug)
         self.assertRedirects(response, redirect_target)
         # Make sure we actually created the submission
         assert_equal([s.description for s in Submission.objects.all()],
