@@ -451,7 +451,7 @@ class EditLinkTest(test_utils.TestCase):
         self.assertEqual(cheese_link.submission, Submission.objects.get())
 
 
-class DeleteEntryTest(test_utils.TestCase):
+class DeleteEntryTest(MessageTestCase):
     
     def setUp(self):
         challenge_setup()
@@ -505,6 +505,8 @@ class DeleteEntryTest(test_utils.TestCase):
     @suppress_locale_middleware
     def test_delete(self):
         self.client.login(username='alex', password='alex')
-        response = self.client.post(self.delete_path, {})
-        assert_equal(response.status_code, 302)
+        response = self.client.post(self.delete_path, {}, follow=True)
+        assert_equal(response.redirect_chain[0][1], 302)
         assert_equal(Submission.objects.count(), 0)
+        
+        self.assertSuccessMessage(response)

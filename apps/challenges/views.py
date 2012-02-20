@@ -404,6 +404,16 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         context['project'] = context['challenge'].project
         return context
     
+    def delete(self, request, *args, **kwargs):
+        # Unfortunately, we can't sensibly hook into the superclass version of
+        # this method and still get things happening in the right order. We
+        # would have to record the success message *before* deleting the entry,
+        # which is just asking for trouble.
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Your submission has been deleted.")
+        return HttpResponseRedirect(self.get_success_url())
+    
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
