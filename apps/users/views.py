@@ -2,11 +2,13 @@ import json
 
 from django.conf import settings
 from django.contrib import auth
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext
 
 from activity.models import Activity
 from users.models import Profile, Link
@@ -123,6 +125,10 @@ def edit(request):
                            files=request.FILES,
                            instance=profile)
         if form.is_valid():
+            
+            success_message = ugettext(u"Thank you \u2013 your profile has "
+                                       u"been updated.")
+            
             profile = form.save(commit=False)
             profile.user = request.user
             profile.save()
@@ -137,11 +143,13 @@ def edit(request):
                     link = links_form.save(commit=False)
                     link.profile = profile
                     link.save()
-                # links only valid on betafarn so feels safe to do this...
+                messages.success(request, success_message)
+                # links only valid on betafarm so feels safe to do this...
                 return HttpResponseRedirect(reverse('users_profile', kwargs={
                     'username': request.user.username
                 }))
             else:
+                messages.success(request, success_message)
                 return HttpResponseRedirect('/')
     form = ProfileForm(instance=profile)
     links = profile.link_set.all()
