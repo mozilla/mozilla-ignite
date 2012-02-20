@@ -364,6 +364,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             return self.form_invalid(form, link_form)
     
     def form_valid(self, form, link_form):
+        messages.success(self.request, 'Your entry has been updated.')
         response = super(EditEntryView, self).form_valid(form)
         link_form.save()
         return response
