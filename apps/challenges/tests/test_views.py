@@ -428,9 +428,6 @@ class EditLinkTest(test_utils.TestCase):
         form_data.update(_build_links(2, *link_forms))
         
         response = self.client.post(self.edit_path, form_data)
-        print '###'
-        print response 
-        print '###'
         self.assertRedirects(response, self.view_path)
         self.assertEqual(ExternalLink.objects.count(), 0)
     
