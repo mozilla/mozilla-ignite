@@ -9,6 +9,7 @@ from challenges.models import Phase, Submission, JudgingCriterion, Judgement, \
                               JudgingAnswer, JudgeAssignment
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_submissions, create_users)
+from challenges.tests.test_views import MessageTestCase
 from ignite.tests.decorators import ignite_only
 
 
@@ -150,7 +151,7 @@ class JudgingFormTest(TestCase):
                      [3, 5, 7])
 
 
-class JudgingViewTest(TestCase):
+class JudgingViewTest(MessageTestCase):
     
     def setUp(self):
         judging_setup()
@@ -204,8 +205,10 @@ class JudgingViewTest(TestCase):
             if key.startswith('criterion_'):
                 post_data[key] = '5'
         post_response = self.client.post(submission.get_judging_url(),
-                                         data=post_data)
+                                         data=post_data,
+                                         follow=True)
         self.assertRedirects(post_response, reverse('entries_assigned'))
+        self.assertSuccessMessage(post_response)
         
         judgement = Judgement.objects.get()
         self.assertEqual(judgement.judge.user.username, 'alex')
@@ -264,8 +267,10 @@ class JudgingViewTest(TestCase):
             if key.startswith('criterion_'):
                 post_data[key] = str(ratings.pop())
         post_response = self.client.post(submission.get_judging_url(),
-                                         data=post_data)
+                                         data=post_data,
+                                         follow=True)
         self.assertRedirects(post_response, reverse('entries_assigned'))
+        self.assertSuccessMessage(post_response)
         
         new_judgement = Judgement.objects.get()
         self.assertEqual(new_judgement.judge.user.username, 'alex')

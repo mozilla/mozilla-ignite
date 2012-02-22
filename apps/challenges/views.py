@@ -312,6 +312,12 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
         return entry_show(self.request, self.kwargs['project'],
                           self.kwargs['slug'], self.kwargs['pk'],
                           judging_form=form)
+    
+    def form_valid(self, form):
+        response = super(EntryJudgementView, self).form_valid(form)
+        messages.success(self.request,
+                         _('Success! Thanks for evaluating the submission.'))
+        return response
 
 
 entry_judge = EntryJudgementView.as_view()
