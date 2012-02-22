@@ -111,7 +111,7 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
                                         for j in submission.judgement_set.all())
-        return submissions
+        return sorted(submissions, key=lambda s: s.has_judged, reverse=True)
 
 
 entries_assigned = judge_required(AssignedEntriesView.as_view())
