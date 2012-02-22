@@ -35,6 +35,13 @@ class EntryForm(forms.ModelForm):
             }),
             'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
         }
+    
+    def clean(self):
+        super(EntryForm, self).clean()
+        if self.errors.get('sketh_note'):
+            # Something is wrong with the image: remove it
+            self.files.pop(self.add_prefix('sketh_note'), None)
+        return self.cleaned_data
 
 
 class AutoDeleteForm(forms.ModelForm):

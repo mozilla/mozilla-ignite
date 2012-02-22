@@ -1,3 +1,6 @@
+# Note: not using cStringIO here because then we can't set the "filename"
+from StringIO import StringIO
+
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -210,6 +213,29 @@ class CreateEntryTest(test_utils.TestCase):
         
         for k in ['Title', 'Summary']:
             assert k in response.context['errors'], 'Missing error key %s' % k
+        assert_equal(Submission.objects.count(), 0)
+    
+    @ignite_skip
+    def test_bad_image(self):
+        """Test that a bad image is discarded."""
+        self.client.login(username='alex', password='alex')
+        alex = User.objects.get(username='alex')
+        
+        bad_image_file = StringIO('kitten pictures')
+        bad_image_file.name = 'kittens.jpg'
+        
+        form_data = {'title': 'Submission',
+                     'brief_description': 'A submission',
+                     'description': 'A submission of shining wonderment.',
+                     'created_by': alex.get_profile(),
+                     'category': self.category_id,
+                     'sketh_note': bad_image_file}
+        
+        form_data.update(BLANK_EXTERNALS)
+        response = self.client.post(self.entry_form_path, data=form_data)
+        
+        assert response.context['errors'].get('Napkin sketch')
+        assert response.context['form']['sketh_note'].value() is None
         assert_equal(Submission.objects.count(), 0)
 
 
