@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.messages import SUCCESS
 from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
@@ -39,6 +40,15 @@ def test_show_challenge():
     request = _build_request('/my-project/my-challenge/')
     response = views.show(request, 'my-project', 'my-challenge')
     assert_equal(response.status_code, 200)
+
+
+class MessageTestCase(test_utils.TestCase):
+    """Test case class to check messaging."""
+    
+    def assertSuccessMessage(self, response):
+        """Assert that there is a success message in the given response."""
+        self.assertEqual(len(response.context['messages']), 1)
+        self.assertEqual(list(response.context['messages'])[0].level, SUCCESS)
 
 
 class ChallengeEntryTest(test_utils.TestCase):
@@ -265,7 +275,7 @@ class ShowEntryTest(test_utils.TestCase):
         assert_equal(response.status_code, 404, response.content)
 
 
-class EditEntryTest(test_utils.TestCase):
+class EditEntryTest(MessageTestCase):
     """Test functionality of the edit entry view."""
     
     def setUp(self):
@@ -309,8 +319,11 @@ class EditEntryTest(test_utils.TestCase):
         self.client.login(username='alex', password='alex')
         data = self._edit_data()
         data.update(BLANK_EXTERNALS)
-        response = self.client.post(self.edit_path, data)
+        response = self.client.post(self.edit_path, data, follow=True)
         self.assertRedirects(response, self.view_path)
+        # Check for a success message
+        self.assertSuccessMessage(response)
+        
         assert_equal(Submission.objects.get().description, data['description'])
     
     @suppress_locale_middleware
@@ -415,9 +428,6 @@ class EditLinkTest(test_utils.TestCase):
         form_data.update(_build_links(2, *link_forms))
         
         response = self.client.post(self.edit_path, form_data)
-        print '###'
-        print response 
-        print '###'
         self.assertRedirects(response, self.view_path)
         self.assertEqual(ExternalLink.objects.count(), 0)
     
@@ -441,7 +451,7 @@ class EditLinkTest(test_utils.TestCase):
         self.assertEqual(cheese_link.submission, Submission.objects.get())
 
 
-class DeleteEntryTest(test_utils.TestCase):
+class DeleteEntryTest(MessageTestCase):
     
     def setUp(self):
         challenge_setup()
@@ -495,6 +505,8 @@ class DeleteEntryTest(test_utils.TestCase):
     @suppress_locale_middleware
     def test_delete(self):
         self.client.login(username='alex', password='alex')
-        response = self.client.post(self.delete_path, {})
-        assert_equal(response.status_code, 302)
+        response = self.client.post(self.delete_path, {}, follow=True)
+        assert_equal(response.redirect_chain[0][1], 302)
         assert_equal(Submission.objects.count(), 0)
+        
+        self.assertSuccessMessage(response)
