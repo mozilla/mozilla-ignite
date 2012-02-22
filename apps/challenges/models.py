@@ -8,6 +8,8 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.db import models
+from django.db.models import signals
+from django.dispatch import receiver
 
 from tower import ugettext_lazy as _
 
@@ -407,3 +409,10 @@ class JudgeAssignment(models.Model):
     
     class Meta:
         unique_together = (('submission', 'judge'),)
+
+
+@receiver(signals.post_save, sender=JudgeAssignment)
+@receiver(signals.post_save, sender=Judgement)
+def judgement_flush_cache(instance, **kwargs):
+    """Flush the cache for any submissions related to this instance."""
+    Submission.objects.invalidate(instance.submission)

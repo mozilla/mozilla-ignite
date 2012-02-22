@@ -111,7 +111,7 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
                                         for j in submission.judgement_set.all())
-        return submissions
+        return sorted(submissions, key=lambda s: s.has_judged, reverse=True)
 
 
 entries_assigned = judge_required(AssignedEntriesView.as_view())
@@ -288,6 +288,11 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
     
     form_class = JudgingForm
     
+    @property
+    def success_url(self):
+        # Need to implement this as a property so it's only called after load
+        return reverse('entries_assigned')
+    
     def _check_permission(self, submission, user):
         return submission.judgeable_by(user)
     
@@ -307,6 +312,12 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
         return entry_show(self.request, self.kwargs['project'],
                           self.kwargs['slug'], self.kwargs['pk'],
                           judging_form=form)
+    
+    def form_valid(self, form):
+        response = super(EntryJudgementView, self).form_valid(form)
+        messages.success(self.request,
+                         _('Success! Thanks for evaluating the submission.'))
+        return response
 
 
 entry_judge = EntryJudgementView.as_view()
