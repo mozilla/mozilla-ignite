@@ -1,4 +1,5 @@
 from django.test import Client
+from django.contrib.messages import SUCCESS
 from django.contrib.auth.models import User
 # This test class gives us access to the Jinja2 template context
 from test_utils import TestCase
@@ -6,6 +7,7 @@ from test_utils import TestCase
 from ignite.tests.decorators import ignite_skip
 from users.models import Profile, Link
 from projects.models import Project
+from challenges.tests.test_views import suppress_locale_middleware
 
 
 class ProfileData(TestCase):
@@ -68,3 +70,21 @@ class ProfileData(TestCase):
 
         response = self.client.get(user_slug, follow=True)
         self.assertNotEqual(response.context['projects'], False)
+    
+    @ignite_skip  # Because redirecting to '/' will 404
+    @suppress_locale_middleware
+    def test_profile_update(self):
+        """Test that a user can update their profile information."""
+        user_slug = '/profile/edit/'
+        self.assertTrue(self.client.login(username='testaccount',
+                                          password='password1'))
+        response = self.client.post('/profile/edit/',
+                                    data={'name': 'Heinrich'},
+                                    follow=True)
+        self.assertRedirects(response, '/')
+        self.assertEqual(Profile.objects.get().name, 'Heinrich')
+        
+        # Check for a success message
+        self.assertEqual(len(response.context['messages']), 1)
+        message = list(response.context['messages'])[0]
+        self.assertEqual(message.level, SUCCESS)

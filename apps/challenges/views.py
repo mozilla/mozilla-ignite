@@ -364,6 +364,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             return self.form_invalid(form, link_form)
     
     def form_valid(self, form, link_form):
+        messages.success(self.request, 'Your entry has been updated.')
         response = super(EditEntryView, self).form_valid(form)
         link_form.save()
         return response
@@ -402,6 +403,16 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         context['challenge'] = self._get_challenge()
         context['project'] = context['challenge'].project
         return context
+    
+    def delete(self, request, *args, **kwargs):
+        # Unfortunately, we can't sensibly hook into the superclass version of
+        # this method and still get things happening in the right order. We
+        # would have to record the success message *before* deleting the entry,
+        # which is just asking for trouble.
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Your submission has been deleted.")
+        return HttpResponseRedirect(self.get_success_url())
     
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
