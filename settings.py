@@ -324,7 +324,8 @@ DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'challenges.auth.SubmissionBackend'
 )
 
 BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
@@ -345,5 +346,7 @@ CACHE_COUNT_TIMEOUT = 60
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 SITE_FEED_URLS = {
-    'splash': 'http://www.ross-eats.co.uk/feed/',
+    'splash': 'https://mozillaignite.org/blog/feed',
 }
+
+JUDGES_PER_SUBMISSION = 2

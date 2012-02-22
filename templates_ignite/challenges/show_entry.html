@@ -23,15 +23,16 @@
 {% endblock %}
 
 {% block header %}
-<a href="#" class="back announce">See all submissions</a>
+<a href="{{ url('entries_all') }}" class="back announce">See all submissions</a>
 <p class="announce">What apps would you make, if you could make anything?</p>
 <a href="{{ url('create_entry') }}" class="cta">Create submission</a>
-<p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit your idea</p>  
+<p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit ideas</p>  
 {% endblock %}
 
 {% block content %}
     <article>
         <h1 class="shout">{{ entry.title }}</h1> 
+        {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
@@ -42,6 +43,12 @@
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>
         {% endif %}
         </ul>
+        {% if entry.is_draft %}
+        <div class="alerts inline">
+            <p><strong>Idea in draft</strong></p>
+            <p>Only you can see this idea until you uncheck the "Save as draft?" option.</p>
+        </div>
+        {% endif %}
         {% endif %}
         <div class="columns">
         <div class="col box">
@@ -59,6 +66,15 @@
             {% endif %}
             <div class="description">
             {{ entry.description_html }}
+            {% if links %}
+            <h2>External links</h2>
+            <p>More information on the idea can be found online at:</p>
+            <ul>
+            {% for link in links %}
+            <li><a href="{{ link.url }}">{{ link.name }}</a></li>
+            {% endfor %}
+            </ul> 
+            {% endif %}
             </div>
             <address class="vcard">
                 <p><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
@@ -72,6 +88,27 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
+            {% if judging_form %}
+            <section>
+                {% if excluded %}
+                {# For the love of all that is holy, style me #}
+                <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
+                    {% trans %}This entry has been eliminated from the contest.{% endtrans %}
+                </p>
+                {% endif %}
+                <h2>Rate this submission</h2>
+                {% if judge_assigned %}
+                <p>This submission has been assigned to you</p>
+                {% else %}
+                <p>This submission has not been assigned to you</p>
+                {% endif %}
+                <form method="POST" action="{{ entry.get_judging_url() }}">
+                    {{ csrf()|safe }}
+                    {{ judging_form.as_p() }}
+                    <input type="submit" class="cta do" value="Submit thy judgement" />
+                </form>
+            </section>
+            {% endif %}
             <section class="widgets">
                 <h2>Share</h2>
                 <ul class="share">
@@ -90,6 +127,10 @@
             <section>
                 <h2>Vote</h2>
                 {% if user.is_authenticated() %}
+                {% if entry.editable_by(user) %}
+                    <p><strong>Looking for more votes?</strong></p>
+                    <p>Use the social media sharing buttons above, or just get your friends to head to <em>http://www.mozillaignite.org{{ entry.get_absolute_url() }}</em></p>
+                {% else %}
                 {% if user_vote and user_vote.is_upvote %}
                 <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
@@ -101,18 +142,15 @@
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
                 {% endif %}
+                {% endif %}
                 {% else %}
                 <p>If you would like to vote up this submission then please login or register to Mozilla Ignite.</p>
                 {% endif %}
             </section>
             <section>
                 <nav class="tags">
-                <h2>Tagged as</h2>
-                <ul>
-                    {% for category in entry.categories.all() %}
-                        <li><a href="{{ url('entries_for_category', category=category.slug ) }}">{{ category }}</a></li>
-                    {% endfor %}
-                </ul>
+                <h2>Category</h2>
+                <p><a href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
             <section>
@@ -127,7 +165,7 @@
                 {% endif %}
                 </ul>
                 </nav>
-            </section>
+            </section> 
         </aside>
         </div>
     </article>

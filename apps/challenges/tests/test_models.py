@@ -3,11 +3,17 @@ from dateutil.relativedelta import relativedelta
 
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.core.exceptions import ValidationError
 from django.test import TestCase
 from mock import Mock, patch
 
 from projects.models import Project
-from challenges.models import Challenge, Submission, Phase, Category
+from challenges.models import Challenge, Submission, Phase, Category, \
+                              JudgingCriterion, ExclusionFlag
+from challenges.tests.fixtures import (challenge_setup, create_submissions,
+                                       create_users)
+from ignite.tests.decorators import ignite_skip
 
 
 def _create_project_and_challenge():
@@ -27,6 +33,7 @@ class PermalinkTest(TestCase):
     def setUp(self):
         self.project, self.challenge = _create_project_and_challenge()
     
+    @ignite_skip
     def test_permalink(self):
         self.assertEqual(self.challenge.get_absolute_url(),
                          '/project/challenges/challenge/')
@@ -69,27 +76,22 @@ class EntriesToLive(TestCase):
             name=u'Phase 1', challenge=self.challenge, order=1
         )
         self.user = User.objects.create_user('bob', 'bob@example.com', 'bob')
+        self.category = Category.objects.create(name='Misc', slug='misc')
         self.submission = Submission.objects.create(
             title=u'A submission to test',
             description=u'<h3>Testing bleach</h3>',
-            is_live=True,
             phase=self.phase,
-            created_by=self.user.get_profile()
+            created_by=self.user.get_profile(),
+            category=self.category
         )
         self.submission_marked = Submission.objects.create(
             title=u'A submission with markdown',
             description=u'I **really** like cake',
-            is_live=True,
             phase=self.phase,
-            created_by=self.user.get_profile()
+            created_by=self.user.get_profile(),
+            category=self.category
         )
 
-    def test_entry_hidden(self):
-        """
-        The user wants the entry to go live but it needs moderating first
-        """
-        self.assertEqual(self.submission.is_live, False)
-    
     def test_phase_unicode(self):
         """Test the string representation of a phase."""
         self.assertEqual(unicode(self.phase),
@@ -109,6 +111,7 @@ class EntriesToLive(TestCase):
         """
         self.assertEqual(self.submission_marked.description_html,
             '<p>I <strong>really</strong> like cake</p>')
+
 
 class CategoryManager(TestCase):
     
@@ -138,14 +141,6 @@ class CategoryManager(TestCase):
             name=u'Ross',
             slug=u'ross'
         )
-        self.submission = Submission.objects.create(
-            title=u'Category',
-            brief_description=u'Blah',
-            description=u'Foot',
-            phase=self.phase,
-            created_by=self.user.get_profile()
-        )
-
 
     def test_initial_return(self):
         """
@@ -157,7 +152,15 @@ class CategoryManager(TestCase):
         """
         Test that we return only categories with submissions in
         """
-        self.submission.categories.add(self.c1)
+        Submission.objects.create(
+            title=u'Category',
+            brief_description=u'Blah',
+            description=u'Foot',
+            phase=self.phase,
+            created_by=self.user.get_profile(),
+            category=self.c1
+        )
+        
         self.cats = Category.objects.get_active_categories()
         self.assertEqual(len(self.cats), 1)
 
@@ -197,3 +200,80 @@ class Phases(TestCase):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()
 
+
+class Criteria(TestCase):
+    
+    def test_value_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=5)
+        self.assertEqual(list(c.range), [0, 1, 2, 3, 4, 5])
+    
+    def test_good_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=5)
+        c.clean()
+    
+    def test_bad_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=5, max_value=0)
+        self.assertRaises(ValidationError, c.clean)
+    
+    def test_single_unit_range(self):
+        c = JudgingCriterion(question='How awesome is this idea?',
+                             min_value=0, max_value=0)
+        # A range of 0 to 0 is valid, if not very useful
+        c.clean()
+
+
+class TestSubmissions(TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        create_submissions(3)
+        cache.clear()
+    
+    def test_no_exclusions(self):
+        self.assertEqual(Submission.objects.eligible().count(), 3)
+    
+    def test_exclusion(self):
+        excluded = Submission.objects.all()[0]
+        ExclusionFlag.objects.create(submission=excluded, notes='Blah blah')
+        self.assertEqual(Submission.objects.eligible().count(), 2)
+    
+class DraftSubmissionTest(TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        create_users()
+        alex_profile = User.objects.get(username='alex').get_profile()
+        create_submissions(5, creator=alex_profile)
+        
+        self.draft_submission = Submission.objects.all()[0]
+        self.draft_submission.is_draft = True
+        self.draft_submission.save()
+        
+        cache.clear()
+    
+    def test_draft_not_public(self):
+        assert self.draft_submission not in Submission.objects.visible()
+    
+    def test_non_draft_visible(self):
+        """Test live submissions are visible to anyone and everyone."""
+        alex, bob = [User.objects.get(username=u) for u in ['alex', 'bob']]
+        s = Submission.objects.all()[3]
+        assert s in Submission.objects.visible()
+        for user in [alex, bob]:
+            assert s in Submission.objects.visible(user=user)
+            assert user.has_perm('challenges.view_submission', obj=s)
+    
+    def test_draft_not_visible_to_user(self):
+        bob = User.objects.get(username='bob')
+        assert self.draft_submission not in Submission.objects.visible(user=bob)
+        assert not bob.has_perm('challenges.view_submission',
+                                obj=self.draft_submission)
+    
+    def test_draft_visible_to_author(self):
+        alex = User.objects.get(username='alex')
+        assert self.draft_submission in Submission.objects.visible(user=alex)
+        assert alex.has_perm('challenges.view_submission',
+                             obj=self.draft_submission)

@@ -34,23 +34,25 @@ ignite.areas = {
         }
     },
     create_submission : {
-        requires: [ignite.media_url('js/include/ext/pagedown/Markdown.Converter.js'), ignite.media_url('js/include/ext/pagedown/Markdown.Editor.js')],
+        requires: [ignite.media_url('js/include/ext/pagedown/Markdown.Converter.js'), ignite.media_url('js/include/ext/pagedown/Markdown.Editor.js'), ignite.media_url('js/include/links.js')],
         onload : function() {
             var ed = $('#wmd-input'),
                 converter = new Markdown.Converter(),
                 editor = new Markdown.Editor(converter);
             ed.before('<div id="wmd-button-bar"></div>');
             editor.run();
+            ignite.idea_links.add_link_set();
         }
     },
     edit_submission : {
-        requires: [ignite.media_url('js/include/ext/pagedown/Markdown.Converter.js'), ignite.media_url('js/include/ext/pagedown/Markdown.Editor.js')],
+        requires: [ignite.media_url('js/include/ext/pagedown/Markdown.Converter.js'), ignite.media_url('js/include/ext/pagedown/Markdown.Editor.js'), ignite.media_url('js/include/links.js')],
         onload: function() {
             var ed = $('#wmd-input'),
                 converter = new Markdown.Converter(),
                 editor = new Markdown.Editor(converter);
             ed.before('<div id="wmd-button-bar"></div>');
             editor.run();
+            ignite.idea_links.delete_link_set();
         }
     }
 };

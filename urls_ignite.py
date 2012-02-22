@@ -27,9 +27,11 @@ urlpatterns = patterns('',
     url(r'^$', 'ignite.views.splash', kwargs=_ignite_kwargs, name='challenge_show'),
     (r'', include('users.urls')),
     # The /ideas/ URL will become available in the application phase
+    url(r'^ideas/assigned/$', 'challenges.views.entries_assigned', kwargs=_ignite_kwargs, name='entries_assigned'),
     url(r'^ideas/list/(?P<category>[\w-]+)/$', 'challenges.views.entries_category', kwargs=_ignite_kwargs, name='entries_for_category'),
-    url(r'^ideas/list/', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
+    url(r'^ideas/list/$', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
     url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
+    url(r'^ideas/(?P<pk>\d+)/judgement/$', 'challenges.views.entry_judge', kwargs=_ignite_kwargs, name='entry_judge'),
     url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
     url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
     url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
@@ -37,6 +39,7 @@ urlpatterns = patterns('',
     url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     # quick redirect to send all requests to /blog/ to the blog itself
     url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),
+    url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
 )
 
 # Handle 404 and 500 errors

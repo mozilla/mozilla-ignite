@@ -1,23 +1,29 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, permission_required
 from django.core.exceptions import PermissionDenied
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
+from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import UpdateView, DeleteView
+from django.views.generic.edit import ProcessFormView, UpdateView, \
+                                      DeleteView, ModelFormMixin
 import jingo
 from tower import ugettext as _
 from voting.models import Vote
 
-from challenges.forms import EntryForm, EntryLinkForm, InlineLinkFormSet
-from challenges.models import Challenge, Phase, Submission, Category, ExternalLink
+from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
+                              JudgingForm)
+from challenges.models import (Challenge, Phase, Submission, Category,
+                               ExternalLink, Judgement, JudgingCriterion,
+                               JudgeAssignment)
 from projects.models import Project
 
 challenge_humanised = {
@@ -25,11 +31,28 @@ challenge_humanised = {
     'brief_description': 'Summary',
     'description': 'Full description',
     'sketh_note': 'Napkin sketch',
-    'categories': 'Tags',
+    'category': 'Category',
 }
 
 
 LOGGER = logging.getLogger(__name__)
+
+judge_required = permission_required('challenges.judge_submission')
+
+
+class JingoTemplateMixin(TemplateResponseMixin):
+    """View mixin to render through Jingo rather than Django's renderer."""
+    
+    def render_to_response(self, context, **response_kwargs):
+        """Render using Jingo and return the response."""
+        template_names = self.get_template_names()
+        if len(template_names) > 1:
+            LOGGER.info('Jingo only works with a single template name; '
+                        'discarding ' + ', '.join(template_names[1:]))
+        template_name = template_names[0]
+        
+        return jingo.render(self.request, template_name, context,
+                            **response_kwargs)
 
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
@@ -37,9 +60,10 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     """ Pagination options """
-    entry_set = Submission.objects.filter(phase__challenge=challenge)
+    entry_set = Submission.objects.visible(request.user)
+    entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
-        entry_set = entry_set.filter(categories__name=category)
+        entry_set = entry_set.filter(category__name=category)
     paginator = Paginator(entry_set, 25)
 
     try:
@@ -65,6 +89,32 @@ def show(request, project, slug, template_name='challenges/show.html', category=
 def entries_all(request, project, slug):
     """Show all entries (submissions) to a challenge."""
     return show(request, project, slug, template_name='challenges/all.html')
+
+
+class AssignedEntriesView(ListView, JingoTemplateMixin):
+    """Show entries assigned to be judged by the current user."""
+    
+    template_name = 'challenges/assigned.html'
+    context_object_name = 'entries'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        
+        ss = Submission.objects
+        submissions = (ss.filter(phase__challenge=self.challenge)
+                         .filter(judgeassignment__judge__user=self.request.user)
+                         .select_related('judgement__judge__user'))
+        
+        # Add a custom attribute for whether user has judged this submission
+        for submission in submissions:
+            submission.has_judged = any(j.judge.user == self.request.user
+                                        for j in submission.judgement_set.all())
+        return submissions
+
+
+entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 
 def entries_category(request, project, slug, category):
@@ -112,9 +162,12 @@ def create_entry(request, project, slug):
                         url = link['url'],
                         submission = entry
                     )
-            msg = _('Your entry has been posted successfully and is now available for public review')
+            if entry.is_draft:
+                msg = _('<strong>Your entry has been saved as draft.</strong> When you want the world to see it then uncheck the "Save as draft?" option from your idea editting page')
+            else:
+                msg = _('Your entry has been posted successfully and is now available for public review')
             messages.success(request, msg)
-            return HttpResponseRedirect(phase.challenge.get_absolute_url())
+            return HttpResponseRedirect(phase.challenge.get_entries_url())
         else:
             form_errors = extract_form_errors(form, link_form)
     else:
@@ -129,48 +182,73 @@ def create_entry(request, project, slug):
     })
 
 
-def entry_show(request, project, slug, entry_id):
+def entry_show(request, project, slug, entry_id, judging_form=None):
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
                               phase__challenge=challenge)
+    
+    if not entry.visible_to(request.user):
+        raise Http404
+    
     # Sidebar
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
+    
     ## Previous/next modules
+    # We can't use Django's built-in methods here, because we need to restrict
+    # to entries the current user is allowed to see
+    entries = Submission.objects.visible(request.user)
     try:
-        previous = entry.get_previous_by_created_on()
-    except Submission.DoesNotExist:
-        previous = False
+        previous_entries = entries.filter(Q(created_on__lt=entry.created_on) |
+                                          Q(pk__lt=entry.pk))
+        previous = previous_entries.order_by('-created_on')[0]
+    except IndexError:
+        previous = entries.order_by('-created_on')[0]
     try:
-        next = entry.get_next_by_created_on()
-    except Submission.DoesNotExist:
-        next = False
+        next_entries = entries.filter(Q(created_on__gt=entry.created_on) |
+                                      Q(pk__gt=entry.pk))
+        next = next_entries.order_by('created_on')[0]
+    except IndexError:
+        next = entries.order_by('created_on')[0]
+    
+    # Judging
+    if not entry.judgeable_by(request.user):
+        judging_form = None
+        judge_assigned = False
+    else:
+        if judging_form is None:
+            judging_form = _get_judging_form(user=request.user, entry=entry)
+        assignments = JudgeAssignment.objects
+        judge_assigned = assignments.filter(judge__user=request.user,
+                                            submission=entry).exists()
+    
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
         'entry': entry,
+        'links': entry.externallink_set.all() or False,
         'previous': previous or False,
         'next': next or False,
         'user_vote': user_vote,
         'votes': votes['score'],
+        'excluded': entry.exclusionflag_set.exists(),
+        'judging_form': judging_form,
+        'judge_assigned': judge_assigned,
     })
 
 
-class JingoTemplateMixin(TemplateResponseMixin):
-    """View mixin to render through Jingo rather than Django's renderer."""
+def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
+    try:
+        judgement = Judgement.objects.get(judge=user.get_profile(),
+                                          submission=entry)
+        criteria = [a.criterion for a in judgement.answers.all()]
+    except Judgement.DoesNotExist:
+        judgement = Judgement(judge=user.get_profile(), submission=entry)
+        criteria = entry.phase.judgement_criteria.all()
     
-    def render_to_response(self, context, **response_kwargs):
-        """Render using Jingo and return the response."""
-        template_names = self.get_template_names()
-        if len(template_names) > 1:
-            LOGGER.info('Jingo only works with a single template name; '
-                        'discarding ' + ', '.join(template_names[1:]))
-        template_name = template_names[0]
-        
-        return jingo.render(self.request, template_name, context,
-                            **response_kwargs)
+    return form_class(data, instance=judgement, criteria=criteria)
 
 
 class SingleSubmissionMixin(SingleObjectMixin):
@@ -204,6 +282,34 @@ class SingleSubmissionMixin(SingleObjectMixin):
         
         """
         return True
+
+
+class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMixin, ProcessFormView):
+    
+    form_class = JudgingForm
+    
+    def _check_permission(self, submission, user):
+        return submission.judgeable_by(user)
+    
+    def get_form(self, form_class):
+        return _get_judging_form(data=self.request.POST, user=self.request.user,
+                                 entry=self.get_object(), form_class=form_class)
+    
+    def get(self, request, *args, **kwargs):
+        # Redirect back to the entry view
+        # Strictly speaking, this view shouldn't accept GET requests, but in
+        # case someone submits theform, gets errors and reloads this URL,
+        # redirecting back to the entry seems the sanest choice
+        return HttpResponseRedirect(self.get_object().get_absolute_url())
+    
+    def form_invalid(self, form):
+        # Show the entry page with the form (and errors)
+        return entry_show(self.request, self.kwargs['project'],
+                          self.kwargs['slug'], self.kwargs['pk'],
+                          judging_form=form)
+
+
+entry_judge = EntryJudgementView.as_view()
 
 
 class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):

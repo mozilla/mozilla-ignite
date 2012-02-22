@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
-{% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} |{% else %}{{ _('All submissions') }} |{% endif %}{% endblock %}
+{% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} | {% else %}{{ _('All submissions') }} | {% endif %}{% endblock %}
 
 {% block page_id %}all_submissions{% endblock %}
 
@@ -19,10 +19,6 @@
 
 {% block content %}
 <h2 class="box_title">Submissions</h2>
-<ul class="sorting">
-    <li><a class="current" href="#">Most recent</a></li>
-    <li><a href="#">Most popular</a></li>
-</ul>
 <nav class="tags">
     <ul>
         <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">all</a></li>
@@ -45,10 +41,19 @@
                     {{ entry.title }}
                 </h4>
             </a>
+            {% if entry.editable_by(user) %}
+            {% if entry.is_draft %}
+            <div class="alerts inline">
+                <p><strong>Idea in draft</strong></p>
+                <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
+                <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+            </div>
+            {% endif %}
+            {% endif %}
             <p>{{ entry.brief_description }}</p>
             <address>{{ created_by(entry, footer=False) }}</address>
-            </article>
-        </li>
+        </article>
+    </li>
     {% endfor %}
     </ol>
     {% if entries.paginator.num_pages > 1 %}

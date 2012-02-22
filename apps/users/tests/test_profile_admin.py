@@ -8,6 +8,7 @@ from django.contrib.auth.models import User
 
 from commons.middleware import LocaleURLMiddleware
 from users.models import Profile
+from ignite.tests.decorators import ignite_skip
 
 log = logging.getLogger(__name__)
 
@@ -37,7 +38,8 @@ class ProfileAdmin(TestCase):
         self.profile = Profile.objects.create(
             user=self.User
         )
-
+    
+    @ignite_skip  # To avoid the check that '/' returns a 200
     @suppress_locale_middleware
     @fudge.patch('django_browserid.auth.BrowserIDBackend.authenticate')
     def test_edit_without_links(self, fake):

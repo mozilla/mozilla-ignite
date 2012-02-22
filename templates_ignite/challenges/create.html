@@ -33,7 +33,7 @@
     </div>
     <div>
         <label for="id_brief_description" class="announce">{{ _('Summary') }}</label>
-        <p class="hint" id="info_brief_description">{{ _('Sum up your picth in 140 characters or less') }}</p>
+        <p class="hint" id="info_brief_description">{{ _('Sum up your pitch in 140 characters or less') }}</p>
         {{ form.brief_description }}
      </div>
      <div class="image_field">
@@ -58,7 +58,7 @@
         {{ form.description }}
         </div>
      </div> 
-     <fieldset>
+     <fieldset class="external_links">
         <legend><span class="announce">{{ _('External links') }}</span></legend>
         <p class="hint">If you've got additional information about your submission elsewhere on the internet (like a youtube video or extra napkin sketches on Flickr) please include them here. The more information you provide the better.</p>
         {{ link_form.management_form }}
@@ -77,7 +77,7 @@
      </fieldset>
      <fieldset class="stacked_field">
         <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
-        {{ form.categories }}
+        {{ form.category }}
      </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}

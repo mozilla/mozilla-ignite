@@ -279,6 +279,14 @@ legend span {
     background: #FFBABA;
     border-bottom-color: #D8000C;
 }
+.inline {
+    padding: 0.5em 5px;
+    margin: 0.5em 0;
+    clear: left;
+}
+.inline .cta {
+    padding: 0.5em 12px;
+}
 .frame {
     float: left;
     margin-right: 10px;
@@ -365,7 +373,7 @@ legend span {
 }
 .tags a {
     background: rgba(0, 0, 0, 0.4);
-    display: block;
+    display: inline-block;
     padding: 0.4em 12px;
     -moz-border-radius: 4px;
     -webkit-border-radius: 4px;
@@ -823,4 +831,39 @@ section footer a {
 .wmd-prompt-dialog b {
     font-size: 24px;
     color: #333;
+}
+/* Index page - for example judges */
+.index h2 {
+    font-size: 14px;
+}
+.index ol {
+    padding-left: 0;
+    font-size: 14px;
+}
+.index-content ol {
+    list-style: none;
+    padding-left: 0;
+}
+.index-content ol li {
+    position: relative;
+    padding-left: 100px;
+    min-height: 100px;
+    margin-top: 1em;
+}
+.index-content ol li:first-child {
+    margin-top: 0;
+}
+.index-content li h2 {
+    margin: 0;
+}
+.index-content li .url {
+    margin-bottom: 1em;
+    display: inline-block;
+    font-size: 12px;
+}
+.index-content ol .frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: auto !important;
 }

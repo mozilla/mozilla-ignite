@@ -33,7 +33,7 @@
                 <ul>
                     <li><a href="#">{{ _('About the challenge') }}</a></li>
                     <li><a href="{{ url('entries_all') }}">{{ _('Submissions') }}</a></li>
-                    <li><a href="#">{{ _('Judges') }}</a></li>
+                    <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
                     <li><a href="/blog/">{{ _('Blog') }}</a></li>
                     {% block login %}
                     {% if not user.is_authenticated() %}
@@ -58,6 +58,17 @@
     <div class="promo">
         <div class="busta">
             {% block header %}{% endblock %}
+        </div>
+        <div class="busta styleme" style="background-color: #ffff00;">
+        {% if perms.challenges.judge_submission and assignment_count %}
+        {% block judgecall %}
+        {% trans count=assignment_count, url=url('entries_assigned') %}
+        <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
+        {% pluralize %}
+        <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
+        {% endtrans %}
+        {% endblock %}
+        {% endif %}
         </div>
     </div>
     {% block alerts %}

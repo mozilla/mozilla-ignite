@@ -13,7 +13,7 @@
 {% if profile.website %}
 <a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
 {% endif %}
-{% if user.get_profile() == profile %}
+{% if profile.user == user %}
 <ul class="user_tools">
 <li><a href="{{ url('users_edit') }}" class="cta do">{{ _('Edit your profile') }}</a></li>
 </ul>
@@ -33,6 +33,15 @@
 <a href="{{ idea.get_absolute_url() }}">
 <div class="frame box"><img src="{{ idea.get_image_src() }}" alt="" /></div>
 </a>
+{% if idea.editable_by(user) %}
+{% if idea.is_draft %}
+<div class="alerts inline">
+    <p><strong>Idea in draft</strong></p>
+    <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
+    <a href="{{ idea.get_edit_url() }}" class="cta do">Edit your idea</a>
+</div>
+{% endif %}
+{% endif %}
 </li>
 {% endfor %}
 </ul>

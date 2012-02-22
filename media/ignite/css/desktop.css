@@ -100,3 +100,11 @@
 #wmd-input {
     padding-top: 50px;
 }
+/* Index pages */
+.index {
+    float: right;
+    width: 33%;
+}
+.index-content {
+    width: 67%;
+}
