@@ -39,6 +39,7 @@ urlpatterns = patterns('',
     url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     # quick redirect to send all requests to /blog/ to the blog itself
     url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),
+    url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
 )
 
 # Handle 404 and 500 errors
