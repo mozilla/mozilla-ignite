@@ -8,7 +8,6 @@ from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.db import models
-from django.db.models.signals import pre_save
 
 from tower import ugettext_lazy as _
 
