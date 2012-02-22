@@ -288,6 +288,11 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
     
     form_class = JudgingForm
     
+    @property
+    def success_url(self):
+        # Need to implement this as a property so it's only called after load
+        return reverse('entries_assigned')
+    
     def _check_permission(self, submission, user):
         return submission.judgeable_by(user)
     

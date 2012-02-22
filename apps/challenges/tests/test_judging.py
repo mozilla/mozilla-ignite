@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
+from django.core.urlresolvers import reverse
 from nose.tools import assert_equal, with_setup
 from test_utils import TestCase
 
@@ -204,7 +205,7 @@ class JudgingViewTest(TestCase):
                 post_data[key] = '5'
         post_response = self.client.post(submission.get_judging_url(),
                                          data=post_data)
-        self.assertRedirects(post_response, submission.get_absolute_url())
+        self.assertRedirects(post_response, reverse('entries_assigned'))
         
         judgement = Judgement.objects.get()
         self.assertEqual(judgement.judge.user.username, 'alex')
@@ -264,7 +265,7 @@ class JudgingViewTest(TestCase):
                 post_data[key] = str(ratings.pop())
         post_response = self.client.post(submission.get_judging_url(),
                                          data=post_data)
-        self.assertRedirects(post_response, submission.get_absolute_url())
+        self.assertRedirects(post_response, reverse('entries_assigned'))
         
         new_judgement = Judgement.objects.get()
         self.assertEqual(new_judgement.judge.user.username, 'alex')
