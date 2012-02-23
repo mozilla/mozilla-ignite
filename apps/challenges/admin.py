@@ -90,7 +90,23 @@ class JudgingAnswerInline(admin.StackedInline):
 class JudgementAdmin(admin.ModelAdmin):
     
     inlines = (JudgingAnswerInline,)
-    list_display = ('__unicode__', 'submission', 'judge')
+    list_display = ('__unicode__', 'submission', 'judge', 'complete', 'score')
+    
+    def complete(self, judgement):
+        try:
+            judgement.get_score()
+        except Judgement.Incomplete:
+            return False
+        else:
+            return True
+    
+    complete.boolean = True
+    
+    def score(self, judgement):
+        try:
+            return judgement.get_score()
+        except Judgement.Incomplete:
+            return 'Incomplete'
 
 
 class ExclusionFlagAdmin(admin.ModelAdmin):
