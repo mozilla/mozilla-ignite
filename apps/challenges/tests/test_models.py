@@ -204,23 +204,20 @@ class Phases(TestCase):
 class Criteria(TestCase):
     
     def test_value_range(self):
-        c = JudgingCriterion(question='How awesome is this idea?',
-                             min_value=0, max_value=5)
+        c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
         self.assertEqual(list(c.range), [0, 1, 2, 3, 4, 5])
     
     def test_good_range(self):
-        c = JudgingCriterion(question='How awesome is this idea?',
-                             min_value=0, max_value=5)
+        c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
         c.clean()
     
     def test_bad_range(self):
         c = JudgingCriterion(question='How awesome is this idea?',
-                             min_value=5, max_value=0)
+                             max_value=-5)
         self.assertRaises(ValidationError, c.clean)
     
     def test_single_unit_range(self):
-        c = JudgingCriterion(question='How awesome is this idea?',
-                             min_value=0, max_value=0)
+        c = JudgingCriterion(question='How awesome is this idea?', max_value=0)
         # A range of 0 to 0 is valid, if not very useful
         c.clean()
 

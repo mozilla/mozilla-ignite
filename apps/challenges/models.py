@@ -331,7 +331,7 @@ class JudgingCriterion(models.Model):
     """A numeric rating criterion for judging submissions."""
     
     question = models.CharField(max_length=250, unique=True)
-    min_value = models.IntegerField(default=0)
+    min_value = 0
     max_value = models.IntegerField(default=10)
     
     phases = models.ManyToManyField(Phase, blank=True,
