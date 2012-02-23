@@ -1,5 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 from markdown import markdown
 
 from django.conf import settings
@@ -382,6 +383,13 @@ class PhaseCriterion(models.Model):
 class Judgement(models.Model):
     """A judge's rating of a submission."""
     
+    class Incomplete(RuntimeError):
+        """Error class when calculating scores on incomplete judgements."""
+        
+        def __init__(self, judgement):
+            super_init = super(Judgement.Incomplete, self).__init__
+            super_init('Judgement is incomplete', judgement)
+    
     submission = models.ForeignKey(Submission)
     judge = models.ForeignKey(Profile)
     
@@ -393,6 +401,18 @@ class Judgement(models.Model):
     
     def get_absolute_url(self):
         return self.submission.get_absolute_url()
+    
+    def get_score(self):
+        total_score = Decimal('0')
+        phase_criteria = self.submission.phase.phasecriterion_set.all()
+        try:
+            for pc in self.submission.phase.phasecriterion_set.all():
+                answer = self.answers.get(criterion=pc.criterion)
+                weighting_factor = pc.weight / pc.criterion.max_value
+                total_score += weighting_factor * answer.rating
+        except JudgingAnswer.DoesNotExist:
+            raise Judgement.Incomplete(self)
+        return total_score
     
     class Meta:
         unique_together = (('submission', 'judge'),)

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -9,8 +10,9 @@ from django.test import TestCase
 from mock import Mock, patch
 
 from projects.models import Project
-from challenges.models import Challenge, Submission, Phase, Category, \
-                              JudgingCriterion, ExclusionFlag
+from challenges.models import (Challenge, Submission, Phase, Category,
+                              ExclusionFlag, Judgement, JudgingCriterion,
+                              PhaseCriterion)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users)
 from ignite.tests.decorators import ignite_skip
@@ -220,6 +222,64 @@ class Criteria(TestCase):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=0)
         # A range of 0 to 0 is valid, if not very useful
         c.clean()
+
+
+class JudgementScoring(TestCase):
+    
+    def setUp(self):
+        challenge_setup()
+        user = User.objects.create_user('bob', 'bob@example.com', 'bob')
+        create_submissions(1)
+        
+        self.phase = Phase.objects.get()
+        self.submission = Submission.objects.get()
+        self.judge = user.get_profile()
+    
+    def test_equal_weighting(self):
+        for i in range(4):
+            c = JudgingCriterion.objects.create(question='Question %d' % i,
+                                                max_value=10)
+            PhaseCriterion.objects.create(phase=self.phase, criterion=c,
+                                          weight=25)
+        judgement = Judgement.objects.create(submission=self.submission,
+                                             judge=self.judge)
+        ratings = [3, 5, 7, 8]
+        for criterion, rating in zip(JudgingCriterion.objects.all(), ratings):
+            judgement.answers.create(criterion=criterion, rating=rating)
+        
+        self.assertEqual(judgement.get_score(), Decimal('57.5'))
+    
+    def test_unequal_weighting(self):
+        for i, weight in zip(range(4), [15, 25, 25, 35]):  # Total: 100
+            c = JudgingCriterion.objects.create(question='Question %d' % i,
+                                                max_value=10)
+            PhaseCriterion.objects.create(phase=self.phase, criterion=c,
+                                          weight=weight)
+        judgement = Judgement.objects.create(submission=self.submission,
+                                             judge=self.judge)
+        ratings = [3, 5, 7, 8]
+        criteria = JudgingCriterion.objects.all().order_by('question')
+        for criterion, rating in zip(criteria, ratings):
+            judgement.answers.create(criterion=criterion, rating=rating)
+        
+        # 3 * 1.5 + 5 * 2.5 + 7 * 2.5 + 8 * 3.5
+        self.assertEqual(judgement.get_score(), Decimal('62.5'))
+    
+    def test_incomplete_judgement(self):
+        """Test that scoring an incomplete judgement raises an error."""
+        for i in range(4):
+            c = JudgingCriterion.objects.create(question='Question %d' % i,
+                                                max_value=10)
+            PhaseCriterion.objects.create(phase=self.phase, criterion=c,
+                                          weight=25)
+        judgement = Judgement.objects.create(submission=self.submission,
+                                             judge=self.judge)
+        ratings = [3, 5, 7]
+        # Only three ratings, so zip will ignore the last criterion
+        for criterion, rating in zip(JudgingCriterion.objects.all(), ratings):
+            judgement.answers.create(criterion=criterion, rating=rating)
+        
+        self.assertRaises(Judgement.Incomplete, judgement.get_score)
 
 
 class TestSubmissions(TestCase):
