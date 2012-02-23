@@ -335,7 +335,8 @@ class JudgingCriterion(models.Model):
     max_value = models.IntegerField(default=10)
     
     phases = models.ManyToManyField(Phase, blank=True,
-                                    related_name='judgement_criteria')
+                                    related_name='judgement_criteria',
+                                    through='PhaseCriterion')
     
     def __unicode__(self):
         return self.question
@@ -354,6 +355,28 @@ class JudgingCriterion(models.Model):
         
         verbose_name_plural = 'Judging criteria'
         ordering = ('id',)
+
+
+class PhaseCriterion(models.Model):
+    """Assignment of judging criteria to individual phases.
+    
+    These include a total weight assigned to each criterion. The score from
+    each criterion is multiplied up to have this weight as a maximum value.
+    
+    """
+    
+    phase = models.ForeignKey(Phase)
+    criterion = models.ForeignKey(JudgingCriterion)
+    
+    # The total weight afforded to this criterion
+    weight = models.DecimalField(max_digits=4, decimal_places=2, default=10)
+    
+    class Meta:
+        
+        unique_together = (('phase', 'criterion'),)
+    
+    def __unicode__(self):
+        return ' - '.join(map(unicode, [self.phase, self.criterion]))
 
 
 class Judgement(models.Model):

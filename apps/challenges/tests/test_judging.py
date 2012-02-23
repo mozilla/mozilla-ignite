@@ -6,7 +6,7 @@ from test_utils import TestCase
 
 from challenges.forms import JudgingForm
 from challenges.models import Phase, Submission, JudgingCriterion, Judgement, \
-                              JudgingAnswer, JudgeAssignment
+                              JudgingAnswer, JudgeAssignment, PhaseCriterion
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_submissions, create_users)
 from challenges.tests.test_views import MessageTestCase
@@ -19,7 +19,9 @@ def judging_setup(create_criteria=True, submission_count=1):
         questions = ['How %s is this idea?' % adjective
                      for adjective in ['awesome', 'sane', 'badass']]
         for question in questions:
-            Phase.objects.get().judgement_criteria.create(question=question)
+            criterion = JudgingCriterion.objects.create(question=question)
+            PhaseCriterion.objects.create(phase=Phase.objects.get(),
+                                          criterion=criterion)
     
     create_users()
     submission_type = ContentType.objects.get_for_model(Submission)
