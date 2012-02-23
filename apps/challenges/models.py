@@ -375,6 +375,7 @@ class PhaseCriterion(models.Model):
     class Meta:
         
         unique_together = (('phase', 'criterion'),)
+        verbose_name_plural = 'phase criteria'
     
     def __unicode__(self):
         return ' - '.join(map(unicode, [self.phase, self.criterion]))
