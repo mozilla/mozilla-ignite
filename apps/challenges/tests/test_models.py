@@ -220,8 +220,8 @@ class Criteria(TestCase):
     
     def test_single_unit_range(self):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=0)
-        # A range of 0 to 0 is valid, if not very useful
-        c.clean()
+        # A range of 0 to 0 is theoretically valid, but you can't weight it
+        self.assertRaises(ValidationError, c.clean)
 
 
 class JudgementScoring(TestCase):

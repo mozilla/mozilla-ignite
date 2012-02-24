@@ -343,7 +343,7 @@ class JudgingCriterion(models.Model):
         return self.question
     
     def clean(self):
-        if self.min_value > self.max_value:
+        if self.min_value >= self.max_value:
             raise ValidationError('Invalid value range %d..%d' %
                                   (self.min_value, self.max_value))
     
