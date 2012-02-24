@@ -31,6 +31,7 @@
 .user_tools {
     float: right;
 }
+/* stashing for later
 .entre:before {
     content: "&nbsp;";
     display: block;
@@ -46,6 +47,7 @@
 .promo .entre:before {
     content: none;
 }
+*/
 /**= Overrides from devices.css */
 .busta {
     max-width: 980px;
