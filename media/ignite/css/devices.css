@@ -544,6 +544,10 @@ div[role=main] {
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
     padding-bottom: 4em;
+    padding-top: 0.625em;
+}
+#splash div[role=main] {
+    padding-top: 0;
 }
 /* homepage */
 .tagline {
