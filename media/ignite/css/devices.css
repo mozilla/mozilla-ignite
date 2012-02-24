@@ -543,9 +543,149 @@ div[role=main] {
     background: #fff;
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
-    padding: 1em 0;
+    padding-bottom: 10em;
 }
 /* homepage */
+.tagline {
+    background: #cde4f2 url(../img/css/homepage-bg.png) repeat-x 0 0;
+    text-align: center;
+    padding-top: 2em;
+    border-bottom: 1px solid #9bc4df;
+}
+.tagline strong {
+    display: block;
+    text-transform: uppercase;
+    font-size: 92px;
+    font-family: "Helvetica Neue";
+    line-height: 1;
+    margin-top: 0.2em;
+}
+.sweet {
+    font-size: 14px;
+    color: #2e2e2e;
+    background: #e4eff9;
+    display: inline-block;
+    padding: 0.5em 2em 0.5em 0;
+    border-radius: 24px;
+}
+.sweet em {
+    position: relative;
+    padding: 0.5em 1em 0.5em 2em;
+    background: #ed4619;
+    margin-right: 30px;
+    color: #fff;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+    font-style: normal;
+}
+.sweet em:after {
+    width: 0;
+    height: 0;
+    content: ".";
+    text-indent: -9999em;
+    border-top: 15px solid transparent;
+    border-bottom: 15px solid transparent;
+    border-left: 15px solid #ed4619;
+    position: absolute;
+    top: 0;
+    right: -15px;
+}
+.ignite_info {
+    border-bottom: 1px solid #9bc4df;
+    background: #e8f2f8;
+}
+.ignite_info p {
+    font-size: 18px;
+    color: #454545;
+    line-height: 28px;
+    background: transparent;
+    background-image: url(../img/css/lightning-bolt.png), url(../img/css/homepage_arrow.png), url(../img/css/homepage_arrow.png);
+    background-position: 40px 50%, 130px 0, 100% 0;
+    background-repeat: no-repeat;
+    margin-bottom: 0;
+    float: left;
+    width: 85%;
+    padding: 1em 1em 1em 180px;
+    position: relative;
+}
+.ignite_info .gather {
+    float: left;
+    width: 15%;
+    padding: 1em 0;
+    text-align: center;
+    font-size: 14px;
+}
+.ignite_info .cta {
+    margin: 0.5em 0;
+}
+.methods {
+    border-bottom: 1px solid #9BC4DF;
+}
+.methods h3 {
+    font-size: 24px;
+    color: #ed4619;
+    margin-top: 0;
+}
+.methods p {
+    font-size: 18px;
+    color: #454545;
+    line-height: 28px;
+}
+.methods ul {
+    overflow: hidden;
+    zoom: 1;
+    margin: 0;
+    padding-left: 0;
+}
+.methods li {
+    border-left: 1px solid #9bc4df;
+    padding: 2em 20px 60px 2em;
+    background: transparent url(../img/css/homepage/brainstorm.png) no-repeat 20px 90%;
+}
+.methods ul li:first-child {
+    border-left: none;
+}
+.methods .hack {
+    background-image: url(../img/css/homepage/hack.png);
+}
+.methods .compete {
+    background-image: url(../img/css/homepage/funding.png);
+}
+.focus_areas ul {
+    overflow: hidden;
+    zoom: 1;
+    border-radius: 8px;
+    border: 1px solid #9bc4df;
+    padding-left: 0;
+}
+.focus_areas li {
+    border-left: 1px solid #9BC4DF;
+    font-size: 12px;
+    color: #757474;
+    line-height: 20px;
+    text-align: center;
+    padding: 120px 20px 20px;
+    background: transparent url(../img/css/homepage/publicsafety.png) no-repeat center top;
+    min-height: 60px;
+}
+.focus_areas .manu {
+    background-image: url(../img/css/homepage/manufacturing.png);
+}
+.focus_areas .health {
+    background-image: url(../img/css/homepage/health.png);
+}
+.focus_areas .edu {
+    background-image: url(../img/css/homepage/education.png);
+}
+.focus_areas .energy {
+    background-image: url(../img/css/homepage/energy.png);
+}
+.focus_areas ul li:first-child {
+    border-left: none;
+}
+.focus_areas .col {
+    width: 20%;
+}
 section footer {
     border-top: 6px solid #000;
     padding: 1em 0;

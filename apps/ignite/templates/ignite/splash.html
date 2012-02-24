@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_id %}splash{% endblock %}
@@ -8,12 +8,51 @@
 {% block site_title %}<h1 class="brand"><img src="{{ MEDIA_URL }}ignite/img/logo.png" alt="Mozilla Ignite" width="200" height="35" /></h1>{% endblock %}
 
 {% block header %}
-<h2 class="shout">What will the web look like in the future?</h2>
-<p class="announce">What apps would you make, if you could make anything?</p>
-<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+<div class="tagline">
+    <h2 class="busta">
+        <span class="sweet"><em>Calling all</em> Developers and Civic Innovators</span>
+        <strong><img src="{{ MEDIA_URL }}ignite/img/build.png" alt="Build the future" /></strong>
+    </h2>
+</div>
+<div class="ignite_info">
+    <div class="busta">
+        <p class="box">Mozilla and the National Science Foundation offer $500 in funding, and invite you to kickstart innovation in healthcare, education, and other national priority areas using gigabit networks and technologies.</p>
+       <div class="gather">
+            <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="#">learn more</a>
+       </div>
+    </div>
+</div>
+<div class="methods">
+    <div class="busta columns">
+    <ul>
+    <li class="col brainstorm box">
+    <h3>Brainstorm</h3>
+    <p>Joing a brainstorm with the Mozilla community; what do tomorrow's apps look like?</p>
+    </li>
+    <li class="col hack box">
+    <h3>Hack</h3>
+    <p>Attend a series of code sprints, design jams and webcats to meet like-minded collaborators.</p>
+    </li>
+    <li class="col compete box">
+    <h3>Compete for funding</h3>
+    <p>Compete for funding from $500k prize pool and quickly build your app.</p>
+    </li>
+    </ul>
+    </div>
+</div>
 {% endblock %}
 
 {% block content %}
+<div class="focus_areas columns">
+    <h2>Focus Areas</h2>
+    <ul>
+    <li class="box col manu">advanced manufacturing</li>
+    <li class="box col emer">emergency preparedness and public safety</li>
+    <li class="box col health">health information technologies</li>
+    <li class="box col edu">education and workforce technologies</li>
+    <li class="box col energy">clean energy, including advanced vechile technologies</li>
+    </ul>
+</div>
 <h3 class="box_title">Submissions</h3>
 <nav class="tags">
     <ul>
