@@ -18,7 +18,7 @@ def splash(request, project, slug, template_name='challenges/show.html'):
         'challenge': challenge,
         'project': project,
         'phases': list(enumerate(challenge.phases.all(), start=1)),
-        'entries': entries[:10],
+        'entries': entries[:3],
         'categories': Category.objects.get_active_categories(),
     })
 
