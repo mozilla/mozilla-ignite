@@ -111,7 +111,7 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
                                         for j in submission.judgement_set.all())
-        return submissions
+        return sorted(submissions, key=lambda s: s.has_judged, reverse=True)
 
 
 entries_assigned = judge_required(AssignedEntriesView.as_view())
@@ -288,6 +288,11 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
     
     form_class = JudgingForm
     
+    @property
+    def success_url(self):
+        # Need to implement this as a property so it's only called after load
+        return reverse('entries_assigned')
+    
     def _check_permission(self, submission, user):
         return submission.judgeable_by(user)
     
@@ -307,6 +312,12 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
         return entry_show(self.request, self.kwargs['project'],
                           self.kwargs['slug'], self.kwargs['pk'],
                           judging_form=form)
+    
+    def form_valid(self, form):
+        response = super(EntryJudgementView, self).form_valid(form)
+        messages.success(self.request,
+                         _('Success! Thanks for evaluating the submission.'))
+        return response
 
 
 entry_judge = EntryJudgementView.as_view()
@@ -364,6 +375,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             return self.form_invalid(form, link_form)
     
     def form_valid(self, form, link_form):
+        messages.success(self.request, 'Your entry has been updated.')
         response = super(EditEntryView, self).form_valid(form)
         link_form.save()
         return response
@@ -402,6 +414,16 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         context['challenge'] = self._get_challenge()
         context['project'] = context['challenge'].project
         return context
+    
+    def delete(self, request, *args, **kwargs):
+        # Unfortunately, we can't sensibly hook into the superclass version of
+        # this method and still get things happening in the right order. We
+        # would have to record the success message *before* deleting the entry,
+        # which is just asking for trouble.
+        self.object = self.get_object()
+        self.object.delete()
+        messages.success(request, "Your submission has been deleted.")
+        return HttpResponseRedirect(self.get_success_url())
     
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):

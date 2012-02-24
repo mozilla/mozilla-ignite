@@ -15,53 +15,34 @@
 {% block judgecall %}{% endblock %}
 
 {% block content %}
-<ol class="submissions columns">
-{% for entry in entries %}
-    <li class="box col">
-        <article>
+{% for group in entries|groupby('has_judged') %}
+    {% if group.grouper %}
+    <h2>{% trans %}Judged by you{% endtrans %}</h2>
+    <p>
+        {% trans count=group.list|length %}
+        You have successfully evaluated {{ count }} submission.
+        {% pluralize %}
+        You have successfully evaluated {{ count }} submissions.
+        {% endtrans %}
+    </p>
+    {% else %}
+    <h2>{% trans %}To be Judged{% endtrans %}</h2>
+    <p>
+        {% trans count=group.list|length %}
+        You have {{ count }} submission awaiting evaluation.
+        {% pluralize %}
+        You have {{ count }} submissions awaiting evaluation.
+        {% endtrans %}
+    </p>
+    {% endif %}
+    <ul class="submissions">
+        {% for entry in group.list %}
+        <li>
             <a href="{{ entry.get_absolute_url() }}">
-                <h4>
-                    <div class="frame box">
-                    <img src="{{ entry.get_image_src() }}" alt="">
-                    </div>
-                    {{ entry.title }}
-                </h4>
+                {{ entry.title }}
             </a>
-            <p>{{ entry.brief_description }}</p>
-            {% if entry.has_judged %}
-            <p>You have judged this submission</p>
-            {% else %}
-            <p>You haven&rsquo;t judged this submission yet</p>
-            {% endif %}
-            <address>{{ created_by(entry, footer=False) }}</address>
-            </article>
         </li>
-    {% endfor %}
-    </ol>
-    {% if is_paginated %}
-    <footer class="pagination">
-    <nav>
-    {% if paginator.has_previous() %}
-        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
-    {% endif %} 
-    <ol>
-    {% for i in range(paginator.num_pages) %}
-    <li>
-        {% if i + 1 == paginator.number %}
-            <span>{{ i + 1 }}</span>
-        {% else %}
-            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-    </ol>
-    {% if paginator.has_next() %}
-        <a href="?page={{ paginator.next_page_number() }}" class="btn">next</a>
-    {% endif %}
-    </nav>
-    </footer>
-    {% endif %}
-    </div>
-    </div>
-</section>       
+        {% endfor %}
+    </ul>
+{% endfor %}
 {% endblock %}
