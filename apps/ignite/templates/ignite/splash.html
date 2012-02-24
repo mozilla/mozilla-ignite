@@ -53,28 +53,22 @@
     <li class="box col energy">clean energy, including advanced vechile technologies</li>
     </ul>
 </div>
-<h3 class="box_title">Submissions</h3>
-<nav class="tags">
-    <ul>
-        <li><a class="current" href="{{ url('entries_all') }}">all</a></li>
-        {% if categories %}
-        {% for cat in categories %}
-            <li><a href="{{ url('entries_for_category', category=cat.slug ) }}">{{ cat.name }}</a></li>
-        {% endfor %}
-        {% endif %}
-    </ul>
-</nav>
-<ol class="submissions columns">
+<div class="columns project_data content_columns">
+<div class="dynamic main col box">
+<section>
+<h2>Recent Brainstorm Submissions</h2>
+<p>Brainstorm submissions will help feed the developer challenge and have the chance of winning 1 of 3 prizes of $5000.</p>
+<ul class="submissions columns">
 {% for entry in entries %}
     <li class="box col">
         <article>
             <a href="{{ entry.get_absolute_url() }}">
-                <h4>
+                <h3 class="title">
                     <div class="frame box">
                     <img src="{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
-                </h4>
+                </h3>
             </a>
             <p>{{ entry.brief_description }}</p>
             <address>{{ created_by(entry, footer=False) }}</address>
@@ -85,11 +79,9 @@
     <footer>
         <a href="{{ url('entries_all') }}">See all submissions</a>
     </footer>
-    </div>
-    </div>
-</section>       
-<section class="busta blogs">
-    <h2 class="announce">Updates from the blog</h2>
+</section>    
+<section class="blogs">
+    <h2>What's New</h2>
     <ol class="hfeed columns">
     {% for i in range(3) %}
         <li class="col box">
@@ -113,4 +105,33 @@
         <a href="/blog/">Read all our news in the Ignite Blog</a>
     </footer>
 </section>
+</div>
+<div class="bonus col box">
+<div class="highlight">
+<h2>How would you push the web forward?</h2>
+<p>Imagine that none of the limitations of todays internet apply. How would you solve real world problems and make people's lives better?</p>
+<a class="cta" href="{{ url('create_entry') }}">Get started</a>
+</div>
+<div class="events">
+<h2>Upcoming Events</h2>
+<ol>
+<li>
+<h3>Gigabit Apps Hackfest</h3>
+<p class="date">March <span>15</span></p>
+<p>Los Angeles - <a href="#">register</a></p>
+</li>
+<li>
+<h3>Webcast: History of Geni</h3>
+<p class="date">March <span>25</span></p>
+<p>Los Angeles - <a href="#">register</a></p>
+</li>
+<li>
+<h3>Webcast: Mozilla Ignite Q/A</h3>
+<p class="date">April <span>25</span></p>
+<p>Los Angeles - <a href="#">register</a></p>
+</li>
+</ol>
+</div>
+</div>
+</div>
 {% endblock %}
