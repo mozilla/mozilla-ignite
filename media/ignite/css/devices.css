@@ -710,7 +710,7 @@ div[role=main] {
 }
 .events {
     background: transparent url(../img/css/homepage/calendar-shadow.png) no-repeat left bottom;
-    padding: 0 0 10px 8px;
+    padding: 0 0 10px 7px;
 }
 .events h2 {
     border: 1px solid #c7ddeb;
