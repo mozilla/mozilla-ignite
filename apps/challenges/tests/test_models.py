@@ -283,6 +283,13 @@ class JudgementScoring(TestCase):
         
         self.assertFalse(judgement.complete)
         self.assertRaises(Judgement.Incomplete, judgement.get_score)
+    
+    def test_no_criteria(self):
+        """Test behaviour when there are no criteria."""
+        judgement = Judgement.objects.create(submission=self.submission,
+                                             judge=self.judge)
+        self.assertTrue(judgement.complete)
+        self.assertEqual(judgement.get_score(), Decimal('0.00'))
 
 
 class TestSubmissions(TestCase):
