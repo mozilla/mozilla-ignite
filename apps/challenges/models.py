@@ -403,6 +403,13 @@ class Judgement(models.Model):
     def get_absolute_url(self):
         return self.submission.get_absolute_url()
     
+    @property
+    def complete(self):
+        """Whether all the criteria in the submission's phase are rated."""
+        criteria = JudgingCriterion.objects.filter(judginganswer__judgement=self)
+        return all(c in criteria for c in
+                   self.submission.phase.judgement_criteria.all())
+    
     def get_score(self):
         total_score = Decimal('0')
         phase_criteria = self.submission.phase.phasecriterion_set.all()

@@ -247,6 +247,7 @@ class JudgementScoring(TestCase):
         for criterion, rating in zip(JudgingCriterion.objects.all(), ratings):
             judgement.answers.create(criterion=criterion, rating=rating)
         
+        self.assertTrue(judgement.complete)
         self.assertEqual(judgement.get_score(), Decimal('57.5'))
     
     def test_unequal_weighting(self):
@@ -262,6 +263,7 @@ class JudgementScoring(TestCase):
         for criterion, rating in zip(criteria, ratings):
             judgement.answers.create(criterion=criterion, rating=rating)
         
+        self.assertTrue(judgement.complete)
         # 3 * 1.5 + 5 * 2.5 + 7 * 2.5 + 8 * 3.5
         self.assertEqual(judgement.get_score(), Decimal('62.5'))
     
@@ -279,6 +281,7 @@ class JudgementScoring(TestCase):
         for criterion, rating in zip(JudgingCriterion.objects.all(), ratings):
             judgement.answers.create(criterion=criterion, rating=rating)
         
+        self.assertFalse(judgement.complete)
         self.assertRaises(Judgement.Incomplete, judgement.get_score)
 
 
