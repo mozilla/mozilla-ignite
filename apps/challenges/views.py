@@ -117,6 +117,37 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
 entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 
+class JudgedEntriesView(ListView, JingoTemplateMixin):
+    """Show all entries that have been judged."""
+    
+    template_name = 'challenges/judged.html'
+    context_object_name = 'entries'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        submissions = Submission.objects.filter(judgement__isnull=False)
+        submissions = submissions.distinct()
+        submissions = submissions.select_related('judgement__judginganswer__criterion')
+        
+        for submission in submissions:
+            judgements = [j for j in submission.judgement_set.all() if j.complete]
+            total = sum(j.get_score() for j in judgements)
+            if judgements:
+                submission.average_score = total / len(judgements)
+            else:
+                submission.average_score = 0
+            submission.judgement_count = len(judgements)
+        
+        submissions = sorted(submissions, key=lambda s: s.average_score,
+                             reverse=True)
+        return submissions
+
+
+entries_judged = judge_required(JudgedEntriesView.as_view())
+
+
 def entries_category(request, project, slug, category):
     """Show all entries to a specific category"""
     return show(request, project, slug, template_name='challenges/all.html', category=category)
