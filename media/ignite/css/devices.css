@@ -43,6 +43,45 @@ p {
     font-size: 12px;
     color: #5c5c5c;
 }
+p.intro {
+    font-size: 18px;
+    line-height: 28px;
+    color: #454545;
+    margin-bottom: 2em;
+}
+.banner {
+    border: 1px solid #C7DDEB;
+    border-width: 1px 0;
+    text-align: center;
+    padding: 1em 10px;
+    font-size: 24px;
+    color: #454545;
+}
+.banner .cta {
+    margin-left: 20px;
+}
+figure {
+    border-top: 1px solid #C7DDEB;
+}
+figcaption {
+    color: #7e7d7d;
+    font-style: italic;
+    font-size: 12px;
+    text-align: center;
+    margin-top: -30px;
+}
+figcaption .fig_title {
+    color: #ED4619;
+    display: block;
+    font-size: 20px;
+    margin: 0;
+    font-style: normal;
+}
+figcaption .fig_title span {
+    background: #fff;
+    display: inline-block;
+    padding: 0 10px;
+}
 .shout {
     font-size: 30px;
     color: #333;
@@ -544,7 +583,7 @@ div[role=main] {
     margin-top: 0.625em; /* 0.625 * 16 = 10 */
     border-bottom: 0.625em solid #000;
     padding-bottom: 4em;
-    padding-top: 0.625em;
+    padding-top: 2em;
 }
 #splash div[role=main] {
     padding-top: 0;
@@ -572,6 +611,12 @@ div[role=main] {
     display: inline-block;
     padding: 0.5em 2em 0.5em 0;
     border-radius: 24px;
+}
+h1 .sweet {
+    background: none;
+    vertical-align: middle;
+    padding-right: 0;
+    margin-top: -1em;
 }
 .sweet em {
     position: relative;
@@ -697,7 +742,7 @@ div[role=main] {
 .content_columns .bonus {
     width: 33%;
 }
-.content_columns p {
+#splash .content_columns p {
     font-size: 14px;
     color: #454545;
     line-height: 26px;
@@ -707,6 +752,23 @@ div[role=main] {
     background: #f1f1f1;
     border-top: 1px solid #e2e2e2;
     margin-bottom: 2em;
+}
+.highlight h2, 
+.highlight h3 {
+    margin-top: 0;
+}
+.highlight ul {
+    padding-left: 0;
+}
+.highlight li {
+    font-size: 12px;
+    color: #5C5C5C;
+    list-style-type: none;
+    padding-left: 0;
+    margin-top: 1em;
+}
+.highlight ul li:first-child {
+    margin-top: 0;
 }
 .events {
     background: transparent url(../img/css/homepage/calendar-shadow.png) no-repeat left bottom;
@@ -758,6 +820,13 @@ div[role=main] {
     font-weight: bold;
     font-size: 24px;
     margin-top: 0.2em;
+}
+/* About page */
+#about .entre section {
+    border-top: 0.625em solid #000;
+}
+#about .entre section:first-child {
+    border-top: 0;
 }
 section footer {
     padding: 1em 0;

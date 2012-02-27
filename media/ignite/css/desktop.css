@@ -7,6 +7,9 @@
     padding: 10px;
     width: 33%;
 }
+.equal .col {
+    width: 50%;
+}
 .col img {
     width: 100%;
 }

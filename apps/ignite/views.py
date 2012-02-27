@@ -22,6 +22,9 @@ def splash(request, project, slug, template_name='challenges/show.html'):
         'categories': Category.objects.get_active_categories(),
     })
 
+def about(request, project, slug):
+    return jingo.render(request, 'ignite/about.html')
+
 def judges(request, project, slug, template_name='challenges/all_judges.html'):
     """ List all judges we have in the system """
     profiles = []

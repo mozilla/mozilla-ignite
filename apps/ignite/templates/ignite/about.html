@@ -1,0 +1,189 @@
+{% extends "second_base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_title %}About | {% endblock %}
+
+{% block page_id %}about{% endblock %}
+
+{% block section_class %}content{% endblock %}
+
+{% block header %}
+<h1 class="shout busta"><span class="sweet"><em>Your mission</em></span>Build apps from the future</h1>
+{% endblock %}
+
+{% block content %}
+<section class="how">
+<h2>How does the challenge work?</h2>
+<div class="columns content_columns">
+<div class="main col box">
+<p class="intro">We're making it easy to access teammates, mentorship, and funding for your world-chaning app. But don't think of this as just a competition. This is your change to be a pioneer, to collaborate with cutting edge thinkers and tech, and to help catalyze radical thinking about a radical new horizon.</p>
+</div>
+<div class="bonus col box">
+<div class="highlight">
+<h3>Think and Do</h3>
+<p>Before the challenge begins, you'll have an opportunity to share your ideas and refine them in a big public brainstorm. We're also hosting salons and hack days around the U.S - so you can meet and plot with friends on an app that will change the world.</p>
+</div>
+</div>
+</div>
+<figure>
+    <figcaption>Fig. One <h3 class="fig_title"><span>The Challenge Process</span></h3></figcaption>
+    <p>Stuff</p>
+</figure>
+<div class="banner">
+Got a great idea? <a class="cta" href="{{ url('create_entry') }}">Get started</a>
+</div>
+<div class="columns">
+<div class="box col">
+<h3>Multiple Funding Rounds</h3>
+<p>To help build your apps, we're offering a total of $500k in funding over three rounds. Round 1 begings in June; Round 2 begings in July, Roud 3 begins in September. You can compete in any single round, or you can compete in all three. It's up to you.</p>
+</div>
+<div class="box col">
+<h3>How to Apply</h3>
+<p>To enter, assemble your team and fill out a written application to least two weeks before a round starts. If your proposal is solid, you'll be greenlit, and will get access to the GENI sandbox. You only need to apply once.</p>
+</div>
+<div class="box col">
+<h3>An Open, Supportive Process</h3>
+<p>Once the round starts, it's off to the races. You'll have access to expert mentors.You'll build in the open, getting feedback and help from the ignite community.</p>
+</div>
+</section>
+<section class="what">
+<h2>What becomes possible?</h2>
+<div class="content_columns columns">
+<div class="main col box">
+<p class="intro">Chattanooga has a gig. Kansas City's getting a gig. That's right: 1 gigabit per second, up and down. That's over 100 times faster than most people's current internet connections.</p>
+<figure>
+    <figcaption>Fig. Two <h3 class="fig_title"><span>The Gigabit Space</span></h3></figcaption>
+    Image
+</figure>
+<div class="columns equal">
+<div class="col box">
+<h3>But what do you do with a 1 Gbps connection?</h3>
+<p>How can developers take advantage of that level of bandwidth, along with the smart networking capabilities that be built into the networks of the future? That is the question the Ignite Apps Challenge poses to developers, designers and civic innovation thinkers.</p>
+</div>
+<div class="col box">
+<h3>Make the world a better place</h3>
+<p>Words, words, words<p>
+</div>
+</div>
+</div>
+<div class="col box bonus">
+<div class="highlight">
+<h3>What would you build?</h3>
+<p>Networks are getting faster and more programmable. Browsers are becoming incredibly powerful. We're more connectied than ever. What would you build?</p>
+</div>
+<div class="highlight">
+<h3>How can I get involved?</h3>
+<ul>
+<li>Join our community discussion list. Attend an instructional webcast, or an in-erson hackf with other forward thinking developers.</li>
+<li>Through April, share your ideas for tomorrows apps in a group brainstorming.</li>
+<li>Starting in May, apply to build your app in GENI, a fast experimental network. We're offering a total of $500k in funding overthree rounds, so you can get your app built. Fast.</li>
+</ul>
+<a href="{{ url('create_entry') }}" class="cta">Get started</a>
+</div>
+</section>
+<section class="judging">
+<h2>How will apps be judged?</h2>
+<div class="content_columns columns">
+<div class="main col box">
+<p class="intro">Words, words and words</p>
+</div>
+<div class="bonus col box">
+<div class="highlight">
+<h3>Measuring success</h3>
+<p>Words and words and words</p>
+</div>
+</div>
+</div>
+</section>
+<section class="build">
+<h2>What kind of apps can I build?</h2>
+<div class="columns equal">
+<div class="col box emer">
+<h3>Emergency Preparedness and Public Safety</h3>
+<p>Emergency preparedness and public safety are being revolutionized at nearly every stage by advanced information and communication technologies. Widespread sensor networks and sophisticated real-time analysis allow early detection of events ranging from severe weather and natural disasters to national security threats. Advanced simulations and predictive modeling allow sophisticated preparation as well as training for events before they occur by emergency first responders to every member of the public. Two-way flows of real-time data from diverse sources (e.g. cell phones, GPS, sensors) combined with computational models and communication technologies provide exquisitely sensitive situational awareness and coordination of actions during an emergency.</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+<div class="col box edu">
+<h3>Education and Workforce Technologies</h3>
+<p>Telepresence can take students across the world to experience archeological dig sites, distant classrooms, or foreign cultures. Medical students, surgical residents or world experts can keep their skills sharp with advanced virtual surgeries, allowing them to practice on patient-specific, real image based models with accurate tissue movement and haptic feedback, simulating the nuances of real life surgery. Workers can expand skillsets through professional development courses and workforce training in areas such as advanced manufacturing or product development using modeling and simulation, accessing computing resources and data analysis tools that real workers use on the job for the actual jobs they hope to obtain.</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+</div>
+<div class="columns equal">
+<div class="col box health">
+<h3>Health Information Technologies</h3>
+<p>Sliceable, programmable networks could provide high levels of privacy and security for health data. In-home sensor systems and real-time analysis of data might lead to early detection of conditions such as cognitive impairment or increased likelihood of falling to allow early intervention and even preemption of adverse health outcomes. Telemedicine will allow easy, efficient communication between patients and their caregivers and increased access to high quality health information from diverse sources in cheaper and more efficient ways. Rapid exchange of large amounts of medical data with high-resolution collaborative tools will enable the efficient exchange of ideas and knowledge between medical experts on the care team. Platforms for interoperable data exchange will allow “big data” in health from diverse sources to be pulled together and analyzed along with current knowledge and best practices to create a learning health system that provides customized, real-time decision support for all members of the care team when and where it is needed.</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+<div class="col box energy">
+<h3>Clean Energy, including Advanced Vechile Technologies</h3>
+<p>Sustainable living, ranging from smart grids with high temporal and spatial
+control of energy as well as intelligent homes, buildings, and
+transportation systems, even to prevention of unnecessary energy use.
+Advanced battery systems and increasing diversity and demands of different
+energy creation and storage systems need much smarter systems of control.
+The security of our energy systems is also a big issue that some of the GENI
+technologies like isolated network slices could dramatically transform.</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+</div>
+<div class="columns equal">
+<div class="col box manu">
+<h3>Advanced Manufacturing</h3>
+<p>Simulation as well as computational design processes and sharing of data,
+knowledge, tools, and expertise.  Many of these models and simulations
+require powerful supercomputing resources for product development and firms
+need access to these resources to be competitive both locally as well as
+globally.  Thus, high bandwidth, interactive computing systems are essential
+to the future of manufacturing in this country.</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+<div class="col box">
+<div class="highlight">
+<h3>Choosing a Category</h3>
+<p>If your app doesn't fit squarely into one of these....</p>
+</div>
+</div>
+</section>
+<section class="tech">
+<h2>What technologies should I use?</h2>
+<div class="content_columns columns">
+<div class="col main box">
+<p class="intro">Words and words and words</p>
+<div class="columns equal">
+<div class="col box">
+<h3>Browser Technologies</h3>
+<p>Where possible your app must run in the browser.<p>
+</div>
+<div class="col box">
+<h3>Web as Platform</h3>
+<p>We think the future needs a highly connected.....<p>
+</div>
+</div>
+<figure>
+	<figcaption>Fig. Three <h3 class="fig_title"><span>The Geni Network</span></h3></figcaption>
+	Images
+</figure>
+</div>
+<div class="col box bonus">
+<div class="highlight">
+<h3>Sure gigabyte networks are cool but they're not the whole story - we're thinking much bigger</h3>
+<p>Words and words and more words and words and words and too many words make ross go crazy.....</p>
+<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+</div>
+</div>
+</div>
+</section>
+<section class="questions">
+<h2>More Questions?</h2>
+<div class="columns equal">
+<div class="col box">
+<h3>What is US Ignite?</h3>
+<p>Words and words and words and even more words</p>
+</div>
+<div class="col box">
+<h3>Who should enter? Do I need to be a US citizen to compete?</h3>
+<p>A good question deserves good answers.</p>
+</div>
+</section>
+{% endblock %}

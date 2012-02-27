@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     # quick redirect to send all requests to /blog/ to the blog itself
     url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
+    url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )
 
 # Handle 404 and 500 errors
