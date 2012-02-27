@@ -13,7 +13,7 @@
 {% block alerts %}
 {% if errors %}
 <section class="alerts errors">
-    <h2 class="busta">{{ _('Opps! We came across a few errors') }}</h2>
+    <h2 class="busta">{{ _('Oops! We came across a few errors') }}</h2>
     <ul class="busta">
     {% for error in errors %}
     <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
@@ -27,7 +27,7 @@
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <p class="announce">{{ _('Are you <em>certain</em> you want to remove your submission?') }}</p>
-    <p>{{ _("If you're not happy with your submission at the moment you can just edit it to be in draft mode and it won't be visible to other users while you decide on how to make it better.") }}</p>
+    <p>{{ _("If you're not happy with your submission at the moment, you can also revert it to "draft" status and keep polishing.") }}</p>
     {% block submit %}
     <a href={{ object.get_absolute_url() }} class="back">{{ _('OK, take me back') }}</a> or
     <input class="cta" type="submit" value="{{ _('Delete this submission permanently') }}" />
