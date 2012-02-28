@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{% if errors %}{{ _('Errors in your submission') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
+
+{% block page_id %}create_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+<h1 class="shout">{% block page_heading %}Create a submission{% endblock %}</h1>
+{% endblock %}
+
+{% block alerts %}
+{% if errors %}
+<section class="alerts errors">
+    <h2 class="busta">{{ _('Oops! We came across a few errors') }}</h2>
+    <ul class="busta">
+    {% for error in errors %}
+    <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
+    {% endfor %}
+    </ul>
+</section>
+{% endif %}
+{% endblock %}
+
+{% block content %}   
+<form action="" method="post" enctype="multipart/form-data">
+    {{ csrf()|safe }}
+    <div>
+        <label for="id_title" class="announce">{{ _('Title') }}</label>
+        <p class="hint" id="info_title">{{ _('Give your idea a name.') }}</p>
+        {{ form.title }}
+    </div>
+    <div>
+        <label for="id_brief_description" class="announce">{{ _('Summary') }}</label>
+        <p class="hint" id="info_brief_description">{{ _('Sum up your pitch in 140 characters or less.') }}</p>
+        {{ form.brief_description }}
+     </div>
+     <div class="image_field">
+        <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
+        <p class="hint" id="info_annouce">{{ _('Everyone loves visuals. Show us a diagram or picture to support your idea. <em>(png, jpg, gif)</em>') }}</p>
+        {% if form.sketh_note.value() %}
+            <div class="frame box">
+                <img src="{{ MEDIA_URL }}{{ form.sketh_note.value() }}" alt="" />
+            </div>
+            <input id="sketh_note-clear_id" type="checkbox" name="sketh_note-clear" />
+            <label for="sketh_note-clear_id">{{ _('Delete the current image') }}</label>
+            <p>{{ _("If you don't like what you've currently got upload a different image") }}</p>
+            <input type="file" id="id_sketh_note" name="sketh_note" />
+        {% else %}
+            {{ form.sketh_note }}
+        {% endif %}
+     </div>
+     <div>
+        <label for="wmd-input" class="announce">{{ _('Full description') }}</label>
+        <p class="hint" id="info_description">{{ _('Take some time to provide us with a more detailed description. You can use basic HTML.') }}</p>
+        <div class="wmd-region">
+        {{ form.description }}
+        </div>
+     </div> 
+     <fieldset class="external_links">
+        <legend><span class="announce">{{ _('External links') }}</span></legend>
+        <p class="hint">If you've got additional information about your submission elsewhere on the internet (like a YouTube video, a mockup, or blog post) please include links here. The more information you provide, the better!</p>
+        {{ link_form.management_form }}
+        {% for link in link_form.forms %}
+            <div class="inline_field">
+                {% for field in link.hidden_fields() %}
+                {{ field }}
+                {% endfor %}
+                
+                {% for field in link.visible_fields() %}
+                    {{ field.label_tag() }}
+                    {{ field }}
+                {% endfor %}
+            </div>
+        {% endfor %}
+     </fieldset>
+     <fieldset class="stacked_field">
+        <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
+        {{ form.category }}
+     </fieldset>
+     <div class="inline_field">
+        {{ form.is_draft }}
+        <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
+        <p class="hint" id="info_is_draft">{{ _("Not ready for the world to see your idea yet? Save as draft and it will go public when you're ready.") }}</p>
+     </div>
+     {% block submit %}
+     <input class="cta" type="submit" value="{{ _('Create idea') }}" />
+     {% endblock %}
+</form>
+{% endblock %}

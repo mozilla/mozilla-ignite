@@ -3,8 +3,8 @@ import os
 from fabric.api import cd, env, run
 from fabric.operations import sudo
 
-env.proj_root = '/var/webapps/betafarm/'
-git_repo = 'https://github.com/mozilla/betafarm.git'
+env.proj_root = '/var/webapps/mozilla-ignite/'
+git_repo = 'https://github.com/rossbruniges/mozilla-ignite.org.git'
 
 
 def run_manage_cmd(cmd):

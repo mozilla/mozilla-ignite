@@ -32,7 +32,7 @@ ALLOWED_ATTRIBUTES = {
     'img': ['src', 'alt', 'title'],
 }
 
-APP_NAME = 'Mozilla Labs'
+APP_NAME = 'Mozilla Ignite'
 
 ## Internationalization.
 
@@ -156,6 +156,10 @@ MINIFY_BUNDLES = {
             'css/innovate/normalise.css',
             'css/innovate/devices.css',
         ),
+        'ignite_devices' : (
+            'css/innovate/normalise.css',
+            'ignite/css/devices.css',
+        ),
     },
     'js': {
         'innovate_js': (
@@ -163,6 +167,12 @@ MINIFY_BUNDLES = {
             'js/common/ext/LAB.min.js',
             'js/common/betafarm.page.js',
             'js/common/core.js',
+        ),
+        'ignite_core': (
+            'js/common/ext/jquery-1.6.1.min.js',
+            'js/common/ext/LAB.min.js',
+            'ignite/js/common/core.js',
+            'js/common/lacky.js',
         ),
     }
 }
@@ -179,7 +189,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 
     'commonware.middleware.FrameOptionsHeader',
-    'innovate.middleware.ProfileMiddleware',
+    'ignite.middleware.ProfileMiddleware',
 
     'waffle.middleware.WaffleMiddleware',
 )
@@ -229,14 +239,16 @@ INSTALLED_APPS = (
     # Feature flipping
     'waffle',
 
-    # Betafarm specific
+    # Ignite specific
     'innovate',
     'users',
     'topics',
     'projects',
     'events',
     'activity',
-    'participation',
+    'challenges',
+    'ignite',
+    'voting',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -290,7 +302,7 @@ USER_AVATAR_PATH = 'img/uploads/avatars/'
 TOPIC_IMAGE_PATH = 'img/uploads/topics/'
 PROJECT_IMAGE_PATH = 'img/uploads/projects/'
 EVENT_IMAGE_PATH = 'img/uploads/events/'
-PARTICIPATION_IMAGE_PATH = 'img/uploads/participation'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.
@@ -311,11 +323,13 @@ DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
-    'django.contrib.auth.backends.ModelBackend'
+    'django.contrib.auth.backends.ModelBackend',
+    'challenges.auth.SubmissionBackend'
 )
 
 BROWSERID_VERIFICATION_URL = 'https://browserid.org/verify'
 BROWSERID_CREATE_USER = True
+BROWSERID_DISABLE_CERT_CHECK = True
 LOGIN_REDIRECT_URL = '/'
 LOGIN_REDIRECT_URL_FAILURE = '/'
 
@@ -326,6 +340,9 @@ PUSH_CREDENTIALS = 'projects.utils.push_hub_credentials'
 
 SOUTH_TESTS_MIGRATE = False
 CACHE_BACKEND = 'caching.backends.locmem://'
-CACHE_COUNT_TIMEOUT = 60
+# Don't cache count queries at all, because there's no way to invalidate them
+CACHE_COUNT_TIMEOUT = None
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
+
+JUDGES_PER_SUBMISSION = 2

@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block page_title %}Please login or register | {% endblock %}
+
+{% block page_id %}create_account{% endblock %}
+
+{% block section_class %}register{% endblock %}
+
+{% block header %}
+<h1 class="shout">Please login or register</h1>
+<p>To participate in the Mozilla Ignite Apps Challenge, you'll need to create an account. Don't worry, this is super simple.</p>
+<form method="POST" action="{{ browserid_target }}" class="browserid_form">
+    {{ csrf()|safe }}
+    <input type="hidden" name="assertion" class="id_assertion" />
+    <a class="cta login" href="#">{{ _('Log in or register') }}</a> 
+</form>
+{% endblock %}

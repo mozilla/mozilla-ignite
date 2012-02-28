@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "layout/breadcrumbs.html" import breadcrumbs %}
+{% from "layout/helpers.html" import sectiontitle, challenge_nav with context %}
+{% from 'challenges/helpers.html' import created_by %}
+
+{% block page_title %}
+    {{ _('{part} : Participation : Mozilla Labs')|f(part=challenge.title) }}
+{% endblock %}
+
+{% block page_id %}participation_detail{% endblock %}
+{% block section_class %}projects{% endblock %}
+
+{% block breadcrumbs %}
+{{ breadcrumbs(
+    (url('innovate_splash'), _('Mozilla Labs Home')),
+    (url('projects_programs'), _('Programs')),
+    (url('projects_show', slug=project.slug), project.name),
+    last=challenge.title) }} 
+{% endblock %}
+
+{% block content %}
+{{ sectiontitle(challenge.title) }}
+{{ challenge_nav(challenge.get_image_src(), challenge.summary, challenge.start_date, challenge.end_date) }}
+<section class="c4 clearfix">
+    <div class="row clearfix">
+        <h2 class="light sans">The brief</h2>
+        {{ challenge.description }}
+        {% if entries %}
+        <div class="entries">
+        <h3>Entries</h3>
+        <ul class="db_objects">
+        {% for e in entries.object_list %}
+        <li class="obj">
+            <article>
+                <h4>{{ e.title }}</h4>
+                <p>{{ e.brief_description }}</p>
+                <p><a href="{{ url('entry_show', project=project.slug, slug=challenge.slug, entry_id=e.id) }}">Read the full entry</a></p>
+                {{ created_by(e) }}
+            </article>
+        </li>
+        {% endfor %}
+        </ul>
+        </div>
+        {% endif %}
+        <a href="{{ url('entry_create', project=project.slug, slug=challenge.slug) }}" class="button submit">Participate now</a>
+    </div>
+</section>
+{% endblock %}

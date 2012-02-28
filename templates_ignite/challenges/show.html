@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_id %}add_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block site_title %}<h1 class="brand">Mozilla + US Ignite</h1>{% endblock %}
+
+{% block content %}
+    <section>
+        <h1>{{ challenge.title }}</h1>
+        {{ challenge.description_html }}
+    </section>
+        
+        <nav id="phases">
+            <ol>
+            {% for phase_number, phase in phases %}
+            <li class="phase">Phase {{ phase_number }}: {{ phase.name }}</li>
+            {% endfor %}
+            </ol>
+        </nav>
+        
+        <section>
+            <header>
+                <h2>Submissions</h2>
+            </header>
+            <nav>
+                <ul class="tags">
+                    {% for tag in ['all', 'manufacturing', 'health', 'education', 'energy'] %}
+                    <li><a href="#">{{ tag }}</a></li>
+                    {% endfor %}
+                </ul>
+                <div class="sort">
+                    Sort by:
+                    <ul>
+                        {% for sort in ['newest', 'best liked'] %}
+                        <li><a href="#">{{ sort }}</a></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </nav>
+            <p><a href="{{ url('create_entry') }}">{{ _('Create submission') }}</a></p>
+            <ul class="submissions">
+                {% for entry in entries %}
+                <li>
+                    <img src="{{ entry.get_image_src() }}" alt="">
+                    <h4><a href="{{ entry.get_absolute_url() }}">{{ entry.title }}</a></h4>
+                    <p>{{ entry.brief_description }}</p>
+                    {{ created_by(entry, footer=False) }}
+                </li>
+                {% endfor %}
+            </ul>
+            <a href="#">See all submissions</a>
+        </section>
+        
+        <section id="updates">
+            <h2>Recent updates from the blogs</h2>
+            {% for i in range(3) %}
+            <article>
+                <h3>Headline of post</h3>
+                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.
+                Aenean sit amet arcu orci. Maecenas scelerisque consequat
+                vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum
+                primis in faucibus orci luctus et ultrices posuere cubilia
+                Curae; Maecenas eros risus, dictum quis dapibus nec,
+                ullamcorper in orci.</p>
+            </article>
+            {% endfor %}
+        </section>
+{% endblock %}

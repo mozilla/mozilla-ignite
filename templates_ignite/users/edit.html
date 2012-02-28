@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ _('Edit profile') }} | {% endblock %}
+
+{% block page_id %}edit_profile{% endblock %}
+
+{% block section_class %}profile{% endblock %}
+
+{% block header %}
+<h1 class="shout">{{ _('Tell us about you') }}</h1>
+<p class="announce">What's your story?</p>
+{% endblock %}
+
+{% block content %}
+<form action="{{ url('users_edit') }}" method="post" enctype="multipart/form-data">
+    {{ csrf()|safe }}
+    <div>
+        <label class="announce" for="id_name">{{ _('Display name') }}</label>
+        <p class="hint" id="name_info">{{ _('What should we call you?') }}</p>
+        {{ form.name }}
+    </div>
+    <div class="image_form">
+        <p class="announce">Avatar</p>
+        <img src="{{ user.get_profile().avatar_url(60) }}" />
+        <p class="hint">{{ _('Profile pictures are powered by ') }} <a href="http://gravatar.com">Gravatar.com</a></p>
+    </div>
+    <div>
+        <label class="announce" for="id_website">{{ _('Website') }}</label>
+        <p class="hint" id="website_info">{{ _('Where can people find out more about you?') }}</p>
+        {{ form.website }}
+    </div>
+    <div>
+        <label class="announce" for="id_bio">{{ _('Personal bio') }}</label>
+        <p class="hint" id="bio_info">{{ _('What do you want people to know about you?') }}</p>
+        {{ form.bio }}
+    </div>
+    <input class="cta" type="submit" value="{{ _('Update') }}" />
+</form>
+{% endblock %}

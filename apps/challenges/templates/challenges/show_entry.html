@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% from 'layout/breadcrumbs.html' import breadcrumbs %}
+{% from 'layout/helpers.html' import sectiontitle, challenge_nav with context %}
+{% from 'challenges/helpers.html' import created_by %}
+
+
+{% block page_title %}
+    {{ _('{title} | Entries | {part} | Mozilla Labs')|f(title=entry.title, part=challenge.title) }}
+{% endblock %}
+
+{% block page_id %}entry_show{% endblock %}
+{% block section_class %}projects{% endblock %}
+
+{% block breadcrumbs %}
+{{ breadcrumbs(
+    (url('innovate_splash'), _('Mozilla Labs Home')),
+    (url('projects_programs'), _('Programs')),
+    (url('projects_show', slug=project.slug), project.name),
+    (challenge.get_absolute_url(), challenge.title),
+    (url('entries_all', project=project.slug, slug=challenge.slug), _('Entries')),
+    last=entry.title) }} 
+{% endblock %}
+
+{% block content %}
+{{ sectiontitle(entry.title) }}
+{{ challenge_nav(challenge.get_image_src(), challenge.summary, challenge.start_date, challenge.end_date) }}
+<section class="c4 clearfix">
+    <div class="row clearfix entries">
+        {{ entry.description_html }}
+        {{ created_by(entry) }}
+    </div>
+</section>
+{% endblock %}

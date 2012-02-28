@@ -1,10 +1,14 @@
 from django.core.urlresolvers import reverse
 from django.test import Client
+from django.test.client import RequestFactory
 
 from projects.models import Project
+from ignite.tests.decorators import ignite_skip
 from innovate import urls
+from innovate.views import handle404, handle500
 
 
+@ignite_skip
 def test_routes():
     c = Client()
     for pattern in urls.urlpatterns:
@@ -17,6 +21,7 @@ def test_routes():
         assert response.status_code == 200
 
 
+@ignite_skip
 def test_featured():
     project = Project.objects.create(
         name=u'Test Project',
@@ -28,3 +33,14 @@ def test_featured():
     response = c.get('/en-US/')
     assert response.status_code == 200
     assert project.name in response.content
+
+
+def test_404_handler():
+    """Test that the 404 error handler renders and gives the correct code."""
+    response = handle404(RequestFactory().get('/not/a/real/path/'))
+    assert response.status_code == 404
+
+def test_500_handler():
+    """Test that the 500 error handler renders and gives the correct code."""
+    response = handle500(RequestFactory().get('/not/a/real/path/'))
+    assert response.status_code == 500

@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} | {% else %}{{ _('All submissions') }} | {% endif %}{% endblock %}
+
+{% block page_id %}all_submissions{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+{% if not category %}
+<h1 class="shout">Submissions</h1>
+{% else %}
+<h1 class="shout">Submissions in {{ category }}</h1>
+{% endif %}
+<p class="announce">How can we use 1Gbps networks to push the web further?</p>
+<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+{% endblock %}
+
+{% block content %}
+<h2 class="box_title">Submissions</h2>
+<nav class="tags">
+    <ul>
+        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">all</a></li>
+        {% if categories %}
+        {% for cat in categories %}
+            <li><a{% if category==cat.slug %} class="current"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
+        {% endfor %}
+        {% endif %}
+    </ul>
+</nav>
+<ol class="submissions columns">
+{% for entry in entries.object_list %}
+    <li class="box col">
+        <article>
+            <a href="{{ entry.get_absolute_url() }}">
+                <h4>
+                    <div class="frame box">
+                    <img src="{{ entry.get_image_src() }}" alt="">
+                    </div>
+                    {{ entry.title }}
+                </h4>
+            </a>
+            {% if entry.editable_by(user) %}
+            {% if entry.is_draft %}
+            <div class="alerts inline">
+                <p><strong>Idea in draft</strong></p>
+                <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
+                <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+            </div>
+            {% endif %}
+            {% endif %}
+            <p>{{ entry.brief_description }}</p>
+            <address>{{ created_by(entry, footer=False) }}</address>
+        </article>
+    </li>
+    {% endfor %}
+    </ol>
+    {% if entries.paginator.num_pages > 1 %}
+    <footer class="pagination">
+    <nav>
+    {% if entries.has_previous() %}
+        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
+    {% endif %} 
+    <ol>
+    {% for i in range(entries.paginator.num_pages) %}
+    <li>
+        {% if i + 1 == entries.number %}
+            <span>{{ i + 1 }}</span>
+        {% else %}
+            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ol>
+    {% if entries.has_next() %}
+        <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
+    {% endif %}
+    </nav>
+    </footer>
+    {% endif %}
+    </div>
+    </div>
+</section>       
+{% endblock %}

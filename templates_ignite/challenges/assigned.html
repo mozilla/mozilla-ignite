@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_title %}{{ _('All submissions assigned to you') }} |{% endblock %}
+
+{% block page_id %}assigned_submissions{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+<h1 class="shout">Submissions assigned to you</h1>
+{% endblock %}
+
+{# No need to display the judge call on this page #}
+{% block judgecall %}{% endblock %}
+
+{% block content %}
+{% for group in entries|groupby('has_judged') %}
+    {% if group.grouper %}
+    <h2>{% trans %}Judged by you{% endtrans %}</h2>
+    <p>
+        {% trans count=group.list|length %}
+        You have successfully evaluated {{ count }} submission.
+        {% pluralize %}
+        You have successfully evaluated {{ count }} submissions.
+        {% endtrans %}
+    </p>
+    {% else %}
+    <h2>{% trans %}To be Judged{% endtrans %}</h2>
+    <p>
+        {% trans count=group.list|length %}
+        You have {{ count }} submission awaiting evaluation.
+        {% pluralize %}
+        You have {{ count }} submissions awaiting evaluation.
+        {% endtrans %}
+    </p>
+    {% endif %}
+    <ul class="submissions">
+        {% for entry in group.list %}
+        <li>
+            <a href="{{ entry.get_absolute_url() }}">
+                {{ entry.title }}
+            </a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+{% endblock %}

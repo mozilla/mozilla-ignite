@@ -1,0 +1,8 @@
+{% macro created_by(submission) %}
+<footer>
+    <p>Entry from:</p>
+    <a href="{{ url('users_profile', username=submission.created_by.user.username) }}">
+        <img src="{{ submission.created_by.avatar_url(32) }}" width="32" height="32">
+    </a>
+</footer>
+{% endmacro %}

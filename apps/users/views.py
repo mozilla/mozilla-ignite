@@ -1,15 +1,20 @@
 import json
 
+from django.conf import settings
 from django.contrib import auth
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
+from django.utils.translation import ugettext
 
 from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
+from challenges.models import Submission
+from settings import INSTALLED_APPS
 
 import jingo
 
@@ -53,10 +58,13 @@ def profile(request, username):
     """Display profile page for user specified by ``username``."""
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
+    if 'challenges' in INSTALLED_APPS:
+        submissions = Submission.objects.filter(created_by=profile)
     return jingo.render(request, 'users/profile.html', {
         'profile': profile,
         'social_links': profile.link_set.all() or False,
-        'projects': profile.project_set.all() or False
+        'projects': profile.project_set.all() or False,
+        'submissions': submissions or False
     })
 
 
@@ -117,21 +125,32 @@ def edit(request):
                            files=request.FILES,
                            instance=profile)
         if form.is_valid():
+            
+            success_message = ugettext(u"Thank you \u2013 your profile has "
+                                       u"been updated.")
+            
             profile = form.save(commit=False)
             profile.user = request.user
             profile.save()
-            # adding in a link non-JS
-            links_form = ProfileLinksForm(data={
-                'url': request.POST['link_url'],
-                'name': request.POST['link_name']
-            })
-            if links_form.is_valid():
-                link = links_form.save(commit=False)
-                link.profile = profile
-                link.save()
-            return HttpResponseRedirect(reverse('users_profile', kwargs={
-                'username': request.user.username
-            }))
+            # if the link form is present we have a few more checks to do
+            if 'link_url' in request.POST:
+                # adding in a link non-JS
+                links_form = ProfileLinksForm(data={
+                    'url': request.POST['link_url'],
+                    'name': request.POST['link_name']
+                })
+                if links_form.is_valid():
+                    link = links_form.save(commit=False)
+                    link.profile = profile
+                    link.save()
+                messages.success(request, success_message)
+                # links only valid on betafarm so feels safe to do this...
+                return HttpResponseRedirect(reverse('users_profile', kwargs={
+                    'username': request.user.username
+                }))
+            else:
+                messages.success(request, success_message)
+                return HttpResponseRedirect('/')
     form = ProfileForm(instance=profile)
     links = profile.link_set.all()
     return jingo.render(request, 'users/edit.html', {

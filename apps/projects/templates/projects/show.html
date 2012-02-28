@@ -59,7 +59,7 @@
       <ul class="db_related clearfix">
         {% for p in participation %}
             <li>
-                <a href="{{ url('participation_show', project=project.slug, slug=p.slug) }}">
+                <a href="{{ p.get_absolute_url() }}">
                     <img src="{{ p.get_image_src() }}" alt="" />
                     <h3>{{ p.title }}</h3> 
                 </a>
