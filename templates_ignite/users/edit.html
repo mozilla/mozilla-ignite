@@ -8,7 +8,7 @@
 
 {% block header %}
 <h1 class="shout">{{ _('Tell us about you') }}</h1>
-<p class="announce">Blah blah blah - why should you do this?</p>
+<p class="announce">What's your story?</p>
 {% endblock %}
 
 {% block content %}
@@ -16,7 +16,7 @@
     {{ csrf()|safe }}
     <div>
         <label class="announce" for="id_name">{{ _('Display name') }}</label>
-        <p class="hint" id="name_info">{{ _('How do you want to be known?') }}</p>
+        <p class="hint" id="name_info">{{ _('What should we call you?') }}</p>
         {{ form.name }}
     </div>
     <div class="image_form">

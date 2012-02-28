@@ -10,13 +10,13 @@
 {% block header %}
 <div class="tagline">
     <h2 class="busta">
-        <span class="sweet"><em>Calling all</em> Developers and Civic Innovators</span>
+        <span class="sweet"><em>Calling all</em> Developers, designers and civic innovators...</span>
         <strong><img src="{{ MEDIA_URL }}ignite/img/build.png" alt="Build the future" /></strong>
     </h2>
 </div>
 <div class="ignite_info">
     <div class="busta">
-        <p class="box">Mozilla and the National Science Foundation offer $500 in funding, and invite you to kickstart innovation in healthcare, education, and other national priority areas using gigabit networks and technologies.</p>
+        <p class="box">Mozilla and the National Science Foundation invite you to kickstart innovation in 1Gbps networks, with $500,000 in funding for apps in healthcare, education, and other national priority areas.</p>
        <div class="gather">
             <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="#">learn more</a>
        </div>
@@ -27,15 +27,15 @@
     <ul>
     <li class="col brainstorm box">
     <h3>Brainstorm</h3>
-    <p>Joing a brainstorm with the Mozilla community; what do tomorrow's apps look like?</p>
+    <p>Joing a <a href="{{ url('entries_all') }}">brainstorm</a> with the Mozilla community; what do tomorrow's apps look like?</p>
     </li>
     <li class="col hack box">
     <h3>Hack</h3>
-    <p>Attend a series of code sprints, design jams and webcats to meet like-minded collaborators.</p>
+    <p>Attend a series of <a href="resources.html#events">code sprints</a>, design jams and <a href="resources.html#labs">webcasts</a> to meet like-minded collaborators.</p>
     </li>
     <li class="col compete box">
     <h3>Compete for funding</h3>
-    <p>Compete for funding from $500k prize pool and quickly build your app.</p>
+    <p>Start <a href="about.html#how">building your app</a> and access funding from a $500,000 prize pool.</p>
     </li>
     </ul>
     </div>
@@ -46,18 +46,20 @@
 <div class="focus_areas columns">
     <h2>Focus Areas</h2>
     <ul>
-    <li class="box col manu">advanced manufacturing</li>
-    <li class="box col emer">emergency preparedness and public safety</li>
-    <li class="box col health">health information technologies</li>
-    <li class="box col edu">education and workforce technologies</li>
-    <li class="box col energy">clean energy, including advanced vechile technologies</li>
+	<a href="about.html#build">
+	<li class="box col edu"><strong>Education</strong></li>    
+    <li class="box col health"><strong>Health IT</strong></li>
+    <li class="box col energy"><strong>Clean Energy</strong></li>
+    <li class="box col manu"><strong>Advanced Manufacturing</strong></li>
+    <li class="box col emer"><strong>Public Safety</strong></li>
+    </a>
     </ul>
 </div>
 <div class="columns project_data content_columns">
 <div class="dynamic main col box">
 <section>
 <h2>Recent Brainstorm Submissions</h2>
-<p class="intro">Brainstorm submissions will help feed the developer challenge and have the chance of winning 1 of 3 prizes of $5000.</p>
+<p class="intro">Share your ideas about how 1Gbps networks can create public benefit. Suggest possible apps for the developer challenge. We're offering $15,000 in awards for the best articulated ideas.</p>
 <ul class="submissions columns">
 {% for entry in entries %}
     <li class="box col">

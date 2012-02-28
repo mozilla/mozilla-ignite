@@ -24,7 +24,7 @@
 
 {% block header %}
 <a href="{{ url('entries_all') }}" class="back announce">See all submissions</a>
-<p class="announce">What apps would you make, if you could make anything?</p>
+<p class="announce">How can we use 1Gbps networks to push the web further?</p>
 <a href="{{ url('create_entry') }}" class="cta">Create submission</a>
 <p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit ideas</p>  
 {% endblock %}
@@ -46,7 +46,7 @@
         {% if entry.is_draft %}
         <div class="alerts inline">
             <p><strong>Idea in draft</strong></p>
-            <p>Only you can see this idea until you uncheck the "Save as draft?" option.</p>
+            <p>This idea is not yet published. To make it public, uncheck the "Save as draft?" option.</p>
         </div>
         {% endif %}
         {% endif %}
@@ -144,7 +144,7 @@
                 {% endif %}
                 {% endif %}
                 {% else %}
-                <p>If you would like to vote up this submission then please login or register to Mozilla Ignite.</p>
+                <p>To upvote this submission, please login or register for Mozilla Ignite.</p>
                 {% endif %}
             </section>
             <section>
