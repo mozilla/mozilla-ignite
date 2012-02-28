@@ -346,3 +346,6 @@ CACHE_COUNT_TIMEOUT = None
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 JUDGES_PER_SUBMISSION = 2
+
+# Switch for the development phase
+DEVELOPMENT_PHASE = True

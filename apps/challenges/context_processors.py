@@ -1,4 +1,5 @@
 from challenges.models import Submission
+from django.conf import settings
 
 def assigned_submissions_processor(request):
     """Add the number of assigned submissions to the request context."""
@@ -16,3 +17,10 @@ def assigned_submissions_processor(request):
     assigned = (Submission.objects.filter(judgeassignment__judge=profile)
                                   .exclude(judgement__judge=profile))
     return {'assignment_count': assigned.count()}
+
+
+def current_phase(request):
+    """Add to the context the ``DEVELOPMENT_PHASE`` flag"""
+    return {
+        'DEVELOPMENT_PHASE': settings.DEVELOPMENT_PHASE
+        }
