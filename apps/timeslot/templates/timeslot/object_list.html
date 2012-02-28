@@ -1,0 +1,16 @@
+{% extends "second_base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block content %}
+<ul>
+  {% for object in object_list %}
+  <li>
+    {% if object.is_booked %}
+    {{ object.start_date }} - {{ object.end_date }}
+    {% else %}
+    <a href="{{ url('timeslot:object_detail', entry_id=entry.id, object_id=object.short_id) }}">{{ object.start_date }} - {{ object.end_date }}</a>
+    {% endif %}
+  </li>
+  {% endfor%}
+</ul>
+{% endblock content%}

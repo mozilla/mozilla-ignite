@@ -43,6 +43,12 @@ urlpatterns = patterns('',
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )
 
+if settings.DEVELOPMENT_PHASE:
+    urlpatterns += patterns(
+        '',
+        (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
+        )
+
 # Handle 404 and 500 errors
 handler404 = 'innovate.views.handle404'
 handler500 = 'innovate.views.handle500'

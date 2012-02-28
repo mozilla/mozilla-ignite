@@ -1,0 +1,10 @@
+{% extends "second_base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block content %}
+<h1>Booking {{ object.start_date }} {{ object.end_date }}</h1>
+<form method="post" id="form-booking-id" action="">
+  <p>Confirm booking</p>
+  <p><button type="submit">Confirm</button>{{ csrf() }}</p>
+</form>
+{% endblock content%}

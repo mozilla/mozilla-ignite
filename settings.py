@@ -209,6 +209,7 @@ INSTALLED_APPS = (
     'commonware.response.cookies',
     'djcelery',
     'django_nose',
+    'django_extensions',
 
     # Django contrib apps
     'django.contrib.admin',
@@ -249,6 +250,7 @@ INSTALLED_APPS = (
     'challenges',
     'ignite',
     'voting',
+    'timeslot',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -349,3 +351,7 @@ JUDGES_PER_SUBMISSION = 2
 
 # Switch for the development phase
 DEVELOPMENT_PHASE = True
+
+# BOOKING AND TIMESLOT
+# 5 minutes
+BOOKING_EXPIRATION = 5 * 60
