@@ -1,24 +1,28 @@
 import jingo
 
+from datetime import datetime
+
 from challenges.models import Submission
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.http import Http404, HttpResponseRedirect
-from timeslot.models import TimeSlot, Booking
+from timeslot.models import TimeSlot
+from django.core.urlresolvers import reverse
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
 
 
 def get_lock_key(object_id):
+    """Determines the key to use for locking the ``TimeSlot``"""
     return 'locked-%s' % object_id
 
+
 def lock_booking(func):
-    """Locks the current view for the specified time,
+    """Locks the current view for a given period of time,
     until the user hits another locked URL"""
-    def _decorated(*args, **kwargs):
-        request = args[0]
+    def _decorated(request, *args, **kwargs):
         entry = kwargs['entry']
         key = get_lock_key(kwargs['object_id'])
         entry_id = cache.get(key)
@@ -27,11 +31,12 @@ def lock_booking(func):
             cache.set(key, entry.id, settings.BOOKING_EXPIRATION)
         # it is free or already has been locked for this entry
         if not entry_id or entry_id == entry.id:
-            return func(*args, **kwargs)
+            return func(request, *args, **kwargs)
         # someone has locked in this view
         message = _('Unfortunately his slot has become unavailable')
         messages.error(request, message)
-        return HttpResponseRedirect(entry.get_absolute_url())
+        return HttpResponseRedirect(reverse('timeslot:object_list'),
+                                    args=[entry.id])
     return _decorated
 
 
@@ -43,14 +48,17 @@ def entry_available_decorator(func):
     def _decorated(*args, **kwargs):
         request = args[0]
         entry_id = kwargs.pop('entry_id')
+        # user owns the submission and it's a winner
         try:
             entry = Submission.objects.get(id=entry_id, is_winner=True,
                                            created_by__user=request.user)
         except Submission.DoesNotExist:
             raise Http404
         # booking has been done
-        if Booking.objects.filter(submission=entry, is_confirmed=True):
-            raise Http404
+        if TimeSlot.objects.filter(submission=entry, is_booked=True):
+            message = _('You have already booked a timeslot for this entry')
+            messages.success(request, message)
+            return HttpResponseRedirect(entry.get_absolute_url())
         kwargs['entry'] = entry
         return func(*args, **kwargs)
     return _decorated
@@ -71,24 +79,19 @@ def object_list(request, entry, template='timeslot/object_list.html'):
 @login_required
 @entry_available_decorator
 @lock_booking
-def object_detail(request, entry, object_id,
-                  template='timeslot/object_detail.html'):
-    """Detail of a ``TimeSlot`` ready to be booked"""
+def object_detail(request, entry, object_id):
+    """Books a ``TimeSlot`` for the ``Entry``"""
+    # we only take post requests
+    if request.method != 'POST':
+        raise Http404
     timeslot = unshorten_object(object_id)
     if not timeslot:
         raise Http404
-    # lock entry
-    if request.method == 'POST':
-        data = {
-            'timeslot': timeslot,
-            'is_confirmed': True,
-            'submission': entry,
-            }
-        booking = Booking.objects.create(**data)
-        timeslot.is_booked = True
-        timeslot.save()
-        message = _('Your booking has been successful')
-        messages.success(request, message)
-        return HttpResponseRedirect(entry.get_absolute_url())
-    context = {'object': timeslot}
-    return jingo.render(request, template, context)
+    # asign the ``TimeSlot`` to the ``Submission``
+    timeslot.submission = entry
+    timeslot.booking_date = datetime.now()
+    timeslot.is_booked = True
+    timeslot.save()
+    message = _('Your booking has been successful')
+    messages.success(request, message)
+    return HttpResponseRedirect(entry.get_absolute_url())

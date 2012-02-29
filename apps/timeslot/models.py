@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
-from django_extensions.db.fields import CreationDateTimeField
 from timeslot.managers import TimeSlotFreeManager
 from timeslot.utils import shorten_object
 
@@ -13,6 +12,9 @@ class TimeSlot(models.Model):
     end_date = models.DateTimeField()
     notes = models.TextField(blank=True)
     is_booked = models.BooleanField(default=False)
+    submission = models.ForeignKey('challenges.Submission', blank=True,
+                                   null=True)
+    booking_date = models.DateTimeField(blank=True, null=True)
     # managers
     objects = models.Manager()
     free = TimeSlotFreeManager()
@@ -24,18 +26,8 @@ class TimeSlot(models.Model):
     def short_id(self):
         return shorten_object(self)
 
-
-class Booking(models.Model):
-    """Time associated with a submission"""
-    timeslot = models.ForeignKey('timeslot.TimeSlot')
-    submission = models.ForeignKey('challenges.Submission')
-    is_confirmed = models.BooleanField(default=False)
-    created = CreationDateTimeField()
-
-    def __unicode__(self):
-        return u'Booking for %s' % self.submission
-
     def has_expired(self):
         """Determines if this booking has expired"""
-        expire_date = self.created + timedelta(seconds=settings.BOOKING_EXPIRATION)
-        return any([expire_date < datetime.now(), self.is_confirmed])
+        expire_date = self.booking_date + \
+            timedelta(seconds=settings.BOOKING_EXPIRATION)
+        return any([expire_date < datetime.now(), self.is_booked])
