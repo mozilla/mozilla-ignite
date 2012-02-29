@@ -15,6 +15,9 @@ class TimeSlot(models.Model):
     submission = models.ForeignKey('challenges.Submission', blank=True,
                                    null=True)
     booking_date = models.DateTimeField(blank=True, null=True)
+    webcast_url = models.URLField(verify_exists=False, max_length=500,
+                                  blank=True)
+
     # managers
     objects = models.Manager()
     free = TimeSlotFreeManager()

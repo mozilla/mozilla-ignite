@@ -317,7 +317,8 @@ class Submission(BaseModel):
         """Determines if this entry needs to book a Timeslot.
         Any other condition should be factored in"""
         return all([self.is_winner,
-                    settings.DEVELOPMENT_PHASE])
+                    settings.DEVELOPMENT_PHASE,
+                    not self.timeslot_set.all()])
 
     class Meta:
         ordering = ['-id']
