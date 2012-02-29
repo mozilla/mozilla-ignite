@@ -7,9 +7,10 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.urlresolvers import reverse
+from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
 from timeslot.models import TimeSlot
-from django.core.urlresolvers import reverse
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
 
@@ -77,13 +78,11 @@ def object_list(request, entry, template='timeslot/object_list.html'):
 
 
 @login_required
+@require_POST
 @entry_available_decorator
 @lock_booking
 def object_detail(request, entry, object_id):
     """Books a ``TimeSlot`` for the ``Entry``"""
-    # we only take post requests
-    if request.method != 'POST':
-        raise Http404
     timeslot = unshorten_object(object_id)
     if not timeslot:
         raise Http404

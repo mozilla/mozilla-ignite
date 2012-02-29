@@ -66,9 +66,11 @@ def submodules():
         run('git submodule sync')
         run('git submodule update')
 
-def run_tests():
+def test():
     """Run the tests locally"""
-    local('python manage.py test timeslots')
+    # TODO: consider use own --settings=settings_test for in memory tests
+    # TODO: add the rest of the apps and make sure the tests pass!
+    local('python manage.py test timeslot')
 
 
 def deploy(branch):
