@@ -95,7 +95,6 @@ class TimeSlotTest(test_utils.TestCase):
         object_list = response.context['object_list']
         self.assertEqual(len(object_list), 20)
 
-
     def test_timeslot_booking(self):
         """Test the booking of a timeslot"""
         # book the first entry
@@ -112,7 +111,6 @@ class TimeSlotTest(test_utils.TestCase):
                                args=[entry.id, timeslot.short_id])
         response = self.client.post(timeslot_url, {})
         self.assertRedirects(response, entry.get_absolute_url())
-
 
     def test_duplicate_booking(self):
         """Test the behaviour on a booked ``Submission``"""

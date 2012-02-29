@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
@@ -93,4 +94,21 @@ def object_detail(request, entry, object_id):
     timeslot.save()
     message = _('Your booking has been successful')
     messages.success(request, message)
+    context = {'entry': entry,
+               'timeslot': timeslot}
+    subject = jingo.render_to_string(request,
+                                     'timeslot/email/confirmation_subject.txt',
+                                     context)
+    # remove new lines
+    subject = subject.splitlines()[0]
+    body = jingo.render_to_string(request,
+                                  'timeslot/email/confirmation_body.txt',
+                                  context)
+    # Temporaly send the email through the instance, this will be moved
+    # to a queue
+    if request.user.email:
+        profile = request.user.get_profile()
+        recipient = '%s <%s>' % (profile.name, request.user.email)
+        send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
+                  [recipient, ], fail_silently=False)
     return HttpResponseRedirect(entry.get_absolute_url())
