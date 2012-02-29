@@ -1,6 +1,6 @@
 import os
 
-from fabric.api import cd, env, run
+from fabric.api import cd, env, run, local
 from fabric.operations import sudo
 
 env.proj_root = '/var/webapps/mozilla-ignite/'
@@ -65,6 +65,10 @@ def submodules():
         run('git submodule init')
         run('git submodule sync')
         run('git submodule update')
+
+def run_tests():
+    """Run the tests locally"""
+    local('python manage.py test timeslots')
 
 
 def deploy(branch):
