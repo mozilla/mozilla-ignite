@@ -311,7 +311,14 @@ class Submission(BaseModel):
     def owned_by(self, user):
         """Return True if user provided owns this entry."""
         return user == self.created_by.user
-    
+
+    @property
+    def needs_booking(self):
+        """Determines if this entry needs to book a Timeslot.
+        Any other condition should be factored in"""
+        return all([self.is_winner,
+                    settings.DEVELOPMENT_PHASE])
+
     class Meta:
         ordering = ['-id']
 

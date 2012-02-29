@@ -31,13 +31,16 @@
 
 {% block content %}
     <article>
-        <h1 class="shout">{{ entry.title }}</h1> 
+      <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
+            {% if entry.needs_booking %}
+            <li><a href="{{ url('timeslot:object_list', entry_id=entry.id) }}" class="cta do">Book a timeslot</a></li>
+            {% endif %}
         {% else %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>

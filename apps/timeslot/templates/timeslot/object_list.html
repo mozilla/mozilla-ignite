@@ -2,6 +2,8 @@
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block content %}
+<h1>Book timeslot for {{ entry.title }}</h1>
+<p>Select one of these timeslots available</p>
 <ul>
   {% for object in object_list %}
   <li>
