@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     (r'', include('users.urls')),
     # The /ideas/ URL will become available in the application phase
     url(r'^ideas/assigned/$', 'challenges.views.entries_assigned', kwargs=_ignite_kwargs, name='entries_assigned'),
+    url(r'^ideas/judged/$', 'challenges.views.entries_judged', kwargs=_ignite_kwargs, name='entries_judged'),
     url(r'^ideas/list/(?P<category>[\w-]+)/$', 'challenges.views.entries_category', kwargs=_ignite_kwargs, name='entries_for_category'),
     url(r'^ideas/list/$', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
     url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),

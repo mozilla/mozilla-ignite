@@ -5,7 +5,8 @@ from django.db.models import Q
 
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
-                               JudgingAnswer, Judgement, JudgeAssignment)
+                               JudgingAnswer, Judgement, JudgeAssignment,
+                               PhaseCriterion)
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -26,6 +27,11 @@ class PhaseInline(admin.TabularInline):
     
     model = Phase
 
+
+class PhaseCriterionInline(admin.TabularInline):
+    
+    model = PhaseCriterion
+
 class CategoryAdmin(admin.ModelAdmin):
     
     model = Category
@@ -41,6 +47,11 @@ class JudgeAssignmentInline(admin.StackedInline):
 class ExclusionFlagInline(admin.StackedInline):
     model = ExclusionFlag
     extra = 1
+
+
+class PhaseAdmin(admin.ModelAdmin):
+    
+    inlines = (PhaseCriterionInline,)
 
 
 class SubmissionAdmin(admin.ModelAdmin):
@@ -79,7 +90,7 @@ class ChallengeAdmin(admin.ModelAdmin):
 
 class JudgingCriterionAdmin(admin.ModelAdmin):
     
-    list_display = ('question', 'min_value', 'max_value')
+    list_display = ('question', 'max_value')
 
 
 class JudgingAnswerInline(admin.StackedInline):
@@ -90,7 +101,23 @@ class JudgingAnswerInline(admin.StackedInline):
 class JudgementAdmin(admin.ModelAdmin):
     
     inlines = (JudgingAnswerInline,)
-    list_display = ('__unicode__', 'submission', 'judge')
+    list_display = ('__unicode__', 'submission', 'judge', 'complete', 'score')
+    
+    def complete(self, judgement):
+        try:
+            judgement.get_score()
+        except Judgement.Incomplete:
+            return False
+        else:
+            return True
+    
+    complete.boolean = True
+    
+    def score(self, judgement):
+        try:
+            return judgement.get_score()
+        except Judgement.Incomplete:
+            return 'Incomplete'
 
 
 class ExclusionFlagAdmin(admin.ModelAdmin):
@@ -106,7 +133,7 @@ admin.site.register(User, JudgeAwareUserAdmin)
 admin.site.register(Challenge, ChallengeAdmin)
 admin.site.register(Submission, SubmissionAdmin)
 admin.site.register(ExternalLink)
-admin.site.register(Phase)
+admin.site.register(Phase, PhaseAdmin)
 admin.site.register(Category, CategoryAdmin)
 admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 
