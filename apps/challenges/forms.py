@@ -5,14 +5,14 @@ from django.forms.util import ErrorDict
 
 from challenges.models import Submission, ExternalLink, Category, \
                               Judgement, JudgingCriterion, JudgingAnswer
-
+from challenges.widgets import CustomRadioSelect
 
 
 class EntryForm(forms.ModelForm):
-    
     # Need to specify this explicitly here to remove the empty option
     category = ModelChoiceField(queryset=Category.objects.all(),
-                                empty_label=None, widget=forms.RadioSelect())
+                                empty_label=None,
+                                widget=CustomRadioSelect())
     class Meta:
         model = Submission
  
