@@ -350,8 +350,13 @@ GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 JUDGES_PER_SUBMISSION = 2
 
 # Switch for the development phase
-DEVELOPMENT_PHASE = True
+DEVELOPMENT_PHASE = False
 
-# BOOKING AND TIMESLOT
-# 5 minutes
-BOOKING_EXPIRATION = 5 * 60
+# Bookings
+BOOKING_EXPIRATION = 5 * 60   # 5 minutes
+# Determines if the throttling will be enabled
+BOOKING_THROTTLING = True
+# Booking release for these users at the time
+BOOKING_THROTTLING_USERS = 30
+# Time between user batches
+BOOKING_THROTTLING_TIMEDELTA = 60 * 60 * 2  # 2 Hours

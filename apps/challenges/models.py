@@ -4,9 +4,11 @@ from markdown import markdown
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
+from django.template.defaultfilters import slugify
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
@@ -105,13 +107,41 @@ class PhaseManager(BaseModelManager):
             end_date__gte=now
         )
 
+    def get_ideation_phase(self):
+        """Returns the ``Ideation`` phase"""
+        try:
+            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
+                            name=settings.IGNITE_IDEATION_NAME)
+        except self.model.DoesNotExist:
+            return None
+
+    def get_development_phase(self):
+        """Returns the ``Development`` phase"""
+        try:
+            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
+                            name=settings.IGNITE_DEVELOPMENT_NAME)
+        except self.model.DoesNotExist:
+            return None
+
 
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
 
+
+def has_phase_finished(phase):
+    """Helper to determine if the ``Ideation`` phase has finished"""
+    cache_key = '%s_END_DATE' % phase.upper()
+    end_date = cache.get(cache_key)
+    if not end_date:
+        phase = Phase.objects.get_ideation_phase()
+        cache.set(cache_key, end_date)
+        if not phase:
+            return False
+        end_date = phase.end_date
+    return datetime.utcnow() > end_date
+
 class Phase(BaseModel):
     """A phase of a challenge."""
-    
     objects = PhaseManager()
     
     challenge = models.ForeignKey(Challenge, related_name='phases')
@@ -138,6 +168,13 @@ class Phase(BaseModel):
     class Meta:
         unique_together = (('challenge', 'name'),)
         ordering = ('order',)
+
+
+@receiver(signals.post_save, sender=Phase)
+def phase_update_cache(instance, **kwargs):
+    """Updates the ``end_date`` on the cache for this phase"""
+    key = '%s_end_date' % slugify(instance.name)
+    cache.set(key.upper(), instance.end_date)
 
 
 class ExternalLink(BaseModel):
@@ -203,6 +240,10 @@ class SubmissionManager(BaseModelManager):
         if not user.is_anonymous():
             criteria |= models.Q(created_by__user=user)
         return self.filter(criteria)
+
+    def green_lit(self):
+        """Returns all the ``Submissions`` that have been green-lit"""
+        return self.filter(is_winner=True)
 
 
 class Submission(BaseModel):

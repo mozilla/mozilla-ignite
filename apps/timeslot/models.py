@@ -34,3 +34,13 @@ class TimeSlot(models.Model):
         expire_date = self.booking_date + \
             timedelta(seconds=settings.BOOKING_EXPIRATION)
         return any([expire_date < datetime.now(), self.is_booked])
+
+
+class BookingAvailability(models.Model):
+    """Determines when ``Submissions`` will be able to book a ``TimeSlot``"""
+    submission = models.ForeignKey('challenges.Submission')
+    available_on = models.DateTimeField()
+
+    def __unicode__(self):
+        return u'Availability for %s on %s' % (self.submission,
+                                               self.available_on)

@@ -89,7 +89,7 @@ def object_detail(request, entry, object_id):
         raise Http404
     # asign the ``TimeSlot`` to the ``Submission``
     timeslot.submission = entry
-    timeslot.booking_date = datetime.now()
+    timeslot.booking_date = datetime.utcnow()
     timeslot.is_booked = True
     timeslot.save()
     message = _('Your booking has been successful')

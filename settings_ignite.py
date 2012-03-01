@@ -5,6 +5,8 @@ ROOT_URLCONF = '%s.urls_ignite' % ROOT_PACKAGE
 
 IGNITE_PROJECT_SLUG = 'us-ignite'
 IGNITE_CHALLENGE_SLUG = 'ignite-challenge'
+IGNITE_IDEATION_NAME = 'Ideation'
+IGNITE_DEVELOPMENT_NAME = 'Development'
 
 FIXTURE_DIRS = (path('fixtures'),)
 
