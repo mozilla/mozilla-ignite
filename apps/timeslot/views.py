@@ -11,7 +11,7 @@ from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, BookingAvailability
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
 
@@ -111,3 +111,13 @@ def object_detail(request, entry, object_id):
         send_mail(subject, body, settings.DEFAULT_FROM_EMAIL,
                   [recipient, ], fail_silently=False)
     return HttpResponseRedirect(entry.get_absolute_url())
+
+
+@login_required
+def pending(request, template='timeslot/pending.html'):
+    """Lists the Pending ideas to be booked for this User"""
+    profile = request.user.get_profile()
+    object_list = BookingAvailability.objects.\
+        select_related('submission', 'submission__created_by').\
+        filter(submission__created_by=profile)
+    assert False, object_list
