@@ -9,12 +9,11 @@
 {% block alerts %}
 {% if errors %}
 <section class="alerts errors">
-    <h2 class="busta">{{ _('Oops! We came across a few errors') }}</h2>
-    <ul class="busta">
-    {% for error in errors %}
-    <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
-    {% endfor %}
-    </ul>
+    {% trans count=errors|length %}
+    <p>You have {{ count }} error in your submission. Please correct this before you can submit an idea.</p>
+    {% pluralize %}
+    <p>You have {{ count }} errors in your submission. Please correct this before you can submit an idea.</p>
+    {% endtrans %}
 </section>
 {% endif %}
 {% endblock %}
@@ -23,6 +22,10 @@
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
+    <fieldset class="stacked_field highlight focus_areas columns">
+        <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
+        {{ form.category }}
+    </fieldset>
     <div class="highlight">
         <label for="id_title" class="announce">{{ _('Title') }}</label>
         <p class="hint" id="info_title">{{ _('Give your idea a name.') }}</p>
@@ -71,10 +74,6 @@
                 {% endfor %}
             </div>
         {% endfor %}
-     </fieldset>
-     <fieldset class="stacked_field highlight">
-        <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
-        {{ form.category }}
      </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}

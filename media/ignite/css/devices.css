@@ -295,12 +295,19 @@ legend span {
 .alerts {
     padding: 1em 0;
     background: #FFFF99;
-    border-bottom: 5px solid #EBEA00;
     font-size: 12px;
     color: #333;
+    font-weight: bold;
+    margin-bottom: 2em;
+    border-radius: 4px;
 }
 .alerts h2 {
     margin-bottom: 0.5em;
+}
+.alerts p {
+    color: #fff;
+    margin: 0.5em 1em;
+    font-size: 14px;
 }
 .alerts ul {
     list-style-type: none;
@@ -317,8 +324,7 @@ legend span {
     font-size: 14px;
 }
 .errors {
-    background: #FFBABA;
-    border-bottom-color: #D8000C;
+    background: #da1c21;
 }
 .inline {
     padding: 0.5em 5px;
@@ -708,7 +714,7 @@ h1 .sweet {
     border: 1px solid #c7ddeb;
     padding-left: 0;
 }
-.focus_areas li {
+.focus_areas .col {
     border-left: 1px solid #C7DDEB;
     font-size: 12px;
     color: #757474;
@@ -717,6 +723,7 @@ h1 .sweet {
     padding: 120px 20px 20px;
     background: transparent url(../img/css/homepage/publicsafety.png) no-repeat center top;
     min-height: 60px;
+    width: 20%;
 }
 .focus_areas .manu {
     background-image: url(../img/css/homepage/manufacturing.png);
@@ -732,9 +739,6 @@ h1 .sweet {
 }
 .focus_areas ul li:first-child {
     border-left: none;
-}
-.focus_areas .col {
-    width: 20%;
 }
 .content_columns .main {
     width: 67%;
