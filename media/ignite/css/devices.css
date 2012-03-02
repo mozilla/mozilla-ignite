@@ -894,6 +894,29 @@ fieldset .focus_areas ul {
 #about .entre section:first-child {
     border-top: 0;
 }
+.build h3 {
+    margin: 0;
+    padding: 1em 0 1em 90px;
+    background: transparent url(../img/css/emergency-prep.png) no-repeat 0 0;
+    min-height: 40px;
+}
+#education h3 {
+    background-image: url(../img/css/education.png);
+}
+#health-it h3 {
+    background-image: url(../img/css/health.png);
+}
+#clean-energy h3 {
+    background-image: url(../img/css/clean-energy.png);
+}
+#advanced-manufacturing h3 {
+    background-image: url(../img/css/manufacturing.png);
+}
+.build .highlight h3 {
+    padding-left: 0;
+    background: none;
+    min-height: 0;
+}
 section footer {
     padding: 1em 0;
     overflow: hidden;
