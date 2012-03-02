@@ -363,3 +363,6 @@ BOOKING_THROTTLING = True
 BOOKING_THROTTLING_USERS = 30
 # Time difference between slot releases
 BOOKING_THROTTLING_TIMEDELTA = 60 * 60 * 2  # 2 Hours
+
+# Paginator
+PAGINATOR_SIZE = 25

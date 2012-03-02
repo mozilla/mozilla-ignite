@@ -18,7 +18,7 @@ from django.views.generic.edit import ProcessFormView, UpdateView, \
 import jingo
 from tower import ugettext as _
 from voting.models import Vote
-
+from commons.helpers import get_page
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
@@ -65,17 +65,11 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     if category:
         entry_set = entry_set.filter(category__name=category)
     paginator = Paginator(entry_set, 25)
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except (ValueError, TypeError):
-        page = 1
-
+    page = get_page(request.GET)
     try:
         entries = paginator.page(page)
     except (EmptyPage, InvalidPage):
         entries = paginator.page(paginator.num_pages)
-
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,

@@ -1,7 +1,2 @@
-{% extends "base.html" %}
-{% block content %}
-<h1>Webcast list</h1>
-{% for object in object_list %}
-{% include "webcast/include/submission_detail.html" %}
-{% endfor%}
-{% endblock content%}
+{% extends "webcast/object_list.html" %}
+{% block listing_title  %}<h1>Webcast list</h1>{% endblock listing_title  %}
