@@ -351,6 +351,7 @@ legend span {
 }
 .alerts ul {
     list-style-type: none;
+    font-size: 14px;
 }
 .alerts li {
     margin-top: 0.4em;
@@ -453,34 +454,32 @@ legend span {
 }
 .tags {
     clear: left;
+    margin-left: -10px;
+    position: relative;
+    min-height: 70px;
+    padding-left: 80px;
 }
-.tags ul {
-    padding-left: 0;
-    overflow: hidden;
+.tags a:after {
+    background: transparent url(../img/css/clean-energy.png) no-repeat 0 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 70px;
+    height: 70px;
+    content: ".";
+    text-indent: -9999em;
 }
-.tags li {
-    float: left;
-    margin: 0 6px 0.5em 0;
-    font-size: 12px;
+.tags .education:after {
+    background-image: url(../img/css/education.png);
 }
-.tags a {
-    background: rgba(0, 0, 0, 0.4);
-    display: inline-block;
-    padding: 0.4em 12px;
-    -moz-border-radius: 4px;
-    -webkit-border-radius: 4px;
-    border-radius: 4px;
+.tags .health-it:after {
+    background-image: url(../img/css/health.png);
 }
-.tags a:link,
-.tags a:visited {
-    color: #fff;
+.tags .advanced-manufacturing:after {
+    background-image: url(../img/css/manufacturing.png);
 }
-.tags a:hover,
-.tags a:focus,
-.tags a:active,
-.tags .current {
-    background: #EF4619;
-    text-decoration: none;
+.tags .public-safety:after {
+    background-image: url(../img/css/emergency-prep.png);
 }
 .share {
     margin: 0;
@@ -560,10 +559,17 @@ legend span {
     background: none;
     padding-left: 0;
 }
-.promo .back {
-    margin-bottom: 0.5em;
-    padding-left: 20px;
-    background: transparent url(../img/css/back.png) no-repeat 0 50%;
+.back {
+    margin-bottom: 1em;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 14px;
+}
+.back:before {
+    content: "<<";
+    margin-right: 10px;
+    font-weight: bold;
+    font-size: 14px;
 }
 /* External links */
 .external {
@@ -1059,6 +1065,8 @@ section footer a {
 }
 #show_submission .entre aside section:last-child {
     border-top: 10px solid #000;
+    padding: 20px;
+    text-align: center;
 }
 #show_submission .entre aside h2 {
     font-weight: normal;
