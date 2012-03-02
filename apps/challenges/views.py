@@ -386,6 +386,11 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         self.object = self.get_object()
         
         context = self.get_context_data(**self.get_forms())
+        """
+        We now access errrors direct in the template - so with no errors 
+        it throws undefined
+        """
+        context['errors'] = {}
         return self.render_to_response(context)
     
     def post(self, request, *args, **kwargs):
