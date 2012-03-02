@@ -1,5 +1,6 @@
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from decimal import Decimal
 from markdown import markdown
 
 from django.conf import settings
@@ -388,17 +389,18 @@ class JudgingCriterion(models.Model):
     """A numeric rating criterion for judging submissions."""
     
     question = models.CharField(max_length=250, unique=True)
-    min_value = models.IntegerField(default=0)
+    min_value = 0
     max_value = models.IntegerField(default=10)
     
     phases = models.ManyToManyField(Phase, blank=True,
-                                    related_name='judgement_criteria')
+                                    related_name='judgement_criteria',
+                                    through='PhaseCriterion')
     
     def __unicode__(self):
         return self.question
     
     def clean(self):
-        if self.min_value > self.max_value:
+        if self.min_value >= self.max_value:
             raise ValidationError('Invalid value range %d..%d' %
                                   (self.min_value, self.max_value))
     
@@ -413,8 +415,38 @@ class JudgingCriterion(models.Model):
         ordering = ('id',)
 
 
+class PhaseCriterion(models.Model):
+    """Assignment of judging criteria to individual phases.
+    
+    These include a total weight assigned to each criterion. The score from
+    each criterion is multiplied up to have this weight as a maximum value.
+    
+    """
+    
+    phase = models.ForeignKey(Phase)
+    criterion = models.ForeignKey(JudgingCriterion)
+    
+    # The total weight afforded to this criterion
+    weight = models.DecimalField(max_digits=4, decimal_places=2, default=10)
+    
+    class Meta:
+        
+        unique_together = (('phase', 'criterion'),)
+        verbose_name_plural = 'phase criteria'
+    
+    def __unicode__(self):
+        return ' - '.join(map(unicode, [self.phase, self.criterion]))
+
+
 class Judgement(models.Model):
     """A judge's rating of a submission."""
+    
+    class Incomplete(RuntimeError):
+        """Error class when calculating scores on incomplete judgements."""
+        
+        def __init__(self, judgement):
+            super_init = super(Judgement.Incomplete, self).__init__
+            super_init('Judgement is incomplete', judgement)
     
     submission = models.ForeignKey(Submission)
     judge = models.ForeignKey(Profile)
@@ -427,6 +459,25 @@ class Judgement(models.Model):
     
     def get_absolute_url(self):
         return self.submission.get_absolute_url()
+    
+    @property
+    def complete(self):
+        """Whether all the criteria in the submission's phase are rated."""
+        criteria = JudgingCriterion.objects.filter(judginganswer__judgement=self)
+        return all(c in criteria for c in
+                   self.submission.phase.judgement_criteria.all())
+    
+    def get_score(self):
+        total_score = Decimal('0')
+        phase_criteria = self.submission.phase.phasecriterion_set.all()
+        try:
+            for pc in self.submission.phase.phasecriterion_set.all():
+                answer = self.answers.get(criterion=pc.criterion)
+                weighting_factor = pc.weight / pc.criterion.max_value
+                total_score += weighting_factor * answer.rating
+        except JudgingAnswer.DoesNotExist:
+            raise Judgement.Incomplete(self)
+        return total_score
     
     class Meta:
         unique_together = (('submission', 'judge'),)

@@ -18,7 +18,7 @@
     <div class="busta">
         <p class="box">Mozilla and the National Science Foundation invite you to kickstart innovation in 1Gbps networks, with $500,000 in funding for apps in healthcare, education, and other national priority areas.</p>
        <div class="gather">
-            <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="#">learn more</a>
+            <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
        </div>
     </div>
 </div>
@@ -46,13 +46,11 @@
 <div class="focus_areas columns">
     <h2>Focus Areas</h2>
     <ul>
-	<a href="about.html#build">
-	<li class="box col edu"><strong>Education</strong></li>    
-    <li class="box col health"><strong>Health IT</strong></li>
-    <li class="box col energy"><strong>Clean Energy</strong></li>
-    <li class="box col manu"><strong>Advanced Manufacturing</strong></li>
-    <li class="box col emer"><strong>Public Safety</strong></li>
-    </a>
+	<li class="box col education"><a href="{{ url('about_ignite') }}"><strong>Education</strong></a></li>    
+    <li class="box col health-it"><a href="{{ url('about_ignite') }}"><strong>Health IT</strong></a></li>
+    <li class="box col clean-energy"><a href="{{ url('about_ignite') }}"><strong>Clean Energy</strong></a></li>
+    <li class="box col advanced-manufacturing"><a href="{{ url('about_ignite') }}"><strong>Advanced Manufacturing</strong></a></li>
+    <li class="box col public-safety"><a href="{{ url('about_ignite') }}"><strong>Public Safety</strong></a></li>
     </ul>
 </div>
 <div class="columns project_data content_columns">
