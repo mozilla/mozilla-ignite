@@ -166,6 +166,33 @@ legend span {
     left: 20px;
     top: 20px;
 }
+.fail label, 
+.fail legend span {
+    color: #DA1C21;
+}
+.fail label em,
+.fail legend em {
+    position: absolute;
+    left: -9999em;
+    height: 0;
+    overflow: hidden;
+}
+.fail .ed {
+    background: #DA1C21;
+    padding: 1em 10px 10px;
+    border-radius: 0 0 4px 4px;
+}
+.fail .ed + .cta {
+    margin-top: 1em;
+}
+.fail .ed strong {
+    color: #fff;
+    font-size: 14px;
+}
+.fail .ed label {
+    color: #fff !important;
+}
+
 .loader {
     margin: 0;
     padding: 1em 0 1em 40px;
@@ -752,7 +779,7 @@ fieldset.highlight {
     border: 1px solid #c7ddeb;
     padding-left: 0;
 }
-fieldset.focus_areas ul {
+fieldset .focus_areas ul {
     border-width: 0;
     border-radius: 0;
 }
