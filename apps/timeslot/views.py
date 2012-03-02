@@ -7,11 +7,13 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
+from commons.helpers import get_page
 from timeslot.models import TimeSlot
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
@@ -73,9 +75,16 @@ def object_list(request, entry, template='timeslot/object_list.html'):
     """Listing of the timeslots available for a given entry"""
     # Book timeslots 24 hours in advance
     start_date = datetime.utcnow() + timedelta(hours=24)
-    object_list = TimeSlot.objects.filter(start_date__gte=start_date)
+    timeslot_qs = TimeSlot.objects.filter(start_date__gte=start_date,
+                                          is_booked=False)
+    paginator = Paginator(timeslot_qs, settings.PAGINATOR_SIZE)
+    page_number = get_page(request.GET)
+    try:
+        page = paginator.page(page_number)
+    except (EmptyPage, InvalidPage):
+        page = paginator.page(paginator.num_pages)
     context = {
-        'object_list': object_list,
+        'page': page,
         'entry': entry,
         }
     return jingo.render(request, template, context)

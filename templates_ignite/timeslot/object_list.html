@@ -1,9 +1,10 @@
 {% extends "base.html" %}
+{% from "layout/pagination.html" import footer_pagination with context %}
 {% block content %}
 <h1>Book timeslot for {{ entry.title }}</h1>
 <p>Select one of these timeslots available</p>
 <ul>
-  {% for object in object_list %}
+  {% for object in page.object_list %}
   <li>
     {% if object.is_booked %}
     {{ object.start_date }} - {{ object.end_date }}
@@ -17,4 +18,7 @@
   </li>
   {% endfor%}
 </ul>
+
+{{ footer_pagination(page) }}
+
 {% endblock content%}

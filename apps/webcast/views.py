@@ -35,7 +35,6 @@ def webcast_list(request, slug='all', template=None):
     upcoming_qs = TimeSlot.objects.select_related('submission').\
         filter(is_booked=True, **queryset)
     paginator = Paginator(upcoming_qs, settings.PAGINATOR_SIZE)
-    page_number = get_page(request.GET)
     try:
         page = paginator.page(page_number)
     except (EmptyPage, InvalidPage):
