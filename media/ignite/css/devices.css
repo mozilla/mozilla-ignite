@@ -333,9 +333,10 @@ legend span {
 }
 .alerts {
     padding: 1em 0;
-    background: #FFFF99;
+    background: #c2e5ae;
+    border: 1px solid #a9cb6f;
     font-size: 12px;
-    color: #333;
+    color: #085526;
     font-weight: bold;
     margin-bottom: 2em;
     border-radius: 4px;
@@ -344,7 +345,7 @@ legend span {
     margin-bottom: 0.5em;
 }
 .alerts p {
-    color: #fff;
+    color: #085526;
     margin: 0.5em 1em;
     font-size: 14px;
 }
@@ -364,6 +365,11 @@ legend span {
 }
 .errors {
     background: #da1c21;
+    border: 1px solid #c33e4d;
+    color: #fff;
+}
+.errors p {
+    color: #fff;
 }
 .inline {
     padding: 0.5em 5px;
