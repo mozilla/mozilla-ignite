@@ -1,6 +1,6 @@
 import jingo
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from challenges.models import Submission
 from django.conf import settings
@@ -71,7 +71,9 @@ def entry_available_decorator(func):
 @entry_available_decorator
 def object_list(request, entry, template='timeslot/object_list.html'):
     """Listing of the timeslots available for a given entry"""
-    object_list = TimeSlot.objects.all()
+    # Book timeslots 24 hours in advance
+    start_date = datetime.utcnow() + timedelta(hours=24)
+    object_list = TimeSlot.objects.filter(start_date__gte=start_date)
     context = {
         'object_list': object_list,
         'entry': entry,
@@ -145,5 +147,16 @@ def upcoming(request, template='timeslot/upcoming.html'):
     context = {
         'object_list': upcoming_list,
         'profile': profile,
+        }
+    return jingo.render(request, template, context)
+
+
+def webcast_list(request, template='timeslot/upcoming_all.html'):
+    """Lists all webcasts"""
+    now = datetime.utcnow()
+    upcoming_list = TimeSlot.objects.select_related('submission').\
+        filter(is_booked=True, end_date__gte=now)
+    context = {
+        'object_list': upcoming_list,
         }
     return jingo.render(request, template, context)

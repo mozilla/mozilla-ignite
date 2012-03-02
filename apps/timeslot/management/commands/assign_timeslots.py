@@ -12,7 +12,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         # submitions allocated
-        submitions_ids = [item.id for item in BookingAvailability.objects.all()]
+        booked_qs = BookingAvailability.objects.all()
+        submitions_ids = [item.submission.id for item in booked_qs]
         phase = Phase.objects.get_ideation_phase()
         # make sure the ideation phase has finished
         if phase.end_date > datetime.utcnow():
@@ -26,7 +27,7 @@ class Command(BaseCommand):
         # allocation starts right after this command has been run
         allocation_date = datetime.utcnow()
         date_increments = timedelta(seconds=settings.BOOKING_THROTTLING_TIMEDELTA)
-        print 'Feeing timeslots from: %s' % allocation_date
+        print 'Allocationg timeslots from: %s' % allocation_date
         for i, submission in enumerate(object_list):
             # Increase availability date for this batch when the
             # limit has been reached and if throttling is enabled
