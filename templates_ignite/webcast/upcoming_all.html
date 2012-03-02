@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
-<h1>Your upcoming webcasts</h1>
+<h1>Upcoming webcasts</h1>
 {% for object in object_list %}
-{% include "timeslot/include/submission_detail.html" %}
+{% include "webcast/include/submission_detail.html" %}
 {% endfor%}
 {% endblock content%}

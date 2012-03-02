@@ -12,7 +12,7 @@ from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
-from timeslot.models import TimeSlot, BookingAvailability
+from timeslot.models import TimeSlot
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
 
@@ -134,29 +134,5 @@ def pending(request, template='timeslot/pending.html'):
     context = {
         'object_list': submission_list,
         'profile': profile,
-        }
-    return jingo.render(request, template, context)
-
-
-@login_required
-def upcoming(request, template='timeslot/upcoming.html'):
-    """Lists the upcoming webcasts for this user"""
-    profile = request.user.get_profile()
-    upcoming_list = TimeSlot.objects.select_related('submission').\
-        filter(submission__created_by=profile, is_booked=True)
-    context = {
-        'object_list': upcoming_list,
-        'profile': profile,
-        }
-    return jingo.render(request, template, context)
-
-
-def webcast_list(request, template='timeslot/upcoming_all.html'):
-    """Lists all webcasts"""
-    now = datetime.utcnow()
-    upcoming_list = TimeSlot.objects.select_related('submission').\
-        filter(is_booked=True, end_date__gte=now)
-    context = {
-        'object_list': upcoming_list,
         }
     return jingo.render(request, template, context)
