@@ -894,6 +894,15 @@ fieldset .focus_areas ul {
 #about .entre section:first-child {
     border-top: 0;
 }
+#public-safety:target,
+#education:target,
+#health-it:target,
+#clean-energy:target,
+#advanced-manufacturing:target {
+    background: #ffebb4;
+    border: 1px solid #f1c378;
+    border-radius: 4px;
+}
 .build h3 {
     margin: 0;
     padding: 1em 0 1em 90px;
