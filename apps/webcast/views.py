@@ -3,6 +3,7 @@ import jingo
 from datetime import datetime
 
 from django.contrib.auth.decorators import login_required
+from django.http import Http404
 from timeslot.models import TimeSlot
 
 
@@ -19,12 +20,21 @@ def upcoming(request, template='webcast/upcoming.html'):
     return jingo.render(request, template, context)
 
 
-def webcast_list(request, template='webcast/upcoming_all.html'):
+def webcast_list(request, slug='all', template=None):
     """Lists all webcasts"""
     now = datetime.utcnow()
+    filters = {
+        'all': {},
+        'upcoming': {'end_date__gte': now},
+        }
+    if not slug in filters:
+        raise Http404
+    queryset = filters[slug]
     upcoming_list = TimeSlot.objects.select_related('submission').\
-        filter(is_booked=True, end_date__gte=now)
+        filter(is_booked=True, **queryset)
     context = {
         'object_list': upcoming_list,
         }
+    if not template:
+        template =  'webcast/webcast_%s.html' % slug
     return jingo.render(request, template, context)
