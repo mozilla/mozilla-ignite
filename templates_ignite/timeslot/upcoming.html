@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your upcoming webcasts</h1>
+{% for object in object_list %}
+<h2>
+  <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title }}</a>
+</h2>
+<p>from {{ object.start_date }} to {{ object.end_date }}</p>
+{% endfor%}
+{% endblock content%}

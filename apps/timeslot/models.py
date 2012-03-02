@@ -22,6 +22,9 @@ class TimeSlot(models.Model):
     objects = models.Manager()
     free = TimeSlotFreeManager()
 
+    class Meta:
+        ordering = ['start_date', ]
+
     def __unicode__(self):
         return u'TimeSlot: %s - %s' % (self.start_date, self.end_date)
 
@@ -40,6 +43,9 @@ class BookingAvailability(models.Model):
     """Determines when ``Submissions`` will be able to book a ``TimeSlot``"""
     submission = models.ForeignKey('challenges.Submission')
     available_on = models.DateTimeField()
+
+    class Meta:
+        ordering = ['available_on', ]
 
     def __unicode__(self):
         return u'Availability for %s on %s' % (self.submission,

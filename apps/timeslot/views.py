@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
 from timeslot.models import TimeSlot, BookingAvailability
@@ -99,7 +100,7 @@ def object_detail(request, entry, object_id):
     # Temporaly send the email through the instance
     # this will be moved to a queue
     if request.user.email:
-        email_template = lambda x: 'timeslot/email/confirmation_%s.txt'
+        email_template = lambda x: 'timeslot/email/confirmation_%s.txt' % x
         subject = jingo.render_to_string(request, email_template('subject'),
                                          context)
         # remove empty lines
@@ -117,7 +118,32 @@ def object_detail(request, entry, object_id):
 def pending(request, template='timeslot/pending.html'):
     """Lists the Pending ideas to be booked for this User"""
     profile = request.user.get_profile()
-    object_list = BookingAvailability.objects.\
-        select_related('submission', 'submission__created_by').\
-        filter(submission__created_by=profile)
-    assert False, object_list
+    now = datetime.utcnow()
+    # already booked timeslots for this user
+    booked_qs = TimeSlot.objects.select_related('submission').\
+        filter(submission__created_by=profile, is_booked=True)
+    booked_ids = [i.submission.id for i in booked_qs]
+    # missing timeslots for this user
+    submission_list = Submission.objects.green_lit().\
+        select_related('bookingavailability', 'created_by').\
+        filter(~Q(id__in=booked_ids),
+               created_by=profile,
+               bookingavailability__available_on__lte=now)
+    context = {
+        'object_list': submission_list,
+        'profile': profile,
+        }
+    return jingo.render(request, template, context)
+
+
+@login_required
+def upcoming(request, template='timeslot/upcoming.html'):
+    """Lists the upcoming webcasts for this user"""
+    profile = request.user.get_profile()
+    upcoming_list = TimeSlot.objects.select_related('submission').\
+        filter(submission__created_by=profile, is_booked=True)
+    context = {
+        'object_list': upcoming_list,
+        'profile': profile,
+        }
+    return jingo.render(request, template, context)

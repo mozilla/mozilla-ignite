@@ -356,10 +356,18 @@ class Submission(BaseModel):
     @property
     def needs_booking(self):
         """Determines if this entry needs to book a Timeslot.
-        Any other condition should be factored in"""
-        return all([self.is_winner,
-                    settings.DEVELOPMENT_PHASE,
-                    not self.timeslot_set.all()])
+        - Entry has been gren lit
+        - Ideation phase has finished
+        - Development phase has been enabled
+        - User has been allowed to book. ``available_on`` is in the past
+        """
+        now = datetime.utcnow()
+        return all([
+            self.is_winner,
+            has_phase_finished(settings.IGNITE_IDEATION_NAME),
+            settings.DEVELOPMENT_PHASE,
+            self.bookingavailability_set.filter(available_on__lte=now),
+            ])
 
     class Meta:
         ordering = ['-id']

@@ -352,11 +352,13 @@ JUDGES_PER_SUBMISSION = 2
 # Switch for the development phase
 DEVELOPMENT_PHASE = False
 
-# Bookings
+
+# TimeSlot Booking
+# Time to expire the booking if not confirmed
 BOOKING_EXPIRATION = 5 * 60   # 5 minutes
-# Determines if the throttling will be enabled
+# Determines if the user throttling will be enabled
 BOOKING_THROTTLING = True
-# Booking release for these users at the time
+# Number of slots released at the same time
 BOOKING_THROTTLING_USERS = 30
-# Time between user batches
+# Time difference between slot releases
 BOOKING_THROTTLING_TIMEDELTA = 60 * 60 * 2  # 2 Hours
