@@ -2,140 +2,175 @@ import test_utils
 
 from datetime import datetime, timedelta
 
-from challenges.tests import fixtures
-from challenges.models import Submission
+from challenges.models import (Submission, Phase, Challenge, Category,
+                               Project)
+from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, BookingAvailability
+from timeslot.tests.fixtures import (create_project, create_challenge,
+                                     create_phase, create_user,
+                                     create_category, create_submission)
 
 
 class TimeSlotTest(test_utils.TestCase):
-    """Tests for the ``TimeSlot`` mechanics
-    IMPORTANT: to use the ``client`` you require to extend the ``test_utils``
-    """
+    """Tests for the ``TimeSlot`` mechanics"""
+
+    SUBMISSIONS = 20
 
     def setUp(self):
-        """actions to be performed at the beginning of each test"""
-        fixtures.challenge_setup()
+        """Actions to be performed at the beginning of each test"""
+        # setup ignite challenge
+        self.project = create_project(settings.IGNITE_PROJECT_SLUG)
+        self.challenge = create_challenge(settings.IGNITE_CHALLENGE_SLUG,
+                                          self.project)
+        now = datetime.utcnow()
+        past = now - timedelta(days=30)
+        future = now + timedelta(days=30)
+        # create the Ideation and Development phases
+        idea_data = {'order': 1, 'start_date': past, 'end_date': now}
+        self.ideation = create_phase(settings.IGNITE_IDEATION_NAME,
+                                     self.challenge, idea_data)
+        dev_data = {'order': 2, 'start_date': now, 'end_date': future}
+        self.development = create_phase(settings.IGNITE_DEVELOPMENT_NAME,
+                                        self.challenge, dev_data)
 
     def tearDown(self):
         """Actions to be performed at the end of each test"""
-        fixtures.challenge_teardown()
-        User.objects.all().delete()
+        Submission.objects.all().delete()
+        Phase.objects.all().delete()
+        Challenge.objects.all().delete()
+        Category.objects.all().delete()
+        Project.objects.all().delete()
+        BookingAvailability.objects.all().delete()
         TimeSlot.objects.all().delete()
+        User.objects.all().delete()
 
-    def add_timeslot(self, extra_data=None):
+    def create_timeslot(self, extra_data=None):
         """Helper to add ``TimeSlots`` with the minium required data"""
+        # booking of timeslots start at least 24 hours in advance
+        start_date = datetime.utcnow() + timedelta(hours=25)
+        end_date = start_date + timedelta(minutes=60)
         data = {
-            'start_date': datetime.now(),
-            'end_date': datetime.now() + timedelta(minutes=60)
+            'start_date': start_date,
+            'end_date': end_date,
             }
         if extra_data:
             data.update(extra_data)
         return TimeSlot.objects.create(**data)
 
-    def create_user(self, handle, extra_data=None):
-        """Helper to create Users with a profile"""
-        email = '%s@%s.com' % (handle, handle)
-        user = User.objects.create_user(handle, email, handle)
-        profile = user.get_profile()
-        # middleware needs a name if not will redirect to edit
-        profile.name = handle
-        profile.save()
-        return profile
+    def generate_timeslots(self, total):
+        """Create a number of ``TimeSlots``"""
+        return [self.create_timeslot() for i in range(total)]
 
-    def help_timeslot_creation(self):
-        """Test the ``TimeSlot`` creation"""
-        for i in range(20):
-            self.add_timeslot()
-        self.assertEqual(TimeSlot.objects.all().count(), 20)
+    def create_bookings(self, total=10):
+        """Helps to create booking availability"""
+        for i in range(total):
+            BookingAvailability.objects.create()
 
     def test_timeslot_protected(self):
-        """Test the listing of the TimeSlots"""
-        self.help_timeslot_creation()
+        """Test the listing of the TimeSlots is secured"""
         # use the first submission
-        user = self.create_user('bob')
-        fixtures.create_submissions(20, creator=user)
-        entry = Submission.objects.all()[0]
-        booking_url = reverse('timeslot:object_list', args=[entry.id])
+        profile = create_user('bob')
+        submission = create_submission('Winner submission',
+                                       profile, self.ideation,
+                                       extra_data={'is_winner': True})
+        # make timeslots available
+        self.generate_timeslots(5)
+        booking_url = reverse('timeslot:object_list', args=[submission.id])
         # Booking timetables are protected
         response = self.client.get(booking_url)
         login_url = reverse('login')
         self.assertEqual(response.status_code, 302)
         self.assertTrue(login_url in response['Location'])
 
-    def test_timeslot_no_win(self):
+    def test_timeslot_failed_submission(self):
         """Test the ``TimeSlot`` when entries are not winners"""
-        self.help_timeslot_creation()
-        user = self.create_user('bob')
-        fixtures.create_submissions(20, creator=user)
+        self.generate_timeslots(self.SUBMISSIONS)
+        profile = create_user('bob')
+        # create failed submissions
+        entry_list = [create_submission('Fail submission %s' % i, profile,
+                                        self.ideation) \
+                                        for i in range(self.SUBMISSIONS)]
         # Booking time tables are only available for winner entries
         self.client.login(username='bob', password='bob')
         # All submissions shouldn't be accessible
-        for tmp_entry in Submission.objects.all():
+        for tmp_entry in entry_list:
             tmp_url = reverse('timeslot:object_list', args=[tmp_entry.id])
             response = self.client.get(tmp_url)
-            # If entry can't access should return a returns a 404
+            # If entry isn't green_lit returns a 404
             self.assertEqual(response.status_code, 404)
 
     def test_timeslot_winner(self):
         """Test a winning entry"""
-        # Mark entry as winner and make sure it renders
-        self.help_timeslot_creation()
-        # use the first submission
-        user = self.create_user('bob')
-        fixtures.create_submissions(20, creator=user)
-        entry = Submission.objects.all()[0]
-        booking_url = reverse('timeslot:object_list', args=[entry.id])
-        entry.is_winner = True
-        entry.save()
+        timeslots = self.generate_timeslots(self.SUBMISSIONS)
+        profile = create_user('bob')
+        # create winner submissions
+        data = {'is_winner': True}
+        entry_list = [create_submission('Submission %s' % i, profile,
+                                        self.ideation, extra_data=data) \
+                                        for i in range(self.SUBMISSIONS)]
         self.client.login(username='bob', password='bob')
-        response = self.client.get(booking_url)
-        self.assertEqual(response.status_code, 200)
-        object_list = response.context['object_list']
-        self.assertEqual(len(object_list), 20)
+        # Timeslots should be availables
+        for tmp_entry in entry_list:
+            booking_url = reverse('timeslot:object_list', args=[tmp_entry.id])
+            response = self.client.get(booking_url)
+            self.assertEqual(response.status_code, 200)
+            page = response.context['page']
+            self.assertEqual(page.paginator.count, self.SUBMISSIONS)
 
     def test_timeslot_booking(self):
         """Test the booking of a timeslot"""
-        # book the first entry
-        self.help_timeslot_creation()
-        # use the first submission
-        user = self.create_user('bob')
-        fixtures.create_submissions(20, creator=user)
-        entry = Submission.objects.all()[0]
-        entry.is_winner = True
-        entry.save()
+        timeslot_list = self.generate_timeslots(self.SUBMISSIONS)
+        profile = create_user('bob')
+        # create winner submissions
+        data = {'is_winner': True}
+        entry_list = [create_submission('Submission %s' % i, profile,
+                                        self.ideation, extra_data=data) \
+                                        for i in range(self.SUBMISSIONS)]
         self.client.login(username='bob', password='bob')
-        timeslot = TimeSlot.objects.all()[0]
-        timeslot_url = reverse('timeslot:object_detail',
-                               args=[entry.id, timeslot.short_id])
-        response = self.client.post(timeslot_url, {})
-        self.assertRedirects(response, entry.get_absolute_url())
+        # Book available timeslots
+        for i, (entry, timeslot) in enumerate(zip(entry_list, timeslot_list),
+                                              start=1):
+            timeslot_url = reverse('timeslot:object_detail',
+                                   args=[entry.id, timeslot.short_id])
+            response = self.client.post(timeslot_url, {})
+            self.assertRedirects(response, entry.get_absolute_url())
+            # Available timeslots reduce as bookings go on
+            self.assertEqual(TimeSlot.objects.filter(is_booked=False).count(),
+                             self.SUBMISSIONS - i)
 
     def test_duplicate_booking(self):
         """Test the behaviour on a booked ``Submission``"""
-        self.help_timeslot_creation()
-        # use the first submission
-        user = self.create_user('bob')
-        fixtures.create_submissions(20, creator=user)
-        entry = Submission.objects.all()[0]
-        entry.is_winner = True
-        entry.save()
+        timeslot_list = self.generate_timeslots(self.SUBMISSIONS)
+        profile = create_user('bob')
+        # create winner submissions
+        data = {'is_winner': True}
+        entry_list = [create_submission('Submission %s' % i, profile,
+                                        self.ideation, extra_data=data) \
+                                        for i in range(self.SUBMISSIONS)]
         self.client.login(username='bob', password='bob')
-        # perform the booking
-        timeslot = TimeSlot.objects.all()[0]
-        timeslot_url = reverse('timeslot:object_detail',
-                               args=[entry.id, timeslot.short_id])
-        response = self.client.post(timeslot_url, {})
-        # try to list should return to the submission homepage and
-        # indicate this has been booked
-        booking_url = reverse('timeslot:object_list', args=[entry.id])
-        response = self.client.get(booking_url)
-        self.assertRedirects(response, entry.get_absolute_url())
-        # Redirect as well if user is trying to book another for the same
-        # project
-        timeslot = TimeSlot.objects.all()[2]
-        timeslot_url = reverse('timeslot:object_detail',
-                               args=[entry.id, timeslot.short_id])
-        response = self.client.post(timeslot_url, {})
-        self.assertRedirects(response, entry.get_absolute_url())
+        # Book available timeslots
+        for i, (entry, timeslot) in enumerate(zip(entry_list, timeslot_list),
+                                              start=1):
+            timeslot_url = reverse('timeslot:object_detail',
+                                   args=[entry.id, timeslot.short_id])
+            response = self.client.post(timeslot_url, {})
+            self.assertRedirects(response, entry.get_absolute_url())
+            # check available timeslots
+            self.assertEqual(TimeSlot.objects.filter(is_booked=False).count(),
+                             self.SUBMISSIONS - i)
+            # trying to list any booking should redirect to the project
+            booking_url = reverse('timeslot:object_list', args=[entry.id])
+            response = self.client.get(booking_url)
+            self.assertRedirects(response, entry.get_absolute_url())
+            # try to re-book the next available booking
+            if self.SUBMISSIONS > i:
+                timeslot_url = reverse('timeslot:object_detail',
+                                       args=[entry.id, timeslot_list[i].short_id])
+                response = self.client.post(timeslot_url, {})
+                # redirect to the project homepage if user tries to rebook
+                self.assertRedirects(response, entry.get_absolute_url())
+                # timeslots available should be the same
+                self.assertEqual(TimeSlot.objects.filter(is_booked=False).count(),
+                                 self.SUBMISSIONS - i)
