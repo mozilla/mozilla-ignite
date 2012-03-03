@@ -653,6 +653,10 @@ div[role=main] {
     border-bottom: 1px solid #9bc4df;
     position: relative;
 }
+.tagline img {
+    width: 100%;
+    height: auto;
+}
 .tagline strong {
     display: block;
     text-transform: uppercase;
@@ -666,36 +670,26 @@ div[role=main] {
     color: #2e2e2e;
     background: #e4eff9;
     display: inline-block;
-    padding: 0.5em 2em 0.5em 0;
-    border-radius: 24px;
+    padding: 0 0 0.5em 0;
+    line-height: 1;
 }
 h1 .sweet {
     background: none;
     vertical-align: middle;
-    padding-right: 0;
-    margin-top: -1em;
+    display: block;
+    text-align: center;
 }
 .sweet em {
     position: relative;
     padding: 0.5em 1em 0.5em 2em;
     background: #ed4619;
-    margin-right: 30px;
     color: #fff;
-    border-top-left-radius: 24px;
-    border-bottom-left-radius: 24px;
     font-style: normal;
+    display: block;
+    margin-bottom: 0.5em;
 }
-.sweet em:after {
-    width: 0;
-    height: 0;
-    content: ".";
-    text-indent: -9999em;
-    border-top: 15px solid transparent;
-    border-bottom: 15px solid transparent;
-    border-left: 15px solid #ed4619;
-    position: absolute;
-    top: 0;
-    right: -15px;
+h1 .sweet em {
+    padding: 0.5em 1em;
 }
 .ignite_info {
     border-bottom: 1px solid #9bc4df;
@@ -705,22 +699,17 @@ h1 .sweet {
     font-size: 18px;
     color: #454545;
     line-height: 28px;
-    background: transparent;
-    background-image: url(../img/css/lightning-bolt.png), url(../img/css/homepage_arrow.png), url(../img/css/homepage_arrow.png);
-    background-position: 40px 50%, 130px 0, 100% 0;
-    background-repeat: no-repeat;
     margin-bottom: 0;
     float: left;
-    width: 85%;
-    padding: 1em 1em 1em 180px;
+    padding: 1em 10px;
     position: relative;
 }
 .ignite_info .gather {
-    float: left;
-    width: 15%;
-    padding: 1em 0;
-    text-align: center;
+    padding: 1em 10px;
     font-size: 14px;
+}
+.ignite_info br {
+    display: none;
 }
 .ignite_info .cta {
     margin: 0.5em 0;
@@ -732,6 +721,7 @@ h1 .sweet {
     font-size: 24px;
     color: #ed4619;
     margin-top: 0;
+    padding-left: 60px;
 }
 .methods p {
     font-size: 18px;
@@ -745,12 +735,8 @@ h1 .sweet {
     padding-left: 0;
 }
 .methods li {
-    border-left: 1px solid #9bc4df;
-    padding: 2em 20px 60px 2em;
-    background: transparent url(../img/css/homepage/brainstorm.png) no-repeat 20px 90%;
-}
-.methods ul li:first-child {
-    border-left: none;
+    padding: 1em 0 0;
+    background: transparent url(../img/css/homepage/brainstorm.png) no-repeat 0 0.5em;
 }
 .methods .hack {
     background-image: url(../img/css/homepage/hack.png);
@@ -799,13 +785,13 @@ fieldset .focus_areas ul {
     border-radius: 0;
 }
 .focus_areas .col {
-    border-left: 1px solid #C7DDEB;
     font-size: 12px;
     color: #757474;
     line-height: 20px;
     text-align: center;
     background: transparent url(../img/css/homepage/publicsafety.png) no-repeat center top;
-    width: 20%;
+    width: 33%;
+    float: left;
 }
 .focus_areas label,
 .focus_areas a {
@@ -825,16 +811,6 @@ fieldset .focus_areas ul {
 }
 .focus_areas .clean-energy {
     background-image: url(../img/css/homepage/energy.png);
-}
-.focus_areas ul li:first-child {
-    border-left: none;
-    margin-top: 10px;
-}
-.content_columns .main {
-    width: 67%;
-}
-.content_columns .bonus {
-    width: 33%;
 }
 .events {
     background: transparent url(../img/css/homepage/calendar-shadow.png) no-repeat left bottom;

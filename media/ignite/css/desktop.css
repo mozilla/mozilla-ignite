@@ -10,6 +10,12 @@
 .equal .col {
     width: 50%;
 }
+.content_columns .main {
+    width: 67%;
+}
+.content_columns .bonus {
+    width: 33%;
+}
 .col img {
     width: 100%;
 }
@@ -88,6 +94,70 @@
 }
 .submissions .col:nth-child(5n + 1) {
     clear: left;
+}
+.sweet {
+    padding: 0 2em 0 0;
+    border-radius: 24px;
+}
+h1 .sweet {
+    padding-right: 0;
+    margin-top: -1em;
+    display: inline-block;
+}
+.sweet em {
+    margin: 0 30px 0 0;
+    display: inline-block;
+    border-top-left-radius: 24px;
+    border-bottom-left-radius: 24px;
+}
+.sweet em:after {
+    width: 0;
+    height: 0;
+    content: ".";
+    text-indent: -9999em;
+    border-top: 14px solid transparent;
+    border-bottom: 14px solid transparent;
+    border-left: 14px solid #ed4619;
+    position: absolute;
+    top: 0;
+    right: -14px;
+}
+.ignite_info p {
+    background: transparent;
+    background-image: url(../img/css/lightning-bolt.png), url(../img/css/homepage_arrow.png), url(../img/css/homepage_arrow.png);
+    background-position: 40px 50%, 130px 0, 100% 0;
+    background-repeat: no-repeat;
+    width: 85%;
+    padding-left: 180px;
+    padding-right: 20px;
+}
+.ignite_info .gather {
+    float: left;
+    width: 15%;
+    text-align: center;
+    padding: 1em 0;
+}
+.ignite_info br {
+    display: block;
+}
+.methods h3 {
+    padding-left: 0;
+}
+.methods li {
+    border-left: 1px solid #9bc4df;
+    padding: 2em 20px 60px 2em;
+    background-position: 20px 90%;
+}
+.methods ul li:first-child {
+    border-left: none;
+}
+.focus_areas .col {
+    border-left: 1px solid #C7DDEB;
+    width: 20%;
+}
+.focus_areas ul li:first-child {
+    border-left: none;
+    margin-top: 10px;
 }
 /* single submission */
 #show_submission h1 {
