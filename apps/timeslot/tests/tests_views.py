@@ -7,7 +7,7 @@ from challenges.models import (Submission, Phase, Challenge, Category,
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from timeslot.models import TimeSlot, BookingAvailability
+from timeslot.models import TimeSlot
 from timeslot.tests.fixtures import (create_project, create_challenge,
                                      create_phase, create_user,
                                      create_category, create_submission)
@@ -42,7 +42,6 @@ class TimeSlotTest(test_utils.TestCase):
         Challenge.objects.all().delete()
         Category.objects.all().delete()
         Project.objects.all().delete()
-        BookingAvailability.objects.all().delete()
         TimeSlot.objects.all().delete()
         User.objects.all().delete()
 
@@ -62,11 +61,6 @@ class TimeSlotTest(test_utils.TestCase):
     def generate_timeslots(self, total):
         """Create a number of ``TimeSlots``"""
         return [self.create_timeslot() for i in range(total)]
-
-    def create_bookings(self, total=10):
-        """Helps to create booking availability"""
-        for i in range(total):
-            BookingAvailability.objects.create()
 
     def test_timeslot_protected(self):
         """Test the listing of the TimeSlots is secured"""

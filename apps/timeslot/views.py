@@ -136,10 +136,8 @@ def pending(request, template='timeslot/pending.html'):
     booked_ids = [i.submission.id for i in booked_qs]
     # missing timeslots for this user
     submission_list = Submission.objects.green_lit().\
-        select_related('bookingavailability', 'created_by').\
-        filter(~Q(id__in=booked_ids),
-               created_by=profile,
-               bookingavailability__available_on__lte=now)
+        select_related('created_by').\
+        filter(~Q(id__in=booked_ids), created_by=profile)
     context = {
         'object_list': submission_list,
         'profile': profile,
