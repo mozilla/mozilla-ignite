@@ -68,9 +68,8 @@ def submodules():
 
 def test():
     """Run the tests locally"""
-    # TODO: consider use own --settings=settings_test for in memory tests
     # TODO: add the rest of the apps and make sure the tests pass!
-    local('python manage.py test timeslot --settings=settings_test')
+    local('python manage.py test webcast --settings=settings_test')
 
 
 def deploy(branch):

@@ -22,8 +22,7 @@ DATABASES = {
 NOSE_ARGS = [
     # '--with-spec',
     # '--spec-color',
-    # '-s',
+    '-s',
     # '--with-coverage',
-    #'--with-querycount'
     ]
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
