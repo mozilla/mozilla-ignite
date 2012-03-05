@@ -39,12 +39,12 @@
     <li class="box col">
         <article>
             <a href="{{ entry.get_absolute_url() }}">
-                <h4>
+                <h3>
                     <div class="frame box">
                     <img src="{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
-                </h4>
+                </h3>
             </a>
             {% if entry.editable_by(user) %}
             {% if entry.is_draft %}

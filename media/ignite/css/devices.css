@@ -1194,6 +1194,9 @@ section footer a {
 #user_profile .vcard .url {
     font-size: 11px;
 }
+.profile .col h3 {
+    font-size: 14px;
+}
 #dsq-content-stub {
     margin-top: 1em;
 }
