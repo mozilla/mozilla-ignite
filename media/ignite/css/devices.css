@@ -773,7 +773,7 @@ h1 .sweet em {
     background-image: url(../img/css/homepage/funding.png);
 }
 .highlight {
-    padding: 20px !important;
+    padding: 20px;
     background: #f1f1f1;
     border-top: 1px solid #e2e2e2;
     margin-bottom: 2em;
