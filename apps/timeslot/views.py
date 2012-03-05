@@ -40,8 +40,8 @@ def lock_booking(func):
         # someone has locked in this view
         message = _('Unfortunately his slot has become unavailable')
         messages.error(request, message)
-        return HttpResponseRedirect(reverse('timeslot:object_list'),
-                                    args=[entry.id])
+        return HttpResponseRedirect(reverse('timeslot:object_list',
+                                            args=[entry.id]))
     return _decorated
 
 
@@ -99,6 +99,13 @@ def object_detail(request, entry, object_id):
     timeslot = unshorten_object(object_id)
     if not timeslot:
         raise Http404
+    # make sure it hasn't been booked
+    if timeslot.is_booked:
+        # someone has locked in this view
+        message = _('Unfortunately his slot has become unavailable')
+        messages.error(request, message)
+        return HttpResponseRedirect(reverse('timeslot:object_list',
+                                            args=[entry.id]))
     # asign the ``TimeSlot`` to the ``Submission``
     timeslot.submission = entry
     timeslot.booking_date = datetime.utcnow()
