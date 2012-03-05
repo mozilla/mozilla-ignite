@@ -128,13 +128,16 @@ class TimeSlotTest(test_utils.TestCase):
                                               start=1):
             timeslot_url = reverse('timeslot:object_detail',
                                    args=[entry.id, timeslot.short_id])
-            response = self.client.post(timeslot_url, {})
+            response = self.client.post(timeslot_url, {}, follow=True)
             self.assertRedirects(response, entry.get_absolute_url())
+            self.assertTrue('messages' in response.context)
+            for item in list(response.context['messages']):
+                self.assertTrue('successful' in item.message)
             # Available timeslots reduce as bookings go on
             self.assertEqual(TimeSlot.objects.filter(is_booked=False).count(),
                              self.SUBMISSIONS - i)
 
-    def test_duplicate_booking(self):
+    def test_booked_timeslot(self):
         """Test the behaviour on a booked ``Submission``"""
         timeslot_list = self.generate_timeslots(self.SUBMISSIONS)
         profile = create_user('bob')
@@ -156,15 +159,21 @@ class TimeSlotTest(test_utils.TestCase):
                              self.SUBMISSIONS - i)
             # trying to list any booking should redirect to the project
             booking_url = reverse('timeslot:object_list', args=[entry.id])
-            response = self.client.get(booking_url)
+            response = self.client.get(booking_url, follow=True)
+            self.assertTrue('messages' in response.context)
+            for item in list(response.context['messages']):
+                self.assertTrue('already booked' in item.message)
             self.assertRedirects(response, entry.get_absolute_url())
             # try to re-book the next available booking
             if self.SUBMISSIONS > i:
                 timeslot_url = reverse('timeslot:object_detail',
                                        args=[entry.id, timeslot_list[i].short_id])
-                response = self.client.post(timeslot_url, {})
+                response = self.client.post(timeslot_url, {}, follow=True)
                 # redirect to the project homepage if user tries to rebook
                 self.assertRedirects(response, entry.get_absolute_url())
+                for item in list(response.context['messages']):
+                    self.assertTrue('already booked' in item.message)
                 # timeslots available should be the same
                 self.assertEqual(TimeSlot.objects.filter(is_booked=False).count(),
                                  self.SUBMISSIONS - i)
+
