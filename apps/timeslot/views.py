@@ -8,7 +8,6 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
-from django.core.mail import send_mail
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
@@ -17,6 +16,11 @@ from commons.helpers import get_page
 from timeslot.models import TimeSlot
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
+
+if 'django_mailer' in settings.INSTALLED_APPS:
+    from django_mailer import send_mail
+else:
+    from django.core.mail import send_mail
 
 
 def get_lock_key(object_id):
@@ -117,7 +121,7 @@ def object_detail(request, entry, object_id):
                'timeslot': timeslot}
     # Temporaly send the email through the instance
     # this will be moved to a queue
-    if request.user.email:
+    if request.user.email and settings.BOOKING_SEND_EMAIL:
         email_template = lambda x: 'timeslot/email/confirmation_%s.txt' % x
         subject = jingo.render_to_string(request, email_template('subject'),
                                          context)

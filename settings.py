@@ -236,6 +236,8 @@ INSTALLED_APPS = (
     # Feed subscription
     'django_push.subscriber',
     'feeds',
+    # email queue
+    'django_mailer',
 
     # Feature flipping
     'waffle',
@@ -321,7 +323,8 @@ PASSWORD_BLACKLIST = (
 AUTH_PROFILE_MODULE = 'users.Profile'
 
 # Email goes to the console by default.  s/console/smtp/ for regular delivery
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
@@ -363,6 +366,8 @@ BOOKING_THROTTLING = True
 BOOKING_THROTTLING_USERS = 30
 # Time difference between slot releases
 BOOKING_THROTTLING_TIMEDELTA = 60 * 60 * 2  # 2 Hours
+# Email preferences
+BOOKING_SEND_EMAILS = True
 
 # Paginator
 PAGINATOR_SIZE = 25
