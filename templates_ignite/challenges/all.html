@@ -11,7 +11,7 @@
 <header class="busta">
 <h1 class="shout">Ideas</h1>
 <div class="meta">
-    <p class="intro">You have <em>VAR</em> days to submit ideas</p>
+    <p class="intro">You have <em>{{ days_remaining }}</em> days to submit ideas</p>
     <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
 </div>
 </header>

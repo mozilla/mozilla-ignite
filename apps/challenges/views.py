@@ -88,6 +88,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
+        'days_remaining': challenge.phases.get_current_phase(slug)[0].days_remaining().days
     })
 
 
