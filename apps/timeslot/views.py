@@ -121,7 +121,7 @@ def object_detail(request, entry, object_id):
                'timeslot': timeslot}
     # Temporaly send the email through the instance
     # this will be moved to a queue
-    if request.user.email and settings.BOOKING_SEND_EMAIL:
+    if request.user.email and settings.BOOKING_SEND_EMAILS:
         email_template = lambda x: 'timeslot/email/confirmation_%s.txt' % x
         subject = jingo.render_to_string(request, email_template('subject'),
                                          context)

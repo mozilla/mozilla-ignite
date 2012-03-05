@@ -361,11 +361,7 @@ DEVELOPMENT_PHASE = False
 # Time to expire the booking if not confirmed
 BOOKING_EXPIRATION = 5 * 60   # 5 minutes
 # Determines if the user throttling will be enabled
-BOOKING_THROTTLING = True
-# Number of slots released at the same time
-BOOKING_THROTTLING_USERS = 30
-# Time difference between slot releases
-BOOKING_THROTTLING_TIMEDELTA = 60 * 60 * 2  # 2 Hours
+BOOKING_THROTTLING = False
 # Email preferences
 BOOKING_SEND_EMAILS = True
 
