@@ -1,6 +1,6 @@
 {% extends 'second_base.html' %}
 
-{% block page_title %}{% if errors %}{{ _('Errors in your submission') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
+{% block page_title %}{% if errors %}{{ _('Errors in your idea') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
 
 {% block page_id %}create_submission{% endblock %}
 
@@ -19,8 +19,10 @@
 {% endblock %}
 
 {% block content %}   
+{% block greeting %}
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
 <p class="announce">{{ _("Congratulations! You've taken the first setp towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
+{% endblock %}
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <fieldset class="stacked_field highlight {% if errors['Category']%}fail{% endif %}">

@@ -2,7 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
@@ -64,12 +64,16 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
         entry_set = entry_set.filter(category__name=category)
-    paginator = Paginator(entry_set, 25)
+    paginator = Paginator(entry_set, 6)
     page = get_page(request.GET)
     try:
         entries = paginator.page(page)
     except (EmptyPage, InvalidPage):
         entries = paginator.page(paginator.num_pages)
+    try:
+        category = Category.objects.get(slug=category)
+    except ObjectDoesNotExist:
+        category = False
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -77,6 +81,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
+        'days_remaining': challenge.phases.get_current_phase(slug)[0].days_remaining().days
     })
 
 
