@@ -13,7 +13,8 @@ from timeslot.models import TimeSlot
 def upcoming(request, template='webcast/upcoming.html'):
     """Lists the upcoming webcasts for this user"""
     profile = request.user.get_profile()
-    upcoming_list = TimeSlot.objects.select_related('submission').\
+    upcoming_list = TimeSlot.objects.\
+        select_related('submission','submission__created_by').\
         filter(submission__created_by=profile, is_booked=True)
     context = {
         'object_list': upcoming_list,
@@ -32,7 +33,8 @@ def webcast_list(request, slug='all', template=None):
     if not slug in filters:
         raise Http404
     queryset = filters[slug]
-    upcoming_qs = TimeSlot.objects.select_related('submission').\
+    upcoming_qs = TimeSlot.objects.\
+        select_related('submission','submission__created_by').\
         filter(is_booked=True, **queryset)
     paginator = Paginator(upcoming_qs, settings.PAGINATOR_SIZE)
     page_number = get_page(request.GET)
