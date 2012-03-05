@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ _('All judged submissions') }} |{% endblock %}
+
+{% block page_id %}judgeded_submissions{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block header %}
+<h1 class="shout">All judged submissions</h1>
+{% endblock %}
+
+{% block content %}
+<table>
+    <thead>
+        <tr><th>Submission</th><th>Average rating</th></tr>
+    </thead>
+    <tbody>
+{% for entry in entries %}
+        <tr>
+            <td><a href="{{ entry.get_absolute_url() }}">{{ entry }}</a></td>
+            {% if entry.judgement_count %}
+            <td>{{ entry.average_score|round(2) }}
+                {% trans count=entry.judgement_count %}
+                ({{ count }} judgement)
+                {% pluralize %}
+                ({{ count }} judgements)
+                {% endtrans %}
+            </td>
+            {% else %}
+            <td>{% trans %}(no complete judgements){% endtrans %}</td>
+            {% endif %}
+        </tr>
+{% endfor %}
+    </tbody>
+</table>
+{% endblock %}

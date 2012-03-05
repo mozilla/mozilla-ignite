@@ -27,7 +27,7 @@
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <p class="announce">{{ _('Are you <em>certain</em> you want to remove your submission?') }}</p>
-    <p>{{ _("If you're not happy with your submission at the moment, you can also revert it to "draft" status and keep polishing.") }}</p>
+    <p>{{ _("If you're not happy with your submission at the moment, you can also revert it to \"draft\" status and keep polishing.") }}</p>
     {% block submit %}
     <a href={{ object.get_absolute_url() }} class="back">{{ _('OK, take me back') }}</a> or
     <input class="cta" type="submit" value="{{ _('Delete this submission permanently') }}" />

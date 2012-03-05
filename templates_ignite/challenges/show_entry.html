@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 
 {% block schema_org %} itemscope itemtype="http://schema.org/Product"{% endblock %}
 
@@ -22,14 +22,8 @@
 <meta property="fb:admins" content="100003097810098" />
 {% endblock %}
 
-{% block header %}
-<a href="{{ url('entries_all') }}" class="back announce">See all submissions</a>
-<p class="announce">How can we use 1Gbps networks to push the web further?</p>
-<a href="{{ url('create_entry') }}" class="cta">Create submission</a>
-<p class="announce break"> You have {{ entry.phase.days_remaining().days }} days remaining to submit ideas</p>  
-{% endblock %}
-
-{% block content %}
+{% block content %} 
+    <a href="{{ url('entries_all') }}" class="back">See all submissions</a>
     <article>
         <h1 class="shout">{{ entry.title }}</h1> 
         {# This will need changing if edit and delete permissions separate #}
@@ -150,7 +144,7 @@
             <section>
                 <nav class="tags">
                 <h2>Category</h2>
-                <p><a href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
+                <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
             <section>
@@ -166,6 +160,10 @@
                 </ul>
                 </nav>
             </section> 
+            <section class="highlight">
+                <p class="announce">How would you push the web further?</p>
+                <a class="cta" href="{{ url('create_entry') }}">Create an idea</a>
+            </section>
         </aside>
         </div>
     </article>

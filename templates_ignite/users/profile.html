@@ -31,7 +31,10 @@
 {% for idea in submissions %}
 <li class="col box">
 <a href="{{ idea.get_absolute_url() }}">
+<h3>
 <div class="frame box"><img src="{{ idea.get_image_src() }}" alt="" /></div>
+{{ idea.title }}
+</h3>
 </a>
 {% if idea.editable_by(user) %}
 {% if idea.is_draft %}

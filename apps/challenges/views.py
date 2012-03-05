@@ -2,7 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
@@ -64,7 +64,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
         entry_set = entry_set.filter(category__name=category)
-    paginator = Paginator(entry_set, 25)
+    paginator = Paginator(entry_set, 6)
 
     try:
         page = int(request.GET.get('page', '1'))
@@ -76,6 +76,11 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     except (EmptyPage, InvalidPage):
         entries = paginator.page(paginator.num_pages)
 
+    try:
+        category = Category.objects.get(slug=category)
+    except ObjectDoesNotExist:
+        category = False
+
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -83,6 +88,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
+        'days_remaining': challenge.phases.get_current_phase(slug)[0].days_remaining().days
     })
 
 
@@ -115,6 +121,37 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
 
 
 entries_assigned = judge_required(AssignedEntriesView.as_view())
+
+
+class JudgedEntriesView(ListView, JingoTemplateMixin):
+    """Show all entries that have been judged."""
+    
+    template_name = 'challenges/judged.html'
+    context_object_name = 'entries'
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        submissions = Submission.objects.filter(judgement__isnull=False)
+        submissions = submissions.distinct()
+        submissions = submissions.select_related('judgement__judginganswer__criterion')
+        
+        for submission in submissions:
+            judgements = [j for j in submission.judgement_set.all() if j.complete]
+            total = sum(j.get_score() for j in judgements)
+            if judgements:
+                submission.average_score = total / len(judgements)
+            else:
+                submission.average_score = 0
+            submission.judgement_count = len(judgements)
+        
+        submissions = sorted(submissions, key=lambda s: s.average_score,
+                             reverse=True)
+        return submissions
+
+
+entries_judged = judge_required(JudgedEntriesView.as_view())
 
 
 def entries_category(request, project, slug, category):
@@ -355,6 +392,11 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         self.object = self.get_object()
         
         context = self.get_context_data(**self.get_forms())
+        """
+        We now access errrors direct in the template - so with no errors 
+        it throws undefined
+        """
+        context['errors'] = {}
         return self.render_to_response(context)
     
     def post(self, request, *args, **kwargs):
