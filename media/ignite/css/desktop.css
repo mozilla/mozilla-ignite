@@ -2,6 +2,9 @@
 .columns {
     margin-left: -10px;
 }
+.highlight .columns {
+    margin-left: 0;
+}
 .col {
     float: left;
     padding: 10px;
@@ -15,6 +18,12 @@
 }
 .content_columns .bonus {
     width: 33%;
+}
+.with_nav .nav {
+    width: 25%;
+}
+.with_nav .main {
+    width: 75%;
 }
 .col img {
     width: 100%;
@@ -89,11 +98,18 @@
 .submissions .col {
     width: 20%;
 }
+.highlight .submissions .col,
 #splash .submissions .col {
     width: 33%;
 }
 .submissions .col:nth-child(5n + 1) {
     clear: left;
+}
+.lists .submissions .col:nth-child(3n + 1) {
+    clear: left;
+}
+.lists .submissions .col:nth-child(5n + 1) {
+    clear: none;
 }
 .sweet {
     padding: 0 2em 0 0;
@@ -121,6 +137,24 @@ h1 .sweet {
     position: absolute;
     top: 0;
     right: -14px;
+}
+header .shout {
+    float: left;
+}
+header .meta {
+    float: right;
+}
+header .meta p {
+    padding: 8px;
+    margin-right: 20px;
+}
+header .meta p,
+header .meta cta {
+    float: left;
+}
+header .meta em {
+    font-weight: bold;
+    font-style: normal;
 }
 .ignite_info p {
     background: transparent;
