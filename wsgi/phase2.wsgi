@@ -6,6 +6,7 @@ os.environ['CELERY_LOADER'] = 'django'
 wsgidir = os.path.dirname(__file__)
 site.addsitedir(os.path.abspath(os.path.join(wsgidir, '..')))
 site.addsitedir(os.path.abspath(os.path.join(wsgidir, '..', '..')))
+site.addsitedir('/var/webapps/ignite-phase2/venv/lib/python2.6/site-packages/')
 
 # manage adds /apps, /lib, and /vendor to the Python path.
 import manage
