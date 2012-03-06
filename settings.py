@@ -254,6 +254,7 @@ INSTALLED_APPS = (
     'voting',
     'timeslot',
     'webcast',
+    'resources',
 )
 
 # Tells the extract script what files to look for L10n in and what function

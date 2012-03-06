@@ -44,13 +44,18 @@ urlpatterns = patterns('',
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )
 
+
+urlpatterns += patterns(
+    '',
+    (r'^resources/', include('resources.urls', namespace='resources'),),
+    )
+
+
 if settings.DEVELOPMENT_PHASE:
     urlpatterns += patterns(
         '',
-        (r'^booking/', include('timeslot.urls',
-                               namespace='timeslot'),),
-        (r'^webcast/', include('webcast.urls',
-                               namespace='webcast'),),
+        (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
+        (r'^webcast/', include('webcast.urls', namespace='webcast'),),
         )
 
 # Handle 404 and 500 errors
