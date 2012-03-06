@@ -1,9 +1,13 @@
 import os
 import site
+import sys
 
 os.environ['CELERY_LOADER'] = 'django'
 # Add the app dir to the python path so we can import manage.
 wsgidir = os.path.dirname(__file__)
+
+sys.path = []
+
 site.addsitedir(os.path.abspath(os.path.join(wsgidir, '..')))
 site.addsitedir(os.path.abspath(os.path.join(wsgidir, '..', '..')))
 site.addsitedir('/var/webapps/ignite-phase2/venv/lib/python2.6/site-packages/')
