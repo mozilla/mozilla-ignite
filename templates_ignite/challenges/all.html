@@ -1,45 +1,50 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} | {% else %}{{ _('All submissions') }} | {% endif %}{% endblock %}
 
 {% block page_id %}all_submissions{% endblock %}
 
-{% block section_class %}entries{% endblock %}
+{% block section_class %}lists{% endblock %}
 
 {% block header %}
-{% if not category %}
-<h1 class="shout">Submissions</h1>
-{% else %}
-<h1 class="shout">Submissions in {{ category }}</h1>
-{% endif %}
-<p class="announce">How can we use 1Gbps networks to push the web further?</p>
-<a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+<header class="busta">
+<h1 class="shout">Ideas</h1>
+<div class="meta">
+    <p class="intro">You have <em>{{ days_remaining }}</em> days to submit ideas</p>
+    <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+</div>
+</header>
 {% endblock %}
 
 {% block content %}
-<h2 class="box_title">Submissions</h2>
-<nav class="tags">
+<div class="content_columns columns with_nav">
+<nav class="tags col box nav">
     <ul>
-        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">all</a></li>
+        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">All ideas</a></li>
         {% if categories %}
         {% for cat in categories %}
-            <li><a{% if category==cat.slug %} class="current"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
+            <li><a{% if category.slug==cat.slug %} class="current"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
         {% endfor %}
         {% endif %}
     </ul>
 </nav>
+<div class="highlight col box main">
+{% if category %}
+<h2 class="{{category.slug }}">{{ category.name }}</h2>
+<p class="intro">Category descriptions should go in here, once we have added them to the app</p>
+{% endif %}
 <ol class="submissions columns">
 {% for entry in entries.object_list %}
     <li class="box col">
         <article>
             <a href="{{ entry.get_absolute_url() }}">
-                <h4>
+                <h3>
                     <div class="frame box">
                     <img src="{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
-                </h4>
+                </h3>
             </a>
             {% if entry.editable_by(user) %}
             {% if entry.is_draft %}
@@ -79,6 +84,8 @@
     </nav>
     </footer>
     {% endif %}
+    </div>
+    </div>
     </div>
     </div>
 </section>       

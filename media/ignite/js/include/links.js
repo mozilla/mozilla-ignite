@@ -1,5 +1,6 @@
 ignite.idea_links = function() {
     var links = $('fieldset.external_links'),
+        box = links.find('div.ed'),
         add_link_set,
         delete_link_set;
     add_link_set = function() {
@@ -25,7 +26,7 @@ ignite.idea_links = function() {
                 }
             });
             total_links.attr('value', index + 1);
-            dupe.insertBefore(add_link);
+            box.append(dupe);
             dupe.find('input:first').focus();
             return false;
         });
@@ -43,7 +44,7 @@ ignite.idea_links = function() {
                     $(this).next('input').attr('value', '');
                 });
                 that.remove();
-                elm.appendTo(links);
+                elm.appendTo(box);
                 return false;
             }
         });

@@ -1,44 +1,65 @@
-{% extends 'base.html' %}
+{% extends 'second_base.html' %}
 
-{% block page_title %}{% if errors %}{{ _('Errors in your submission') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
+{% block page_title %}{% if errors %}{{ _('Errors in your idea') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
 
 {% block page_id %}create_submission{% endblock %}
 
 {% block section_class %}entries{% endblock %}
 
-{% block header %}
-<h1 class="shout">{% block page_heading %}Create a submission{% endblock %}</h1>
-{% endblock %}
-
 {% block alerts %}
 {% if errors %}
 <section class="alerts errors">
-    <h2 class="busta">{{ _('Oops! We came across a few errors') }}</h2>
-    <ul class="busta">
-    {% for error in errors %}
-    <li><strong>{{ error }}</strong>{{ errors[error][2:] }}</li>
-    {% endfor %}
-    </ul>
+    {% trans count=errors|length %}
+    <p>You have {{ count }} error in your submission. Please correct this before you can submit an idea.</p>
+    {% pluralize %}
+    <p>You have {{ count }} errors in your submission. Please correct this before you can submit an idea.</p>
+    {% endtrans %}
 </section>
 {% endif %}
 {% endblock %}
 
 {% block content %}   
+{% block greeting %}
+<h1 class="shout">{{ _('Submit an idea') }}</h1>
+<p class="announce">{{ _("Congratulations! You've taken the first setp towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
+{% endblock %}
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
-    <div>
-        <label for="id_title" class="announce">{{ _('Title') }}</label>
-        <p class="hint" id="info_title">{{ _('Give your idea a name.') }}</p>
+    <fieldset class="stacked_field highlight {% if errors['Category']%}fail{% endif %}">
+        <legend><span class="announce">{% if errors['Category'] %}<em>Error in</em> {% endif %}{{ _('Pick a category') }}</span></legend>
+        <div class="focus_areas columns ed">
+            <strong>{{ errors['Category'] }}</strong>
+            {{ form.category }}
+        </div>
+    </fieldset>
+    <div class="highlight  {% if errors['Title']%}fail{% endif %}">
+        <label for="id_title" class="announce">{% if errors['Title'] %}<em>Error in</em> {% endif %}{{ _('Give your idea a title') }}</label>
+        <div class="ed">
+        <strong>{{ errors['Title'] }}</strong>
         {{ form.title }}
+        </div>
     </div>
-    <div>
-        <label for="id_brief_description" class="announce">{{ _('Summary') }}</label>
-        <p class="hint" id="info_brief_description">{{ _('Sum up your pitch in 140 characters or less.') }}</p>
-        {{ form.brief_description }}
+    <div class="highlight {% if errors['Full description']%}fail{% endif %}">
+        <label for="wmd-input" class="announce">{% if errors['Full description'] %}<em>Error in</em> {% endif %}{{ _('Tell us about your idea') }}</label>
+        <p class="hint" id="info_description">{{ _('Take some time to provide us with a more detailed description. You can use basic HTML and Markdown') }}</p>
+        <div class="ed">
+        <strong>{{ errors['Full description'] }}</strong>
+        <div class="wmd-region">
+        {{ form.description }}
+        </div>
+        </div>
      </div>
-     <div class="image_field">
+<div class="highlight {% if errors['Summary']%}fail{% endif %}">
+        <label for="id_brief_description" class="announce">{% if errors['Summary'] %}<em>Error in</em> {% endif %}{{ _('Summarize in 140 characters or less') }}</label>
+        <div class="ed">
+        <strong>{{ errors['Summary'] }}</strong>
+        {{ form.brief_description }}
+        </div>
+     </div>
+
+     <div class="image_field highlight">
         <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
-        <p class="hint" id="info_annouce">{{ _('Everyone loves visuals. Show us a diagram or picture to support your idea. <em>(png, jpg, gif)</em>') }}</p>
+        <p class="hint" id="info_annouce">{{ _('If your idea makes more sense on paper please include a diagram. <em>(png, jpg, gif)</em>') }}</p>
         {% if form.sketh_note.value() %}
             <div class="frame box">
                 <img src="{{ MEDIA_URL }}{{ form.sketh_note.value() }}" alt="" />
@@ -51,17 +72,12 @@
             {{ form.sketh_note }}
         {% endif %}
      </div>
-     <div>
-        <label for="wmd-input" class="announce">{{ _('Full description') }}</label>
-        <p class="hint" id="info_description">{{ _('Take some time to provide us with a more detailed description. You can use basic HTML.') }}</p>
-        <div class="wmd-region">
-        {{ form.description }}
-        </div>
-     </div> 
-     <fieldset class="external_links">
-        <legend><span class="announce">{{ _('External links') }}</span></legend>
-        <p class="hint">If you've got additional information about your submission elsewhere on the internet (like a YouTube video, a mockup, or blog post) please include links here. The more information you provide, the better!</p>
+     <fieldset class="external_links highlight {% if errors['External links']%}fail{% endif %}">
+        <legend><span class="announce">{% if errors['External links'] %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
+        <p class="hint">If you've got additional information about your idea elsewhere on the internet (like youtube, extra napkin sketches or blog posts) please include them here. The more information you provide, the better!</p>
         {{ link_form.management_form }}
+        <div class="ed">
+        <strong>{{ errors['External links'] }}</strong>
         {% for link in link_form.forms %}
             <div class="inline_field">
                 {% for field in link.hidden_fields() %}
@@ -74,10 +90,7 @@
                 {% endfor %}
             </div>
         {% endfor %}
-     </fieldset>
-     <fieldset class="stacked_field">
-        <legend><span class="announce">{{ _('Tag your submission') }}</span></legend>
-        {{ form.category }}
+        </div>
      </fieldset>
      <div class="inline_field">
         {{ form.is_draft }}

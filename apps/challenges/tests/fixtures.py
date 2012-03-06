@@ -70,7 +70,6 @@ def create_submissions(count, phase=None, creator=None):
         creator = user.get_profile()
 
     category = Category.objects.all()[0]
-    
     titles = ['Submission %d' % i for i in range(1, count + 1)]
     for title in titles:
         foo = Submission.objects.create(title=title,
