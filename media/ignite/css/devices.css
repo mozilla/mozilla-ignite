@@ -748,7 +748,7 @@ h1 .sweet em {
 .methods h3 {
     font-size: 24px;
     color: #ed4619;
-    margin-top: 0;
+    margin: 0 0 0.5em;
     padding-left: 60px;
 }
 .methods p {
@@ -797,9 +797,6 @@ fieldset.highlight {
     list-style-type: none;
     padding-left: 0;
     margin-top: 1em;
-}
-.highlight ul li:first-child {
-    margin-top: 0;
 }
 .focus_areas ul {
     overflow: hidden;
@@ -863,12 +860,13 @@ fieldset .focus_areas ul {
     position: relative;
     padding: 20px 20px 20px 100px;
     border-top: 1px solid #c7ddeb;
+    overflow: hidden;
 }
 .events ul li:first-child {
     border-top: none;
 }
 .events h3 {
-    font-size: 14px;
+    font-size: 13px;
     color: #2e2e2d;
     margin: 0;
 }
@@ -888,7 +886,7 @@ fieldset .focus_areas ul {
 .events .date span {
     display: block;
     font-weight: bold;
-    font-size: 24px;
+    font-size: 20px;
     margin-top: 0.2em;
 }
 /* About page */
