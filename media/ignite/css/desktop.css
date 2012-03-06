@@ -191,7 +191,6 @@ header .meta em {
 }
 .focus_areas ul li:first-child {
     border-left: none;
-    margin-top: 10px;
 }
 /* single submission */
 #show_submission h1 {
