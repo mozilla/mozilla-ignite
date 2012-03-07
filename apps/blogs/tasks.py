@@ -35,26 +35,23 @@ def parse_feed(feed_url, page):
     for entry in entries:
         parsed = parse_entry(entry) 
         clean_summary = smart_str(bleach.clean(parsed['summary'], tags=(), strip=True))
-        try:
-            checksum = hashlib.md5(clean_summary + page).hexdigest()
-            exists = BlogEntry.objects.filter(checksum=checksum)
-            if not exists:
-                entry = BlogEntry(
-                    title = parsed['title'].encode('utf-8'),
-                    link = parsed['link'].encode('utf-8'),
-                    summary = clean_summary,
-                    page = page, 
-                    checksum = checksum,
-                    updated = time.strftime(
-                        "%Y-%m-%d", parsed['updated_on']),
-                    autor = parsed['author'])
-                entry.save()
-                entry_id = entry.id
-            else:
-                entry_id = exists[0].id
-            ids.append(entry_id)
-        except:
-            continue
+        checksum = hashlib.md5(clean_summary + page).hexdigest()
+        exists = BlogEntry.objects.filter(checksum=checksum)
+        if not exists:
+            entry = BlogEntry(
+                title = parsed['title'].encode('utf-8'),
+                link = parsed['link'].encode('utf-8'),
+                summary = clean_summary,
+                page = page, 
+                checksum = checksum,
+                updated = time.strftime(
+                    "%Y-%m-%d", parsed['updated_on']),
+                autor = parsed['author'])
+            entry.save()
+            entry_id = entry.id
+        else:
+            entry_id = exists[0].id
+        ids.append(entry_id)
     return ids
 
 def update_site_feeds():
