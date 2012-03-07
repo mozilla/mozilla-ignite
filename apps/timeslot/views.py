@@ -105,7 +105,7 @@ def object_detail(request, entry, object_id):
         raise Http404
     # make sure it hasn't been booked
     if timeslot.is_booked:
-        # someone has locked in this view
+        # someone has locked in this timeslot
         message = _('Unfortunately his slot has become unavailable')
         messages.error(request, message)
         return HttpResponseRedirect(reverse('timeslot:object_list',
@@ -142,13 +142,13 @@ def pending(request, template='timeslot/pending.html'):
     profile = request.user.get_profile()
     now = datetime.utcnow()
     # already booked timeslots for this user
-    booked_qs = TimeSlot.objects.select_related('submission').\
-        filter(submission__created_by=profile, is_booked=True)
+    booked_qs = (TimeSlot.objects.select_related('submission').
+                 filter(submission__created_by=profile, is_booked=True))
     booked_ids = [i.submission.id for i in booked_qs]
     # missing timeslots for this user
-    submission_list = Submission.objects.green_lit().\
-        select_related('created_by').\
-        filter(~Q(id__in=booked_ids), created_by=profile)
+    submission_list = (Submission.objects.green_lit().
+                       select_related('created_by').
+                       filter(~Q(id__in=booked_ids), created_by=profile))
     context = {
         'object_list': submission_list,
         'profile': profile,

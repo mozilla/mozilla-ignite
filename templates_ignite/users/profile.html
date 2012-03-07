@@ -26,6 +26,20 @@
 <p>{{ profile.bio }}</p>
 {% endif %}
 
+
+{% if webcast_list  %}
+<h1>Webcasts of assigned submissions</h1>
+<ul class="">
+  {% for object in webcast_list %}
+  <li>
+    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title  }} on {{ object.start_date }}</a>
+  </li>
+  {% endfor%}
+</ul>
+{% endif %}
+
+
+
 {% if profile.user == user %}
 
 {% if submission_list %}

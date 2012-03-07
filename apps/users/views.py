@@ -14,7 +14,7 @@ from django.utils.translation import ugettext
 from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
-from challenges.models import Submission
+from challenges.models import Submission, JudgeAssignment
 from timeslot.models import TimeSlot
 from settings import INSTALLED_APPS
 
@@ -58,12 +58,15 @@ def signout(request):
 
 
 def profile(request, username):
-    """Display profile page for user specified by ``username``."""
+    """Display profile page for user specified by ``username``.
+    This page also acts as a hub for all the user notifications
+    """
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
     if 'challenges' in INSTALLED_APPS:
         submissions = Submission.objects.filter(created_by=profile)
     # Show the all the submission related data when the user is the owner
+    submission_list = []
     if settings.DEVELOPMENT_PHASE and profile.user == user:
         booked_list = TimeSlot.objects.select_related('submission').\
             filter(submission__created_by=profile, is_booked=True)
@@ -71,6 +74,17 @@ def profile(request, username):
         submission_list = Submission.objects.green_lit().\
             select_related('created_by').\
             filter(~Q(id__in=booked_ids), created_by=profile)
+    # User has assigned judging tasks
+    webcast_list = []
+    if settings.DEVELOPMENT_PHASE:
+        # Determining if a user is a judge is quite expensive query-wise,
+        # so we use the JudgeAssignment model to list the judge
+        # booked webcasts, past and present.
+        ids = (JudgeAssignment.objects.filter(judge=request.user.get_profile()).
+               values_list('submission__id', flat=True))
+        webcast_list = (TimeSlot.objects.
+                        select_related('submission').
+                        filter(is_booked=True, submission__in=ids))
     return jingo.render(request, 'users/profile.html', {
         'profile': profile,
         'social_links': profile.link_set.all() or False,
@@ -78,6 +92,7 @@ def profile(request, username):
         'submissions': submissions or False,
         'booked_list': booked_list,
         'submission_list': submission_list,
+        'webcast_list': webcast_list,
     })
 
 
