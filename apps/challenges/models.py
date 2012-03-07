@@ -14,11 +14,11 @@ from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
 
-from tower import ugettext_lazy as _
-
 from challenges.lib import cached_bleach
+from django_extensions.db.fields import AutoSlugField
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
+from tower import ugettext_lazy as _
 from users.models import Profile
 
 
@@ -244,6 +244,8 @@ class SubmissionManager(BaseModelManager):
 
     def green_lit(self):
         """Returns all the ``Submissions`` that have been green-lit"""
+        # TODO: we need a better method to determine when a submission has
+        # been green lit
         return self.filter(is_winner=True)
 
 
@@ -523,3 +525,23 @@ class JudgeAssignment(models.Model):
 def judgement_flush_cache(instance, **kwargs):
     """Flush the cache for any submissions related to this instance."""
     Submission.objects.invalidate(instance.submission)
+
+
+class PhaseRound(models.Model):
+    """Rounds for a given ``Phase``"""
+    name = models.CharField(max_length=255)
+    slug = AutoSlugField(populate_from='name')
+    phase = models.ForeignKey('challenges.Phase')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    def __unicode__(self):
+        return u'Round: %s' % self.name
+
+    @property
+    def is_active(self):
+        now = datetime.utcnow()
+        return all([
+            now > self.start_date,
+            now < self.end_date,
+            ])

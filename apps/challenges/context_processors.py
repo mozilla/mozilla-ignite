@@ -22,6 +22,7 @@ def current_phase(request):
     """Add to the context the ``DEVELOPMENT_PHASE``is active
     and if the ``IDEATION_PHASE`` has finished"""
     return {
+        'IGNITE_SITE': settings.IGNITE_SITE,
         'DEVELOPMENT_PHASE': settings.DEVELOPMENT_PHASE,
         'IDEATION_PHASE': has_phase_finished(settings.IGNITE_IDEATION_NAME),
         }

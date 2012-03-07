@@ -6,7 +6,7 @@ from django.db.models import Q
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
-                               PhaseCriterion)
+                               PhaseCriterion, PhaseRound)
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -127,6 +127,9 @@ class ExclusionFlagAdmin(admin.ModelAdmin):
     list_display = ('submission', 'notes')
 
 
+class PhaseRoundAdmin(admin.ModelAdmin):
+    pass
+
 admin.site.unregister(User)
 admin.site.register(User, JudgeAwareUserAdmin)
 
@@ -140,3 +143,4 @@ admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
+admin.site.register(PhaseRound, PhaseRoundAdmin)

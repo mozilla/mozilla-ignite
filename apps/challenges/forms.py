@@ -3,8 +3,9 @@ from django.forms import widgets
 from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink, Category, \
-                              Judgement, JudgingCriterion, JudgingAnswer
+from challenges.models import (Submission, ExternalLink, Category,
+                               Judgement, JudgingCriterion, JudgingAnswer,
+                               PhaseRound)
 from challenges.widgets import CustomRadioSelect
 
 
@@ -187,3 +188,14 @@ class MinMaxIntegerField(forms.IntegerField):
     
     def widget_attrs(self, widget):
         return {'min': self.min_value, 'max': self.max_value}
+
+
+class PhaseRoundAdminform(forms.ModelForm):
+    model = PhaseRound
+
+    def clean(self):
+        """Validate that
+        - The round dates don't overlap
+        - The round is inside the phase they are associated
+        """
+        return self.cleaned_data
