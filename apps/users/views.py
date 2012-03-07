@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext
@@ -14,6 +15,7 @@ from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
 from challenges.models import Submission
+from timeslot.models import TimeSlot
 from settings import INSTALLED_APPS
 
 import jingo
@@ -21,6 +23,7 @@ import jingo
 ACTIVITY_PAGE_SIZE = 20
 
 
+@login_required
 def dashboard(request, page=0):
     """Display first page of activities for a users dashboard."""
     start = int(page) * ACTIVITY_PAGE_SIZE
@@ -60,11 +63,21 @@ def profile(request, username):
     profile = get_object_or_404(Profile, user=user)
     if 'challenges' in INSTALLED_APPS:
         submissions = Submission.objects.filter(created_by=profile)
+    # Show the all the submission related data when the user is the owner
+    if settings.DEVELOPMENT_PHASE and profile.user == user:
+        booked_list = TimeSlot.objects.select_related('submission').\
+            filter(submission__created_by=profile, is_booked=True)
+        booked_ids = [i.submission.id for i in booked_list]
+        submission_list = Submission.objects.green_lit().\
+            select_related('created_by').\
+            filter(~Q(id__in=booked_ids), created_by=profile)
     return jingo.render(request, 'users/profile.html', {
         'profile': profile,
         'social_links': profile.link_set.all() or False,
         'projects': profile.project_set.all() or False,
-        'submissions': submissions or False
+        'submissions': submissions or False,
+        'booked_list': booked_list,
+        'submission_list': submission_list,
     })
 
 
