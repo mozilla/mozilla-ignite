@@ -28,6 +28,12 @@
 .col img {
     width: 100%;
 }
+figure {
+    text-align: center
+}
+figure img {
+    width: auto !important;
+ }   
 #disqus_thread img {
     width: auto;
 }
