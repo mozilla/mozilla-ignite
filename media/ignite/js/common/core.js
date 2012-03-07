@@ -53,6 +53,7 @@ ignite.areas = {
             ed.before('<div id="wmd-button-bar"></div>');
             editor.run();
             ignite.idea_links.delete_link_set();
+            ignite.idea_links.add_link_set();
         }
     }
 };

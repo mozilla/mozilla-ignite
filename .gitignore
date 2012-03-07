@@ -4,6 +4,8 @@ settings_local.py
 *.komodoproject
 .coverage
 pip-log.txt
+build/
+src/
 graveyard.css
 docs/_gh-pages
 build.py

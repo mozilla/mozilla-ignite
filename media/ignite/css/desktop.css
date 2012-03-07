@@ -28,6 +28,13 @@
 .col img {
     width: 100%;
 }
+figure {
+    margin-top: 30px;
+    text-align: center
+}
+figure img {
+    width: auto !important;
+ }   
 #disqus_thread img {
     width: auto;
 }
@@ -191,7 +198,6 @@ header .meta em {
 }
 .focus_areas ul li:first-child {
     border-left: none;
-    margin-top: 10px;
 }
 /* single submission */
 #show_submission h1 {
