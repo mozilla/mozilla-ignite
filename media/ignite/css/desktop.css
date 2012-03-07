@@ -29,6 +29,7 @@
     width: 100%;
 }
 figure {
+    margin-top: 30px;
     text-align: center
 }
 figure img {

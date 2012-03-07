@@ -12,43 +12,6 @@
 {% endblock %}
 
 {% block content %}
-<section class="what">
-	<h2>What becomes possible?</h2>
-	<div class="content_columns columns">
-		<div class="main col box">
-			<p class="intro">Chattanooga has a gig. Kansas City's getting a gig. That's right: 1 gigabit per second, up and down. That's over 100 times faster than most people's current internet connections.</p>
-			<figure>
-    			<figcaption>Fig. Two <h3 class="fig_title"><span>The Sweet Spot</span></h3></figcaption>
-    		    <img src="{{ MEDIA_URL }}/ignite/img/infographics/sweet-spot.png" width="600" height="410" alt="A diagram showing how we believe Ignite will be the perfect mix of the network, HTML5 and civic innovators" />
-            </figure>
-			<div class="columns equal">
-				<div class="col box">
-					<h3>But what do you do with a 1 Gbps connection?</h3>
-					<p>How can developers take advantage of that level of bandwidth, along with the smart networking capabilities that be built into the networks of the future? That is the question the Ignite Apps Challenge poses to developers, designers and civic innovation thinkers.</p>
-				</div>
-				<div class="col box">
-					<h3>There's a world of opportunity here...</h3>
-					<p>So we are building a community to explore the possibilities of a gigabit apps, and create public benefit in areas like health IT, education, clean energy, and more.<p>
-				</div>
-			</div>
-		</div>
-		<div class="col box bonus">
-			<div class="highlight">
-				<h3>What would you build?</h3>
-				<p>Networks are getting faster and more programmable. Browsers are becoming incredibly powerful. We're more connectied than ever. What will you build?</p>
-				<a href="{{ url('create_entry') }}" class="cta">Get started</a>
-			</div>
-			<div class="highlight">
-				<h3>How can I get involved?</h3>
-				<ul>
-					<li>Join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>. Attend an <a href="resources.html#labs">instructional webcast</a>, or an in-person hackfest with other forward-thinking developers.</li>
-					<li>Through April, <a href="{{ url('create_entry') }}" class="cta">share your ideas for tomorrow's apps</a> in a group brainstorm.</li>
-					<li>Starting in May, <strong>apply to build your app on GENI</strong>, a fast experimental network. We're offering a total of $500k in funding, so you can get your app built, fast.</li>
-				</ul>
-			</div>
-		</div>
-	</div>
-</section>
 <section class="how">
 	<h2>How does the challenge work?</h2>
 	<div class="columns content_columns">
@@ -116,18 +79,93 @@
 	<div class="banner">
 		Got a great idea? <a class="cta" href="{{ url('create_entry') }}">Get started</a> Everyone's welcome!
 	</div>
+	<h3>Brainstorming</h3>
 	<div class="columns">
 		<div class="box col">
-			<h3>Multiple Funding Rounds</h3>
-			<p>To help build your apps, we're offering a total of $500k in funding. Round 1 of the development challenge begins on June 13th; Round 2 begins on July 25th, and Round 3 begins on September 26th. You can compete in any single round, or you can compete in all three. It's up to you.</p>
+			<h4>What is the Public Brainstorm?</h4>
+			<p>The Public Brainstorm is an opportunity for everyone interested in imagining how web apps running on next-generation networks (internet) can improve people’s everyday lives.</p>
+			<p>Anyone is welcome to submit ideas on how to make people happier, or healthier, or more well-informed using a 1 Gigabit per second smart network. </p>
+			<p>Submissions are eligible for the following prizes:</p>
+			<ul>
+				<li>$4000, 2x $3000,</li> 
+				<li>$2000, 3x $1000,</li>
+				<li>10x Notable Idea Awards,</li>
+				<li>10x People's Choice Awards</li>
+			</ul>
 		</div>
 		<div class="box col">
-			<h3>How to Apply</h3>
-			<p>To enter, assemble your team and fill out a written application at least two weeks before a round starts. If your proposal is solid, you'll be greenlit, and will get access to the GENI sandbox. You only need to apply once.</p>
+			<h4>What is the purpose of the Brainstorm?</h4>
+			<p>The Brainstorm will help us all understand the possibility space and identify potential teams and participants.</p>
+			<p>This Brainstorm will bring together app developers, university researchers, industry experts, start-ups and visionaries. By uniting people from such different perspectives we hope to get a wide range of ideas from varying areas of expertise.</p>
+			<p>It's not necessary for Development Challenge teams to participate in the Brainstorm, but we do encourage dev teams to join in and refine their ideas.</p> 
+			<p>Similarly,you don’t need to be a developer in order to submit an idea into the brainstorm. All you need is a great idea that leverages smart 1Gbps networks. In fact, you may well want to submit a Brainstorm idea in order to attract a team who wants to bring it to life within the Development Challenge.</p>
+			<p>Everyone is welcome.</p>
 		</div>
 		<div class="box col">
-			<h3>An Open, Supportive Process</h3>
-			<p>Once the round starts, it's off to the races. You'll have access to <a href="#">expert mentors</a>. You'll build in the open, getting feedback and help from the Ignite community.</p>
+			<h4>Brainstorm submission requirements</h4>
+			<p>All submissions must make use of the next generation network capabilities (1Gbps smart networks) and create broad public benefit in one of the following areas:</p>
+			<ul>
+				<li>Health IT</li>
+				<li>Education</li>
+				<li>Clean Energy &amp; Transportation</li>
+				<li>Advanced Manufacturing</li>
+				<li>Emergency Preparedness and Public Safety</li>
+				<li>Workforce Technologies</li>
+				<li>Advanced Manufacturing</li>
+			</ul>
+			<p>Submissions will be judged by a panel of judges. Top rated ideas that best fit the criteria, are clearly articulated, and provide considerable public benefit impact will be awarded prizes and recognition.</p>
+		</div>
+	</div>
+	<h3>Not familiar with 1Gbps smart networks? Here are some examples to help you understand their potential</h3>
+	<div class="columns">
+		<div class="box col">
+			<h4>Example 1</h4>
+			<p>A world-renowned doctor is able to remotely conference about an enormously detailed 3D medical file in high detail with colleagues across the country. Each of the conference members can view the changing high definition view and zoom of image being driven by one member in the conference. At the same time, they are able to have a video conference and discuss what they see.  This technology allows a remote group of experts to conference on the most difficult cases, through each person navigating very large files with no delay for the group allowing a new level of insight to be provided.</p>
+		</div>
+		<div class="box col">
+			<h4>Example 2</h4>
+			<p>A national emergency strikes suddenly and unexpectedly. First responders need a secure communication channel, with no possibility of a man-in-the-middle attack. To enable the more secure communications possible, dispatchers take a slice of the network and create a private VLAN. All the police on the scene are able to communicate sensitive details with confidence through this secure direct link.</p>
+		</div>
+		<div class="box col">
+			<h4>Example 3</h4>
+			<p>An entrepreneur has a massive data set about the performance of her product during field test. She has terabytes and terabytes of physics and sensor data, and needs to simulate and analyze the field test many times. She queues an app that borrows processing power from others on the network and gains access to a temporary “render farm.” Using these networked computing resources, she can distribute the computing load and come to conclusions much faster..</p>
+		</div>
+	</div>
+</section>
+<section class="what">
+	<h2>What becomes possible?</h2>
+	<div class="content_columns columns">
+		<div class="main col box">
+			<p class="intro">Chattanooga has a gig. Kansas City's getting a gig. That's right: 1 gigabit per second, up and down. That's over 100 times faster than most people's current internet connections.</p>
+			<figure>
+    			<figcaption>Fig. Two <h3 class="fig_title"><span>The Sweet Spot</span></h3></figcaption>
+    		    <img src="{{ MEDIA_URL }}/ignite/img/infographics/sweet-spot.png" width="600" height="410" alt="A diagram showing how we believe Ignite will be the perfect mix of the network, HTML5 and civic innovators" />
+            </figure>
+			<div class="columns equal">
+				<div class="col box">
+					<h3>But what do you do with a 1 Gbps connection?</h3>
+					<p>How can developers take advantage of that level of bandwidth, along with the smart networking capabilities that be built into the networks of the future? That is the question the Ignite Apps Challenge poses to developers, designers and civic innovation thinkers.</p>
+				</div>
+				<div class="col box">
+					<h3>There's a world of opportunity here...</h3>
+					<p>So we are building a community to explore the possibilities of a gigabit apps, and create public benefit in areas like health IT, education, clean energy, and more.<p>
+				</div>
+			</div>
+		</div>
+		<div class="col box bonus">
+			<div class="highlight">
+				<h3>What would you build?</h3>
+				<p>Networks are getting faster and more programmable. Browsers are becoming incredibly powerful. We're more connectied than ever. What will you build?</p>
+				<a href="{{ url('create_entry') }}" class="cta">Get started</a>
+			</div>
+			<div class="highlight">
+				<h3>How can I get involved?</h3>
+				<ul>
+					<li>Join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>. Attend an <a href="resources.html#labs">instructional webcast</a>, or an in-person hackfest with other forward-thinking developers.</li>
+					<li>Through April, <a href="{{ url('create_entry') }}" class="cta">share your ideas for tomorrow's apps</a> in a group brainstorm.</li>
+					<li>Starting in May, <strong>apply to build your app on GENI</strong>, a fast experimental network. We're offering a total of $500k in funding, so you can get your app built, fast.</li>
+				</ul>
+			</div>
 		</div>
 	</div>
 </section>
@@ -218,6 +256,10 @@ to the future of manufacturing in this country.</p>
 					<p>We think that the deeply connected future needs a common, freely implementable, consensus-based development platform. And even as the role of the browser changes—and the distinction between local and remote code begins to blur—we think the web will be the best and most universal platform to build apps from the future.</p>
 				</div>
 			</div>
+			<figure>
+				<figcaption>Fig. Three <h3 class="fig_title"><span>The GENI Network</span></h3></figcaption>
+		    	<img src="{{ MEDIA_URL }}/ignite/img/infographics/geni.png" width="601" height="560" alt="Diagram explaining how Geni provides their network either by direct contact to one of their racks or point to point via their backbone and commodity internet" />
+			</figure>
 		</div>
 		<div class="col box bonus">
 			<div class="highlight">
@@ -233,28 +275,8 @@ to the future of manufacturing in this country.</p>
 		</div>
 	</div>
 </section>
-<section class="geni">
-	<p class="intro">GENI, the General Environment for Network Innovation, is a sandbox where you can play with future networking concepts.<p>
-	<p>Say you have an idea about how to make people happier, or healthier, or more well informed—but that idea is too big for today's internet.</p>	
-	<p>Transfer speeds are too slow, latency is too high, or your users’ computers aren’t fast enough. Or, maybe you need the network to work differently. Whatever the reason, the naysayers will tell you that it can't be built.</p>
-	<div class="columns equal">
-		<div class="col box">
-			<h3>Living in the Future</h3>
-			<p>Now imagine that none of these limitations apply. Information can travel as fast as it needs to. "Loading" and "latency" are things thing of the past. And as an app developer, you can program the entire network, from the clients and servers to all the middle boxes in between. GENI, the "Global Environment for Network Innovations," is a sandboxed experimenters' network. It's like a scale model of many future internets. And it's where you'll develop and deploy apps in the Ignite Apps Challenge.</p>
-		</div>
-		<div class="col box">
-			<h3>Programmable + Sliceable</h3>
-			<p>If you’re a networking geek, check this out: using GENI, you can take a slice of the network and create your own virtual networks. You can directly access Layer 2 resources, getting more control and flexibility than what’s afforded by the commodity Internet. And there’s computing and storage clusters at many points in the network— “programmable local clouds” — so you can optimize computing, storage, and networking aspects of their apps, simultaneously.</p>
-			<p>GENI will help you build and test your app, whether you’re building a small and novel app or a revolution in networking.</p>
-		</div>
-	</div>
-	<figure>
-		<figcaption>Fig. Three <h3 class="fig_title"><span>The GENI Network</span></h3></figcaption>
-		    <img src="{{ MEDIA_URL }}/ignite/img/infographics/geni.png" width="601" height="560" alt="Diagram explaining how Geni provides their network either by direct contact to one of their racks or point to point via their backbone and commodity internet" />
-	</figure>
-</section>
 <section class="questions">
-	<h2>More Questions?</h2>
+	<h2>Frequnetly asked questions</h2>
 	<div class="columns equal">
 		<div class="col box">
 			<h3>What is US Ignite?</h3>
