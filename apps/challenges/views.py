@@ -213,6 +213,7 @@ def create_entry(request, project, slug):
 
 
 def entry_show(request, project, slug, entry_id, judging_form=None):
+    """Detail of an idea, show any related information to this"""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
@@ -225,7 +226,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
-    
+
     ## Previous/next modules
     # We can't use Django's built-in methods here, because we need to restrict
     # to entries the current user is allowed to see
@@ -253,7 +254,11 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         assignments = JudgeAssignment.objects
         judge_assigned = assignments.filter(judge__user=request.user,
                                             submission=entry).exists()
-    
+
+    # Determine if this idea has a timeslot allocated for the webcast
+    # triggered here to cache it
+    webcast_list = entry.timeslot_set.filter(is_booked=True)
+
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -266,6 +271,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'excluded': entry.exclusionflag_set.exists(),
         'judging_form': judging_form,
         'judge_assigned': judge_assigned,
+        'webcast_list': webcast_list,
     })
 
 

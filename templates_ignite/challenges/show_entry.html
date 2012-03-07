@@ -85,6 +85,15 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
+          {% if webcast_list %}
+          <section>
+            <h2>Upcoming</h2>
+            {% for webcast in webcast_list %}
+            <p>Webcast on {{ webcast.start_date }}.</p>
+            {% endfor%}
+          </section>
+          {% endif %}
+
             {% if judging_form %}
             <section>
                 {% if excluded %}

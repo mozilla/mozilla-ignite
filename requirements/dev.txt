@@ -21,4 +21,3 @@ mock==0.7.2
 -e git://github.com/robhudson/django-debug-toolbar.git#egg=django-debug-toolbar
 fabric
 ipdb
-
