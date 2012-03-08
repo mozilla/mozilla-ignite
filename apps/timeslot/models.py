@@ -2,11 +2,8 @@ from datetime import timedelta, datetime
 
 from django.conf import settings
 from django.db import models
-from django_extensions.db.fields import (CreationDateTimeField,
-                                         ModificationDateTimeField)
 from timeslot.managers import TimeSlotFreeManager
 from timeslot.utils import shorten_object
-from django.utils.translation import ugettext as _
 
 
 class TimeSlot(models.Model):

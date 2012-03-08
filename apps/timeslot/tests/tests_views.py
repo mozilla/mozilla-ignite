@@ -37,13 +37,9 @@ class TimeSlotTest(test_utils.TestCase):
 
     def tearDown(self):
         """Actions to be performed at the end of each test"""
-        Submission.objects.all().delete()
-        Phase.objects.all().delete()
-        Challenge.objects.all().delete()
-        Category.objects.all().delete()
-        Project.objects.all().delete()
-        TimeSlot.objects.all().delete()
-        User.objects.all().delete()
+        for model in [Submission, Phase, Challenge, Category, Project,
+                      TimeSlot, User]:
+            model.objects.all().delete()
 
     def create_timeslot(self, extra_data=None):
         """Helper to add ``TimeSlots`` with the minium required data"""
