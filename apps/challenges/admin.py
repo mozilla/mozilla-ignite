@@ -3,6 +3,7 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Q
 
+from challenges.forms import PhaseRoundAdminForm
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
@@ -128,7 +129,9 @@ class ExclusionFlagAdmin(admin.ModelAdmin):
 
 
 class PhaseRoundAdmin(admin.ModelAdmin):
-    pass
+    model = PhaseRound
+    form = PhaseRoundAdminForm
+
 
 admin.site.unregister(User)
 admin.site.register(User, JudgeAwareUserAdmin)
