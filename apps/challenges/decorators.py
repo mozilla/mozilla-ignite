@@ -1,8 +1,7 @@
 from django.conf import settings
 from django.contrib.auth.models import User, Permission
-from django.http import Http404
-
 from django.db.models import Q
+from django.http import Http404
 
 
 def judge_required(func):

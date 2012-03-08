@@ -14,8 +14,9 @@ from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
 
-from challenges.lib import cached_bleach
-from django_extensions.db.fields import AutoSlugField, ModificationDateTimeField
+from challenges.lib import cached_bleach, cached_property
+from django_extensions.db.fields import (AutoSlugField,
+                                         ModificationDateTimeField)
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
 from tower import ugettext_lazy as _
@@ -94,19 +95,15 @@ class Challenge(BaseModel):
 
 
 class PhaseManager(BaseModelManager):
-    
+
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
     def get_current_phase(self, slug):
         now = datetime.utcnow()
-        return self.filter(
-            challenge__slug=slug
-        ).filter(
-            start_date__lte=now
-        ).filter(
-            end_date__gte=now
-        )
+        return self.filter(challenge__slug=slug,
+                           start_date__lte=now,
+                           end_date__gte=now)
 
     def get_ideation_phase(self):
         """Returns the ``Ideation`` phase"""
@@ -123,7 +120,6 @@ class PhaseManager(BaseModelManager):
                             name=settings.IGNITE_DEVELOPMENT_NAME)
         except self.model.DoesNotExist:
             return None
-
 
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
@@ -165,6 +161,15 @@ class Phase(BaseModel):
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.challenge.title)
+
+    @cached_property
+    def current_round(self):
+        """Determines the current round for this ``Phase``"""
+        now = datetime.utcnow()
+        round_list = self.phaseround_set.filter(start_date__lte=now,
+                                                end_date__gte=now)
+        return round_list[0] if round_list else None
+
     
     class Meta:
         unique_together = (('challenge', 'name'),)
@@ -277,7 +282,8 @@ class Submission(BaseModel):
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
     phase = models.ForeignKey('challenges.Phase')
     phase_round = models.ForeignKey('challenges.PhaseRound',
-                                    blank=True, null=True)
+                                    blank=True, null=True,
+                                    on_delete=models.SET_NULL)
 
     @property
     def challenge(self):
@@ -357,7 +363,7 @@ class Submission(BaseModel):
         """Return True if user provided owns this entry."""
         return user == self.created_by.user
 
-    @property
+    @cached_property
     def needs_booking(self):
         """Determines if this entry needs to book a Timeslot.
         - Entry has been gren lit

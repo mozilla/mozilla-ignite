@@ -175,7 +175,7 @@ def create_entry(request, project, slug):
     
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
-    form_errors = False 
+    form_errors = False
     if request.method == 'POST':
         form = EntryForm(data=request.POST,
             files=request.FILES)
@@ -184,18 +184,23 @@ def create_entry(request, project, slug):
             entry = form.save(commit=False)
             entry.created_by = profile
             entry.phase = phase
+            if phase.current_round:
+                entry.phase_round = phase.current_round
             entry.save()
             for link in link_form.cleaned_data:
-                if all(i in link for i in ("name", "url")): 
+                if all(i in link for i in ("name", "url")):
                     ExternalLink.objects.create(
                         name = link['name'],
                         url = link['url'],
                         submission = entry
                     )
             if entry.is_draft:
-                msg = _('<strong>Your entry has been saved as draft.</strong> When you want the world to see it then uncheck the "Save as draft?" option from your idea editting page')
+                msg = _('<strong>Your entry has been saved as draft.</strong>'
+                        ' When you want the world to see it then uncheck the '
+                        '"Save as draft?" option from your idea editting page')
             else:
-                msg = _('Your entry has been posted successfully and is now available for public review')
+                msg = _('Your entry has been posted successfully and is now '
+                        'available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_entries_url())
         else:

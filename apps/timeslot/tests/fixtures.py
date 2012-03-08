@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from django.contrib.admin.models import User
 
 from challenges.models import (Submission, Phase, Challenge,
-                               Category, Project)
+                               Category, Project, PhaseRound)
 
 
 def create_project(slug, extra_data=None):
@@ -82,3 +82,15 @@ def create_submission(title, profile, phase, extra_data=None):
         data.update(extra_data)
     instance, created = Submission.objects.get_or_create(**data)
     return instance
+
+
+def create_phase_round(name, phase, extra_data=None):
+    data = {
+        'name': name,
+        'phase': phase,
+        'start_date': datetime.utcnow(),
+        'end_date': datetime.utcnow() + timedelta(hours=1),
+        }
+    if extra_data:
+        data.update(extra_data)
+    return PhaseRound.objects.create(**data)
