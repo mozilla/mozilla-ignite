@@ -191,20 +191,11 @@ class MinMaxIntegerField(forms.IntegerField):
         return {'min': self.min_value, 'max': self.max_value}
 
 
-class PhaseRoundAdminform(forms.ModelForm):
-    model = PhaseRound
-
-    def clean(self):
-        """Validate that
-        - The round dates don't overlap
-        - The round is inside the phase they are associated
-        """
-        return self.cleaned_data
-
-
 class PhaseRoundAdminForm(forms.ModelForm):
     """Form for validating the ``PhaseRound`` dates"""
-    model = PhaseRound
+
+    class Meta:
+        model = PhaseRound
 
     def clean(self):
         """Validate that
