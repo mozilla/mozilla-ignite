@@ -201,8 +201,9 @@ class PhaseRoundAdminform(forms.ModelForm):
         """
         return self.cleaned_data
 
-class PhaseRoundAdminForm(forms.ModelForm):
 
+class PhaseRoundAdminForm(forms.ModelForm):
+    """Form for validating the ``PhaseRound`` dates"""
     model = PhaseRound
 
     def clean(self):
