@@ -131,6 +131,8 @@ class ExclusionFlagAdmin(admin.ModelAdmin):
 class PhaseRoundAdmin(admin.ModelAdmin):
     model = PhaseRound
     form = PhaseRoundAdminForm
+    list_display = ['name', 'start_date', 'end_date', 'phase']
+    list_filter = ['phase__name']
 
 
 admin.site.unregister(User)

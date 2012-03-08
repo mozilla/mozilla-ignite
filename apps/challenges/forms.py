@@ -227,13 +227,19 @@ class PhaseRoundAdminForm(forms.ModelForm):
                                         ' Between  %s and %s' % \
                                         (phase.name, phase.start_date,
                                          phase.end_date))
-        # Avoid querying for existing PhaseRound, this may be an update
+        # PhaseRound shouldn't overlap
         query_args = []
         if self.instance.id:
+            # this may be an update avoid it if so
             query_args = [~Q(id=self.instance.id)]
-        if PhaseRound.objects.filter(start_date__lte=start_date,
-                                     end_date__gte=end_date,
-                                     *query_args):
+        # Make sure the dates don't overlap, are contained or contain other
+        # rounds
+        if PhaseRound.objects.filter(
+                (Q(start_date__lte=start_date) & Q(end_date__gte=start_date)) |
+                (Q(start_date__lte=end_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__lte=start_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__gte=start_date) & Q(end_date__lte=end_date)),
+                *query_args):
             raise forms.ValidationError('This round dates overlap with other '
                                         'rounds')
         return self.cleaned_data

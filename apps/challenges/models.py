@@ -15,7 +15,7 @@ from django.db.models import signals
 from django.dispatch import receiver
 
 from challenges.lib import cached_bleach
-from django_extensions.db.fields import AutoSlugField
+from django_extensions.db.fields import AutoSlugField, ModificationDateTimeField
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
 from tower import ugettext_lazy as _
@@ -271,13 +271,14 @@ class Submission(BaseModel):
     
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(default=datetime.utcnow)
-    
+    updated_on = ModificationDateTimeField()
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
-    
-    phase = models.ForeignKey(Phase)
-    
+    phase = models.ForeignKey('challenges.Phase')
+    phase_round = models.ForeignKey('challenges.PhaseRound',
+                                    blank=True, null=True)
+
     @property
     def challenge(self):
         return self.phase.challenge
@@ -536,7 +537,7 @@ class PhaseRound(models.Model):
     end_date = models.DateTimeField()
 
     def __unicode__(self):
-        return u'Round: %s' % self.name
+        return u'%s: %s' % (self.phase, self.name)
 
     @property
     def is_active(self):
