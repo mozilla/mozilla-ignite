@@ -7,9 +7,9 @@ from challenges.models import (Submission, Phase, Challenge, Category,
 from django.conf import settings
 from django.core.urlresolvers import reverse
 from django.contrib.auth.models import User
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, Release
 from timeslot.tests.fixtures import (create_project, create_challenge,
-                                     create_phase, create_user,
+                                     create_phase, create_user, create_release,
                                      create_category, create_submission)
 
 
@@ -37,15 +37,11 @@ class WebcastTest(test_utils.TestCase):
 
     def tearDown(self):
         """Actions to be performed at the end of each test"""
-        Submission.objects.all().delete()
-        Phase.objects.all().delete()
-        Challenge.objects.all().delete()
-        Category.objects.all().delete()
-        Project.objects.all().delete()
-        TimeSlot.objects.all().delete()
-        User.objects.all().delete()
+        for model in [Submission, Phase, Challenge, Category, Project,
+                      TimeSlot, User, Release]:
+            model.objects.all().delete()
 
-    def create_timeslot(self, extra_data=None):
+    def create_timeslot(self, release, extra_data=None):
         """Helper to add ``TimeSlots`` with the minium required data"""
         # booking of timeslots start at least 24 hours in advance
         start_date = datetime.utcnow() + timedelta(hours=25)
@@ -53,6 +49,7 @@ class WebcastTest(test_utils.TestCase):
         data = {
             'start_date': start_date,
             'end_date': end_date,
+            'release': release,
             }
         if extra_data:
             data.update(extra_data)
@@ -60,7 +57,8 @@ class WebcastTest(test_utils.TestCase):
 
     def generate_timeslots(self, total):
         """Create a number of ``TimeSlots``"""
-        return [self.create_timeslot() for i in range(total)]
+        release = create_release('Release', True)
+        return [self.create_timeslot(release) for i in range(total)]
 
     def generate_winning_submissions(self, total):
         """Helper to generate a list of winning submissions"""
@@ -78,11 +76,12 @@ class WebcastTest(test_utils.TestCase):
         # create winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
         webcast_url = reverse('webcast:object_list')
+        release = create_release('Release', True)
         # book the winning submissions
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
                       'is_booked': True}
-            timeslot = self.create_timeslot(extra_data=t_data)
+            timeslot = self.create_timeslot(release, extra_data=t_data)
             response = self.client.get(webcast_url)
             page = response.context['page']
             self.assertEqual(page.paginator.count, i)
@@ -102,11 +101,12 @@ class WebcastTest(test_utils.TestCase):
         # create winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
         webcast_url = reverse('webcast:upcoming')
+        release = create_release('Release', True)
         # book the winning submissions in the future
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
                       'is_booked': True}
-            timeslot = self.create_timeslot(extra_data=t_data)
+            timeslot = self.create_timeslot(release, extra_data=t_data)
             response = self.client.get(webcast_url)
             self.assertEqual(response.status_code, 200)
             page = response.context['page']
@@ -127,11 +127,12 @@ class WebcastTest(test_utils.TestCase):
         """Test the user upcoming webcasts"""
         # generate winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
+        release = create_release('Release', True)
         # book all the winning submissions
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
                       'is_booked': True}
-            timeslot = self.create_timeslot(extra_data=t_data)
+            timeslot = self.create_timeslot(release, extra_data=t_data)
         # user has only one winning submission
         webcast_url = reverse('webcast:upcoming_mine')
         response = self.client.get(webcast_url)

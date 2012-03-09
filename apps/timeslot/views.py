@@ -76,11 +76,10 @@ def entry_available_decorator(func):
 @login_required
 @entry_available_decorator
 def object_list(request, entry, template='timeslot/object_list.html'):
-    """Listing of the timeslots available for a given entry"""
+    """Listing of the ``TimeSlots`` available for a given entry"""
     # Book timeslots start at least 24 hours in advance
     start_date = datetime.utcnow() + timedelta(hours=24)
-    timeslot_qs = TimeSlot.objects.filter(start_date__gte=start_date,
-                                          is_booked=False)
+    timeslot_qs = TimeSlot.available.filter(start_date__gte=start_date)
     paginator = Paginator(timeslot_qs, settings.PAGINATOR_SIZE)
     page_number = get_page(request.GET)
     try:

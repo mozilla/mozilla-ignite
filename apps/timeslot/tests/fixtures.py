@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 from django.contrib.admin.models import User
 
-from challenges.models import (Submission, Phase, Challenge,
-                               Category, Project, PhaseRound)
+from timeslot.models import Release
+from challenges.models import (Submission, Phase, Challenge, Category,
+                               Project, PhaseRound)
 
 
 def create_project(slug, extra_data=None):
@@ -94,3 +95,12 @@ def create_phase_round(name, phase, extra_data=None):
     if extra_data:
         data.update(extra_data)
     return PhaseRound.objects.create(**data)
+
+
+def create_release(name, is_current, extra_data=None):
+    """Helper to create releases"""
+    data = {'name': name, 'is_current': is_current}
+    if extra_data:
+        data.update(extra_data)
+    instance, created = Release.objects.get_or_create(**data)
+    return instance

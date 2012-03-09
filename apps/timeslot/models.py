@@ -3,7 +3,7 @@ from datetime import timedelta, datetime
 from django.conf import settings
 from django.db import models
 from django_extensions.db.fields import AutoSlugField
-from timeslot.managers import TimeSlotFreeManager
+from timeslot.managers import TimeSlotFreeManager, ReleaseManager
 from timeslot.utils import shorten_object
 
 
@@ -22,7 +22,7 @@ class TimeSlot(models.Model):
 
     # managers
     objects = models.Manager()
-    free = TimeSlotFreeManager()
+    available = TimeSlotFreeManager()
 
     class Meta:
         ordering = ['start_date', ]
@@ -46,6 +46,9 @@ class Release(models.Model):
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from='name')
     is_current = models.BooleanField(default=True)
+
+    # managers
+    objects = ReleaseManager()
 
     def __unicode__(self):
         return self.name

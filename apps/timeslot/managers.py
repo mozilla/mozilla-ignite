@@ -1,6 +1,8 @@
 from django.db import models
 
+
 class TimeSlotFreeManager(models.Manager):
+
     def get_query_set(self):
         """Makes sure the timeslots are available:
         - They are not booked
@@ -15,6 +17,6 @@ class ReleaseManager(models.Manager):
     def get_current(self):
         """Returns the active manager"""
         try:
-            return self.get(default=True)
+            return self.get(is_current=True)
         except self.model.DoesNotExist:
             return None
