@@ -69,7 +69,8 @@ def submodules():
 def test():
     """Run the tests locally"""
     # TODO: add the rest of the apps and make sure the tests pass!
-    local('python manage.py test challenges timeslot webcast --settings=settings_test')
+    local('python manage.py test challenges timeslot webcast badges '
+          '--settings=settings_test')
 
 
 def deploy(branch):

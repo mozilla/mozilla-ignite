@@ -255,6 +255,7 @@ INSTALLED_APPS = (
     'timeslot',
     'webcast',
     'resources',
+    'badges',
 )
 
 # Tells the extract script what files to look for L10n in and what function
