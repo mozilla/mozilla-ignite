@@ -13,7 +13,7 @@ class Badge(models.Model):
     body = models.CharField(blank=True, max_length=255)
 
     def __unicode__(self):
-        return self.name
+        return u'%s: %s' % (self.get_badge_type_display(), self.body)
 
 
 class SubmissionBadge(models.Model):

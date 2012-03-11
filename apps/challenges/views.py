@@ -263,7 +263,8 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # Determine if this idea has a timeslot allocated for the webcast
     # triggered here to cache it
     webcast_list = entry.timeslot_set.filter(is_booked=True)
-
+    # Cache the awarded badges
+    badge_list = entry.submissionbadge_set.select_related('badge').all()
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -277,6 +278,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'judging_form': judging_form,
         'judge_assigned': judge_assigned,
         'webcast_list': webcast_list,
+        'badge_list': badge_list,
     })
 
 

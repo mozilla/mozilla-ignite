@@ -87,9 +87,17 @@
         <aside class="col box">
           {% if webcast_list %}
           <section>
-            <h2>Upcoming</h2>
+            <h2>Upcoming webcast</h2>
             {% for webcast in webcast_list %}
             <p>Webcast on {{ webcast.start_date }}.</p>
+            {% endfor%}
+          </section>
+          {% endif %}
+          {% if badge_list %}
+          <section>
+            <h2>Badges awarded</h2>
+            {% for object in badge_list %}
+            <p>{{ object.badge.badge_type }} {{ object.text }}</p>
             {% endfor%}
           </section>
           {% endif %}

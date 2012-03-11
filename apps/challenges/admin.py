@@ -8,6 +8,7 @@ from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
                                PhaseCriterion, PhaseRound)
+from badges.models import SubmissionBadge
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -55,17 +56,20 @@ class PhaseAdmin(admin.ModelAdmin):
     inlines = (PhaseCriterionInline,)
 
 
+class SubmissionBadgeInline(admin.TabularInline):
+    model = SubmissionBadge
+
+
 class SubmissionAdmin(admin.ModelAdmin):
-    
     model = Submission
     list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
                     'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
     list_filter = ('category', 'is_draft', 'is_winner')
     list_select_related = True  # For the judgement fields
-    
-    inlines = (JudgeAssignmentInline, ExclusionFlagInline)
-    
+    inlines = (JudgeAssignmentInline, ExclusionFlagInline,
+               SubmissionBadgeInline)
+
     def judge_assignment(self, submission):
         """Return the names of all judges assigned to this submission."""
         assignments = submission.judgeassignment_set.all()
