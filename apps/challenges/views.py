@@ -264,7 +264,8 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # triggered here to cache it
     webcast_list = entry.timeslot_set.filter(is_booked=True)
     # Cache the awarded badges
-    badge_list = entry.submissionbadge_set.select_related('badge').all()
+    badge_list = (entry.submissionbadge_set.select_related('badge')
+                  .filter(is_published=True))
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,

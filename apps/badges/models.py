@@ -6,8 +6,14 @@ from django_extensions.db.fields import CreationDateTimeField
 class Badge(models.Model):
     """``Badges`` to be awarded"""
     GREEN_LIT = 'green-lit'
+    FUNDED_1 = 'funded-1'
+    FUNDED_2 = 'funded-2'
+    FUNDED_3 = 'funded-3'
     BADGE_CHOICES = (
         (GREEN_LIT, _('Green lit')),
+        (FUNDED_1, _('Funded in Round 1')),
+        (FUNDED_2, _('Funded in Round 2')),
+        (FUNDED_3, _('Funded in Round 3')),
         )
     badge_type = models.CharField(choices=BADGE_CHOICES, max_length=50)
     body = models.CharField(blank=True, max_length=255)
@@ -21,6 +27,7 @@ class SubmissionBadge(models.Model):
     badge = models.ForeignKey('badges.Badge')
     submission = models.ForeignKey('challenges.Submission')
     body = models.CharField(blank=True, max_length=255)
+    is_published = models.BooleanField(default=True)
     created_on = CreationDateTimeField()
 
     class Meta:
