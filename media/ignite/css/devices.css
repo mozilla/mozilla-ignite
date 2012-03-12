@@ -1,6 +1,7 @@
 .how .col ul {
     font-size: 12px;
     color: #5C5C5C;
+    line-height: 22px;
 }
 @font-face {
     font-family: MetaWebPro-Black;
@@ -33,14 +34,37 @@ address {
 aside {
     position: relative;
 }
-h1 {
+h1,
+.shout {
     margin-top: 0;
-    color: #333;
+    color: #2e2e2d;
+    font-size: 48px;
+    font-weight: bold;
+    margin-bottom: 0.5em;
 }
-h2 {
-    color: #333;
+h2,
+.announce {
+    color: #454545;
+    font-weight: normal;
+    font-size: 24px;
+}
+h3,
+.exclaim {
+    color: #2e2e2d;
     font-weight: bold;
     font-size: 24px;
+}
+h4,
+.point {
+    font-size: 18px;
+    color: #2e2e2d;
+    font-weight: bold;
+}
+h5,
+.wimper {
+    color: #454545;
+    font-size: 14px;
+    font-weight: bold;
 }
 figure img {
     width: 100%;
@@ -49,16 +73,30 @@ figure img {
 p {
     margin-top: 0;
     font-size: 12px;
+    line-height: 22px;
     color: #5c5c5c;
 }
-p.intro {
+p.page-intro {
+    color: #2e2e2d;
+    font-size: 24px;
+    line-height: 30px;
+}
+p.intro,
+.faq p {
     font-size: 18px;
-    line-height: 28px;
-    color: #454545;
-    margin-bottom: 2em;
+    line-height: 30px;
+    color: #5c5c5c;
+}
+.cf:before,
+.cf:after {
+    content:"";
+    display:table;
+}
+
+.cf:after {
+    clear:both;
 }
 .banner {
-    border-bottom: 1px solid #C7DDEB;
     text-align: center;
     padding: 1em 10px;
     font-size: 24px;
@@ -77,6 +115,7 @@ figcaption {
     font-size: 12px;
     text-align: center;
     margin-top: -30px;
+    margin-bottom: 2em;
 }
 figcaption .fig_title {
     color: #ED4619;
@@ -89,18 +128,6 @@ figcaption .fig_title span {
     background: #fff;
     display: inline-block;
     padding: 0 10px;
-}
-.shout {
-    font-size: 30px;
-    color: #333;
-    line-height: 0.9;
-    font-weight: bold;
-    margin-bottom: 0.5em;
-}
-.announce {
-    font-size: 20px;
-    color: #333;
-    font-weight: bold;
 }
 .shout + .announce {
     margin-top: 0;
@@ -785,6 +812,7 @@ h1 .sweet em {
     background: #f1f1f1;
     border-top: 1px solid #e2e2e2;
     margin-bottom: 2em;
+    border-radius: 0 0 10px 10px;
 }
 #about .highlight + .highlight {
     margin-top: -2em;
@@ -792,9 +820,9 @@ h1 .sweet em {
 fieldset.highlight {
     padding-top: 60px;
 }
-.highlight h2, 
-.highlight h3 {
+.highlight .box-title {
     margin-top: 0;
+    color: #2E2E2D !important;
 }
 .highlight ul {
     padding-left: 0;
@@ -904,6 +932,17 @@ fieldset .focus_areas ul {
 #about .entre section:first-child {
     border-top: 0;
 }
+/* how section */
+.how .questions h3 {
+    border-top: 1px solid #C7DDEB;
+    padding-top: 3em;
+}
+.how .questions h4,
+.what .columns h3,
+.tech .columns h3,
+.faq h3 {
+    color: #ed4619;
+}
 /* process diagram */
 .process {
     overflow: hidden;
@@ -943,17 +982,19 @@ fieldset .focus_areas ul {
     float: left;
     border-top: none !important;
     text-align: left;
-    width: 20%;
+    width: 18%;
+}
+.ideation {
+    margin-right: 3%;
 }
 .development {
-    float: right;
     width: 75%;
     position: relative;
     padding-bottom: 6em;
     background: transparent url(../img/css/infographic_arrow.png) no-repeat 40px 80%;
 }
-.rounds h3 {
-    font-size: 14px;
+.rounds .wimper {
+    color: #878686;
 }
 .all {
     overflow: hidden;
@@ -1005,14 +1046,14 @@ fieldset .focus_areas ul {
 }
 .round strong em {
     display: block;
-    font-weight: bold;
     font-style: normal;
     font-size: 36px;
     margin: 0 auto;
     width: 20px;
 }
 .ideation .round strong {
-    font-size: 20px;
+    font-size: 18px;
+    line-height: 24px;
     width: 70px;
 }
 .round .ribbon {
@@ -1021,8 +1062,8 @@ fieldset .focus_areas ul {
     font-size: 14px;
     text-align: right;
     display: inline-block;
-    padding: 10px 10px 10px 26px;
-    margin-left: 20px;
+    padding: 5px 10px 5px 26px;
+    float: right;
     margin-right: -14px;
     margin-bottom: 1em;
     position: relative;
@@ -1033,9 +1074,9 @@ fieldset .focus_areas ul {
     position: absolute;
     width: 0;
     height: 0;
-    border-top: 18px solid transparent;
-    border-bottom: 18px solid transparent;
-    border-left: 18px solid #fff;
+    border-top: 13px solid transparent;
+    border-bottom: 13px solid transparent;
+    border-left: 13px solid #fff;
     top: 0;
     left: 0;
 }
@@ -1055,7 +1096,9 @@ fieldset .focus_areas ul {
     padding: 10px;
     color: #ED4619;
     font-style: normal;
-     border-top: 1px solid #bfdcec;
+    border-top: 1px solid #bfdcec;
+    font-size: 14px;
+    text-align: center;
 }
 #public-safety:target,
 #education:target,
@@ -1066,11 +1109,20 @@ fieldset .focus_areas ul {
     border: 1px solid #f1c378;
     border-radius: 4px;
 }
+.build .columns {
+    border-bottom: 1px solid #C7DDEB;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+}
+.build .columns:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
 .build h3 {
     margin: 0;
-    padding: 1em 0 1em 90px;
+    padding: 2em 0 2em 90px;
     background: transparent url(../img/css/emergency-prep.png) no-repeat 0 0;
-    min-height: 40px;
+    color: #ed4619;
 }
 #education h3 {
     background-image: url(../img/css/education.png);
@@ -1085,9 +1137,23 @@ fieldset .focus_areas ul {
     background-image: url(../img/css/manufacturing.png);
 }
 .build .highlight h3 {
-    padding-left: 0;
+    padding: 0 0 1em;
     background: none;
-    min-height: 0;
+    color: #2E2E2D;
+}
+.faq {
+    padding-left: 0;
+    list-style-type: none;
+}
+.faq li {
+    border-bottom: 1px solid #C7DDEB;
+    padding-bottom: 2em;
+    margin-bottom: 2em;
+}
+.faq li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
 }
 section footer {
     padding: 1em 0;
