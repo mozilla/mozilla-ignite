@@ -558,15 +558,31 @@ class PhaseRound(models.Model):
 class SubmissionParent(models.Model):
     """Acts as a proxy for the ``Submissions`` so we can keep them versioned"""
     name = models.CharField(max_length=255)
-    slug = models.SlugField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
     created = CreationDateTimeField()
     modified = ModificationDateTimeField()
     is_featured = models.BooleanField(default=False)
     submission = models.ForeignKey('challenges.Submission')
 
+    class Meta:
+        ordering = ('-created',)
+
     def __unicode__(self):
         return u'Project: %s' % self.name
 
+    def save(self, *args, **kwargs):
+        """Set slug and name from the ``Submission``"""
+        if not self.slug:
+            self.slug = self.submission.id
+        if not self.name:
+            self.name = self.submission.title
+        super(SubmissionParent, self).save(*args, **kwargs)
+
+    def update_version(self, submission):
+        """Updates the current ``SubmissionParent`` version"""
+        self.submissionversion_set.create(submission=self.submission)
+        self.submission = submission
+        self.save()
 
 class SubmissionVersion(models.Model):
     """Keeps track of the version of a given ``Submission``"""

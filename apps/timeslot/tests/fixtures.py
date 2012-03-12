@@ -3,7 +3,7 @@ from django.contrib.admin.models import User
 
 from timeslot.models import Release
 from challenges.models import (Submission, Phase, Challenge, Category,
-                               Project, PhaseRound)
+                               Project, PhaseRound, SubmissionParent)
 
 
 def create_project(slug, extra_data=None):
@@ -82,6 +82,7 @@ def create_submission(title, profile, phase, extra_data=None):
     if extra_data:
         data.update(extra_data)
     instance, created = Submission.objects.get_or_create(**data)
+    SubmissionParent.objects.get_or_create(submission=instance)
     return instance
 
 

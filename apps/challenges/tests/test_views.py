@@ -15,7 +15,8 @@ import test_utils
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
-from challenges.models import Challenge, Submission, Phase, Category, ExternalLink
+from challenges.models import (Challenge, Submission, Phase, Category,
+                               ExternalLink, SubmissionParent)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions)
 from ignite.tests.decorators import ignite_skip
@@ -272,7 +273,7 @@ def test_wrong_project():
 
 class ShowEntryTest(test_utils.TestCase):
     """Test functionality of the single entry view."""
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
@@ -284,14 +285,15 @@ class ShowEntryTest(test_utils.TestCase):
                                       created_by=alex_profile,
                                       category=Category.objects.get())
         s.save()
-        
+        # Entries require a SubmissionParent which acts as a proxy for versions
+        SubmissionParent.objects.create(submission=s)
         self.submission_path = s.get_absolute_url()
-    
+
     @suppress_locale_middleware
     def test_show_entry(self):
         response = self.client.get(self.submission_path)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_entry_not_found(self):
         # Get an ID that doesn't exist

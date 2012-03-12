@@ -194,9 +194,7 @@ def create_entry(request, project, slug):
                         submission = entry
                     )
             # create the ``SubmissionParent`` for this entry
-            SubmissionParent.objects.create(name=entry.title,
-                                            slug=entry.id,
-                                            submission=entry)
+            SubmissionParent.objects.create(submission=entry)
             if entry.is_draft:
                 msg = _('<strong>Your entry has been saved as draft.</strong>'
                         ' When you want the world to see it then uncheck the '
@@ -221,15 +219,23 @@ def create_entry(request, project, slug):
 
 
 def entry_show(request, project, slug, entry_id, judging_form=None):
-    """Detail of an idea, show any related information to this"""
-    project = get_object_or_404(Project, slug=project)
-    challenge = get_object_or_404(project.challenge_set, slug=slug)
-    entry = get_object_or_404(Submission.objects, pk=entry_id,
-                              phase__challenge=challenge)
-    
+    """Detail of an idea, show any related information to it"""
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    project = challenge.project
+    # SubmissionParent acts as an proxy for any of the revisions.
+    # and it only shows the current revision
+    try:
+        parent = (SubmissionParent.objects.select_related('submission')
+                  .get(slug=entry_id, submission__phase__challenge=challenge))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+    entry = parent.submission
     if not entry.visible_to(request.user):
         raise Http404
-    
     # Sidebar
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)

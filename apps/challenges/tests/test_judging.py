@@ -316,7 +316,6 @@ class JudgingViewTest(MessageTestCase):
         for criterion in submission.phase.judgement_criteria.all():
             JudgingAnswer.objects.create(judgement=judgement,
                                          criterion=criterion, rating=1)
-        
         response = self.client.get(submission.get_absolute_url())
         judging_form = response.context['judging_form']
         post_data = {'notes': 'I actually quite like this submission.'}
