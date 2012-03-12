@@ -23,7 +23,7 @@ from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
-                               JudgeAssignment)
+                               JudgeAssignment, SubmissionVersion)
 from projects.models import Project
 
 challenge_humanised = {
@@ -216,6 +216,30 @@ def create_entry(request, project, slug):
         'link_form': link_form,
         'errors': form_errors
     })
+
+
+def entry_version(request, project, slug, entry_id):
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    # Submisison is on the Parent
+    try:
+        parent = (SubmissionParent.objects
+                  .get(submission__id=entry_id,
+                       submission__phase__challenge=challenge))
+        return HttpResponseRedirect(parent.get_absolute_url())
+    except SubmissionParent.DoesNotExist:
+        pass
+    # Submission was versioned and has a new SubmissionParent
+    try:
+        version = (SubmissionVersion.objects.select_related('submission_list')
+                   .get(submission__id=entry_id,
+                        submission__phase__challenge=challenge))
+    except SubmissionVersion.DoesNotExist:
+        raise Http404
+    return HttpResponseRedirect(version.parent.get_absolute_url())
 
 
 def entry_show(request, project, slug, entry_id, judging_form=None):

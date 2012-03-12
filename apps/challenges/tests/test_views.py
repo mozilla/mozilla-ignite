@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.messages import SUCCESS
+from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
@@ -277,21 +278,31 @@ class ShowEntryTest(test_utils.TestCase):
     def setUp(self):
         challenge_setup()
         create_users()
-        alex_profile = User.objects.get(username='alex').get_profile()
-        s = Submission.objects.create(phase=Phase.objects.get(),
-                                      title='A submission',
-                                      brief_description='My submission',
-                                      description='My wonderful submission',
-                                      created_by=alex_profile,
-                                      category=Category.objects.get())
-        s.save()
+        self.alex_profile = User.objects.get(username='alex').get_profile()
+        s = self.create_submission()
+        self.submission = s
         # Entries require a SubmissionParent which acts as a proxy for versions
-        SubmissionParent.objects.create(submission=s)
+        self.parent = SubmissionParent.objects.create(submission=s)
         self.submission_path = s.get_absolute_url()
+
+    def create_submission(self, **kwargs):
+        """Helper to create a ``Submission``"""
+        defaults = {
+            'phase': Phase.objects.get(),
+            'title': 'A submission',
+            'brief_description': 'My submission',
+            'description': 'My wonderful submission',
+            'created_by': self.alex_profile,
+            'category': Category.objects.get()
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
 
     @suppress_locale_middleware
     def test_show_entry(self):
-        response = self.client.get(self.submission_path)
+        url = reverse('entry_show', args=[self.submission.id])
+        response = self.client.get(url)
         assert_equal(response.status_code, 200)
 
     @suppress_locale_middleware
@@ -302,10 +313,35 @@ class ShowEntryTest(test_utils.TestCase):
         response = self.client.get(bad_path)
         assert_equal(response.status_code, 404, response.content)
 
+    @suppress_locale_middleware
+    def test_old_versioned_entry(self):
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        response = self.client.get(self.submission_path)
+        assert_equal(response.status_code, 200)
+        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+
+    @suppress_locale_middleware
+    def test_new_versioned_entry(self):
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        response = self.client.get(new_submission.get_absolute_url())
+        assert_equal(response.status_code, 200)
+        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+
+    @suppress_locale_middleware
+    def test_failed_versioned_entry(self):
+        """New versioned entries shouldn't change the url"""
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        url = reverse('entry_show', args=[new_submission.id])
+        response = self.client.get(url)
+        assert_equal(response.status_code, 404)
+
 
 class EditEntryTest(MessageTestCase):
     """Test functionality of the edit entry view."""
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
@@ -538,3 +574,4 @@ class DeleteEntryTest(MessageTestCase):
         assert_equal(Submission.objects.count(), 0)
         
         self.assertSuccessMessage(response)
+        

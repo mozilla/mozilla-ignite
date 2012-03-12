@@ -44,6 +44,11 @@ urlpatterns = patterns('',
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )
 
+urlpatterns += patterns(
+    'challenges.views',
+    url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
+        kwargs=_ignite_kwargs, name='entry_version'),
+    )
 
 urlpatterns += patterns(
     '',

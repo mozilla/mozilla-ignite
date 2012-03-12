@@ -140,6 +140,9 @@ class SubmissionVersionInline(admin.TabularInline):
 
 class SubmissionParentAdmin(admin.ModelAdmin):
     inlines = [SubmissionVersionInline]
+    list_display = ['name', 'submission', 'slug', 'is_featured']
+    list_filter = ['is_featured']
+    search_fields = ['name', 'submission__title', 'slug']
 
 
 admin.site.unregister(User)

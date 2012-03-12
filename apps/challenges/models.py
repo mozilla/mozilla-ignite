@@ -293,7 +293,7 @@ class Submission(BaseModel):
     def get_image_src(self):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
-        return path(self.sketh_note) or path('img/project-default.gif')    
+        return path(self.sketh_note) or path('img/project-default.gif')
     
     def __unicode__(self):
         return self.title
@@ -314,11 +314,27 @@ class Submission(BaseModel):
             kwargs.update({'project': self.challenge.project.slug,
                            'slug': self.challenge.slug})
             return reverse(view_name, kwargs=kwargs)
-    
+
+    @property
+    def parent_slug(self):
+        parent_list = self.submissionparent_set.all()
+        if parent_list:
+            return parent_list[0].slug
+        # Fallback to the versioning list, this query is expensive.
+        # Provided for consistency
+        version_list = self.submissionversion_set.select_related('parent').all()
+        if version_list:
+            return version_list[0].parent.slug
+        return None
+
     def get_absolute_url(self):
         """Return this submission's URL."""
-        return self._lookup_url('entry_show', {'entry_id': self.id})
-    
+        return self._lookup_url('entry_show', {'entry_id': self.parent_slug})
+
+    def get_version_url(self):
+        """Return this submission's URL."""
+        return self._lookup_url('entry_version', {'entry_id': self.id})
+
     def get_edit_url(self):
         """Return the URL to edit this submission."""
         return self._lookup_url('entry_edit', {'pk': self.id})
@@ -577,6 +593,10 @@ class SubmissionParent(models.Model):
         if not self.name:
             self.name = self.submission.title
         super(SubmissionParent, self).save(*args, **kwargs)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('entry_show', [self.slug])
 
     def update_version(self, submission):
         """Updates the current ``SubmissionParent`` version"""

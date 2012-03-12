@@ -405,17 +405,42 @@ class SubmissionParentTest(TestCase):
         self.assertEqual(parent.slug, submission.id)
         self.assertEqual(parent.name, submission.title)
 
-    def test_update_parent(self):
-        submission_a = self.create_submission(title='a')
-        submission_b = self.create_submission(title='b')
-        parent = SubmissionParent.objects.create(submission=submission_a)
-        parent.update_version(submission_b)
-        # check the history
+
+class SubmissionParentVersioningTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+        self.submission_a = self.create_submission(title='a')
+        self.submission_b = self.create_submission(title='b')
+        self.parent = SubmissionParent.objects.create(submission=self.submission_a)
+
+    def create_submission(self, **kwargs):
+        defaults = {
+            'title': 'Title',
+            'brief_description': 'A submission',
+            'description': 'A really good submission',
+            'phase': self.phase,
+            'created_by': self.created_by,
+            'category': self.category,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+    def test_update_parent_history(self):
+        self.parent.update_version(self.submission_b)
         submission_versions = SubmissionVersion.objects.all()
         self.assertEqual(len(submission_versions), 1)
         submission_version = submission_versions[0]
-        self.assertEqual(submission_version.submission, submission_a)
-        self.assertEqual(parent.submission, submission_b)
-        # check the values on the parent
-        self.assertEqual(parent.slug, submission_a.id)
-        self.assertEqual(parent.name, submission_a.title)
+        self.assertEqual(submission_version.submission, self.submission_a)
+        self.assertEqual(self.parent.submission, self.submission_b)
+
+    def test_update_parent_values(self):
+        self.parent.update_version(self.submission_b)
+        self.assertEqual(self.parent.submission, self.submission_b)
+        self.assertEqual(self.parent.slug, self.submission_a.id)
+        self.assertEqual(self.parent.name, self.submission_a.title)
