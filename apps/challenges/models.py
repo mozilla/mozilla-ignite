@@ -16,6 +16,7 @@ from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
 from django_extensions.db.fields import (AutoSlugField,
+                                         CreationDateTimeField,
                                          ModificationDateTimeField)
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
@@ -552,3 +553,29 @@ class PhaseRound(models.Model):
             now > self.start_date,
             now < self.end_date,
             ])
+
+
+class SubmissionParent(models.Model):
+    """Acts as a proxy for the ``Submissions`` so we can keep them versioned"""
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255)
+    created = CreationDateTimeField()
+    modified = ModificationDateTimeField()
+    is_featured = models.BooleanField(default=False)
+    submission = models.ForeignKey('challenges.Submission')
+
+    def __unicode__(self):
+        return u'Project: %s' % self.name
+
+
+class SubmissionVersion(models.Model):
+    """Keeps track of the version of a given ``Submission``"""
+    submission = models.ForeignKey('challenges.Submission')
+    parent = models.ForeignKey('challenges.SubmissionParent')
+    created = CreationDateTimeField()
+
+    class Meta:
+        unique_together = (('submission', 'parent'),)
+
+    def __unicode__(self):
+        return u'Version for %s on %s' % (self.submission, self.created)

@@ -22,7 +22,7 @@ from commons.helpers import get_page
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
-                               ExternalLink, Judgement, JudgingCriterion,
+                               ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment)
 from projects.models import Project
 
@@ -166,13 +166,12 @@ def extract_form_errors(form, link_form):
 
 @login_required
 def create_entry(request, project, slug):
+    """Creates a ``Submission`` from the user details"""
     project = get_object_or_404(Project, slug=project)
-    
     try:
         phase = Phase.objects.get_current_phase(slug)[0]
     except IndexError:
         raise Http404
-    
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
@@ -194,6 +193,10 @@ def create_entry(request, project, slug):
                         url = link['url'],
                         submission = entry
                     )
+            # create the ``SubmissionParent`` for this entry
+            SubmissionParent.objects.create(name=entry.title,
+                                            slug=entry.id,
+                                            submission=entry)
             if entry.is_draft:
                 msg = _('<strong>Your entry has been saved as draft.</strong>'
                         ' When you want the world to see it then uncheck the '
@@ -248,7 +251,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-    
+
     # Judging
     if not entry.judgeable_by(request.user):
         judging_form = None
