@@ -21,7 +21,7 @@
 {% block content %}   
 {% block greeting %}
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
-<p class="announce">{{ _("Congratulations! You've taken the first setp towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
+<p class="page-intro">{{ _("Congratulations! You've taken the first setp towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
 {% endblock %}
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
