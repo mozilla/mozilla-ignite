@@ -534,9 +534,7 @@ legend span {
     background: #f1f1f1;
 }
 .lists .tags a.current {
-    color: #5C5C5C;
-    font-weight: bold;
-    font-size: 14px;
+    color: #454545;
 }
 .lists .tags ul li:first-child a {
     border-top: none;
@@ -1237,23 +1235,20 @@ section footer .cta {
     float: left;
     list-style-type: none;
     margin-top: 0;
-    font-size: 14px;
 }
 .pagination a {
-    font-size: 14px;
-    font-family: Arial;
     float: left;
     background: none;
     text-transform: none;
     display: block;
     padding: 2px 4px;
+    line-height: 1.5;
 }
 .pagination span {
     background: #EF4619;
     color: #fff;
     padding: 2px 4px;
     display: block;
-    font-size: 11px;
     margin: 0 5px;
     line-height: 1.5;
 }
