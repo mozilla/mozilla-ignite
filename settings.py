@@ -372,3 +372,9 @@ PAGINATOR_SIZE = 25
 
 # Judge permission
 JUDGE_PERMISSION = 'judge_submission'
+
+MIDDLEWARE_URL_EXCEPTIONS = [
+    '/__debug__/',
+    '/admin/',
+    MEDIA_URL,
+    ]

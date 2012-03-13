@@ -102,9 +102,13 @@ class PhaseManager(BaseModelManager):
 
     def get_current_phase(self, slug):
         now = datetime.utcnow()
-        return self.filter(challenge__slug=slug,
-                           start_date__lte=now,
-                           end_date__gte=now)
+        try:
+            return self.filter(challenge__slug=slug,
+                               start_date__lte=now,
+                               end_date__gte=now)[0]
+        except IndexError:
+            return None
+
 
     def get_ideation_phase(self):
         """Returns the ``Ideation`` phase"""
@@ -140,41 +144,44 @@ def has_phase_finished(phase):
 
 class Phase(BaseModel):
     """A phase of a challenge."""
-    objects = PhaseManager()
-    
     challenge = models.ForeignKey(Challenge, related_name='phases')
     name = models.CharField(max_length=100)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'),
                                       default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'),
                                     default=in_six_months)
-
-    
-    def natural_key(self):
-        return self.challenge.natural_key() +  (self.name,)
-    
-    natural_key.dependencies = ['challenges.challenge']
-    
     order = models.IntegerField()
-    
-    def days_remaining(self):
-        return self.end_date - datetime.utcnow()
-    
+
+    # managers
+    objects = PhaseManager()
+
+    class Meta:
+        unique_together = (('challenge', 'name'),)
+        ordering = ('order',)
+
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.challenge.title)
+
+    def natural_key(self):
+        return self.challenge.natural_key() +  (self.name,)
+    natural_key.dependencies = ['challenges.challenge']
+
+    @cached_property
+    def days_remaining(self):
+        return self.end_date - datetime.utcnow()
+
+    @cached_property
+    def phase_rounds(self):
+        return self.phaseround_set.all()
 
     @cached_property
     def current_round(self):
         """Determines the current round for this ``Phase``"""
         now = datetime.utcnow()
-        round_list = self.phaseround_set.filter(start_date__lte=now,
-                                                end_date__gte=now)
-        return round_list[0] if round_list else None
-
-    
-    class Meta:
-        unique_together = (('challenge', 'name'),)
-        ordering = ('order',)
+        for item in self.phase_rounds:
+            if item.start_date <= now and item.end_date >= now:
+                return item
+        return None
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -563,13 +570,14 @@ class PhaseRound(models.Model):
     def __unicode__(self):
         return u'%s: %s' % (self.phase, self.name)
 
-    @property
+    @cached_property
     def is_active(self):
         now = datetime.utcnow()
-        return all([
-            now > self.start_date,
-            now < self.end_date,
-            ])
+        return all([now > self.start_date, now < self.end_date])
+
+    @cached_property
+    def days_remaining(self):
+        return self.end_date - datetime.utcnow()
 
 
 class SubmissionParent(models.Model):

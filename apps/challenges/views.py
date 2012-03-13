@@ -80,6 +80,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
         category = False
+
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -87,7 +88,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
-        'days_remaining': challenge.phases.get_current_phase(slug)[0].days_remaining().days
+        'days_remaining': request.phase['days_remaining']
     })
 
 
