@@ -18,6 +18,7 @@ from django.views.generic.edit import ProcessFormView, UpdateView, \
 import jingo
 from tower import ugettext as _
 from voting.models import Vote
+from badges.models import SubmissionBadge
 from commons.helpers import get_page
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
@@ -298,14 +299,14 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         assignments = JudgeAssignment.objects
         judge_assigned = assignments.filter(judge__user=request.user,
                                             submission=entry).exists()
-
-    # Determine if this idea has a timeslot allocated for the webcast
-    # triggered here to cache it
-    # Cache the awarded badges
-    badge_list = (entry.submissionbadge_set.select_related('badge')
-                  .filter(is_published=True))
+    # Use all the submission ids to sumarize any information required for the
+    # project homepage
     submission_ids = list(parent.submissionversion_set.all()
                       .values_list('submission__id', flat=True)) + [entry.id]
+    # Cache the awarded badges
+    badge_list = (SubmissionBadge.objects.select_related('badge')
+                  .filter(is_published=True, submission__in=submission_ids))
+    # Cache webcast list
     webcast_list = TimeSlot.objects.filter(is_booked=True,
                                            submission__in=submission_ids)
     return jingo.render(request, 'challenges/show_entry.html', {
