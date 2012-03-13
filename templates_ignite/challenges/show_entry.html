@@ -25,13 +25,16 @@
 {% block content %} 
     <a href="{{ url('entries_all') }}" class="back">See all submissions</a>
     <article>
-        <h1 class="shout">{{ entry.title }}</h1> 
+      <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
+            {% if entry.needs_booking %}
+            <li><a href="{{ url('timeslot:object_list', entry_id=entry.id) }}" class="cta do">Book a timeslot</a></li>
+            {% endif %}
         {% else %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>
@@ -82,6 +85,23 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
+          {% if webcast_list %}
+          <section>
+            <h2>Upcoming webcast</h2>
+            {% for webcast in webcast_list %}
+            <p>Webcast on {{ webcast.start_date }}.</p>
+            {% endfor%}
+          </section>
+          {% endif %}
+          {% if badge_list %}
+          <section>
+            <h2>Badges awarded</h2>
+            {% for object in badge_list %}
+            <p>{{ object.badge.badge_type }} {{ object.text }}</p>
+            {% endfor%}
+          </section>
+          {% endif %}
+
             {% if judging_form %}
             <section>
                 {% if excluded %}

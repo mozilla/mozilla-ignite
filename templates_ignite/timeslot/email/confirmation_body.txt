@@ -1,0 +1,5 @@
+Hello,
+
+You have successfully booked a timeslot
+
+The Mozilla Ignite Team

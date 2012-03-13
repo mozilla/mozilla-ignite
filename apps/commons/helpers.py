@@ -66,3 +66,12 @@ def _urlencode(items):
 def urlencode(txt):
     """Url encode a path."""
     return urllib.quote_plus(txt)
+
+
+def get_page(data):
+    """Determines the page number"""
+    try:
+        page = int(data.get('page', '1'))
+    except (ValueError, TypeError):
+        page = 1
+    return page

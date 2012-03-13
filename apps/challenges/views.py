@@ -18,7 +18,7 @@ from django.views.generic.edit import ProcessFormView, UpdateView, \
 import jingo
 from tower import ugettext as _
 from voting.models import Vote
-
+from commons.helpers import get_page
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
@@ -65,22 +65,15 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     if category:
         entry_set = entry_set.filter(category__name=category)
     paginator = Paginator(entry_set, 6)
-
-    try:
-        page = int(request.GET.get('page', '1'))
-    except (ValueError, TypeError):
-        page = 1
-
+    page = get_page(request.GET)
     try:
         entries = paginator.page(page)
     except (EmptyPage, InvalidPage):
         entries = paginator.page(paginator.num_pages)
-
     try:
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
         category = False
-
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -182,7 +175,7 @@ def create_entry(request, project, slug):
     
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
-    form_errors = False 
+    form_errors = False
     if request.method == 'POST':
         form = EntryForm(data=request.POST,
             files=request.FILES)
@@ -191,18 +184,23 @@ def create_entry(request, project, slug):
             entry = form.save(commit=False)
             entry.created_by = profile
             entry.phase = phase
+            if phase.current_round:
+                entry.phase_round = phase.current_round
             entry.save()
             for link in link_form.cleaned_data:
-                if all(i in link for i in ("name", "url")): 
+                if all(i in link for i in ("name", "url")):
                     ExternalLink.objects.create(
                         name = link['name'],
                         url = link['url'],
                         submission = entry
                     )
             if entry.is_draft:
-                msg = _('<strong>Your entry has been saved as draft.</strong> When you want the world to see it then uncheck the "Save as draft?" option from your idea editting page')
+                msg = _('<strong>Your entry has been saved as draft.</strong>'
+                        ' When you want the world to see it then uncheck the '
+                        '"Save as draft?" option from your idea editting page')
             else:
-                msg = _('Your entry has been posted successfully and is now available for public review')
+                msg = _('Your entry has been posted successfully and is now '
+                        'available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_entries_url())
         else:
@@ -220,6 +218,7 @@ def create_entry(request, project, slug):
 
 
 def entry_show(request, project, slug, entry_id, judging_form=None):
+    """Detail of an idea, show any related information to this"""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
@@ -232,7 +231,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
-    
+
     ## Previous/next modules
     # We can't use Django's built-in methods here, because we need to restrict
     # to entries the current user is allowed to see
@@ -260,7 +259,13 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         assignments = JudgeAssignment.objects
         judge_assigned = assignments.filter(judge__user=request.user,
                                             submission=entry).exists()
-    
+
+    # Determine if this idea has a timeslot allocated for the webcast
+    # triggered here to cache it
+    webcast_list = entry.timeslot_set.filter(is_booked=True)
+    # Cache the awarded badges
+    badge_list = (entry.submissionbadge_set.select_related('badge')
+                  .filter(is_published=True))
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -273,6 +278,8 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'excluded': entry.exclusionflag_set.exists(),
         'judging_form': judging_form,
         'judge_assigned': judge_assigned,
+        'webcast_list': webcast_list,
+        'badge_list': badge_list,
     })
 
 

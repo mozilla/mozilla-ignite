@@ -1,10 +1,12 @@
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink, Category, \
-                              Judgement, JudgingCriterion, JudgingAnswer
+from challenges.models import (Submission, ExternalLink, Category,
+                               Judgement, JudgingCriterion, JudgingAnswer,
+                               PhaseRound)
 from challenges.widgets import CustomRadioSelect
 
 
@@ -187,3 +189,49 @@ class MinMaxIntegerField(forms.IntegerField):
     
     def widget_attrs(self, widget):
         return {'min': self.min_value, 'max': self.max_value}
+
+
+class PhaseRoundAdminForm(forms.ModelForm):
+    """Form for validating the ``PhaseRound`` dates"""
+
+    class Meta:
+        model = PhaseRound
+
+    def clean(self):
+        """Validate that
+        - The round dates don't overlap
+        - The round is inside the phase they are associated
+        """
+        data = self.cleaned_data
+        # ignore non_field_errors if the required fields are not in
+        # self.cleaned_data
+        if not all(k in data for k in ('start_date', 'end_date', 'phase')):
+            return data
+        start_date = data['start_date']
+        end_date = data['end_date']
+        phase = data['phase']
+        if end_date < start_date:
+            raise forms.ValidationError('Start date must be before the end date')
+        # Selected phase should contain the PhaseRound
+        if not all([phase.start_date <= start_date,
+                    phase.end_date >= end_date]):
+            raise forms.ValidationError('Dates should be inside the %s phase.'
+                                        ' Between  %s and %s' % \
+                                        (phase.name, phase.start_date,
+                                         phase.end_date))
+        # PhaseRound shouldn't overlap
+        query_args = []
+        if self.instance.id:
+            # this may be an update avoid it if so
+            query_args = [~Q(id=self.instance.id)]
+        # Make sure the dates don't overlap, are contained or contain other
+        # rounds
+        if PhaseRound.objects.filter(
+                (Q(start_date__lte=start_date) & Q(end_date__gte=start_date)) |
+                (Q(start_date__lte=end_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__lte=start_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__gte=start_date) & Q(end_date__lte=end_date)),
+                *query_args):
+            raise forms.ValidationError('This round dates overlap with other '
+                                        'rounds')
+        return self.cleaned_data

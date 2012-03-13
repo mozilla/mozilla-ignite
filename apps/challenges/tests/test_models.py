@@ -12,7 +12,7 @@ from mock import Mock, patch
 from projects.models import Project
 from challenges.models import (Challenge, Submission, Phase, Category,
                               ExclusionFlag, Judgement, JudgingCriterion,
-                              PhaseCriterion)
+                              PhaseCriterion, PhaseRound)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users)
 from ignite.tests.decorators import ignite_skip
@@ -344,3 +344,25 @@ class DraftSubmissionTest(TestCase):
         assert self.draft_submission in Submission.objects.visible(user=alex)
         assert alex.has_perm('challenges.view_submission',
                              obj=self.draft_submission)
+
+
+def PhaseRoundTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        self.phase = Phase.objects.all()[0]
+
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submission]:
+            model.objects.all().delete()
+
+    def test_create_phase(self):
+        data = {
+            'name': 'Round A',
+            'phase': self.phase,
+            'start_date': datetime.utcnow(),
+            'end_date': datetime.utcnow() + relativedelta(hours=1),
+            }
+        phase = PhaseRound.objects.create(**data)
+        assert phase.slug, 'Slug missing on: %s' % phase
+        self.assertTrue(phase.is_active)

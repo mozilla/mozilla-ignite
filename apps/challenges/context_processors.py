@@ -1,4 +1,5 @@
-from challenges.models import Submission
+from challenges.models import Submission, has_phase_finished
+from django.conf import settings
 
 def assigned_submissions_processor(request):
     """Add the number of assigned submissions to the request context."""
@@ -16,3 +17,12 @@ def assigned_submissions_processor(request):
     assigned = (Submission.objects.filter(judgeassignment__judge=profile)
                                   .exclude(judgement__judge=profile))
     return {'assignment_count': assigned.count()}
+
+def current_phase(request):
+    """Add to the context the ``DEVELOPMENT_PHASE``is active
+    and if the ``IDEATION_PHASE`` has finished"""
+    return {
+        'IGNITE_SITE': settings.IGNITE_SITE,
+        'DEVELOPMENT_PHASE': settings.DEVELOPMENT_PHASE,
+        'IDEATION_PHASE': has_phase_finished(settings.IGNITE_IDEATION_NAME),
+        }

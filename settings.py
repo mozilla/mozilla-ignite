@@ -209,6 +209,7 @@ INSTALLED_APPS = (
     'commonware.response.cookies',
     'djcelery',
     'django_nose',
+    'django_extensions',
 
     # Django contrib apps
     'django.contrib.admin',
@@ -235,6 +236,8 @@ INSTALLED_APPS = (
     # Feed subscription
     'django_push.subscriber',
     'feeds',
+    # email queue
+    'django_mailer',
 
     # Feature flipping
     'waffle',
@@ -249,6 +252,10 @@ INSTALLED_APPS = (
     'challenges',
     'ignite',
     'voting',
+    'timeslot',
+    'webcast',
+    'resources',
+    'badges',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -318,7 +325,8 @@ PASSWORD_BLACKLIST = (
 AUTH_PROFILE_MODULE = 'users.Profile'
 
 # Email goes to the console by default.  s/console/smtp/ for regular delivery
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
@@ -346,3 +354,21 @@ CACHE_COUNT_TIMEOUT = None
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 JUDGES_PER_SUBMISSION = 2
+
+# Switch for the development phase
+DEVELOPMENT_PHASE = False
+
+
+# TimeSlot Booking
+# Time to expire the booking if not confirmed
+BOOKING_EXPIRATION = 5 * 60   # 5 minutes
+# Determines if the user throttling will be enabled
+BOOKING_THROTTLING = False
+# Email preferences
+BOOKING_SEND_EMAILS = True
+
+# Paginator
+PAGINATOR_SIZE = 25
+
+# Judge permission
+JUDGE_PERMISSION = 'judge_submission'

@@ -3,10 +3,12 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Q
 
+from challenges.forms import PhaseRoundAdminForm
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
-                               PhaseCriterion)
+                               PhaseCriterion, PhaseRound)
+from badges.models import SubmissionBadge
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -54,17 +56,20 @@ class PhaseAdmin(admin.ModelAdmin):
     inlines = (PhaseCriterionInline,)
 
 
+class SubmissionBadgeInline(admin.TabularInline):
+    model = SubmissionBadge
+
+
 class SubmissionAdmin(admin.ModelAdmin):
-    
     model = Submission
     list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
                     'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
     list_filter = ('category', 'is_draft', 'is_winner')
     list_select_related = True  # For the judgement fields
-    
-    inlines = (JudgeAssignmentInline, ExclusionFlagInline)
-    
+    inlines = (JudgeAssignmentInline, ExclusionFlagInline,
+               SubmissionBadgeInline)
+
     def judge_assignment(self, submission):
         """Return the names of all judges assigned to this submission."""
         assignments = submission.judgeassignment_set.all()
@@ -127,6 +132,13 @@ class ExclusionFlagAdmin(admin.ModelAdmin):
     list_display = ('submission', 'notes')
 
 
+class PhaseRoundAdmin(admin.ModelAdmin):
+    model = PhaseRound
+    form = PhaseRoundAdminForm
+    list_display = ['name', 'start_date', 'end_date', 'phase']
+    list_filter = ['phase__name']
+
+
 admin.site.unregister(User)
 admin.site.register(User, JudgeAwareUserAdmin)
 
@@ -140,3 +152,4 @@ admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
+admin.site.register(PhaseRound, PhaseRoundAdmin)

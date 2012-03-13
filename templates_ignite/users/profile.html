@@ -25,6 +25,45 @@
 {% if profile.bio %}
 <p>{{ profile.bio }}</p>
 {% endif %}
+
+
+{% if webcast_list  %}
+<h1>Webcasts of assigned submissions</h1>
+<ul class="">
+  {% for object in webcast_list %}
+  <li>
+    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title  }} on {{ object.start_date }}</a>
+  </li>
+  {% endfor%}
+</ul>
+{% endif %}
+
+
+
+{% if profile.user == user %}
+
+{% if submission_list %}
+<h2>Winning submissions waiting to be booked</h2>
+<p>You need to book a timeslot for these submissions</p>
+<ul>
+  {% for object in submission_list %}
+  <li><a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object }}</a></li>
+  {% endfor%}
+</ul>
+{% endif %}
+
+
+{% if booked_list %}
+<h2>Upcoming webcasts</h2>
+<p>your upcoming webcasts</p>
+<ul>
+  {% for object in booked_list %}
+  <li><a href="{{ object.submission.get_absolute_url() }}">{{ object }}</a></li>
+  {% endfor%}
+</ul>
+{% endif %}
+{% endif %}
+
 {% if submissions %}
 <h2>{{ _('Ideas') }}</h2>
 <ul class="columns">

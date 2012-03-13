@@ -5,18 +5,21 @@ from markdown import markdown
 
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
+from django.template.defaultfilters import slugify
 from django.db import models
 from django.db.models import signals
 from django.dispatch import receiver
 
-from tower import ugettext_lazy as _
-
-from challenges.lib import cached_bleach
+from challenges.lib import cached_bleach, cached_property
+from django_extensions.db.fields import (AutoSlugField,
+                                         ModificationDateTimeField)
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
+from tower import ugettext_lazy as _
 from users.models import Profile
 
 
@@ -92,27 +95,50 @@ class Challenge(BaseModel):
 
 
 class PhaseManager(BaseModelManager):
-    
+
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
     def get_current_phase(self, slug):
         now = datetime.utcnow()
-        return self.filter(
-            challenge__slug=slug
-        ).filter(
-            start_date__lte=now
-        ).filter(
-            end_date__gte=now
-        )
+        return self.filter(challenge__slug=slug,
+                           start_date__lte=now,
+                           end_date__gte=now)
 
+    def get_ideation_phase(self):
+        """Returns the ``Ideation`` phase"""
+        try:
+            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
+                            name=settings.IGNITE_IDEATION_NAME)
+        except self.model.DoesNotExist:
+            return None
+
+    def get_development_phase(self):
+        """Returns the ``Development`` phase"""
+        try:
+            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
+                            name=settings.IGNITE_DEVELOPMENT_NAME)
+        except self.model.DoesNotExist:
+            return None
 
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
 
+
+def has_phase_finished(phase):
+    """Helper to determine if the ``Ideation`` phase has finished"""
+    cache_key = '%s_END_DATE' % phase.upper()
+    end_date = cache.get(cache_key)
+    if not end_date:
+        phase = Phase.objects.get_ideation_phase()
+        cache.set(cache_key, end_date)
+        if not phase:
+            return False
+        end_date = phase.end_date
+    return datetime.utcnow() > end_date
+
 class Phase(BaseModel):
     """A phase of a challenge."""
-    
     objects = PhaseManager()
     
     challenge = models.ForeignKey(Challenge, related_name='phases')
@@ -135,10 +161,26 @@ class Phase(BaseModel):
     
     def __unicode__(self):
         return '%s (%s)' % (self.name, self.challenge.title)
+
+    @cached_property
+    def current_round(self):
+        """Determines the current round for this ``Phase``"""
+        now = datetime.utcnow()
+        round_list = self.phaseround_set.filter(start_date__lte=now,
+                                                end_date__gte=now)
+        return round_list[0] if round_list else None
+
     
     class Meta:
         unique_together = (('challenge', 'name'),)
         ordering = ('order',)
+
+
+@receiver(signals.post_save, sender=Phase)
+def phase_update_cache(instance, **kwargs):
+    """Updates the ``end_date`` on the cache for this phase"""
+    key = '%s_end_date' % slugify(instance.name)
+    cache.set(key.upper(), instance.end_date)
 
 
 class ExternalLink(BaseModel):
@@ -205,6 +247,12 @@ class SubmissionManager(BaseModelManager):
             criteria |= models.Q(created_by__user=user)
         return self.filter(criteria)
 
+    def green_lit(self):
+        """Returns all the ``Submissions`` that have been green-lit"""
+        # TODO: we need a better method to determine when a submission has
+        # been green lit
+        return self.filter(is_winner=True)
+
 
 class Submission(BaseModel):
     """A user's entry into a challenge."""
@@ -228,13 +276,15 @@ class Submission(BaseModel):
     
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(default=datetime.utcnow)
-    
+    updated_on = ModificationDateTimeField()
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
-    
-    phase = models.ForeignKey(Phase)
-    
+    phase = models.ForeignKey('challenges.Phase')
+    phase_round = models.ForeignKey('challenges.PhaseRound',
+                                    blank=True, null=True,
+                                    on_delete=models.SET_NULL)
+
     @property
     def challenge(self):
         return self.phase.challenge
@@ -312,7 +362,22 @@ class Submission(BaseModel):
     def owned_by(self, user):
         """Return True if user provided owns this entry."""
         return user == self.created_by.user
-    
+
+    @cached_property
+    def needs_booking(self):
+        """Determines if this entry needs to book a Timeslot.
+        - Entry has been gren lit
+        - Ideation phase has finished
+        - Development phase has been enabled
+        - User hasn't booked a timeslot
+        """
+        return all([
+            self.is_winner,
+            has_phase_finished(settings.IGNITE_IDEATION_NAME),
+            settings.DEVELOPMENT_PHASE,
+            not self.timeslot_set.all(),
+            ])
+
     class Meta:
         ordering = ['-id']
 
@@ -467,3 +532,23 @@ class JudgeAssignment(models.Model):
 def judgement_flush_cache(instance, **kwargs):
     """Flush the cache for any submissions related to this instance."""
     Submission.objects.invalidate(instance.submission)
+
+
+class PhaseRound(models.Model):
+    """Rounds for a given ``Phase``"""
+    name = models.CharField(max_length=255)
+    slug = AutoSlugField(populate_from='name')
+    phase = models.ForeignKey('challenges.Phase')
+    start_date = models.DateTimeField()
+    end_date = models.DateTimeField()
+
+    def __unicode__(self):
+        return u'%s: %s' % (self.phase, self.name)
+
+    @property
+    def is_active(self):
+        now = datetime.utcnow()
+        return all([
+            now > self.start_date,
+            now < self.end_date,
+            ])
