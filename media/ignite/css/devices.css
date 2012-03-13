@@ -324,6 +324,8 @@ legend span {
     box-shadow: 0 2px 0 #ebebeb;
     display: inline-block;
     letter-spacing: 0.6px;
+    /* Using important so line-height based on containers doesnt't screw stuff up */
+    line-height: 1 !important;
 }
 .do {
     font-size: 12px;
@@ -726,10 +728,8 @@ div[role=main] {
     font-size: 92px;
     font-family: "Helvetica Neue";
     line-height: 1;
-    margin-top: 0.2em;
 }
 .sweet {
-    font-size: 14px;
     color: #2e2e2e;
     background: #e4eff9;
     display: inline-block;
@@ -744,24 +744,18 @@ h1 .sweet {
 }
 .sweet em {
     position: relative;
-    padding: 0.5em 1em 0.5em 2em;
+    padding: 0.5em 1em;
     background: #ed4619;
     color: #fff;
     font-style: normal;
     display: block;
     margin-bottom: 0.5em;
 }
-h1 .sweet em {
-    padding: 0.5em 1em;
-}
 .ignite_info {
     border-bottom: 1px solid #9bc4df;
     background: #e8f2f8;
 }
 .ignite_info p {
-    font-size: 18px;
-    color: #454545;
-    line-height: 28px;
     margin-bottom: 0;
     float: left;
     padding: 1em 10px;
@@ -781,15 +775,9 @@ h1 .sweet em {
     border-bottom: 1px solid #9BC4DF;
 }
 .methods h3 {
-    font-size: 24px;
     color: #ed4619;
     margin: 0 0 0.5em;
     padding-left: 60px;
-}
-.methods p {
-    font-size: 18px;
-    color: #454545;
-    line-height: 28px;
 }
 .methods ul {
     overflow: hidden;
@@ -879,10 +867,10 @@ fieldset .focus_areas ul {
 }
 .events h2 {
     border: 1px solid #c7ddeb;
+    border-bottom: none;
     background: #f0f6fb;
     color: #EF4619;
-    font-size: 14px;
-    padding: 10px 20px;
+    padding: 10px 15px;
     margin: 0;
 }
 .events ol {
@@ -894,7 +882,7 @@ fieldset .focus_areas ul {
 }
 .events li {
     position: relative;
-    padding: 20px 20px 20px 100px;
+    padding: 15px 15px 15px 80px;
     border-top: 1px solid #c7ddeb;
     overflow: hidden;
 }
@@ -902,17 +890,14 @@ fieldset .focus_areas ul {
     border-top: none;
 }
 .events h3 {
-    font-size: 13px;
-    color: #2e2e2d;
     margin: 0;
 }
 .events p {
     margin: 0;
-    font-size: 12px;
 }
 .events .date {
     position: absolute;
-    padding: 20px;
+    padding: 15px;
     top: 0;
     left: 0;
     border-right: 1px solid #c7ddeb;
@@ -922,7 +907,7 @@ fieldset .focus_areas ul {
 .events .date span {
     display: block;
     font-weight: bold;
-    font-size: 20px;
+    font-size: 25px;
     margin-top: 0.2em;
 }
 /* About page */
@@ -967,6 +952,7 @@ fieldset .focus_areas ul {
 .application .sweet {
     display: block;
     padding: 0;
+    font-weight: normal;
     margin-bottom: 0.5em;
 }
 .application .sweet em {
@@ -1159,17 +1145,10 @@ section footer {
     padding: 1em 0;
     overflow: hidden;
     clear: left;
+    text-align: right;
 }
-section footer a {
-    font-size: 14px;
-    float: right;
-    padding-right: 40px;
-    background: transparent url(../img/css/arrow.png) no-repeat 100% 50%;
-}
-.hentry {
-    font-size: 12px;
-    line-height: 2.2;
-    color: #5c5c5c;
+section footer .cta {
+    margin-left: 20px;
 }
 .hentry address {
     display: inline;
@@ -1178,6 +1157,7 @@ section footer a {
 .hentry footer {
     border-top: none;
     padding: 0;
+    text-align: left;
 }
 .hentry .entry-title {
     font-size: 15px;
@@ -1197,21 +1177,18 @@ section footer a {
     font-size: 15px;
     padding: 1em 15px;
 }
+.submissions article a {
+    color: #454545;
+}
 .submissions .title {
-    font-weight: bold;
-    font-size: 15px;
-    margin: 0;
+    margin: 0 0 1em;
 }
 .submissions p {
-    font-size: 12px;
     margin-bottom: 0;
 }
 .submissions .frame {
     width: 50%;
     margin-bottom: 1em;
-}
-.submissions address {
-    margin-top: 0.5em;
 }
 .lists .highlight h2 {
     border-bottom: 1px solid #E2E2E2;

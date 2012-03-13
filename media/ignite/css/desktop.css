@@ -180,7 +180,7 @@ header .meta em {
 }
 .methods li {
     border-left: 1px solid #9bc4df;
-    padding: 2em 20px 60px 2em;
+    padding: 2em 20px 60px;
     background-position: 20px 90%;
 }
 .methods ul li:first-child {
