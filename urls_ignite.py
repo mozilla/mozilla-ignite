@@ -1,12 +1,12 @@
+
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from django.views.generic.simple import redirect_to
-from jingo.views import direct_to_template
+
+from challenges.models import SubmissionParent
 from voting.views import vote_on_object
 
-from challenges.models import Submission
 
 admin.autodiscover()
 
@@ -14,7 +14,7 @@ _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
                   'slug': settings.IGNITE_CHALLENGE_SLUG}
 
 vote_dict = {
-    'model': Submission,
+    'model': SubmissionParent,
     'template_object_name': 'submission',
     'allow_xmlhttprequest': True,
 }
@@ -44,6 +44,11 @@ urlpatterns = patterns('',
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )
 
+urlpatterns += patterns(
+    'challenges.views',
+    url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
+        kwargs=_ignite_kwargs, name='entry_version'),
+    )
 
 urlpatterns += patterns(
     '',

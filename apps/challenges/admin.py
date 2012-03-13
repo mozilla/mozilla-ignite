@@ -7,7 +7,8 @@ from challenges.forms import PhaseRoundAdminForm
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
-                               PhaseCriterion, PhaseRound)
+                               PhaseCriterion, PhaseRound, SubmissionParent,
+                               SubmissionVersion)
 from badges.models import SubmissionBadge
 
 
@@ -126,9 +127,7 @@ class JudgementAdmin(admin.ModelAdmin):
 
 
 class ExclusionFlagAdmin(admin.ModelAdmin):
-    
     model = ExclusionFlag
-    
     list_display = ('submission', 'notes')
 
 
@@ -137,6 +136,17 @@ class PhaseRoundAdmin(admin.ModelAdmin):
     form = PhaseRoundAdminForm
     list_display = ['name', 'start_date', 'end_date', 'phase']
     list_filter = ['phase__name']
+
+
+class SubmissionVersionInline(admin.TabularInline):
+    model = SubmissionVersion
+
+
+class SubmissionParentAdmin(admin.ModelAdmin):
+    inlines = [SubmissionVersionInline]
+    list_display = ['name', 'submission', 'slug', 'is_featured']
+    list_filter = ['is_featured']
+    search_fields = ['name', 'submission__title', 'slug']
 
 
 admin.site.unregister(User)
@@ -153,3 +163,4 @@ admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
 admin.site.register(PhaseRound, PhaseRoundAdmin)
+admin.site.register(SubmissionParent, SubmissionParentAdmin)

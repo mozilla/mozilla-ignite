@@ -16,6 +16,7 @@ from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
 from django_extensions.db.fields import (AutoSlugField,
+                                         CreationDateTimeField,
                                          ModificationDateTimeField)
 from innovate.models import BaseModel, BaseModelManager
 from projects.models import Project
@@ -226,32 +227,33 @@ class Category(BaseModel):
 
 
 class SubmissionManager(BaseModelManager):
-    
     def eligible(self):
         """Return all eligible submissions (i.e. those not excluded)."""
         return self.filter(exclusionflag__isnull=True)
-    
+
     # Note: normally anything mutable wouldn't go into a default, but we can be
     # sure this method doesn't modify the anonymous user
     def visible(self, user=AnonymousUser()):
         """Return all submissions that are visible.
-        
         If a user is provided, return all submissions visible to that user; if
-        not, return all submissions visible to the general public.
-        
-        """
+        not, return all submissions visible to the general public."""
         if user.is_superuser:
-            return self.all()
+            return self.current()
         criteria = models.Q(is_draft=False)
         if not user.is_anonymous():
             criteria |= models.Q(created_by__user=user)
-        return self.filter(criteria)
+        # Return only active submissions
+        return self.current().filter(criteria)
 
     def green_lit(self):
-        """Returns all the ``Submissions`` that have been green-lit"""
-        # TODO: we need a better method to determine when a submission has
-        # been green lit
+        """Returns all the ``Submissions`` that have been green-lit.
+        Each ``Submission`` belongs to a ``Phase`` or ``PhaseRound``
+        hence once it is marked as winner is green-lit for this phase"""
         return self.filter(is_winner=True)
+
+    def current(self):
+        """Returns all the ``Submissions`` that are active"""
+        return self.filter(submissionparent__status=SubmissionParent.ACTIVE)
 
 
 class Submission(BaseModel):
@@ -292,7 +294,7 @@ class Submission(BaseModel):
     def get_image_src(self):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
-        return path(self.sketh_note) or path('img/project-default.gif')    
+        return path(self.sketh_note) or path('img/project-default.gif')
     
     def __unicode__(self):
         return self.title
@@ -313,11 +315,27 @@ class Submission(BaseModel):
             kwargs.update({'project': self.challenge.project.slug,
                            'slug': self.challenge.slug})
             return reverse(view_name, kwargs=kwargs)
-    
+
+    @property
+    def parent_slug(self):
+        parent_list = self.submissionparent_set.all()
+        if parent_list:
+            return parent_list[0].slug
+        # Fallback to the versioning list, this query is expensive.
+        # Provided for consistency
+        version_list = self.submissionversion_set.select_related('parent').all()
+        if version_list:
+            return version_list[0].parent.slug
+        return None
+
     def get_absolute_url(self):
         """Return this submission's URL."""
-        return self._lookup_url('entry_show', {'entry_id': self.id})
-    
+        return self._lookup_url('entry_show', {'entry_id': self.parent_slug})
+
+    def get_version_url(self):
+        """Return this submission's URL."""
+        return self._lookup_url('entry_version', {'entry_id': self.id})
+
     def get_edit_url(self):
         """Return the URL to edit this submission."""
         return self._lookup_url('entry_edit', {'pk': self.id})
@@ -552,3 +570,58 @@ class PhaseRound(models.Model):
             now > self.start_date,
             now < self.end_date,
             ])
+
+
+class SubmissionParent(models.Model):
+    """Acts as a proxy for the ``Submissions`` so we can keep them versioned"""
+    ACTIVE = 1
+    INACTIVE = 2
+    REMOVED = 3
+    STATUS_CHOICES = (
+        (ACTIVE, _('Active')),
+        (INACTIVE, _('Inactive')),
+        (REMOVED, _('Removed')),
+        )
+    name = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True)
+    created = CreationDateTimeField()
+    modified = ModificationDateTimeField()
+    is_featured = models.BooleanField(default=False)
+    submission = models.ForeignKey('challenges.Submission')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=ACTIVE)
+
+    class Meta:
+        ordering = ('-created',)
+
+    def __unicode__(self):
+        return u'Project: %s' % self.name
+
+    def save(self, *args, **kwargs):
+        """Set slug and name from the ``Submission``"""
+        if not self.slug:
+            self.slug = self.submission.id
+        if not self.name:
+            self.name = self.submission.title
+        super(SubmissionParent, self).save(*args, **kwargs)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('entry_show', [self.slug])
+
+    def update_version(self, submission):
+        """Updates the current ``SubmissionParent`` version"""
+        self.submissionversion_set.create(submission=self.submission)
+        self.submission = submission
+        self.save()
+
+class SubmissionVersion(models.Model):
+    """Keeps track of the version of a given ``Submission``"""
+    submission = models.ForeignKey('challenges.Submission')
+    parent = models.ForeignKey('challenges.SubmissionParent')
+    created = CreationDateTimeField()
+
+    class Meta:
+        unique_together = (('submission', 'parent'),)
+
+    def __unicode__(self):
+        return u'Version for %s on %s' % (self.submission, self.created)

@@ -64,7 +64,10 @@ def profile(request, username):
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
     if 'challenges' in INSTALLED_APPS:
-        submissions = Submission.objects.filter(created_by=profile)
+        if profile.user == user:
+            submissions = Submission.objects.current().filter(created_by=profile)
+        else:
+            submissions = Submission.objects.visible().filter(created_by=profile)
     # Show the all the submission related data when the user is the owner
     submission_list = []
     if settings.DEVELOPMENT_PHASE and profile.user == user:
@@ -76,7 +79,7 @@ def profile(request, username):
             filter(~Q(id__in=booked_ids), created_by=profile)
     # User has assigned judging tasks
     webcast_list = []
-    if settings.DEVELOPMENT_PHASE:
+    if settings.DEVELOPMENT_PHASE and request.user.is_authenticated():
         # Determining if a user is a judge is quite expensive query-wise,
         # so we use the JudgeAssignment model to list the judge
         # booked webcasts, past and present.

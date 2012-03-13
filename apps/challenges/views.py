@@ -22,9 +22,10 @@ from commons.helpers import get_page
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
-                               ExternalLink, Judgement, JudgingCriterion,
-                               JudgeAssignment)
+                               ExternalLink, Judgement, SubmissionParent,
+                               JudgeAssignment, SubmissionVersion)
 from projects.models import Project
+from timeslot.models import TimeSlot
 
 challenge_humanised = {
     'title': 'Title',
@@ -57,9 +58,13 @@ class JingoTemplateMixin(TemplateResponseMixin):
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
-    project = get_object_or_404(Project, slug=project)
-    challenge = get_object_or_404(project.challenge_set, slug=slug)
-    """ Pagination options """
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    project = challenge.project
+    """Pagination options """
     entry_set = Submission.objects.visible(request.user)
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
@@ -166,13 +171,12 @@ def extract_form_errors(form, link_form):
 
 @login_required
 def create_entry(request, project, slug):
+    """Creates a ``Submission`` from the user details"""
     project = get_object_or_404(Project, slug=project)
-    
     try:
         phase = Phase.objects.get_current_phase(slug)[0]
     except IndexError:
         raise Http404
-    
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
@@ -194,6 +198,8 @@ def create_entry(request, project, slug):
                         url = link['url'],
                         submission = entry
                     )
+            # create the ``SubmissionParent`` for this entry
+            SubmissionParent.objects.create(submission=entry)
             if entry.is_draft:
                 msg = _('<strong>Your entry has been saved as draft.</strong>'
                         ' When you want the world to see it then uncheck the '
@@ -217,20 +223,53 @@ def create_entry(request, project, slug):
     })
 
 
+def entry_version(request, project, slug, entry_id):
+    """Redirects an ``Submission`` version to the ``SubmissionParent``"""
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    # Submisison is on the Parent
+    try:
+        parent = (SubmissionParent.objects
+                  .get(submission__id=entry_id,
+                       submission__phase__challenge=challenge))
+        return HttpResponseRedirect(parent.get_absolute_url())
+    except SubmissionParent.DoesNotExist:
+        pass
+    # Submission was versioned and has a new SubmissionParent
+    try:
+        version = (SubmissionVersion.objects.select_related('submission_list')
+                   .filter(submission__id=entry_id,
+                           submission__phase__challenge=challenge))[0]
+    except IndexError:
+        raise Http404
+    return HttpResponseRedirect(version.parent.get_absolute_url())
+
+
 def entry_show(request, project, slug, entry_id, judging_form=None):
-    """Detail of an idea, show any related information to this"""
-    project = get_object_or_404(Project, slug=project)
-    challenge = get_object_or_404(project.challenge_set, slug=slug)
-    entry = get_object_or_404(Submission.objects, pk=entry_id,
-                              phase__challenge=challenge)
-    
+    """Detail of an idea, show any related information to it"""
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    project = challenge.project
+    # SubmissionParent acts as an proxy for any of the revisions.
+    # and it only shows the current revision
+    try:
+        parent = (SubmissionParent.objects.select_related('submission')
+                  .get(slug=entry_id, submission__phase__challenge=challenge))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+    entry = parent.submission
     if not entry.visible_to(request.user):
         raise Http404
-    
     # Sidebar
     ## Voting
-    user_vote = Vote.objects.get_for_user(entry, request.user)
-    votes = Vote.objects.get_score(entry)
+    user_vote = Vote.objects.get_for_user(parent, request.user)
+    votes = Vote.objects.get_score(parent)
 
     ## Previous/next modules
     # We can't use Django's built-in methods here, because we need to restrict
@@ -248,7 +287,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-    
+
     # Judging
     if not entry.judgeable_by(request.user):
         judging_form = None
@@ -262,10 +301,13 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
 
     # Determine if this idea has a timeslot allocated for the webcast
     # triggered here to cache it
-    webcast_list = entry.timeslot_set.filter(is_booked=True)
     # Cache the awarded badges
     badge_list = (entry.submissionbadge_set.select_related('badge')
                   .filter(is_published=True))
+    submission_ids = list(parent.submissionversion_set.all()
+                      .values_list('submission__id', flat=True)) + [entry.id]
+    webcast_list = TimeSlot.objects.filter(is_booked=True,
+                                           submission__in=submission_ids)
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -280,6 +322,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'judge_assigned': judge_assigned,
         'webcast_list': webcast_list,
         'badge_list': badge_list,
+        'parent': parent,
     })
 
 
@@ -308,7 +351,8 @@ class SingleSubmissionMixin(SingleObjectMixin):
                                  slug=self.kwargs['slug'])
     
     def get_queryset(self):
-        return Submission.objects.filter(phase__challenge=self._get_challenge())
+        return Submission.objects.filter(phase__challenge=self._get_challenge(),
+                                         submissionparent__isnull=False)
     
     def get_object(self, *args, **kwargs):
         obj = super(SingleSubmissionMixin, self).get_object(*args, **kwargs)
@@ -470,6 +514,10 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         # would have to record the success message *before* deleting the entry,
         # which is just asking for trouble.
         self.object = self.get_object()
+        # Remove all the versioned content from the Parent, since
+        # the User don't want to keep any versions of this ``Submission``
+        for parent in self.object.submissionparent_set.all():
+            [s.submission.delete() for s in parent.submissionversion_set.all()]
         self.object.delete()
         messages.success(request, "Your submission has been deleted.")
         return HttpResponseRedirect(self.get_success_url())
@@ -477,6 +525,5 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
-
 
 entry_delete = DeleteEntryView.as_view()

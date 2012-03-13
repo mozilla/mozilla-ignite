@@ -2,38 +2,21 @@ import test_utils
 
 from datetime import datetime, timedelta
 
-from challenges.models import (Submission, Phase, Challenge, Category,
-                               Project)
-from django.conf import settings
+from challenges.models import Submission, Phase, Challenge, Project
 from django.core.urlresolvers import reverse
-from django.contrib.auth.models import User
-from timeslot.models import TimeSlot, Release
-from timeslot.tests.fixtures import (create_project, create_challenge,
-                                     create_phase, create_user, create_release,
-                                     create_category, create_submission)
+from timeslot.models import TimeSlot
+from timeslot.tests.fixtures import create_user, create_release, create_submission
+from timeslot.tests.test_base import TimeSlotBaseTest
 
 
-class TimeSlotTest(test_utils.TestCase):
+class TimeSlotTest(TimeSlotBaseTest):
     """Tests for the ``TimeSlot`` mechanics"""
 
     SUBMISSIONS = 5
 
     def setUp(self):
         """Actions to be performed at the beginning of each test"""
-        # setup ignite challenge
-        self.project = create_project(settings.IGNITE_PROJECT_SLUG)
-        self.challenge = create_challenge(settings.IGNITE_CHALLENGE_SLUG,
-                                          self.project)
-        now = datetime.utcnow()
-        past = now - timedelta(days=30)
-        future = now + timedelta(days=30)
-        # create the Ideation and Development phases
-        idea_data = {'order': 1, 'start_date': past, 'end_date': now}
-        self.ideation = create_phase(settings.IGNITE_IDEATION_NAME,
-                                     self.challenge, idea_data)
-        dev_data = {'order': 2, 'start_date': now, 'end_date': future}
-        self.development = create_phase(settings.IGNITE_DEVELOPMENT_NAME,
-                                        self.challenge, dev_data)
+        super(TimeSlotTest, self).setUp()
         # create a winning submission
         self.name = 'bob'
         self.profile = create_user(self.name)
@@ -44,12 +27,6 @@ class TimeSlotTest(test_utils.TestCase):
                                 args=[self.submission.id])
         # create a list of submissions
         self.submission_list = self.generate_submissions(self.SUBMISSIONS)
-
-    def tearDown(self):
-        """Actions to be performed at the end of each test"""
-        for model in [Submission, Phase, Challenge, Category, Project,
-                      TimeSlot, User, Release]:
-            model.objects.all().delete()
 
     def create_timeslot(self, release, extra_data=None):
         """Helper to add ``TimeSlots`` with the minium required data"""
@@ -193,7 +170,7 @@ class TimeSlotTest(test_utils.TestCase):
         for item in list(response.context['messages']):
             self.assertTrue('already booked' in item.message)
 
-    def test_timeslot_releasess(self):
+    def test_timeslot_releases(self):
         """Test ``TimeSlots`` available for different releases"""
         release_a = create_release('Release A', True)
         self.generate_timeslots(self.SUBMISSIONS, release_a)

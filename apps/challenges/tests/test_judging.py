@@ -218,7 +218,7 @@ class JudgingViewTest(MessageTestCase):
     def test_no_judge_form(self):
         """Test the form doesn't show if the user doesn't have permission."""
         submission = Submission.objects.get()
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judging_form'] is None
     
     @ignite_only
@@ -226,7 +226,7 @@ class JudgingViewTest(MessageTestCase):
         """Test displaying the judge form."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         assert 'notes' in judging_form.fields
         criteria = submission.phase.judgement_criteria.all()
@@ -239,7 +239,7 @@ class JudgingViewTest(MessageTestCase):
         """Test that non-eliminated entries are not marked as eliminated."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         self.assertEqual(response.context['excluded'], False)
     
     @ignite_only
@@ -248,7 +248,7 @@ class JudgingViewTest(MessageTestCase):
         submission = Submission.objects.get()
         submission.exclusionflag_set.create(notes='This entry sucks')
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         self.assertEqual(response.context['excluded'], True)
     
     @ignite_only
@@ -256,7 +256,7 @@ class JudgingViewTest(MessageTestCase):
         """Test judging an unjudged submission."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         post_data = {'notes': 'This submission is acceptable to me.'}
         for key in judging_form.fields:
@@ -279,7 +279,7 @@ class JudgingViewTest(MessageTestCase):
         """Test behaviour when the current user is not assigned this entry."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is False
     
     @ignite_only
@@ -290,7 +290,7 @@ class JudgingViewTest(MessageTestCase):
         JudgeAssignment.objects.create(submission=submission,
                                        judge=user_profile)
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is True
     
     @ignite_only
@@ -301,7 +301,7 @@ class JudgingViewTest(MessageTestCase):
         JudgeAssignment.objects.create(submission=submission,
                                        judge=user_profile)
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is False
     
     @ignite_only
@@ -316,8 +316,7 @@ class JudgingViewTest(MessageTestCase):
         for criterion in submission.phase.judgement_criteria.all():
             JudgingAnswer.objects.create(judgement=judgement,
                                          criterion=criterion, rating=1)
-        
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         post_data = {'notes': 'I actually quite like this submission.'}
         ratings = [6, 7, 8]

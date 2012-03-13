@@ -12,7 +12,8 @@ from mock import Mock, patch
 from projects.models import Project
 from challenges.models import (Challenge, Submission, Phase, Category,
                               ExclusionFlag, Judgement, JudgingCriterion,
-                              PhaseCriterion, PhaseRound)
+                              PhaseCriterion, PhaseRound, SubmissionParent,
+                              SubmissionVersion)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users)
 from ignite.tests.decorators import ignite_skip
@@ -346,14 +347,15 @@ class DraftSubmissionTest(TestCase):
                              obj=self.draft_submission)
 
 
-def PhaseRoundTest(TestCase):
+class PhaseRoundTest(TestCase):
 
     def setUp(self):
         challenge_setup()
         self.phase = Phase.objects.all()[0]
 
     def tearDown(self):
-        for model in [Challenge, Project, Phase, User, Category, Submission]:
+        for model in [Challenge, Project, Phase, User, Category, Submission,
+                      PhaseRound]:
             model.objects.all().delete()
 
     def test_create_phase(self):
@@ -366,3 +368,98 @@ def PhaseRoundTest(TestCase):
         phase = PhaseRound.objects.create(**data)
         assert phase.slug, 'Slug missing on: %s' % phase
         self.assertTrue(phase.is_active)
+
+
+class SubmissionParentTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+
+    def create_submission(self, **kwargs):
+        defaults = {
+            'title': 'Title',
+            'brief_description': 'A submission',
+            'description': 'A really good submission',
+            'phase': self.phase,
+            'created_by': self.created_by,
+            'category': self.category,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submission,
+                      SubmissionParent]:
+            model.objects.all().delete()
+
+    def test_parent_creation(self):
+        """Create a ``SubmissionParent`` with the less possible data"""
+        submission = self.create_submission(title='a')
+        parent = SubmissionParent.objects.create(submission=submission)
+        assert parent.id, "SubmissionParent creation failure"
+        self.assertEqual(parent.status, SubmissionParent.ACTIVE)
+        self.assertEqual(parent.slug, submission.id)
+        self.assertEqual(parent.name, submission.title)
+
+    def test_parent_visibility(self):
+        submission = self.create_submission(title='a')
+        parent = SubmissionParent.objects.create(submission=submission)
+        self.assertEqual(Submission.objects.visible().count(), 1)
+        parent.status = SubmissionParent.INACTIVE
+        parent.save()
+        self.assertEqual(Submission.objects.visible().count(), 0)
+
+    def test_submission_without_parent(self):
+        submission = self.create_submission(title='a')
+        self.assertEqual(Submission.objects.visible().count(), 0)
+
+
+class SubmissionParentVersioningTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+        self.submission_a = self.create_submission(title='a')
+        self.submission_b = self.create_submission(title='b')
+        self.parent = SubmissionParent.objects.create(submission=self.submission_a)
+
+    def create_submission(self, **kwargs):
+        defaults = {
+            'title': 'Title',
+            'brief_description': 'A submission',
+            'description': 'A really good submission',
+            'phase': self.phase,
+            'created_by': self.created_by,
+            'category': self.category,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+    def test_update_parent_history(self):
+        self.parent.update_version(self.submission_b)
+        submission_versions = SubmissionVersion.objects.all()
+        self.assertEqual(len(submission_versions), 1)
+        submission_version = submission_versions[0]
+        self.assertEqual(submission_version.submission, self.submission_a)
+        self.assertEqual(self.parent.submission, self.submission_b)
+
+    def test_update_parent_values(self):
+        self.parent.update_version(self.submission_b)
+        self.assertEqual(self.parent.submission, self.submission_b)
+        self.assertEqual(self.parent.slug, self.submission_a.id)
+        self.assertEqual(self.parent.name, self.submission_a.title)
+
+    def test_visible_submission(self):
+        """Test a versioned Submission is not visible on all listing"""
+        self.parent.update_version(self.submission_b)
+        assert self.submission_a not in Submission.objects.visible()
+        assert self.submission_a in Submission.objects.all()

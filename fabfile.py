@@ -2,6 +2,7 @@ import os
 
 from fabric.api import cd, env, run, local
 from fabric.operations import sudo
+from fabric.colors import yellow
 
 env.proj_root = '/var/webapps/mozilla-ignite/'
 git_repo = 'https://github.com/rossbruniges/mozilla-ignite.org.git'
@@ -66,11 +67,15 @@ def submodules():
         run('git submodule sync')
         run('git submodule update')
 
-def test():
-    """Run the tests locally"""
-    # TODO: add the rest of the apps and make sure the tests pass!
-    local('python manage.py test challenges timeslot webcast badges '
-          '--settings=settings_test')
+def test(*args):
+    """Run the tests locally takes a list of apps to test as arguments"""
+    if args:
+        apps = ' '.join(args)
+    else:
+        # TODO: add the rest of the apps and make sure the tests pass!
+        apps = 'challenges timeslot webcast activity badges events users'
+    print yellow('Testing: %s' % apps)
+    local('python manage.py test %s --settings=settings_test' % apps)
 
 
 def deploy(branch):
