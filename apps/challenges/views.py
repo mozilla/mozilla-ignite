@@ -25,6 +25,7 @@ from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
 from projects.models import Project
+from timeslot.models import TimeSlot
 
 challenge_humanised = {
     'title': 'Title',
@@ -300,7 +301,10 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
 
     # Determine if this idea has a timeslot allocated for the webcast
     # triggered here to cache it
-    webcast_list = entry.timeslot_set.filter(is_booked=True)
+    submission_ids = list(parent.submissionversion_set.all()
+                      .values_list('submission__id', flat=True)) + [entry.id]
+    webcast_list = TimeSlot.objects.filter(is_booked=True,
+                                           submission__in=submission_ids)
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
