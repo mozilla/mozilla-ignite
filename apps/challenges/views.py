@@ -57,9 +57,13 @@ class JingoTemplateMixin(TemplateResponseMixin):
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
-    project = get_object_or_404(Project, slug=project)
-    challenge = get_object_or_404(project.challenge_set, slug=slug)
-    """ Pagination options """
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
+        raise Http404
+    project = challenge.project
+    """Pagination options """
     entry_set = Submission.objects.visible(request.user)
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
@@ -219,6 +223,7 @@ def create_entry(request, project, slug):
 
 
 def entry_version(request, project, slug, entry_id):
+    """Redirects an ``Submission`` version to the ``SubmissionParent``"""
     try:
         challenge = (Challenge.objects.select_related('project')
                      .get(project__slug=project, slug=slug))
@@ -235,9 +240,9 @@ def entry_version(request, project, slug, entry_id):
     # Submission was versioned and has a new SubmissionParent
     try:
         version = (SubmissionVersion.objects.select_related('submission_list')
-                   .get(submission__id=entry_id,
-                        submission__phase__challenge=challenge))
-    except SubmissionVersion.DoesNotExist:
+                   .filter(submission__id=entry_id,
+                           submission__phase__challenge=challenge))[0]
+    except IndexError:
         raise Http404
     return HttpResponseRedirect(version.parent.get_absolute_url())
 
@@ -338,7 +343,8 @@ class SingleSubmissionMixin(SingleObjectMixin):
                                  slug=self.kwargs['slug'])
     
     def get_queryset(self):
-        return Submission.objects.filter(phase__challenge=self._get_challenge())
+        return Submission.objects.filter(phase__challenge=self._get_challenge(),
+                                         submissionparent__isnull=False)
     
     def get_object(self, *args, **kwargs):
         obj = super(SingleSubmissionMixin, self).get_object(*args, **kwargs)

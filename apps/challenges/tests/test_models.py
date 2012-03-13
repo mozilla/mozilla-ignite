@@ -402,8 +402,21 @@ class SubmissionParentTest(TestCase):
         submission = self.create_submission(title='a')
         parent = SubmissionParent.objects.create(submission=submission)
         assert parent.id, "SubmissionParent creation failure"
+        self.assertEqual(parent.status, SubmissionParent.ACTIVE)
         self.assertEqual(parent.slug, submission.id)
         self.assertEqual(parent.name, submission.title)
+
+    def test_parent_visibility(self):
+        submission = self.create_submission(title='a')
+        parent = SubmissionParent.objects.create(submission=submission)
+        self.assertEqual(Submission.objects.visible().count(), 1)
+        parent.status = SubmissionParent.INACTIVE
+        parent.save()
+        self.assertEqual(Submission.objects.visible().count(), 0)
+
+    def test_submission_without_parent(self):
+        submission = self.create_submission(title='a')
+        self.assertEqual(Submission.objects.visible().count(), 0)
 
 
 class SubmissionParentVersioningTest(TestCase):
@@ -444,3 +457,9 @@ class SubmissionParentVersioningTest(TestCase):
         self.assertEqual(self.parent.submission, self.submission_b)
         self.assertEqual(self.parent.slug, self.submission_a.id)
         self.assertEqual(self.parent.name, self.submission_a.title)
+
+    def test_visible_submission(self):
+        """Test a versioned Submission is not visible on all listing"""
+        self.parent.update_version(self.submission_b)
+        assert self.submission_a not in Submission.objects.visible()
+        assert self.submission_a in Submission.objects.all()

@@ -227,32 +227,33 @@ class Category(BaseModel):
 
 
 class SubmissionManager(BaseModelManager):
-    
     def eligible(self):
         """Return all eligible submissions (i.e. those not excluded)."""
         return self.filter(exclusionflag__isnull=True)
-    
+
     # Note: normally anything mutable wouldn't go into a default, but we can be
     # sure this method doesn't modify the anonymous user
     def visible(self, user=AnonymousUser()):
         """Return all submissions that are visible.
-        
         If a user is provided, return all submissions visible to that user; if
-        not, return all submissions visible to the general public.
-        
-        """
+        not, return all submissions visible to the general public."""
         if user.is_superuser:
-            return self.all()
+            return self.current()
         criteria = models.Q(is_draft=False)
         if not user.is_anonymous():
             criteria |= models.Q(created_by__user=user)
-        return self.filter(criteria)
+        # Return only active submissions
+        return self.current().filter(criteria)
 
     def green_lit(self):
-        """Returns all the ``Submissions`` that have been green-lit"""
-        # TODO: we need a better method to determine when a submission has
-        # been green lit
+        """Returns all the ``Submissions`` that have been green-lit.
+        Each ``Submission`` belongs to a ``Phase`` or ``PhaseRound``
+        hence once it is marked as winner is green-lit for this phase"""
         return self.filter(is_winner=True)
+
+    def current(self):
+        """Returns all the ``Submissions`` that are active"""
+        return self.filter(submissionparent__status=SubmissionParent.ACTIVE)
 
 
 class Submission(BaseModel):
@@ -573,12 +574,21 @@ class PhaseRound(models.Model):
 
 class SubmissionParent(models.Model):
     """Acts as a proxy for the ``Submissions`` so we can keep them versioned"""
+    ACTIVE = 1
+    INACTIVE = 2
+    REMOVED = 3
+    STATUS_CHOICES = (
+        (ACTIVE, _('Active')),
+        (INACTIVE, _('Inactive')),
+        (REMOVED, _('Removed')),
+        )
     name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, unique=True)
     created = CreationDateTimeField()
     modified = ModificationDateTimeField()
     is_featured = models.BooleanField(default=False)
     submission = models.ForeignKey('challenges.Submission')
+    status = models.IntegerField(choices=STATUS_CHOICES, default=ACTIVE)
 
     class Meta:
         ordering = ('-created',)
