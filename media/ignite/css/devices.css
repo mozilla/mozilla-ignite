@@ -1161,13 +1161,6 @@ section footer .cta {
     height: 1px;
     overflow: hidden;
 }
-.box_title {
-    float: left;
-    background: #fff;
-    color: #333;
-    font-size: 15px;
-    padding: 1em 15px;
-}
 .submissions article a {
     color: #454545;
 }
