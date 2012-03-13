@@ -244,7 +244,6 @@ legend span {
     display: none;
 }
 .hint {
-    font-size: 14px;
     margin-top: -0.5em;
 }
 .inline_field {
@@ -1160,8 +1159,6 @@ section footer .cta {
     text-align: left;
 }
 .hentry .entry-title {
-    font-size: 15px;
-    color: #454545;
     margin-bottom: 0;
 }
 .hentry a[rel=bookmark] span {
@@ -1373,31 +1370,19 @@ section footer .cta {
     padding-top: 0;
     position: relative;
 }
-#user_profile .vcard {
+header.vcard {
     margin-bottom: 1.5em;
     padding-left: 110px;
+    position: relative;
 }
-#user_profile .vcard .frame {
+header.vcard .frame {
     width: 90px;
     position: absolute;
     top: 0;
     left: 0;
 }
-#user_profile .columns {
-    border-bottom: 1px solid #dcdcdc;
-}
-#user_profile .entre h2 {
-    font-size: 15px;
-    margin-bottom: 0;
-}
-#user_profile .vcard .fn {
+header.vcard .fn {
     margin: 0
-}
-#user_profile .vcard .url {
-    font-size: 11px;
-}
-.profile .col h3 {
-    font-size: 14px;
 }
 #dsq-content-stub {
     margin-top: 1em;

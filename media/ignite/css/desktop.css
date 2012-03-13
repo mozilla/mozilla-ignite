@@ -39,11 +39,9 @@ figure img {
     width: auto;
 }
 #user_profile .user_tools {
-    margin-top: -1.5em;
-}
-#user_profile .promo .entre  {
-    width: 67%;
-    padding-left: 110px;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 /* Masthead */
 .masthead .brand {
@@ -96,21 +94,8 @@ figure img {
 }
 /**= Main content */
 /* homepage */
-.submissions .col {
-    width: 20%;
-}
-.highlight .submissions .col,
-#splash .submissions .col {
-    width: 33%;
-}
-.submissions .col:nth-child(5n + 1) {
+.submissions .col:nth-child(3n + 1) {
     clear: left;
-}
-.lists .submissions .col:nth-child(3n + 1) {
-    clear: left;
-}
-.lists .submissions .col:nth-child(5n + 1) {
-    clear: none;
 }
 .sweet {
     padding: 0 2em 0 0;
@@ -201,11 +186,12 @@ header .meta em {
 #show_submission .entre div.col {
     width: 67%;
 }
-#user_profile .vcard {
-    padding-left: 0;
-}
 #wmd-input {
     padding-top: 50px;
+}
+/* User profile */
+header.vcard {
+    padding-right: 100px;
 }
 /* Index pages */
 .index {
