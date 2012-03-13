@@ -1255,7 +1255,7 @@ section footer .cta {
 .widgets {
     background: #fff;
     padding: 1em;
-    border: 1px solid #979696;
+    border: 1px solid #E2E2E2;
     border-width: 1px 0;
     font-size: 12px;
     color: #333;
@@ -1297,8 +1297,6 @@ section footer .cta {
 #show_submission .entre address {
     border: 10px solid #000;
     border-width: 10px 0;
-    font-style: normal;
-    min-height: 90px;
 }
 .description {
     border-bottom: 1px solid #E2E2E2;
@@ -1316,19 +1314,13 @@ section footer .cta {
 .links a {
     font-weight: normal;
 }
-#show_submission .entre address .frame {
-    width: auto;
-    position: absolute;
-    left: 0;
-    top: 10px;
-}
-#show_submission .entre aside section {
-    padding: 1em 0 1em 10px;
-    border: 1px solid #979696;
+aside section {
+    padding: 1em 10px;
+    border: 1px solid #E2E2E2;
     border-width: 1px 0 0;
     overflow: hidden;
 }
-#show_submission .entre aside h2 {
+aside section h2 {
     margin-top: 0;
 }
 .browser ul {
@@ -1365,6 +1357,9 @@ address.vcard {
     position: absolute;
     top: 0;
     left: 0;
+}
+address.vcard .frame {
+    top: 10px;
 }
 .vcard .fn {
     margin: 0
