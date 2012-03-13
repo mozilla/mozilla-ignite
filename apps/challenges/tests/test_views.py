@@ -17,7 +17,7 @@ import test_utils
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import (Challenge, Submission, Phase, Category,
-                               ExternalLink, SubmissionParent)
+                               ExternalLink, SubmissionParent, SubmissionVersion)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions)
 from ignite.tests.decorators import ignite_skip
@@ -516,41 +516,52 @@ class EditLinkTest(test_utils.TestCase):
 
 
 class DeleteEntryTest(MessageTestCase):
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
-        
-        alex_profile = User.objects.get(username='alex').get_profile()
-        create_submissions(1, creator=alex_profile)
-        
-        submission = Submission.objects.get()
-        
+        self.alex_profile = User.objects.get(username='alex').get_profile()
+        submission = self.create_submission()
+        self.parent = SubmissionParent.objects.create(submission=submission)
         base_kwargs = {'project': Project.objects.get().slug,
                        'slug': Challenge.objects.get().slug}
-        
         self.view_path = submission.get_absolute_url()
         self.delete_path = submission.get_delete_url()
-    
+
+    def create_submission(self, **kwargs):
+        """Helper to create a ``Submission``"""
+        defaults = {
+            'phase': Phase.objects.get(),
+            'title': 'A submission',
+            'brief_description': 'My submission',
+            'description': 'My wonderful submission',
+            'created_by': self.alex_profile,
+            'category': Category.objects.get()
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+
     @suppress_locale_middleware
     def test_anonymous_delete_form(self):
         """Check that anonymous users can't get at the form."""
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_anonymous_delete(self):
         """Check that anonymous users can't delete entries."""
         response = self.client.post(self.delete_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_non_owner_access(self):
         """Check that non-owners cannot see the delete form."""
         self.client.login(username='bob', password='bob')
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 403)
-    
+
     @suppress_locale_middleware
     def test_non_owner_delete(self):
         """Check that users cannot delete each other's submissions."""
@@ -558,20 +569,62 @@ class DeleteEntryTest(MessageTestCase):
         response = self.client.post(self.delete_path, {})
         assert_equal(response.status_code, 403)
         assert Submission.objects.exists()
-    
+
     @suppress_locale_middleware
     def test_delete_form(self):
         self.client.login(username='alex', password='alex')
-        
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_delete(self):
         self.client.login(username='alex', password='alex')
         response = self.client.post(self.delete_path, {}, follow=True)
         assert_equal(response.redirect_chain[0][1], 302)
-        assert_equal(Submission.objects.count(), 0)
-        
+        assert_equal((Submission.objects.filter(created_by=self.alex_profile)
+                      .count()), 0)
         self.assertSuccessMessage(response)
-        
+        assert_equal((SubmissionParent.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)
+
+    def test_delete_safety(self):
+        """Test delete doesn't remove any other user content"""
+        self.client.login(username='alex', password='alex')
+        submission_b = self.create_submission(title='b')
+        SubmissionParent.objects.create(submission=submission_b)
+        response = self.client.post(self.delete_path, {}, follow=True)
+        self.assertSuccessMessage(response)
+        submission_list = Submission.objects.filter(created_by=self.alex_profile)
+        assert_equal(len(submission_list), 1)
+        assert_equal(submission_list[0], submission_b)
+        parent_list = (SubmissionParent.objects
+                       .filter(submission__created_by=self.alex_profile))
+        assert_equal(len(parent_list), 1)
+        assert_equal(parent_list[0].submission, submission_b)
+
+    @suppress_locale_middleware
+    def test_delete_versioned_submission_past(self):
+        """Deleting an old versioned ``Submission`` should fail"""
+        submission_b = self.create_submission(title='b')
+        self.parent.update_version(submission_b)
+        self.client.login(username='alex', password='alex')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 404)
+
+    @suppress_locale_middleware
+    def test_delete_versioned_submission(self):
+        """Deleting a versioned ``Submission`` should take down all the related
+        content"""
+        submission_b = self.create_submission(title='b')
+        self.parent.update_version(submission_b)
+        self.client.login(username='alex', password='alex')
+        self.client.post(submission_b.get_delete_url(), {})
+        assert_equal((Submission.objects.filter(created_by=self.alex_profile)
+                      .count()), 0)
+        assert_equal((SubmissionParent.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)
+        assert_equal((SubmissionVersion.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)

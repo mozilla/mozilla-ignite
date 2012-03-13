@@ -506,6 +506,10 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         # would have to record the success message *before* deleting the entry,
         # which is just asking for trouble.
         self.object = self.get_object()
+        # Remove all the versioned content from the Parent, since
+        # the User don't want to keep any versions of this ``Submission``
+        for parent in self.object.submissionparent_set.all():
+            [s.submission.delete() for s in parent.submissionversion_set.all()]
         self.object.delete()
         messages.success(request, "Your submission has been deleted.")
         return HttpResponseRedirect(self.get_success_url())
