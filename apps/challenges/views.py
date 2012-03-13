@@ -267,8 +267,8 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         raise Http404
     # Sidebar
     ## Voting
-    user_vote = Vote.objects.get_for_user(entry, request.user)
-    votes = Vote.objects.get_score(entry)
+    user_vote = Vote.objects.get_for_user(parent, request.user)
+    votes = Vote.objects.get_score(parent)
 
     ## Previous/next modules
     # We can't use Django's built-in methods here, because we need to restrict
@@ -301,7 +301,6 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # Determine if this idea has a timeslot allocated for the webcast
     # triggered here to cache it
     webcast_list = entry.timeslot_set.filter(is_booked=True)
-
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -315,6 +314,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'judging_form': judging_form,
         'judge_assigned': judge_assigned,
         'webcast_list': webcast_list,
+        'parent': parent,
     })
 
 

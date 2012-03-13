@@ -138,12 +138,12 @@
                     <p>Use the social media sharing buttons above, or just get your friends to head to <em>http://www.mozillaignite.org{{ entry.get_absolute_url() }}</em></p>
                 {% else %}
                 {% if user_vote and user_vote.is_upvote %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
+                <form action="{{ url('entry_vote', object_id=parent.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="cancel cta do" value="{{ _('Clear my vote') }}" />
                 </form>
                 {% else %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST" id="user_vote">
+                <form action="{{ url('entry_vote', object_id=parent.pk, direction='up') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>

@@ -73,7 +73,7 @@ def test(*args):
         apps = ' '.join(args)
     else:
         # TODO: add the rest of the apps and make sure the tests pass!
-        apps = 'challenges users timeslot webcast'
+        apps = 'challenges timeslot webcast activity events users'
     print yellow('Testing: %s' % apps)
     local('python manage.py test %s --settings=settings_test' % apps)
 
