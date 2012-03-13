@@ -624,14 +624,10 @@ legend span {
 .back {
     margin-bottom: 1em;
     display: inline-block;
-    font-weight: bold;
-    font-size: 14px;
 }
 .back:before {
     content: "<<";
     margin-right: 10px;
-    font-weight: bold;
-    font-size: 14px;
 }
 /* External links */
 .external {
@@ -1301,27 +1297,24 @@ section footer .cta {
 #show_submission .entre address {
     border: 10px solid #000;
     border-width: 10px 0;
-    padding: 1em 0 1em 100px;
-    position: relative;
     font-style: normal;
     min-height: 90px;
 }
-#show_submission .description {
+.description {
+    border-bottom: 1px solid #E2E2E2;
+}
+.description p,
+.description ol,
+.description ul {
     font-size: 18px;
     color: #5c5c5c;
-    margin: 1em 0 2em;
+    line-height: 30px;
 }
-#show_submission .description ul,
-#show_submission .description ol {
-    font-size: 12px;
+.links ul {
+    padding-left: 20px;
 }
-#show_submission .entre address a {
-    font-weight: bold;
-    font-size: 14px;
-}
-#show_submission .entre address p {
-    font-size: 12px;
-    color: #5c5c5c;
+.links a {
+    font-weight: normal;
 }
 #show_submission .entre address .frame {
     width: auto;
@@ -1335,15 +1328,7 @@ section footer .cta {
     border-width: 1px 0 0;
     overflow: hidden;
 }
-#show_submission .entre aside section:last-child {
-    border-top: 10px solid #000;
-    padding: 20px;
-    text-align: center;
-}
 #show_submission .entre aside h2 {
-    font-weight: normal;
-    color: #5c5c5c;
-    font-size: 12px;
     margin-top: 0;
 }
 .browser ul {
@@ -1365,18 +1350,23 @@ section footer .cta {
     padding-top: 0;
     position: relative;
 }
-header.vcard {
+.vcard {
     margin-bottom: 1.5em;
     padding-left: 110px;
     position: relative;
+    min-height: 90px;
 }
-header.vcard .frame {
+address.vcard {
+    padding-top: 1em;
+    padding-bottom: 1em;
+}
+.vcard .frame {
     width: 90px;
     position: absolute;
     top: 0;
     left: 0;
 }
-header.vcard .fn {
+.vcard .fn {
     margin: 0
 }
 #dsq-content-stub {
@@ -1443,25 +1433,10 @@ header.vcard .fn {
     list-style: none;
     padding-left: 0;
 }
-.index-content ol li {
-    position: relative;
-    padding-left: 100px;
-    min-height: 100px;
-    margin-top: 1em;
-}
-.index-content ol li:first-child {
-    margin-top: 0;
-}
 .index-content li h2 {
     margin: 0;
 }
 .index-content li .url {
     margin-bottom: 1em;
     display: inline-block;
-}
-.index-content ol .frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: auto !important;
 }
