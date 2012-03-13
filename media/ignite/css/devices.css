@@ -1436,12 +1436,8 @@ header.vcard .fn {
     color: #333;
 }
 /* Index page - for example judges */
-.index h2 {
-    font-size: 14px;
-}
 .index ol {
     padding-left: 0;
-    font-size: 14px;
 }
 .index-content ol {
     list-style: none;
@@ -1462,7 +1458,6 @@ header.vcard .fn {
 .index-content li .url {
     margin-bottom: 1em;
     display: inline-block;
-    font-size: 12px;
 }
 .index-content ol .frame {
     position: absolute;

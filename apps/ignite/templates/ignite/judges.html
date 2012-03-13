@@ -9,16 +9,16 @@
 {% endblock %}
 
 {% block content %}
-<div class="columns">
+<div class="content_columns columns">
 <nav class="index col box">
-<h2>Index</h2>
+<h2 class="wimper">Index</h2>
 <ol>
 {% for profile in profiles %}
 <li><a href="#{{ profile.user.username }}">{{ profile.display_name }}</a></li>
 {% endfor %}
 </ol>
 </nav>
-<div class=" index-content col box">
+<div class="main index-content col box">
 <ol>
 {% for profile in profiles %}
 <li id={{ profile.user.username }} tabIndex="0" class="vcard">

@@ -196,8 +196,4 @@ header.vcard {
 /* Index pages */
 .index {
     float: right;
-    width: 33%;
-}
-.index-content {
-    width: 67%;
 }
