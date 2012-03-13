@@ -64,7 +64,10 @@ def profile(request, username):
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
     if 'challenges' in INSTALLED_APPS:
-        submissions = Submission.objects.visible().filter(created_by=profile)
+        if profile.user == user:
+            submissions = Submission.objects.current().filter(created_by=profile)
+        else:
+            submissions = Submission.objects.visible().filter(created_by=profile)
     # Show the all the submission related data when the user is the owner
     submission_list = []
     if settings.DEVELOPMENT_PHASE and profile.user == user:

@@ -518,5 +518,4 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
-
 entry_delete = DeleteEntryView.as_view()
