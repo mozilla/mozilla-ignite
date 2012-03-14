@@ -177,7 +177,7 @@ class Phases(TestCase):
 
     def setUp(self):
         self.project, self.challenge = _create_project_and_challenge()
-        
+
         self.p1 = Phase.objects.create(
             name=u'Phase 1',
             order=1,
@@ -192,13 +192,11 @@ class Phases(TestCase):
             start_date = datetime.now() + relativedelta( months = +2 ),
             end_date = datetime.now() + relativedelta( months = +3 )
         )
- 
-    
+
     def test_get_current_open(self):
        current = Phase.objects.get_current_phase(self.challenge.slug)
-       self.assertEqual(len(current), 1)
-       self.assertEqual(current[0].name, 'Phase 1')
-    
+       self.assertEqual(current.name, 'Phase 1')
+
     def tearDown(self):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()

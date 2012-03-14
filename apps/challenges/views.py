@@ -175,9 +175,8 @@ def extract_form_errors(form, link_form):
 def create_entry(request, project, slug):
     """Creates a ``Submission`` from the user details"""
     project = get_object_or_404(Project, slug=project)
-    try:
-        phase = Phase.objects.get_current_phase(slug)[0]
-    except IndexError:
+    phase = Phase.objects.get_current_phase(slug)
+    if not phase:
         raise Http404
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
