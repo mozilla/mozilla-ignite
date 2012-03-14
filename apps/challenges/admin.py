@@ -70,7 +70,8 @@ class SubmissionAdmin(admin.ModelAdmin):
     list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
                     'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
-    list_filter = ('category', 'is_draft', 'is_winner')
+    list_filter = ('category', 'is_draft', 'is_winner',
+                   'phase__name')
     list_select_related = True  # For the judgement fields
     inlines = (JudgeAssignmentInline, ExclusionFlagInline,
                SubmissionBadgeInline)
@@ -149,7 +150,7 @@ class SubmissionVersionInline(admin.TabularInline):
 class SubmissionParentAdmin(admin.ModelAdmin):
     inlines = [SubmissionVersionInline]
     list_display = ['name', 'submission', 'slug', 'is_featured']
-    list_filter = ['is_featured']
+    list_filter = ['is_featured', 'status']
     search_fields = ['name', 'submission__title', 'slug']
 
 

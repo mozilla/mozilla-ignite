@@ -16,6 +16,9 @@ from challenges.models import (Challenge, Submission, Phase, Category,
                               SubmissionVersion)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users)
+from challenges.tests.test_base import TestPhasesBase
+from timeslot.tests.fixtures import (create_user, create_submission,
+                                      create_phase_round)
 from ignite.tests.decorators import ignite_skip
 
 
@@ -292,20 +295,68 @@ class JudgementScoring(TestCase):
 
 
 class TestSubmissions(TestCase):
-    
+
     def setUp(self):
         challenge_setup()
         create_submissions(3)
+        self.phase = Phase.objects.get()
         cache.clear()
-    
+
     def test_no_exclusions(self):
-        self.assertEqual(Submission.objects.eligible().count(), 3)
-    
+        self.assertEqual(Submission.objects.eligible(self.phase).count(), 3)
+
     def test_exclusion(self):
         excluded = Submission.objects.all()[0]
         ExclusionFlag.objects.create(submission=excluded, notes='Blah blah')
-        self.assertEqual(Submission.objects.eligible().count(), 2)
-    
+        self.assertEqual(Submission.objects.eligible(self.phase).count(), 2)
+
+
+class TestSubmissionsMultiplePhases(TestPhasesBase):
+
+    def setUp(self):
+        super(TestSubmissionsMultiplePhases, self).setUp()
+        self.user = create_user('bob')
+        self.round_a = create_phase_round('A', self.development)
+        self.round_b = create_phase_round('B', self.development)
+
+    def test_exclude_submission_phases(self):
+        for i in range(3):
+            create_submission('Submision %s' % i, self.user, self.ideation)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 3)
+        self.assertEqual(Submission.objects.eligible(self.development).count(), 0)
+        self.assertEqual(Submission.objects.count(), 3)
+
+    def test_exclude_submission_rounds(self):
+        extra = {'phase_round': self.round_a}
+        for i in range(3):
+            create_submission('Submision %s' % i, self.user, self.ideation, extra)
+        self.assertEqual(Submission.objects.eligible(self.ideation,
+                                                     self.round_a).count(), 3)
+        self.assertEqual((Submission.objects.eligible(self.ideation,
+                                                      self.round_b).count()), 0)
+
+    def test_exclude_submission_version(self):
+        i_list = [create_submission('Submision %s' % i,
+                                    self.user, self.ideation) for i in range(3)]
+        item = i_list[0]
+        new_sub = create_submission('Replacement', self.user, self.development,
+                                    parent=False)
+        self.assertEqual(Submission.objects.count(), 4)
+        parent = item.submissionparent_set.all()[0]
+        parent.update_version(new_sub)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 2)
+        self.assertEqual(Submission.objects.eligible(self.development).count(), 1)
+
+    def test_exclude_drafts(self):
+        i_list = [create_submission('Submision %s' % i,
+                                    self.user, self.ideation) for i in range(3)]
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 3)
+        for item in i_list:
+            item.is_draft = True
+            item.save()
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
+
+
 class DraftSubmissionTest(TestCase):
     
     def setUp(self):
@@ -454,7 +505,7 @@ class SubmissionParentVersioningTest(TestCase):
         self.parent.update_version(self.submission_b)
         self.assertEqual(self.parent.submission, self.submission_b)
         self.assertEqual(self.parent.slug, self.submission_a.id)
-        self.assertEqual(self.parent.name, self.submission_a.title)
+        self.assertEqual(self.parent.name, self.submission_b.title)
 
     def test_visible_submission(self):
         """Test a versioned Submission is not visible on all listing"""

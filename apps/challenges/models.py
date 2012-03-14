@@ -234,9 +234,20 @@ class Category(BaseModel):
 
 
 class SubmissionManager(BaseModelManager):
-    def eligible(self):
-        """Return all eligible submissions (i.e. those not excluded)."""
-        return self.filter(exclusionflag__isnull=True)
+    def eligible(self, phase, phase_round=None):
+        """Return all eligible submissions
+        - Not excluded
+        - With an entry in the current phase.
+        - Submission must be in the current ``SubmissionParent``
+        - Is not a draft
+        Older submissions when edited will always have an entr in the current
+        phase"""
+        qs = {'phase': phase}
+        if phase_round:
+            qs.update({'phase_round': phase_round})
+        return self.filter(exclusionflag__isnull=True, is_draft=False,
+                           submissionparent__status=SubmissionParent.ACTIVE,
+                           **qs)
 
     # Note: normally anything mutable wouldn't go into a default, but we can be
     # sure this method doesn't modify the anonymous user
@@ -581,7 +592,9 @@ class PhaseRound(models.Model):
 
 
 class SubmissionParent(models.Model):
-    """Acts as a proxy for the ``Submissions`` so we can keep them versioned"""
+    """Acts as a proxy for the ``Submissions`` so we can keep them versioned
+    Slug should never change since it is the main ID for this submission
+    through all the process"""
     ACTIVE = 1
     INACTIVE = 2
     REMOVED = 3
@@ -619,6 +632,7 @@ class SubmissionParent(models.Model):
     def update_version(self, submission):
         """Updates the current ``SubmissionParent`` version"""
         self.submissionversion_set.create(submission=self.submission)
+        self.name = submission.title
         self.submission = submission
         self.save()
 

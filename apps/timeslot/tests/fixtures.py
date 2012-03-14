@@ -71,7 +71,7 @@ def create_category(slug, extra_data=None):
     return instance
 
 
-def create_submission(title, profile, phase, extra_data=None):
+def create_submission(title, profile, phase, extra_data=None, parent=True):
     """Creates a submission"""
     data = {
         'created_by': profile,
@@ -82,7 +82,8 @@ def create_submission(title, profile, phase, extra_data=None):
     if extra_data:
         data.update(extra_data)
     instance, created = Submission.objects.get_or_create(**data)
-    SubmissionParent.objects.get_or_create(submission=instance)
+    if parent:
+        SubmissionParent.objects.get_or_create(submission=instance)
     return instance
 
 
@@ -96,7 +97,6 @@ def create_phase_round(name, phase, extra_data=None):
     if extra_data:
         data.update(extra_data)
     return PhaseRound.objects.create(**data)
-
 
 def create_release(name, is_current, extra_data=None):
     """Helper to create releases"""
