@@ -29,7 +29,7 @@ class JudgeAwareUserAdmin(UserAdmin):
 class PhaseInline(admin.TabularInline):
     
     model = Phase
-
+    
 
 class PhaseCriterionInline(admin.TabularInline):
     
@@ -52,9 +52,13 @@ class ExclusionFlagInline(admin.StackedInline):
     extra = 1
 
 
+class PhaseRoundInline(admin.TabularInline):
+    model = PhaseRound
+    form = PhaseRoundAdminForm
+    extra = 1
+
 class PhaseAdmin(admin.ModelAdmin):
-    
-    inlines = (PhaseCriterionInline,)
+    inlines = (PhaseCriterionInline, PhaseRoundInline)
 
 
 class SubmissionBadgeInline(admin.TabularInline):
@@ -162,5 +166,4 @@ admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
-admin.site.register(PhaseRound, PhaseRoundAdmin)
 admin.site.register(SubmissionParent, SubmissionParentAdmin)

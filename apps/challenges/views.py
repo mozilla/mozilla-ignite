@@ -20,6 +20,7 @@ from tower import ugettext as _
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page
+from challenges.decorators import phase_open_required
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
@@ -171,6 +172,7 @@ def extract_form_errors(form, link_form):
     return form_errors
 
 
+@phase_open_required(methods_allowed=['GET'])
 @login_required
 def create_entry(request, project, slug):
     """Creates a ``Submission`` from the user details"""
@@ -492,7 +494,9 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         return super(EditEntryView, self).dispatch(*args, **kwargs)
 
 
-entry_edit = EditEntryView.as_view()
+# This view is only available when there is a Phase open
+entry_edit = phase_open_required(EditEntryView.as_view(),
+                                 methods_allowed=['GET'])
 
 
 class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
@@ -527,4 +531,7 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
-entry_delete = DeleteEntryView.as_view()
+
+# Removal only allowed during phases opened
+entry_delete = phase_open_required(DeleteEntryView.as_view(),
+                                   methods_allowed=['GET'])
