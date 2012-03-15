@@ -38,7 +38,7 @@ class TimeSlot(models.Model):
         """Determines if this booking has expired"""
         expire_date = self.booking_date + \
             timedelta(seconds=settings.BOOKING_EXPIRATION)
-        return any([expire_date < datetime.now(), self.is_booked])
+        return any([expire_date < datetime.utcnow(), self.is_booked])
 
 
 class Release(models.Model):

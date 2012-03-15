@@ -3,20 +3,26 @@ from django.conf import settings
 
 def assigned_submissions_processor(request):
     """Add the number of assigned submissions to the request context."""
+    # Avoid any admin, media or debug url
+    if any(p in request.path for p in settings.MIDDLEWARE_URL_EXCEPTIONS):
+        return {}
     try:
         user = request.user
     except:
         # For some reason, we can't get hold of the user information
         return {}
-    
-    if not user.has_perm('challenges.judge_submission'):
+    # Rf we don't have the phase in the request, we assume it is closed
+    is_open = request.phase['is_open'] if hasattr(request, 'phase') else False
+    # judging only should happen when the phases are closed
+    # only calculate the details when user is a judge
+    if is_open or not user.has_perm('challenges.judge_submission'):
         return {}
     profile = user.get_profile()
-    
     # Count the submissions assigned but not judged
     assigned = (Submission.objects.filter(judgeassignment__judge=profile)
                                   .exclude(judgement__judge=profile))
     return {'assignment_count': assigned.count()}
+
 
 def current_phase(request):
     """Add to the context the ``DEVELOPMENT_PHASE``is active

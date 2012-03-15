@@ -2,6 +2,7 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, permission_required
+from django.conf import settings
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
@@ -20,7 +21,7 @@ from tower import ugettext as _
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page
-from challenges.decorators import phase_open_required
+from challenges.decorators import phase_open_required, phase_closed_required
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
@@ -291,8 +292,9 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     except IndexError:
         next = entries.order_by('created_on')[0]
 
-    # Judging
-    if not entry.judgeable_by(request.user):
+    # Judging is only open if the submission has been assigned and
+    # the phases are closed
+    if request.phase['is_open'] or not entry.judgeable_by(request.user):
         judging_form = None
         judge_assigned = False
     else:
@@ -410,6 +412,10 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
                          _('Success! Thanks for evaluating the submission.'))
         return response
 
+    # Make sure it is only available when the phases are closed
+    @method_decorator(phase_closed_required(methods_allowed=['GET']))
+    def dispatch(self, *args, **kwargs):
+        return super(EntryJudgementView, self).dispatch(*args, **kwargs)
 
 entry_judge = EntryJudgementView.as_view()
 
@@ -454,28 +460,66 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         return self.render_to_response(context)
     
     def post(self, request, *args, **kwargs):
-        """Handle a POST request.
-        
+        """Handle the ``Submission`` update, only available when a phase is open
         If the forms are both valid, save them and redirect to the success URL.
         If either form is invalid, render the form with the errors displayed.
-        
+        If a different round is active:
+        - Archive the old submission, add the new one with the changes
         """
         self.object = self.get_object()
-        
         forms = self.get_forms()
         form, link_form = forms['form'], forms['link_form']
-        
         if form.is_valid() and link_form.is_valid():
             return self.form_valid(form, link_form)
         else:
             return self.form_invalid(form, link_form)
-    
+
     def form_valid(self, form, link_form):
+        """Saves updates the ``Submission`` if it is on the same ``Round`` and
+        ``Phase`` else archive the old submission and create a new entry"""
         messages.success(self.request, 'Your entry has been updated.')
-        response = super(EditEntryView, self).form_valid(form)
-        link_form.save()
+        phase = Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
+        object_phase = self.object.phase_round if self.object.phase_round else None
+        if self.object.phase == phase and object_phase == phase.current_round:
+            # No changes during a different Round and Phase update the
+            # current entry
+            response = super(EditEntryView, self).form_valid(form)
+            link_form.save()
+        else:
+            #  Archive the old submission and create a new entry for the current
+            # Phase / Round with the new details
+            previous_submission = self.object
+            profile = self.request.user.get_profile()
+            parent = previous_submission.parent
+            submission = Submission(created_by=profile,
+                                    category=previous_submission.category,
+                                    phase=phase)
+            if phase.current_round:
+                submission.phase_round = phase.current_round
+            # Pass the form data to the new submission
+            kwargs = self.get_form_kwargs()
+            kwargs['instance'] = submission
+            new_form = self.form_class(**kwargs)
+            if new_form.is_valid():
+                new_submission = new_form.save()
+                if not kwargs['files']:
+                    new_submission.sketh_note = previous_submission.sketh_note
+                    new_submission.save()
+                parent.update_version(new_submission)
+                # Duplicate links
+                for link in link_form.cleaned_data:
+                    if not link:
+                        continue
+                    ExternalLink.objects.create(url=link['url'],
+                                                name=link['name'],
+                                                submission=new_submission)
+            else:
+                # This is the best way to handle invalid details when duplicating
+                # the form
+                return self.form_invalid(new_form, link_form)
+            response = HttpResponseRedirect(self.get_success_url())
         return response
-    
+
     def form_invalid(self, form, link_form):
         """Display the form with errors."""
         form_errors = extract_form_errors(form, link_form)
@@ -488,15 +532,15 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         context['challenge'] = self._get_challenge()
         context['project'] = context['challenge'].project
         return context
-    
+
     @method_decorator(login_required)
+    @method_decorator(phase_open_required(methods_allowed=['GET']))
     def dispatch(self, *args, **kwargs):
         return super(EditEntryView, self).dispatch(*args, **kwargs)
 
 
 # This view is only available when there is a Phase open
-entry_edit = phase_open_required(EditEntryView.as_view(),
-                                 methods_allowed=['GET'])
+entry_edit = EditEntryView.as_view()
 
 
 class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
@@ -526,12 +570,10 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         self.object.delete()
         messages.success(request, "Your submission has been deleted.")
         return HttpResponseRedirect(self.get_success_url())
-    
+
     @method_decorator(login_required)
+    @method_decorator(phase_open_required(methods_allowed=['GET']))
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
-
-# Removal only allowed during phases opened
-entry_delete = phase_open_required(DeleteEntryView.as_view(),
-                                   methods_allowed=['GET'])
+entry_delete = DeleteEntryView.as_view()

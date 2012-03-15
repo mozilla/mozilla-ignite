@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from decimal import Decimal
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -213,7 +215,18 @@ class JudgingViewTest(MessageTestCase):
     
     def setUp(self):
         judging_setup()
-    
+        # Make sure dates are in the past
+        self.phase = Phase.objects.get()
+        date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.start_date = date
+        self.phase.end_date = date
+        self.phase.save()
+
+    def open_phase(self):
+        date = datetime.utcnow() + timedelta(hours=1)
+        self.phase.end_date = date
+        self.phase.save()
+
     @ignite_only
     def test_no_judge_form(self):
         """Test the form doesn't show if the user doesn't have permission."""
@@ -233,7 +246,16 @@ class JudgingViewTest(MessageTestCase):
         expected_keys = set(['criterion_%s' % c.pk for c in criteria])
         expected_keys.add('notes')
         self.assertEqual(set(judging_form.fields.keys()), expected_keys)
-    
+
+    @ignite_only
+    def test_judge_closed_phase(self):
+        """Test the judging form is not valid when the phase is closed"""
+        self.open_phase()
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url(), follow=True)
+        assert response.context['judging_form'] is None
+
     @ignite_only
     def test_non_eliminated_entry(self):
         """Test that non-eliminated entries are not marked as eliminated."""
@@ -273,7 +295,19 @@ class JudgingViewTest(MessageTestCase):
         self.assertEqual(judgement.submission, submission)
         for answer in judgement.answers.all():
             self.assertEqual(answer.rating, 5)
-    
+
+    @ignite_only
+    def test_submit_judge_form_with_closed_phase(self):
+        """Test judging when the Phase has been closed"""
+        self.open_phase()
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url(), follow=True)
+        post_data = {'notes': 'This submission is acceptable to me.'}
+        response = self.client.post(submission.get_judging_url(),
+                                    data=post_data, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     @ignite_only
     def test_judge_not_assigned(self):
         """Test behaviour when the current user is not assigned this entry."""

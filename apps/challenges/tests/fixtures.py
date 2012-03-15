@@ -29,7 +29,7 @@ def challenge_setup():
     c.slug = getattr(settings, 'IGNITE_CHALLENGE_SLUG', 'my-challenge')
     c.summary = 'Are you up to it?'
     c.description = 'This is a challenge of supreme challengingness.'
-    c.end_date = datetime.now() + timedelta(days=365)
+    c.end_date = datetime.utcnow() + timedelta(days=365)
     c.save()
     
     ph = Phase()

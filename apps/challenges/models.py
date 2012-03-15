@@ -142,6 +142,7 @@ def has_phase_finished(phase):
         end_date = phase.end_date
     return datetime.utcnow() > end_date
 
+
 class Phase(BaseModel):
     """A phase of a challenge."""
     challenge = models.ForeignKey(Challenge, related_name='phases')
@@ -240,7 +241,7 @@ class SubmissionManager(BaseModelManager):
         - With an entry in the current phase.
         - Submission must be in the current ``SubmissionParent``
         - Is not a draft
-        Older submissions when edited will always have an entr in the current
+        Older submissions when edited will always have an entry in the current
         phase"""
         qs = {'phase': phase}
         if phase_round:
@@ -279,7 +280,7 @@ class Submission(BaseModel):
     
     objects = SubmissionManager()
     
-    title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
+    title = models.CharField(verbose_name=_(u'Title'), max_length=60)
     brief_description = models.CharField(max_length=200,
         verbose_name=_(u'Brief Description'),
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
@@ -297,7 +298,9 @@ class Submission(BaseModel):
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(default=datetime.utcnow)
     updated_on = ModificationDateTimeField()
-    is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
+    is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'),
+                                    default=False,
+                                    help_text=_(u'Mark this entry as green lit'))
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
         help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
     phase = models.ForeignKey('challenges.Phase')
@@ -334,11 +337,17 @@ class Submission(BaseModel):
                            'slug': self.challenge.slug})
             return reverse(view_name, kwargs=kwargs)
 
-    @property
-    def parent_slug(self):
+    @cached_property
+    def parent(self):
         parent_list = self.submissionparent_set.all()
         if parent_list:
-            return parent_list[0].slug
+            return parent_list[0]
+        return None
+
+    @cached_property
+    def parent_slug(self):
+        if self.parent:
+            return self.parent.slug
         # Fallback to the versioning list, this query is expensive.
         # Provided for consistency
         version_list = self.submissionversion_set.select_related('parent').all()
@@ -629,12 +638,18 @@ class SubmissionParent(models.Model):
     def get_absolute_url(self):
         return ('entry_show', [self.slug])
 
-    def update_version(self, submission):
+    def update_version(self, new_submission):
         """Updates the current ``SubmissionParent`` version"""
-        self.submissionversion_set.create(submission=self.submission)
-        self.name = submission.title
-        self.submission = submission
+        if not self.id:
+            raise ValueError('You need to save the SubmissionParent before '
+                             'updating versions')
+        # Archive the current submission
+        SubmissionVersion.objects.create(submission=self.submission,
+                                         parent=self)
+        self.name = new_submission.title
+        self.submission = new_submission
         self.save()
+
 
 class SubmissionVersion(models.Model):
     """Keeps track of the version of a given ``Submission``"""

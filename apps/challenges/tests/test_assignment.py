@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User, Group, Permission
 from test_utils import TestCase
@@ -122,7 +123,19 @@ class AssignmentContextTest(TestCase):
     
     def setUp(self):
         assignment_setup()
+        # Make sure the phase is closed
+        self.phase = Phase.objects.get()
+        date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.start_date = date
+        self.phase.end_date = date
+        self.phase.save()
         self.judge_profile = User.objects.get(username='alex').get_profile()
+
+    def open_phase(self):
+        date = datetime.utcnow() + timedelta(hours=1)
+        self.phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.end_date = date
+        self.phase.save()
     
     @ignite_only
     def test_anonymous_context(self):
@@ -143,7 +156,17 @@ class AssignmentContextTest(TestCase):
         assert self.client.login(username='alex', password='alex')
         response = self.client.get('/')
         self.assertEqual(response.context.get('assignment_count'), 2)
-    
+
+    @ignite_only
+    def test_assigned_phase_open(self):
+        self.open_phase()
+        for submission in Submission.objects.all()[:2]:
+            JudgeAssignment.objects.create(submission=submission,
+                                           judge=self.judge_profile)
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        assert response.context.get('assignment_count') is None
+
     @ignite_only
     def test_assigned_and_judged(self):
         """Check that submissions don't count if the judge has judged them."""

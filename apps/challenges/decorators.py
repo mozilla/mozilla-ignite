@@ -23,8 +23,7 @@ def judge_required(func):
         return func(request, *args, **kwargs)
     return _decorated
 
-
-def phase_open_required(func=None, methods_allowed=None):
+def phase_required(func=None, methods_allowed=None, is_open=True):
     """Forbids access to the wrapped view when the phase is not open, by default
     blocks all methods
     Usage:
@@ -38,7 +37,12 @@ def phase_open_required(func=None, methods_allowed=None):
         @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
             allowed = [] if not methods_allowed else methods_allowed
-            if not request.phase['is_open'] and not request.method in allowed:
+            # Determine which phase state is blacklisted open or closed
+            if is_open:
+                condition = not request.phase['is_open']
+            else:
+                condition = request.phase['is_open']
+            if condition and not request.method in allowed:
                 return HttpResponseForbidden()
             return func(request, *args, **kwargs)
         return wrapper
@@ -47,3 +51,12 @@ def phase_open_required(func=None, methods_allowed=None):
     else:
         return decorator(func)
 
+
+def phase_open_required(func=None, methods_allowed=None):
+    return phase_required(func=func, methods_allowed=methods_allowed,
+                          is_open=True)
+
+
+def phase_closed_required(func=None, methods_allowed=None):
+    return phase_required(func=func, methods_allowed=methods_allowed,
+                          is_open=False)

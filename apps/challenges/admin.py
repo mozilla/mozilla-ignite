@@ -67,11 +67,10 @@ class SubmissionBadgeInline(admin.TabularInline):
 
 class SubmissionAdmin(admin.ModelAdmin):
     model = Submission
-    list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
-                    'is_winner', 'excluded', 'judge_assignment',
+    list_display = ('title', 'created_by', 'category', 'phase',
+                    'is_draft', 'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
-    list_filter = ('category', 'is_draft', 'is_winner',
-                   'phase__name')
+    list_filter = ('category', 'is_draft', 'is_winner', 'phase__name')
     list_select_related = True  # For the judgement fields
     inlines = (JudgeAssignmentInline, ExclusionFlagInline,
                SubmissionBadgeInline)
