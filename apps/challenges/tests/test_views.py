@@ -205,6 +205,8 @@ class CreateEntryTest(test_utils.TestCase):
         submission = Submission.objects.get()
         assert_equal(submission.challenge.slug, self.challenge_slug)
         assert_equal(submission.created_by.user, alex)
+        parent = SubmissionParent.objects.get()
+        assert_equal(parent.submission, submission)
     
     @ignite_skip
     def test_invalid_form(self):
@@ -345,24 +347,33 @@ class EditEntryTest(MessageTestCase):
     def setUp(self):
         challenge_setup()
         create_users()
-        
         admin = User.objects.create_user('admin', 'admin@example.com',
                                          password='admin')
         admin.is_superuser = True
         admin.save()
-        
         # Fill in the profile name to stop nag redirects
         admin_profile = admin.get_profile()
         admin_profile.name = 'Admin Adminson'
         admin_profile.save()
-        
         alex_profile = User.objects.get(username='alex').get_profile()
         create_submissions(1, creator=alex_profile)
-        
         entry = Submission.objects.get()
         self.view_path = entry.get_absolute_url()
         self.edit_path = entry.get_edit_url()
-    
+
+
+    def open_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() + timedelta(hours=1)
+        phase.save()
+
+    def close_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() - timedelta(hours=1)
+        phase.save()
+
     def _edit_data(self, submission=None):
         if submission is None:
             submission = Submission.objects.get()
@@ -370,14 +381,13 @@ class EditEntryTest(MessageTestCase):
                     brief_description='A submission',
                     description='A really, seriously good submission',
                     category=submission.category.id)
-    
+
     @suppress_locale_middleware
     def test_edit_form(self):
         self.client.login(username='alex', password='alex')
-        
         response = self.client.get(self.edit_path)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_edit(self):
         self.client.login(username='alex', password='alex')
@@ -387,15 +397,23 @@ class EditEntryTest(MessageTestCase):
         self.assertRedirects(response, self.view_path)
         # Check for a success message
         self.assertSuccessMessage(response)
-        
         assert_equal(Submission.objects.get().description, data['description'])
-    
+
+    @suppress_locale_middleware
+    def test_edit_closed_phase(self):
+        self.close_phase()
+        self.client.login(username='alex', password='alex')
+        data = self._edit_data()
+        data.update(BLANK_EXTERNALS)
+        response = self.client.post(self.edit_path, data, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     @suppress_locale_middleware
     def test_anonymous_access(self):
         """Check that anonymous users can't get at the form."""
         response = self.client.get(self.edit_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_anonymous_edit(self):
         """Check that anonymous users can't post to the form."""
@@ -628,3 +646,76 @@ class DeleteEntryTest(MessageTestCase):
         assert_equal((SubmissionVersion.objects
                       .filter(submission__created_by=self.alex_profile)
                       .count()), 0)
+
+
+class EditEntryPhaseTest(MessageTestCase):
+    """Test functionality of the edit entry view for new versions."""
+
+    def setUp(self):
+        challenge_setup()
+        create_users()
+        admin = User.objects.create_user('admin', 'admin@example.com',
+                                         password='admin')
+        admin.is_superuser = True
+        admin.save()
+        # Fill in the profile name to stop nag redirects
+        admin_profile = admin.get_profile()
+        admin_profile.name = 'Admin Adminson'
+        admin_profile.save()
+        alex_profile = User.objects.get(username='alex').get_profile()
+        create_submissions(1, creator=alex_profile)
+        self.close_phase()
+        entry = Submission.objects.get()
+        self.view_path = entry.get_absolute_url()
+        self.edit_path = entry.get_edit_url()
+        # create new active phase
+        challenge = Challenge.objects.get()
+        start_date = datetime.utcnow() - timedelta(hours=1)
+        end_date = datetime.utcnow() + timedelta(hours=1)
+        self.phase = Phase.objects.create(challenge=challenge,
+                                          name='New Phase',
+                                          start_date=start_date,
+                                          end_date=end_date, order=2)
+
+    def open_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() + timedelta(hours=1)
+        phase.save()
+
+    def close_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() - timedelta(hours=1)
+        phase.save()
+
+    def _edit_data(self, submission=None):
+        if submission is None:
+            submission = Submission.objects.get()
+        return dict(title=submission.title,
+                    brief_description='Versioned Submission',
+                    description='A really, seriously good submission',
+                    category=submission.category.id)
+
+    @suppress_locale_middleware
+    def test_edit_form(self):
+        self.client.login(username='alex', password='alex')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)
+
+    @suppress_locale_middleware
+    def test_edit(self):
+        """Test an edit when there is a new Phase"""
+        self.client.login(username='alex', password='alex')
+        data = self._edit_data()
+        data.update(BLANK_EXTERNALS)
+        response = self.client.post(self.edit_path, data, follow=True)
+        self.assertRedirects(response, self.view_path)
+        # Check for a success message
+        self.assertSuccessMessage(response)
+        parent = SubmissionParent.objects.get()
+        self.assertEqual(parent.name, data['title'])
+        # Make sure it was cloned
+        assert_equal(parent.submission.brief_description, data['brief_description'])
+        assert_equal(parent.submission.phase, self.phase)
+        assert_equal(Submission.objects.count(), 2)
