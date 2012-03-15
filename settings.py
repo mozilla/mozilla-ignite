@@ -33,6 +33,7 @@ ALLOWED_ATTRIBUTES = {
 }
 
 APP_NAME = 'Mozilla Ignite'
+APP_URL = 'http://www.mozillaignite.org'
 
 ## Internationalization.
 
@@ -123,7 +124,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     'topics.context_processors.topics',
     'django.core.context_processors.request',
-    'innovate.context_processors.app_name'
+    'innovate.context_processors.app_name',
+    'ignite.context_processors.site_url'
 )
 
 TEMPLATE_DIRS = (
