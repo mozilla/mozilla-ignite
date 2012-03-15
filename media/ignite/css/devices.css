@@ -311,28 +311,56 @@ legend span {
     background-image: -webkit-linear-gradient(bottom, rgb(239,50,25) 30%, rgb(239,72,25) 47%);
     padding: 0.4em 24px;
     font-size: 20px;
-    box-shadow: 0 2px 0 #ebebeb;
+    box-shadow: 0 0 0.3em #dbdbdb;
     display: inline-block;
     letter-spacing: 0.6px;
     /* Using important so line-height based on containers doesnt't screw stuff up */
     line-height: 1 !important;
 }
+.cta:hover {
+    background-image: linear-gradient(bottom, rgb(239,75,35) 40%, rgb(244,136,75) 82%);
+    background-image: -o-linear-gradient(bottom, rgb(239,75,35) 40%, rgb(244,136,75) 82%);
+    background-image: -moz-linear-gradient(bottom, rgb(239,75,35) 40%, rgb(244,136,75) 82%);
+    background-image: -webkit-linear-gradient(bottom, rgb(239,75,35) 40%, rgb(244,136,75) 82%);
+    text-decoration: none;
+}
+.cta:active {
+    box-shadow: none;
+    background: #e54821;
+    text-decoration: none;
+}
 .do {
-    color: #333 !important;
+    color: #fff !important;
     font-family: Arial;
     text-transform: none;
-    border: 1px solid #dcdcdc;
+    border: none;
+    font-size: 12px !important;
     padding: 1em 24px;
     -moz-border-radius: 20px;
     -webkit-border-radius: 20px;
     border-radius: 20px;
-    background-image: linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-image: -o-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-image: -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-image: -webkit-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
-    background-image: -ms-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    box-shadow: 3px 3px 0 #e3e3e3;
+    background-image: linear-gradient(bottom, rgb(69,127,192) 45%, rgb(56,165,221) 73%);
+    background-image: -o-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(56,165,221) 73%);
+    background-image: -moz-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(56,165,221) 73%);
+    background-image: -webkit-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(56,165,221) 73%);
+    background-image: -ms-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(56,165,221) 73%);
     letter-spacing: 0
 }
+.do:hover {
+    background-image: linear-gradient(bottom, rgb(69,127,192) 45%, rgb(100,194,238) 73%);
+    background-image: -o-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(100,194,238) 73%);
+    background-image: -moz-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(100,194,238) 73%);
+    background-image: -webkit-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(100,194,238) 73%);
+    background-image: -ms-linear-gradient(bottom, rgb(69,127,192) 45%, rgb(100,194,238) 73%);
+    text-decoration: none;
+}
+.do:active {
+    background: #427ab8;
+    text-decoration: none;
+    box-shadow: none;
+}
+
 .thumb {
     background: transparent url(../img/css/thumbs_up.png) no-repeat 10px 50%;
     background-image: url(../img/css/thumbs_up.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
@@ -550,6 +578,25 @@ legend span {
 .masthead ul a:active {
     color: #f3f3f3;
 }
+.masthead .toolbar {
+    overflow: hidden;
+    clear: both;
+    line-height: 22px;
+    list-style-type: none;
+}
+.masthead .toolbar p,
+.masthead .toolbar ul {
+    float: left;
+    margin-right: 10px;
+}
+.masthead .toolbar li {
+    float: left;
+    list-style-type: none;
+}
+.masthead .toolbar a {
+    color: #EF4619 !important;
+    padding: 0 10px !important ;
+}
 /* Promo box */
 .promo .shout {
     width: 60%;
@@ -706,6 +753,7 @@ h1 .sweet {
 }
 .methods {
     border-bottom: 1px solid #9BC4DF;
+    position: relative;
 }
 .methods h3 {
     color: #ed4619;
@@ -874,7 +922,8 @@ fieldset .focus_areas ul {
     bottom: 0;
     left: 0;
     text-align: left;
-    padding-left: 10em;
+    padding-left: 13em;
+    color: #5c5c5c;
 }
 .application .small_print h4 {
     margin-bottom: 0;
@@ -907,7 +956,7 @@ fieldset .focus_areas ul {
 .development {
     width: 75%;
     position: relative;
-    padding-bottom: 6em;
+    padding-bottom: 8em;
     background: transparent url(../img/css/infographic_arrow.png) no-repeat 40px 80%;
 }
 .rounds .wimper {
@@ -940,7 +989,7 @@ fieldset .focus_areas ul {
     content: ".";
     text-indent: -9999em;
     width: 1440px;
-    height: 180px;
+    height: 150px;
     position: absolute;
     z-index: 1;
     background: transparent url(../img/css/process_bg.png) no-repeat 0 0;;
@@ -1087,6 +1136,7 @@ section footer .cta {
     border-top: none;
     padding: 0;
     text-align: left;
+    margin-bottom: 0.5em;
 }
 .hentry .entry-title {
     margin-bottom: 0;
@@ -1097,7 +1147,7 @@ section footer .cta {
     height: 1px;
     overflow: hidden;
 }
-.submissions article a {
+.submissions article .title {
     color: #454545;
 }
 .submissions .title {

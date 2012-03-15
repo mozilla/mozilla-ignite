@@ -45,10 +45,16 @@
                 </ul>
             </nav>
             {% if user.is_authenticated() %}
-            <div style="font-size: 12px;">
-                <p style="clear: both; float: left; margin-right: 20px;">Signed in as {{ user.get_profile().display_name }}</p>
-                <a style="float: left; text-transform: lowercase; margin-right: 20px;" href="{{ url('users_profile', username=user.username) }}">View profile</a>
-                <a style="float: left; text-transform: lowercase;" href="{{ url('users_edit') }}">Edit profile</a>
+            <div class="toolbar">
+                <p>Signed in as {{ user.get_profile().display_name }}</p>
+                <ul>
+                    <li>
+                        <a href="{{ url('users_profile', username=user.username) }}">View profile</a>
+                    </li>
+                    <li>
+                        <a href="{{ url('users_edit') }}">Edit profile</a>
+                    </li>
+                </ul>
             </div>
             {% endif %}
         </div>

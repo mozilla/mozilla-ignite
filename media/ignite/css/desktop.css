@@ -160,12 +160,23 @@ header .meta em {
 .ignite_info br {
     display: block;
 }
+.methods:after {
+    content: "&nbsp;";
+    position: absolute;
+    height: 2em;
+    border-bottom: 1px solid #9BC4DF;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: block;
+    text-indent: -9999em;
+}
 .methods h3 {
     padding-left: 0;
 }
 .methods li {
     border-left: 1px solid #9bc4df;
-    padding: 2em 20px 60px;
+    padding: 4em 20px 60px;
     background-position: 20px 90%;
 }
 .methods ul li:first-child {
