@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %} 
-    <a href="{{ url('entries_all') }}" class="back">See all submissions</a>
+    <a href="{{ url('entries_all') }}" class="back wimper">See all submissions</a>
     <article>
         <h1 class="shout">{{ entry.title }}</h1> 
         {# This will need changing if edit and delete permissions separate #}
@@ -60,18 +60,19 @@
             {% endif %}
             <div class="description">
             {{ entry.description_html }}
+            </div>
             {% if links %}
-            <h2>External links</h2>
-            <p>More information on the idea can be found online at:</p>
+            <div class="links">
+            <h2 class="wimper">See also</h2>
             <ul>
             {% for link in links %}
-            <li><a href="{{ link.url }}">{{ link.name }}</a></li>
+            <li><a class="wimper" href="{{ link.url }}">{{ link.name }}</a></li>
             {% endfor %}
             </ul> 
-            {% endif %}
             </div>
+            {% endif %}
             <address class="vcard">
-                <p><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
+                <p class="wimper"><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
                 <div class="frame box">
                     <img class="photo" src="{{ entry.created_by.get_gravatar_url(80) }}" width="80" height="80" alt="" />
@@ -83,14 +84,14 @@
         </div>
         <aside class="col box">
             {% if judging_form %}
-            <section>
+            <section class="widgets">
                 {% if excluded %}
                 {# For the love of all that is holy, style me #}
                 <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
                     {% trans %}This entry has been eliminated from the contest.{% endtrans %}
                 </p>
                 {% endif %}
-                <h2>Rate this submission</h2>
+                <h2 class="wimper">Rate this submission</h2>
                 {% if judge_assigned %}
                 <p>This submission has been assigned to you</p>
                 {% else %}
@@ -99,12 +100,12 @@
                 <form method="POST" action="{{ entry.get_judging_url() }}">
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
-                    <input type="submit" class="cta do" value="Submit thy judgement" />
+                    <input type="submit" class="cta" value="Submit thy judgement" />
                 </form>
             </section>
             {% endif %}
             <section class="widgets">
-                <h2>Share</h2>
+                <h2 class="wimper">Share</h2>
                 <ul class="share">
                 <li>
                 <a href="https://twitter.com/share" class="twitter-share-button" data-count="horizontal" data-via="mozilla" data-related="USignite">Tweet</a>
@@ -118,8 +119,8 @@
 
                 </ul>
             </section>
-            <section>
-                <h2>Vote</h2>
+            <section class="widgets">
+                <h2 class="wimper">Vote</h2>
                 {% if user.is_authenticated() %}
                 {% if entry.editable_by(user) %}
                     <p><strong>Looking for more votes?</strong></p>
@@ -141,15 +142,15 @@
                 <p>To upvote this submission, please login or register for Mozilla Ignite.</p>
                 {% endif %}
             </section>
-            <section>
+            <section class="widgets">
                 <nav class="tags">
-                <h2>Category</h2>
+                <h2 class="wimper">Category</h2>
                 <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
-            <section>
+            <section class="widgets">
                 <nav class="browser">
-                <h2>More ideas</h2>
+                <h2 class="wimper">More ideas</h2>
                 <ul>
                 {% if previous %}
                     <li class="box"><a href="{{ previous.get_absolute_url() }}"><div class="frame box"><img src="{{ previous.get_image_src() }}" alt="" /></div>Previous</a></li>
@@ -160,10 +161,10 @@
                 </ul>
                 </nav>
             </section> 
-            <section class="highlight">
-                <p class="announce">How would you push the web further?</p>
+            <div class="highlight">
+                <h2 class="point box-title">How would you push the web further?</h2>
                 <a class="cta" href="{{ url('create_entry') }}">Create an idea</a>
-            </section>
+            </div>
         </aside>
         </div>
     </article>

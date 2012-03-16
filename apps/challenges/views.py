@@ -97,6 +97,30 @@ def entries_all(request, project, slug):
     return show(request, project, slug, template_name='challenges/all.html')
 
 
+class WinningEntriesView(ListView, JingoTemplateMixin):
+    """Show entries that have been marked as winners."""
+    
+    template_name = 'challenges/winning.html'
+    context_object_name = 'entries'
+    
+    def get_context_data(self, **kwargs):
+        context = super(WinningEntriesView, self).get_context_data(**kwargs)
+        context.update(project=self.project, challenge=self.challenge)
+        return context
+    
+    def get_queryset(self):
+        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
+        self.challenge = get_object_or_404(self.project.challenge_set,
+                                           slug=self.kwargs['slug'])
+        submissions = (Submission.objects.visible(self.request.user)
+                       .filter(phase__challenge=self.challenge)
+                       .filter(is_winner=True))
+        return submissions
+
+
+entries_winning = WinningEntriesView.as_view()
+
+
 class AssignedEntriesView(ListView, JingoTemplateMixin):
     """Show entries assigned to be judged by the current user."""
     

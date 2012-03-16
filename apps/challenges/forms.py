@@ -38,8 +38,11 @@ class EntryForm(forms.ModelForm):
     
     def clean(self):
         super(EntryForm, self).clean()
-        if self.errors.get('sketh_note'):
-            # Something is wrong with the image: remove it
+        if self.errors:
+            # Either something is wrong with the image, or there was another
+            # error on the form. In the former case, we don't want the image any
+            # more; in the latter, we've already lost it and it'll need
+            # re-uploading.
             self.files.pop(self.add_prefix('sketh_note'), None)
         return self.cleaned_data
 

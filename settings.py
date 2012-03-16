@@ -33,6 +33,7 @@ ALLOWED_ATTRIBUTES = {
 }
 
 APP_NAME = 'Mozilla Ignite'
+APP_URL = 'http://www.mozillaignite.org'
 
 ## Internationalization.
 
@@ -123,7 +124,8 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
     'topics.context_processors.topics',
     'django.core.context_processors.request',
-    'innovate.context_processors.app_name'
+    'innovate.context_processors.app_name',
+    'ignite.context_processors.site_url'
 )
 
 TEMPLATE_DIRS = (
@@ -249,6 +251,7 @@ INSTALLED_APPS = (
     'challenges',
     'ignite',
     'voting',
+    'blogs',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -344,5 +347,9 @@ CACHE_BACKEND = 'caching.backends.locmem://'
 CACHE_COUNT_TIMEOUT = None
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
+
+SITE_FEED_URLS = {
+    'splash': 'https://mozillaignite.org/blog/feed',
+}
 
 JUDGES_PER_SUBMISSION = 2
