@@ -100,7 +100,7 @@
                         <footer>
                             <span class="updated"><span class="value-title" title="{{ blog.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>{{ blog.updated.strftime('%B %d, %Y') }}</span> by <address class="author hcard"><span class="fn">{{ blog.autor }}</span></address>
                         </footer>
-                        <p class="entry-summary">{{ blog.summary }}</p>
+                        <p class="entry-summary">{{ blog.summary|replace("Continue reading →", "") }}</p>
                         <a href="{{ blog.link }}" rel="bookmark">Read more <span>on {{ blog.title }}</span></a>
                     </article>
                 </li>
