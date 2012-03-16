@@ -292,18 +292,24 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-
-    # Judging is only open if the submission has been assigned and
-    # the submission belongs to the judging phase
     if request.phase['is_open'] or not entry.judgeable_by(request.user):
         judging_form = None
         judge_assigned = False
     else:
-        if judging_form is None:
-            judging_form = _get_judging_form(user=request.user, entry=entry)
-        assignments = JudgeAssignment.objects
-        judge_assigned = assignments.filter(judge__user=request.user,
-                                            submission=entry).exists()
+        # the ``Submission`` belongs to the current combination of
+        # judging Phase and PhaseRound
+        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        if any([entry.phase != phase,
+                entry.phase_round != phase.judging_phase_round]):
+            judging_form = None
+            judge_assigned = None
+        else:
+            # Judging is only open if the submission has been assigned
+            if judging_form is None:
+                judging_form = _get_judging_form(user=request.user, entry=entry)
+            assignments = JudgeAssignment.objects
+            judge_assigned = assignments.filter(judge__user=request.user,
+                                                submission=entry).exists()
     # Use all the submission ids to sumarize any information required for the
     # project homepage
     submission_ids = list(parent.submissionversion_set.all()
@@ -388,6 +394,12 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
         return reverse('entries_assigned')
     
     def _check_permission(self, submission, user):
+        """Validates the entry ``Phase`` and ``PhaseRound`` is available
+        for judging and the user has privileges"""
+        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        if any([submission.phase != phase,
+                submission.phase_round != phase.judging_phase_round]):
+            return False
         return submission.judgeable_by(user)
     
     def get_form(self, form_class):

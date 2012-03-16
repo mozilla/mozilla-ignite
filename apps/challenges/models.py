@@ -446,6 +446,10 @@ class Submission(BaseModel):
             not self.timeslot_set.all(),
             ])
 
+    @property
+    def is_green_lit(self):
+        return self.is_winner
+
     class Meta:
         ordering = ['-id']
 
