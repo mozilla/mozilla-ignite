@@ -84,7 +84,7 @@
         </div>
         <aside class="col box">
             {% if judging_form %}
-            <section>
+            <section class="widgets">
                 {% if excluded %}
                 {# For the love of all that is holy, style me #}
                 <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
@@ -119,7 +119,7 @@
 
                 </ul>
             </section>
-            <section>
+            <section class="widgets">
                 <h2 class="wimper">Vote</h2>
                 {% if user.is_authenticated() %}
                 {% if entry.editable_by(user) %}
@@ -142,13 +142,13 @@
                 <p>To upvote this submission, please login or register for Mozilla Ignite.</p>
                 {% endif %}
             </section>
-            <section>
+            <section class="widgets">
                 <nav class="tags">
                 <h2 class="wimper">Category</h2>
                 <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
-            <section>
+            <section class="widgets">
                 <nav class="browser">
                 <h2 class="wimper">More ideas</h2>
                 <ul>
