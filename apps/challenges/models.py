@@ -11,7 +11,7 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.template.defaultfilters import slugify
 from django.db import models
-from django.db.models import signals
+from django.db.models import signals, Q
 from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
@@ -109,6 +109,16 @@ class PhaseManager(BaseModelManager):
         except IndexError:
             return None
 
+    def get_judging_phase(self, slug):
+        """Determines the judging ``Phase`` if the end_date is in the past
+        or a ``PhaseRound`` has past"""
+        now = datetime.utcnow()
+        try:
+            return self.filter((Q(end_date__lte=now) |
+                                Q(phaseround__end_date__lte=now)),
+                                challenge__slug=slug).order_by('-end_date')[0]
+        except IndexError:
+            return None
 
     def get_ideation_phase(self):
         """Returns the ``Ideation`` phase"""
@@ -184,6 +194,19 @@ class Phase(BaseModel):
                 return item
         return None
 
+    @cached_property
+    def judging_phase_round(self):
+        """Returns the ``PhaseRound`` that is being judged at the moment
+        - The round should have finished
+        """
+        now = datetime.utcnow()
+        # wed don't know if the phase_rounds are ordered by end date
+        sorted_rounds = sorted(self.phase_rounds, key=lambda x: x.end_date)
+        sorted_rounds.reverse()
+        for phase_round in sorted_rounds:
+            if phase_round.end_date <= now:
+                return phase_round
+        return None
 
 @receiver(signals.post_save, sender=Phase)
 def phase_update_cache(instance, **kwargs):

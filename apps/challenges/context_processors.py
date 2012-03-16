@@ -1,4 +1,4 @@
-from challenges.models import Submission, has_phase_finished
+from challenges.models import Submission, Phase, has_phase_finished
 from django.conf import settings
 
 def assigned_submissions_processor(request):
@@ -18,9 +18,15 @@ def assigned_submissions_processor(request):
     if is_open or not user.has_perm('challenges.judge_submission'):
         return {}
     profile = user.get_profile()
+    # Determine which is the phase that is being Judged at the moment
+    phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+    qs = {'phase': phase}
+    if phase.judging_phase_round:
+        qs.update({'phase_round': phase.judging_phase_round})
     # Count the submissions assigned but not judged
-    assigned = (Submission.objects.filter(judgeassignment__judge=profile)
-                                  .exclude(judgement__judge=profile))
+    assigned = (Submission.objects
+                .filter(judgeassignment__judge=profile, **qs)
+                .exclude(judgement__judge=profile))
     return {'assignment_count': assigned.count()}
 
 

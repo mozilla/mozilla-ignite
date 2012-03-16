@@ -101,20 +101,23 @@ def entries_all(request, project, slug):
 
 class AssignedEntriesView(ListView, JingoTemplateMixin):
     """Show entries assigned to be judged by the current user."""
-    
     template_name = 'challenges/assigned.html'
     context_object_name = 'entries'
-    
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
                                            slug=self.kwargs['slug'])
-        
-        ss = Submission.objects
-        submissions = (ss.filter(phase__challenge=self.challenge)
-                         .filter(judgeassignment__judge__user=self.request.user)
-                         .select_related('judgement__judge__user'))
-        
+        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        qs = {
+            'phase': phase,
+            'phase__challenge': self.challenge,
+            'judgeassignment__judge__user': self.request.user
+            }
+        if phase.judging_phase_round:
+            qs.update({'phase_round': phase.judging_phase_round})
+        submissions = (Submission.objects.filter(**qs)
+                       .select_related('judgement__judge__user'))
         # Add a custom attribute for whether user has judged this submission
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
@@ -127,10 +130,9 @@ entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 class JudgedEntriesView(ListView, JingoTemplateMixin):
     """Show all entries that have been judged."""
-    
     template_name = 'challenges/judged.html'
     context_object_name = 'entries'
-    
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
@@ -138,7 +140,6 @@ class JudgedEntriesView(ListView, JingoTemplateMixin):
         submissions = Submission.objects.filter(judgement__isnull=False)
         submissions = submissions.distinct()
         submissions = submissions.select_related('judgement__judginganswer__criterion')
-        
         for submission in submissions:
             judgements = [j for j in submission.judgement_set.all() if j.complete]
             total = sum(j.get_score() for j in judgements)
@@ -147,7 +148,7 @@ class JudgedEntriesView(ListView, JingoTemplateMixin):
             else:
                 submission.average_score = 0
             submission.judgement_count = len(judgements)
-        
+
         submissions = sorted(submissions, key=lambda s: s.average_score,
                              reverse=True)
         return submissions
@@ -293,7 +294,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = entries.order_by('created_on')[0]
 
     # Judging is only open if the submission has been assigned and
-    # the phases are closed
+    # the submission belongs to the judging phase
     if request.phase['is_open'] or not entry.judgeable_by(request.user):
         judging_form = None
         judge_assigned = False
@@ -514,8 +515,8 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
                                                 name=link['name'],
                                                 submission=new_submission)
             else:
-                # This is the best way to handle invalid details when duplicating
-                # the form
+                # This is the best way to handle invalid details
+                # from the form when duplicating the submission
                 return self.form_invalid(new_form, link_form)
             response = HttpResponseRedirect(self.get_success_url())
         return response
