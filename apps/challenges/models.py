@@ -212,12 +212,19 @@ class Submission(BaseModel):
     objects = SubmissionManager()
     
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
-    brief_description = models.CharField(max_length=200,
+    brief_description = models.CharField(
+        max_length=200,
         verbose_name=_(u'Brief Description'),
         help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
     description = models.TextField(verbose_name=_(u'Description'))
-    sketh_note = models.ImageField(verbose_name=_(u'Featured image'), blank=True, null=True,
-        help_text=_(u"This will be used in our summary and list views. You can add more images in your description or link out to sets or images out on the web by adding in an external link"), upload_to=settings.CHALLENGE_IMAGE_PATH)
+    sketh_note = models.ImageField(
+        verbose_name=_(u'Featured image'),
+        blank=True,
+        null=True,
+        help_text=_(u"This will be used in our summary and list views. You "
+                    u"can add more images in your description or link out to "
+                    u"sets or images out on the web by adding in an external link"),
+        upload_to=settings.CHALLENGE_IMAGE_PATH)
     
     category = models.ForeignKey(Category)
 
@@ -230,8 +237,11 @@ class Submission(BaseModel):
     created_on = models.DateTimeField(default=datetime.utcnow)
     
     is_winner = models.BooleanField(verbose_name=_(u'A winning entry?'), default=False)
-    is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
-        help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
+    is_draft = models.BooleanField(
+        verbose_name=_(u'Draft?'),
+        help_text=_(u"If you would like some extra time to polish your "
+                    u"submission before making it public then you can set it "
+                    u"as draft. When you're ready just un-tick and it will go live"))
     
     phase = models.ForeignKey(Phase)
     
@@ -242,7 +252,7 @@ class Submission(BaseModel):
     def get_image_src(self):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
-        return path(self.sketh_note) or path('img/project-default.gif')    
+        return path(self.sketh_note) or path('img/project-default.gif')
     
     def __unicode__(self):
         return self.title
