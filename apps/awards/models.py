@@ -52,5 +52,8 @@ class SubmissionAward(models.Model):
     submission = models.ForeignKey('challenges.Submission')
     created = CreationDateTimeField()
 
+    class Meta:
+        unique_together = (('judge_allowance', 'submission'),)
+
     def __unicode__(self):
         return u'Award of %s for %s' % (self.amount, self.submission)

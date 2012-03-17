@@ -1,8 +1,7 @@
-
-from test_utils import TestCase
 from awards.models import JudgeAllowance, SubmissionAward
 from challenges.models import Project, Phase, Submission
 from django.contrib.auth.models import User
+from test_utils import TestCase
 from timeslot.tests.fixtures import (create_user, create_phase, create_project,
                                      create_challenge, create_submission)
 

@@ -3,14 +3,13 @@ import test_utils
 from datetime import datetime
 
 from challenges.models import (Submission, Phase, Challenge, Category,
-                               Project)
+                               Project, PhaseRound)
 from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
 from timeslot.tests.fixtures import (create_project, create_challenge,
                                      create_phase)
-from challenges.models import PhaseRound
 
 
 class TestPhasesBase(test_utils.TestCase):
