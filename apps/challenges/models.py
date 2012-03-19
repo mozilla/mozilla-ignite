@@ -287,11 +287,11 @@ class SubmissionManager(BaseModelManager):
         # Return only active submissions
         return self.current().filter(criteria)
 
-    def green_lit(self):
+    def green_lit(self, phase, phase_round=None):
         """Returns all the ``Submissions`` that have been green-lit.
         Each ``Submission`` belongs to a ``Phase`` or ``PhaseRound``
         hence once it is marked as winner is green-lit for this phase"""
-        return self.filter(is_winner=True)
+        return self.eligible(phase, phase_round).filter(is_winner=True)
 
     def current(self):
         """Returns all the ``Submissions`` that are active"""

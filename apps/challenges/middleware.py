@@ -1,3 +1,5 @@
+import logging
+
 from django.conf import settings
 from django.core.cache import cache
 from challenges.models import Phase
@@ -39,5 +41,7 @@ class PhaseStatusMiddleware(object):
                     'days_remaining': phase.days_remaining.days,
                     })
         cache.set(key, defaults, 60 * 30)  # 30 minutes
+        if 'debug_toolbar' in settings.INSTALLED_APPS:
+            logging.debug(defaults)
         request.phase = defaults
         return

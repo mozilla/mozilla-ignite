@@ -1,4 +1,3 @@
-
 from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
@@ -52,7 +51,8 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    (r'^resources/', include('resources.urls', namespace='resources'),),
+    (r'^resources/', include('resources.urls', namespace='resources')),
+    (r'^award/', include('awards.urls', namespace='awards'), _ignite_kwargs),
     )
 
 

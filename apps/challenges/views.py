@@ -18,6 +18,8 @@ from django.views.generic.edit import ProcessFormView, UpdateView, \
                                       DeleteView, ModelFormMixin
 import jingo
 from tower import ugettext as _
+from awards.forms import AwardForm
+from awards.models import JudgeAllowance, SubmissionAward, Award
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page
@@ -43,6 +45,9 @@ LOGGER = logging.getLogger(__name__)
 
 judge_required = permission_required('challenges.judge_submission')
 
+def is_judge(user):
+    """Helper to determine if user is a Judge"""
+    return user.has_perm('challenges.judge_submission')
 
 class JingoTemplateMixin(TemplateResponseMixin):
     """View mixin to render through Jingo rather than Django's renderer."""
@@ -104,20 +109,46 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
     template_name = 'challenges/assigned.html'
     context_object_name = 'entries'
 
+    def get_context_data(self, **kwargs):
+        """Add green-lit entries to the context when:
+        - Judge has allowance
+        - The Award money has been released
+        - It is the same Phase/Round that was judged
+        """
+        context = super(AssignedEntriesView, self).get_context_data(**kwargs)
+        profile = self.request.user.get_profile()
+        allowance = JudgeAllowance.objects.get_for_judge(profile)
+        if not allowance:
+            return context
+        context['allowance'] = allowance
+        # Awarded submissions
+        awarded_list = (allowance.submissionaward_set
+                        .filter(judge_allowance__judge=profile))
+        context['awarded_list'] = awarded_list
+        awarded_ids = [o.submission.id for o in awarded_list]
+        # Green-lit submissions for this round awaiting to be awarded
+        args = [self.phase]
+        if self.phase.judging_phase_round:
+            args.append(self.phase.judging_phase_round)
+        context['phase'] = self.phase
+        context['greenlit_list'] = (Submission.objects.green_lit(*args)
+                                    .filter(~Q(id__in=awarded_ids)))
+        return context
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
                                            slug=self.kwargs['slug'])
-        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        self.phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
         qs = {
-            'phase': phase,
+            'phase': self.phase,
             'phase__challenge': self.challenge,
             'judgeassignment__judge__user': self.request.user
             }
-        if phase.judging_phase_round:
-            qs.update({'phase_round': phase.judging_phase_round})
+        if self.phase.judging_phase_round:
+            qs.update({'phase_round': self.phase.judging_phase_round})
         submissions = (Submission.objects.filter(**qs)
-                       .select_related('judgement__judge__user'))
+                       .select_related('judgement__judge__user', 'judgement'))
         # Add a custom attribute for whether user has judged this submission
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
@@ -310,6 +341,23 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
             assignments = JudgeAssignment.objects
             judge_assigned = assignments.filter(judge__user=request.user,
                                                 submission=entry).exists()
+    award_form = None
+    allowance = None
+    if is_judge(request.user):
+        # Award form, judge has allowance for this Submission
+        profile = request.user.get_profile()
+        allowance = JudgeAllowance.objects.get_for_judge(profile)
+        if allowance:
+            award_list = (allowance.submissionaward_set
+                          .filter(submission=entry,
+                                  judge_allowance__judge=profile))
+            if award_list:
+                awarded = award_list[0]
+                award_form = AwardForm({'amount': awarded.amount})
+                if all([not awarded,
+                        allowance.award.phase == entry.phase,
+                        allowance.award.phase_round == entry.phase_round]):
+                    award_form = AwardForm()
     # Use all the submission ids to sumarize any information required for the
     # project homepage
     submission_ids = list(parent.submissionversion_set.all()
@@ -335,6 +383,8 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'webcast_list': webcast_list,
         'badge_list': badge_list,
         'parent': parent,
+        'award_form': award_form,
+        'allowance': allowance,
     })
 
 
