@@ -76,11 +76,12 @@ def profile(request, username):
                        .filter(submission__created_by=profile,
                                is_booked=True, release=release))
         booked_ids = [i.submission.id for i in booked_list]
-        need_booking_list = (Submission.objects
-                             .green_lit(release.phase, release.phase_round)
-                             .select_related('created_by')
-                             .filter(~Q(id__in=booked_ids),
-                                     created_by=profile))
+        if release:
+            need_booking_list = (Submission.objects
+                                 .green_lit(release.phase, release.phase_round)
+                                 .select_related('created_by')
+                                 .filter(~Q(id__in=booked_ids),
+                                         created_by=profile))
     # User has assigned judging tasks
     webcast_list = []
     if settings.DEVELOPMENT_PHASE and request.user.is_authenticated():

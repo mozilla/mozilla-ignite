@@ -57,7 +57,7 @@ class WebcastTest(test_utils.TestCase):
 
     def generate_timeslots(self, total):
         """Create a number of ``TimeSlots``"""
-        release = create_release('Release', True)
+        release = create_release('Release', True, self.ideation)
         return [self.create_timeslot(release) for i in range(total)]
 
     def generate_winning_submissions(self, total):
@@ -76,7 +76,7 @@ class WebcastTest(test_utils.TestCase):
         # create winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
         webcast_url = reverse('webcast:object_list')
-        release = create_release('Release', True)
+        release = create_release('Release', True, self.ideation)
         # book the winning submissions
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
@@ -101,7 +101,7 @@ class WebcastTest(test_utils.TestCase):
         # create winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
         webcast_url = reverse('webcast:upcoming')
-        release = create_release('Release', True)
+        release = create_release('Release', True, self.ideation)
         # book the winning submissions in the future
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
@@ -127,7 +127,7 @@ class WebcastTest(test_utils.TestCase):
         """Test the user upcoming webcasts"""
         # generate winning submissions
         submission_list = self.generate_winning_submissions(self.SUBMISSIONS)
-        release = create_release('Release', True)
+        release = create_release('Release', True, self.ideation)
         # book all the winning submissions
         for i, submission in enumerate(submission_list, start=1):
             t_data = {'submission': submission,
