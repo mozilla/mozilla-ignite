@@ -27,6 +27,7 @@ urlpatterns = patterns('',
     (r'', include('users.urls')),
     # The /ideas/ URL will become available in the application phase
     url(r'^ideas/assigned/$', 'challenges.views.entries_assigned', kwargs=_ignite_kwargs, name='entries_assigned'),
+    url(r'^ideas/winning/$', 'challenges.views.entries_winning', kwargs=_ignite_kwargs, name='entries_winning'),
     url(r'^ideas/judged/$', 'challenges.views.entries_judged', kwargs=_ignite_kwargs, name='entries_judged'),
     url(r'^ideas/list/(?P<category>[\w-]+)/$', 'challenges.views.entries_category', kwargs=_ignite_kwargs, name='entries_for_category'),
     url(r'^ideas/list/$', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
@@ -37,8 +38,6 @@ urlpatterns = patterns('',
     url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
         vote_on_object, vote_dict, name='entry_vote'),
     url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
-    # quick redirect to send all requests to /blog/ to the blog itself
-    url(r'^blog/', lambda x: HttpResponseRedirect('https://mozillaignite.org/blog/')),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
 )

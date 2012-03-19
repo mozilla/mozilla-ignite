@@ -259,6 +259,7 @@ INSTALLED_APPS = (
     'resources',
     'badges',
     'awards',
+    'blogs',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -355,6 +356,10 @@ CACHE_BACKEND = 'caching.backends.locmem://'
 CACHE_COUNT_TIMEOUT = None
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
+
+SITE_FEED_URLS = {
+    'splash': 'https://mozillaignite.org/blog/feed',
+}
 
 JUDGES_PER_SUBMISSION = 2
 

@@ -93,15 +93,15 @@
         <section class="blogs">
             <h2 class="point">What's New</h2>
             <ol class="hfeed columns">
-                {% for i in range(3) %}
+                {% for blog in blogs %}
                 <li class="col box">
                     <article class="hentry">
-                        <h3 class="wimper entry-title">Headline of post</h3>
+                        <h3 class="wimper entry-title">{{ blog.title }}</h3>
                         <footer>
-                            <span class="updated"><span class="value-title" title="ISO-formatted time"></span>16th November 2011</span> by <address class="author hcard"><span class="fn">Briney McGinty</span></address>
+                            <span class="updated"><span class="value-title" title="{{ blog.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>{{ blog.updated.strftime('%B %d, %Y') }}</span> by <address class="author hcard"><span class="fn">{{ blog.autor }}</span></address>
                         </footer>
-                        <p class="entry-summary">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean sit amet arcu orci. Maecenas scelerisque consequat vehicula. Sed fringilla feugiat nulla. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Maecenas eros risus, dictum quis dapibus nec, ullamcorper in orci.</p>
-                        <a href="#" rel="bookmark">Read more <span>on Headline of post</span></a>
+                        <p class="entry-summary">{{ blog.summary|replace("Continue reading →", "") }}</p>
+                        <a href="{{ blog.link }}" rel="bookmark">Read more <span>on {{ blog.title }}</span></a>
                     </article>
                 </li>
                 {% endfor %}

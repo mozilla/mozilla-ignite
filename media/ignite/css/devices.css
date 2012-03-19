@@ -1235,9 +1235,14 @@ section footer .cta {
     background: #fff;
     padding: 1em;
     border: 1px solid #E2E2E2;
-    border-width: 1px 0;
-    color: #333;
+    border-width: 1px 0 0;
     overflow: hidden;
+}
+div.widgets {
+    border-width: 1px 0;
+}
+.widgets h2 {
+    margin-top: 0;
 }
 .widgets p {
     margin-bottom: 0;
@@ -1250,6 +1255,7 @@ section footer .cta {
     list-style-type: none;
     padding-top: 0.5em;
     clear: left;
+    line-height: 22px;
 }
 .widgets .popularity li {
     float: left;
@@ -1291,15 +1297,6 @@ section footer .cta {
 }
 .links a {
     font-weight: normal;
-}
-aside section {
-    padding: 1em 10px;
-    border: 1px solid #E2E2E2;
-    border-width: 1px 0 0;
-    overflow: hidden;
-}
-aside section h2 {
-    margin-top: 0;
 }
 .browser ul {
     padding-left: 0;
