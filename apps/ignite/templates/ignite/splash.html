@@ -10,13 +10,13 @@
 {% block header %}
 <div class="tagline">
     <h2 class="busta">
-        <span class="wimper sweet"><em>Calling all</em> Developers, designers and civic innovators...</span>
-        <strong><img src="{{ MEDIA_URL }}ignite/img/build.png" alt="Build the future" /></strong>
+        <span class="wimper sweet"><em>Calling all</em> developers, designers and civic innovators...</span>
+        <strong><img src="{{ MEDIA_URL }}ignite/img/build.png" alt="Build apps from the future" width="940" height="182" /></strong>
     </h2>
 </div>
 <div class="ignite_info">
     <div class="busta">
-        <p class="box intro">Mozilla and the National Science Foundation invite you to kickstart innovation in 1Gbps networks, with $500,000 in funding for apps in healthcare, education, and other national priority areas.</p>
+        <p class="box intro">Design and build apps for the faster, smarter internet of the future. Mozilla and the National Science Foundation offer $500k in funding, and invite you to kickstart innovation in healthcare, education and other national priority areas using gigabit networks and technologies.</p>
        <div class="gather wimper">
             <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
        </div>
@@ -27,15 +27,18 @@
         <ul>
             <li class="col brainstorm box">
                 <h3 class="exclaim">Brainstorm</h3>
-                <p class="intro">Joing a <a href="{{ url('entries_all') }}">brainstorm</a> with the Mozilla community; what do tomorrow's apps look like?</p>
+                <p class="intro">What would you do with 1 Gigabit per second? What apps would you create for deeply programmable networks up to 250 times faster than today?</p>
+                <a class="col-foot" href="{{ url('create_entry') }}">Submit your idea</a>
             </li>
             <li class="col hack box">
                 <h3 class="exclaim">Hack</h3>
-                <p class="intro">Attend a series of <a href="resources.html#events">code sprints</a>, design jams and <a href="resources.html#labs">webcasts</a> to meet like-minded collaborators.</p>
+                <p class="intro">Meet like-minded collaborators at code sprints, design james and webinars. Gain access to one of the fastest networks on the planet.</p>
+                <a class="col-foot" href="#">Register for an upcoming event</a>
             </li>
             <li class="col compete box">
-                <h3 class="exclaim">Compete for funding</h3>
-                <p class="intro">Start <a href="about.html#how">building your app</a> and access funding from a $500,000 prize pool.</p>
+                <h3 class="exclaim">Compete</h3>
+                <p class="intro">Win funding and support to make your app a reality. $500,000 availiable to be won.</p>
+                <p class="col-foot">Applications open May 23rd</p>
             </li>
         </ul>
     </div>
@@ -44,7 +47,7 @@
 
 {% block content %}
 <section class="focus_areas columns">
-    <h2 class="point">Focus Areas</h2>
+    <h2 class="point">Build Apps that revolutionize there priority areas</h2>
     <ul>
         <li class="box col education">
             <a href="{{ url('about_ignite') }}#education"><strong>Education</strong></a>
@@ -63,40 +66,48 @@
         </li>
     </ul>
 </section>
+<h2 class="point">Now to May 23rd: Let's Brainstorm</h2>
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
-        <section>
-            <h2 class="point">Recent Brainstorm Submissions</h2>
-            <p class="intro">Share your ideas about how 1Gbps networks can create public benefit. Suggest possible apps for the developer challenge. We're offering $15,000 in awards for the best articulated ideas.</p>
-            <ul class="submissions columns">
-                {% for entry in entries %}
-                <li class="box col">
-                    <article>
-                        <a class="title" href="{{ entry.get_absolute_url() }}">
-                            <h3 class="title wimper">
-                                <div class="frame box">
-                                    <img src="http://src.sencha.io/200/{{ app_url }}{{ entry.get_image_src() }}" alt="">
-                                </div>
-                                {{ entry.title }}
-                            </h3>
-                        </a>
-                        <p>{{ entry.brief_description }}</p>
-                        <address>{{ created_by(entry, footer=False) }}</address>
-                    </article>
-                </li>
-                {% endfor %}
-            </ul>
-            <footer>
-                <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
-            </footer>
-        </section>    
+        <p class="intro">How can next-generation apps change the world? How could 1 Gbps networks solve real-world problems and make people's live better? Submit your rough ideas and brainstorm with innovators now. You don't need to be a developer or major brainiac to participate - at this stage we're just seeking written ideas. All are welcome!</p>
+    </div>
+    <div class="bonus col box">
+        <div class="highlight">
+            <h2 class="point box-title">What's your big idea?</h2>
+            <a class="cta" href="{{ url('create_entry') }}">Get started</a>
+        </div>
+    </div>
+</div>
+<ul class="submissions columns">
+    {% for entry in entries %}
+    <li class="box col">
+        <article>
+            <a class="title" href="{{ entry.get_absolute_url() }}">
+                <h3 class="title wimper">
+                    <div class="frame box">
+                        <img src="http://src.sencha.io/200/{{ app_url }}{{ entry.get_image_src() }}" alt="">
+                    </div>
+                    {{ entry.title }}
+                </h3>
+            </a>
+            <p>{{ entry.brief_description }}</p>
+            <address>{{ created_by(entry, footer=False) }}</address>
+        </article>
+    </li>
+    {% endfor %}
+</ul>
+<footer>
+    <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
+</footer>
+<h2>Latest news and events</h2>
+<div class="columns content_columns">
+    <div class="col box main">
         <section class="blogs">
-            <h2 class="point">What's New</h2>
             <ol class="hfeed columns">
                 {% for blog in blogs %}
                 <li class="col box">
                     <article class="hentry">
-                        <h3 class="wimper entry-title">{{ blog.title }}</h3>
+                        <h2 class="wimper entry-title">{{ blog.title }}</h2>
                         <footer>
                             <span class="updated"><span class="value-title" title="{{ blog.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>{{ blog.updated.strftime('%B %d, %Y') }}</span> by <address class="author hcard"><span class="fn">{{ blog.autor }}</span></address>
                         </footer>
@@ -112,11 +123,6 @@
         </section>
     </div>
     <div class="bonus col box">
-        <div class="highlight">
-            <h2 class="point box-title">How would you push the web forward?</h2>
-            <p>Imagine that none of the limitations of todays internet apply. How would you solve real world problems and make people's lives better?</p>
-            <a class="cta" href="{{ url('create_entry') }}">Get started</a>
-        </div>
         <div class="events">
             <h2 class="wimper">Upcoming Events</h2>
             <ol>

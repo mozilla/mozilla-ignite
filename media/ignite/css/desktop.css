@@ -149,13 +149,13 @@ header .meta em {
     background-repeat: no-repeat;
     width: 85%;
     padding-left: 180px;
-    padding-right: 20px;
+    padding-right: 40px;
 }
 .ignite_info .gather {
     float: left;
     width: 15%;
     text-align: center;
-    padding: 1em 0;
+    padding: 2em 0;
 }
 .ignite_info br {
     display: block;
@@ -171,13 +171,20 @@ header .meta em {
     display: block;
     text-indent: -9999em;
 }
-.methods h3 {
-    padding-left: 0;
-}
 .methods li {
     border-left: 1px solid #9bc4df;
-    padding: 4em 20px 60px;
-    background-position: 20px 90%;
+    padding: 4em 20px 1em;
+    position: relative;
+}
+.methods .intro {
+    padding-bottom: 50px;
+    min-height: 8.5em;
+    margin: 0;
+}
+.methods .col-foot {
+    position: absolute;
+    left: 20px;
+    bottom: 1em;
 }
 .methods ul li:first-child {
     border-left: none;
