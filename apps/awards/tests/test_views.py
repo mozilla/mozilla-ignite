@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from awards.models import JudgeAllowance, SubmissionAward
+from awards.models import JudgeAllowance, SubmissionAward, Award
 from challenges.models import (Project, Phase, Submission, Challenge, Category,
                                PhaseRound)
 from dateutil.relativedelta import relativedelta
@@ -37,9 +37,11 @@ class AwardAmountTest(TestCase):
                                             self.ideation)
         self.award_url = reverse('awards:award', args=[self.submission.id])
         self.login_url = reverse('login')
+        self.phase_award = Award.objects.create(phase=self.ideation,
+                                                amount=10000)
 
     def tearDown(self):
-        for model in [Submission, Phase, Challenge, Category, Project,
+        for model in [Award, Submission, Phase, Challenge, Category, Project,
                       User, PhaseRound]:
             model.objects.all().delete()
 
@@ -47,7 +49,7 @@ class AwardAmountTest(TestCase):
         defaults = {
             'amount': 10000,
             'judge': self.judge,
-            'phase': self.ideation,
+            'award': self.phase_award,
             }
         if kwargs:
             defaults.update(kwargs)
@@ -125,3 +127,4 @@ class AwardAmountTest(TestCase):
         self.assertRedirects(response, self.submission.get_absolute_url())
         for item in list(response.context['messages']):
             self.assertEqual(item.tags, 'error')
+

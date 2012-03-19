@@ -1,4 +1,4 @@
-from awards.models import JudgeAllowance, SubmissionAward
+from awards.models import JudgeAllowance, SubmissionAward, Award
 from challenges.models import Project, Phase, Submission
 from django.contrib.auth.models import User
 from test_utils import TestCase
@@ -16,9 +16,11 @@ class JudgeAllowanceTest(TestCase):
         self.user = create_user('alex')
         self.submission = create_submission('A submission', self.user,
                                             self.phase)
+        self.phase_award = Award.objects.create(phase=self.phase,
+                                                amount=10000)
 
     def tearDown(self):
-        for model in [Project, Phase, Submission, User]:
+        for model in [Award, Project, Phase, Submission, User]:
             model.objects.all().delete()
 
     def award(self, submission, amount, allowance):
@@ -32,8 +34,8 @@ class JudgeAllowanceTest(TestCase):
     def create_allowance(self, **kwargs):
         defaults = {
             'amount': 10000,
+            'award': self.phase_award,
             'judge': self.judge,
-            'phase': self.phase,
             }
         if kwargs:
             defaults.update(kwargs)
@@ -44,7 +46,7 @@ class JudgeAllowanceTest(TestCase):
         data = {
             'amount': 10000,
             'judge': self.judge,
-            'phase': self.phase,
+            'award': self.phase_award,
             }
         allowance = JudgeAllowance.objects.create(**data)
         assert allowance.id, "Failed to create JudgeAllowance"
@@ -127,16 +129,18 @@ class SubmissionAwardTest(TestCase):
         self.user = create_user('alex')
         self.submission = create_submission('A submission', self.user,
                                             self.phase)
+        self.phase_award = Award.objects.create(phase=self.phase,
+                                                amount=10000)
 
     def tearDown(self):
-        for model in [Project, Phase, User]:
+        for model in [Award, Project, Phase, User]:
             model.objects.all().delete()
 
     def create_allowance(self, **kwargs):
         defaults = {
             'amount': 10000,
             'judge': self.judge,
-            'phase': self.phase,
+            'award': self.phase_award,
             }
         if kwargs:
             defaults.update(kwargs)

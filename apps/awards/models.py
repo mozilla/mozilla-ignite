@@ -1,16 +1,43 @@
+from awards.managers import JudgeAllowanceManager
+from challenges.lib import cached_property
 from django.db import models
 from django.db.models import Sum, Q
 from django_extensions.db.fields import CreationDateTimeField
+from tower import ugettext_lazy as _
 
 
-class JudgeAllowance(models.Model):
-    """Allowance for a ``Judge`` on a ``Phase`` or ``PhaseRound``"""
+class Award(models.Model):
+    """Award for a given ``Phase`` or ``PhaseRound``"""
+    PENDING = 1
+    RELEASED = 2
+    FROZEN = 3
+    AWARD_STATUS = (
+        (PENDING, _('Pending')),
+        (RELEASED, _('Released')),
+        (FROZEN, _('Frozen')),
+        )
     amount = models.IntegerField(default=0)
-    judge = models.ForeignKey('users.Profile')
     phase = models.ForeignKey('challenges.Phase')
     phase_round = models.ForeignKey('challenges.PhaseRound',
                                     blank=True, null=True)
+    status = models.IntegerField(choices=AWARD_STATUS, default=PENDING)
+
+    class Meta:
+        unique_together = (('phase', 'phase_round'),)
+
+    def __unicode__(self):
+        return u'Allowance of %s on %s' % (self.amount, self.phase)
+
+
+class JudgeAllowance(models.Model):
+    """Allowance for a ``Judge`` on an ``Award``"""
+    amount = models.IntegerField(default=0)
+    judge = models.ForeignKey('users.Profile')
+    award = models.ForeignKey('awards.Award')
     created = CreationDateTimeField()
+
+    # managers
+    objects = JudgeAllowanceManager()
 
     def __unicode__(self):
         return u'Allowance of %s for %s' % (self.amount, self.judge)
@@ -28,9 +55,17 @@ class JudgeAllowance(models.Model):
         amount = amount_used['amount__sum']
         return amount if amount else 0
 
+    @cached_property
+    def amount_used(self):
+        return self.get_amount_used()
+
+    @cached_property
+    def amount_free(self):
+        return self.amount - self.amount_used
+
     def can_award(self, amount_requested, submission):
         """Determines if the amount can be awarded to the submission"""
-        amount_available  = self.amount - self.get_amount_used(submission)
+        amount_available = self.amount - self.get_amount_used(submission)
         return amount_available >= amount_requested and amount_requested > 0
 
     def allocate(self, amount, submission):

@@ -102,7 +102,21 @@
             {% endfor%}
           </section>
           {% endif %}
-
+            {% if award_form %}
+            <section>
+              <h2>Award this submission</h2>
+              <ul>
+                <li>Total Funds: ${{ allowance.amount }}</li>
+                <li>Allocated Funds: ${{ allowance.amount_used }}</li>
+                <li>Free Funds: ${{ allowance.amount_free }}</li>
+              </ul>
+              <form method="post" id="form-awardform-id" action="{{ url('awards:award', submission_id=entry.id) }}">
+                {{ award_form.as_p() }}
+                {{ csrf()|safe }}
+                <p><input type="submit" value="Award Idea" class="cta"></p>
+              </form>
+            </section>
+            {% endif %}
             {% if judging_form %}
             <section>
                 {% if excluded %}
