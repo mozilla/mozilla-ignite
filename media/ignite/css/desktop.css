@@ -145,11 +145,11 @@ header .meta em {
 .ignite_info p {
     background: transparent;
     background-image: url(../img/css/lightning-bolt.png), url(../img/css/homepage_arrow.png), url(../img/css/homepage_arrow.png);
-    background-position: 40px 50%, 130px 0, 102% 0;
+    background-position: 40px 50%, 130px 0, 100% 0;
     background-repeat: no-repeat;
     width: 85%;
     padding-left: 180px;
-    padding-right: 20px;
+    padding-right: 40px;
 }
 .ignite_info .gather {
     float: left;

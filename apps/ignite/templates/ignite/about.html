@@ -8,23 +8,29 @@
 {% block section_class %}content{% endblock %}
 
 {% block header %}
-<h1 class="busta"><span class="sweet wimper"><em>Your mission</em></span>Build apps from the future</h1>
+<h1 class="busta"><span class="sweet wimper"><em>Your mission</em></span>Design and Build apps that change the world</h1>
 {% endblock %}
 
 {% block content %}
-<section class="how">
-	<h2 class="announce">How does the challenge work?</h2>
+<section class="challenge_info">
+	<h2 class="announce">What is the Mozilla Ignite Challenge?</h2>
 	<div class="columns content_columns">
 		<div class="main col box">
-			<p class="intro">We're making it easy to access teammates, mentorship, and funding for your world-changing app. But don't think of this as merely a competition. This is your change to be a pioneer, to collaborate with cutting edge thinkers and tech, and to catalyze thinking about a radical new horizon.</p>
+			<p class="intro">Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation.The goal: imagine and build apps that show the potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
+			<p class="intro">Show us what’s next. Imagine the limitations of today’s internet no longer apply.What becomes possible at 1 Gbps? How would you take advantage of deeply programmable, sliceable networks? How can we leverage speeds up to 250x faster than the internet of today?</p>
+			<p class="intro">The best ideas will win funding and support. And help shape the internet’s future.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
-			<h3 class="point box-title">Think and Do</h3>
-			<p>Before the challenge begins, you'll have an opportunity to share your ideas and refine them in a big <a href="{{ url('entries_all') }}">public brainstorm</a>. We're also hosting salons and hack days around the U.S.—so you can meet and plot with friends on an app that will change the world.</p>
+				<h3 class="point box-title">Brainstorm, connect and collaborate</h3>
+				<p>Between now and May 7, we’re hosting a big <a href="{{ url('entries_all') }}">public brainstorm</a>, online and at salons and hack days across the U.S. This is a chance to connect with other innovators, meet potential collaborators, and refine your big idea. Ready? Go.</p>
+				<a class="cta" href="{{ url('create_entry') }}">Submit your idea now</a>
 			</div>
 		</div>
 	</div>
+</section>
+<section class="how">
+	<h2 class="announce">How does the challenge work?</h2>
 	<figure>
     	<figcaption>Fig. One <h3 class="point fig_title"><span>The Challenge Process</span></h3></figcaption>
     	<div class="process">
@@ -45,10 +51,6 @@
             <div class="application">
                 <span class="sweet wimper"><em>Initial application</em></span>
                 May 23 - 30
-                <div class="small_print">
-                    <h4>When else can I apply?</h4>
-                    <p>You can compete in any single round, or you can compete in all three. To enter, assemble your team and fill out a written application at least two weeks before a round starts.</p>
-                </div>
             </div>
             <div class="all"> 
                 <div class="round">
@@ -76,188 +78,200 @@
             </section>
         </div>
 	</figure>
-	<div class="banner announce">
-		Got a great idea? <a class="cta" href="{{ url('create_entry') }}">Get started</a> Everyone's welcome!
-	</div>
-    <div class="questions">
-		<h3 class="wimper">Brainstorming</h3>
-		<div class="columns">
-			<div class="box col">
-				<h4 class="wimper">What is the Public Brainstorm?</h4>
-				<p>The Public Brainstorm is an opportunity for everyone interested in imagining how web apps running on next-generation networks (internet) can improve people’s everyday lives.</p>
-				<p>Anyone is welcome to submit ideas on how to make people happier, or healthier, or more well-informed using a 1 Gigabit per second smart network. </p>
-				<p>Submissions are eligible for the following prizes:</p>
+	<div class="columns content_columns">
+		<div class="col main box">
+			<p class="intro"><strong>The Mozilla Ignite Challenge is broken into four rounds</strong></p>
+			<ul class="intro">
+				<li class="intro">an initial Brainstorming Round,</li>
+				<li>follwoed by 3 development rounds</li>
+			</ul>
+			<p class="intro">Submissions for the Brainstorming Round are open now to May 7. Participation in the Brainstorming Round is optional, but encouraged. Applications for the Development Phase will open May 14, and close on Sep 24.
+			<p class="intro">Funding will be awarded by our panel of expert judges at the end of each round. $500,000 US will be awarded in all. You can compete in a single development round, or in all three.</p>
+		</div>
+		<div class="col bonux box">
+			<div class="highlight">
+				<h3 class="point box-title">Get Involved</h3>
 				<ul>
-					<li>$4000, 2x $3000,</li> 
-					<li>$2000, 3x $1000,</li>
-					<li>10x Notable Idea Awards,</li>
-					<li>10x People's Choice Awards</li>
+					<li><strong>Submit your idea.</strong>What’s your next- generation Gigabit app?</li>
+					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
+					<li><strong>Stay in touch.</strong> Follow Mozilla Ignite on twitter or join our community discussion list.</li>
+					<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
 				</ul>
-			</div>
-			<div class="box col">
-				<h4 class="wimper">What is the purpose of the Brainstorm?</h4>
-				<p>The Brainstorm will help us all understand the possibility space and identify potential teams and participants.</p>
-				<p>This Brainstorm will bring together app developers, university researchers, industry experts, start-ups and visionaries. By uniting people from such different perspectives we hope to get a wide range of ideas from varying areas of expertise.</p>
-				<p>It's not necessary for Development Challenge teams to participate in the Brainstorm, but we do encourage dev teams to join in and refine their ideas.</p> 
-				<p>Similarly,you don’t need to be a developer in order to submit an idea into the brainstorm. All you need is a great idea that leverages smart 1Gbps networks. In fact, you may well want to submit a Brainstorm idea in order to attract a team who wants to bring it to life within the Development Challenge.</p>
-				<p>Everyone is welcome.</p>
-			</div>
-			<div class="box col">
-				<h4 class="wimper">Brainstorm submission requirements</h4>
-				<p>All submissions must make use of the next generation network capabilities (1Gbps smart networks) and create broad public benefit in one of the following areas:</p>
-				<ul>
-					<li>Health IT</li>
-					<li>Education</li>
-					<li>Clean Energy &amp; Transportation</li>
-					<li>Advanced Manufacturing</li>
-					<li>Emergency Preparedness and Public Safety</li>
-					<li>Workforce Technologies</li>
-					<li>Advanced Manufacturing</li>
-				</ul>
-				<p>Submissions will be judged by a panel of judges. Top rated ideas that best fit the criteria, are clearly articulated, and provide considerable public benefit impact will be awarded prizes and recognition.</p>
 			</div>
 		</div>
-		<h3 class="wimper">Not familiar with 1Gbps smart networks? Here are some examples to help you understand their potential</h3>
+	</div>
+</section>
+<section class="ideation_stage">
+	<h2 class="announce">How does the Brainstorming Round work?</h2>
+    <div class="questions">
 		<div class="columns">
 			<div class="box col">
-				<h4 class="wimper">Example 1</h4>
-				<p>A world-renowned doctor is able to remotely conference about an enormously detailed 3D medical file in high detail with colleagues across the country. Each of the conference members can view the changing high definition view and zoom of image being driven by one member in the conference. At the same time, they are able to have a video conference and discuss what they see.  This technology allows a remote group of experts to conference on the most difficult cases, through each person navigating very large files with no delay for the group allowing a new level of insight to be provided.</p>
+				<h3 class="wimper">What is the Brainstorming Round?</h3>
+				<p>The Brainstorming Round is an opportunity for everyone interested in the potential of next- generation application to participate.</p>
+				<p>You don't have to be a developer or technologist -- you just need a Big Idea. In fact, we may be able to help pair you with a development team to bring your idea to life in the Development Phase.</p>
+				<p>The best ideas will win prizes ranging from $1,000 to $4,000.They'll also be eligible to win a Notable Idea Award or People's Choice Award.</p>
 			</div>
 			<div class="box col">
-				<h4 class="wimper">Example 2</h4>
-				<p>A national emergency strikes suddenly and unexpectedly. First responders need a secure communication channel, with no possibility of a man-in-the-middle attack. To enable the more secure communications possible, dispatchers take a slice of the network and create a private VLAN. All the police on the scene are able to communicate sensitive details with confidence through this secure direct link.</p>
+				<h3 class="wimper">Why a Brainstorming Round?</h3>
+				<p>The Brainstorming Round will help to:</p>
+				<ul>
+					<li>define what's possible.This is a new space, so open ideation is important.</li>
+					<li>identify potential collaborators. Find others working in similar spaces, to promote collaboration.</li>
+					<li>refine your idea. Get early feedback and refine your application for the Development Phase.</li>
+				</ul>
+				<p>Who should participate? App developers, university researchers, industry experts, start-ups. We're hoping to connect participants with diverse background and wide-ranging expertise.</p>
 			</div>
 			<div class="box col">
-				<h4 class="wimper">Example 3</h4>
-				<p>An entrepreneur has a massive data set about the performance of her product during field test. She has terabytes and terabytes of physics and sensor data, and needs to simulate and analyze the field test many times. She queues an app that borrows processing power from others on the network and gains access to a temporary “render farm.” Using these networked computing resources, she can distribute the computing load and come to conclusions much faster..</p>
+				<h3 class="wimper">What do I need to submit?</h3>
+				<p>In x words or less (plus any pictures or visual aids you’d like to include),clearly explain how your idea will make use of 1 Gbps networks to create broad public benefit in one of these areas:</p>
+				<ul>
+					<li>healthcare</li>
+					<li>education and training</li>
+					<li>clean energy &amp; transportation</li>
+					<li>advanced manufacturing</li>
+					<li>emergency preparedness and public safety</li>
+				</ul>
+				<p>The deadline for submitting your ideas to the Brainstorming Round is May 7.</p>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="development_stage">
+	<h2 class="announce">How do the Development Rounds work?</h2>
+	<div class="questions">
+		<div class="columns">
+			<div class="box col">
+				<h3 class="wimper">Win funding</h3>
+				<p>To help make your app ideas a reality, we’re offering a total of $500K in awards, spread over three Development Rounds. You can compete in a single round, or in all three.</p>
+				<p>At the end of each round, participants will pitch their app in public sessions to a panel of expert judges. Judges and observers will be free to ask questions, with judges using the criteria in this judging scorecard to decide the winners.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">Get support</h3>
+				<p>This is not a traditional “competition.” The goal is to create an open and collaborative community of practise.</p>
+				<p>Participants will get access to expert mentors, build in the open, and receive feedback and help from the Ignite community.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">How to apply</h3>
+				<p>Development applications open May 14. To enter, assemble your team and fill out the online application form.</p>
+				<p>Successful applicants will be greenlit and given access to the GENI sandbox, a screaming fast next-generation network for you to develop and test your apps. So think big!</p>
+			</div>
+		</div>
+    </div>
+</section>
+<section class="priority_areas">
+	<h2 class="announce">How can Gigabit apps change the world?</h2>
+	<div class="columns">
+		<div class="col box" id="public-safety">
+			<h3 class="wimper">for Public Safety?</h3>
+			<p>First-responders could access secure communication channels, without fear of “man-in-the-middle” attacks. Dispatchers could use a slice of the network to create a private VLAN, with all responders communicating through this secure direct link.</p>
+			<ul>
+				<li><strong>Early detection.</strong> Widespread sensor networks and sophisticated real-time analysis can enable earlier detection of emergencies, from severe weather and natural disasters to national security threats.</li>
+				<li><strong>Preparation and training.</strong> Advanced simulations and predictive modelling allow first responders and the public to prepare and train for emergencies before they happen.</li> 
+				<li><strong>Co-ordination.</strong> Two-way flows of real-time data from diverse sources (cell phones, GPS, sensors) can combine with computational models to provide greater situational awareness and coordination.</li>
+			</ul>
+		</div>
+		<div class="col box" id="education">
+			<h3 class="wimper">for Education and Training?</h3>
+			<p>Students could produce hybrid video essays, running apps that search every digitized book andTV newscast in history. They could query any term and instantly download datasets, collaborating with remote partners through HD, zero-latency video.</p>
+			<ul>
+				<li><strong>Telepresence</strong> can take students around the world to experience archeological dig sites, distant classrooms, or foreign cultures.</li>
+				<li><strong>Virtual surgery.</strong> Medical students and surgical residents can sharpen their skills with advanced virtual surgeries. Practice on real image-based models with life-like tissue movement and haptic feedback,
+				simulating the nuances of real life surgery.</li>
+				<li><strong>21st century skills.</strong> Workers can access professional development courses and workforce training in areas like advanced manufacturing and product development. Use modelling, simulation and data analysis tools that 21st century workers need.</li>
+			</ul>
+		</div>
+		<div class="col box" id="health-it">
+			<h3 class="wimper">for Healthcare?</h3>
+			<p>Expert physicians could instantly video conference about their most difficult cases, sharing 3D medical files in high definition with colleagues across the country in real time.</p>
+			<ul>
+				<li><strong>Telemedicine</strong> can allow easier, more efficient communication between patients and caregivers and increase access to health information.</li>
+				<li><strong>Privacy and security.</strong> Sliceable, programmable networks can provide unprecedented levels of privacy and security for health data.</li>
+				<li><strong>Collaboration.</strong> Rapid exchange of medical data with high-resolution collaboration tools between medical experts on the care team.</li>
+				<li><strong>Big data.</strong> Aggregate huge amounts of health data from diverse sources for customized, real-time decision support.</li>
+			</ul>
+		</div>
+	</div>
+	<div class="columns">
+		<div class="col box" id="clean-energy">
+			<h3 class="wimper">for Clean Energy and Transportation?</h3>
+			<ul>
+				<li><strong>Sustainable living.</strong> From smart grids with high temporal and spatial control of energy to intelligent homes, buildings and transportation systems.</li>
+				<li><strong>Smarter control systems</strong> for advanced batteries and other new energy creation and storage systems.</li>
+				<li><strong>Security.</strong> GENI technologies like isolated network slices can help safeguard our power grids.</li>
+			</ul>
+		</div>
+		<div class="col box" id="advanced-manufacturing">
+			<h3 class="wimper">for Advanced Manufacturing?</h3>
+			<ul>
+				<li><strong>Economic competitiveness.</strong> Computational design processes and more effective sharing of data, knowledge, tools, and expertise.</li>
+				<li><strong>Rapid innovation.</strong> Computational modelling and detailed simulation. Distributed access to supercomputing resources.</li>
+			</ul>
+		</div>
+		<div class="col box">
+			<div class="highlight">
+				<h3 class="box-title point">Got an idea that doesn’t fit these categories?</h3>
+				<p>Pick the area that best describes the public benefit you want to create. We’re open to all ideas -- as long as they create public benefit in some way.</p>
+			</div>
+		</div>
+	</div>
+	<footer>
+		<a href="{{ 'create_entry' }}" class="cta">Submit your idea now</a>
+	</footer>
+</section>
+<section class="examples">
+	<h2 class="announce">What already exists? What are some real-time examples?</h2>
+	<div class="questions">
+		<div class="columns">
+			<div class="box col">
+				<h3 class="wimper">Healthcare</h3>
+				<p><strong>Remote Nursing Care via Multipoint HD Video Conferencing --</strong> This collaboration between Case Western University in Cleveland and the University of Missouri remotely tracks, analyzes and intervenes to support elders’ health care. High definition videoconferencing allows patients to reduce their travel time and cost for follow-up visits.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">Emergency Preparedness</h3>
+				<p><strong>UMass Radar</strong> is able to provide early warning for severe weather, predicting the touchdown of events like tornados or hurricanes. In technical speak, it’s “on-demand, high-spatial/temporal resolution, low-level weather hazard information from a low-cost, dense RADAR network.” Put simply, it’s about making communities safer from by providing extremely accurate severe weather prediction.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">Advanced Manufactiring</h3>
+				<p><strong>Purdue University’s “HUBZero”</strong> is a platform for sharing interactive, graphical, high- powered computational modelling and simulation resources and tools.This allows team members to build cars together despite being separated geographically. The platform is focused on advanced manufacturing applications, but can also be used for interactive, graphical simulations, education and training.</p>
 			</div>
 		</div>
     </div>
 </section>
 <section class="what">
-	<h2>What becomes possible?</h2>
+	<h2>Combining smart networks, civic innovation and the open web</h2>
 	<div class="content_columns columns">
 		<div class="main col box">
-			<p class="intro">Chattanooga has a gig. Kansas City's getting a gig. That's right: 1 gigabit per second, up and down. That's over 100 times faster than most people's current internet connections.</p>
+			<p class="intro">As networks become faster and more programmable, we’re looking for innovative civic uses of new potential like:</p>
+			<ul class="intro">
+				<li><strong>Speed.</strong> How can developers take advantage of 1 Gbps connections?</li>
+				<li><strong>Video.</strong> What can we do with zero-latenct, high defination video?</li>
+				<li><strong>Big Data.</strong> How can we leverage complex calculations at super high-speed?</li>
+				<li><strong>Programmable networks.</strong> What can we do with unique routing, slicing and more?</li>
+			</ul>
 			<figure>
     			<figcaption>Fig. Two <h3 class="point fig_title"><span>The Sweet Spot</span></h3></figcaption>
     		    <img src="{{ MEDIA_URL }}/ignite/img/infographics/sweet-spot.png" width="600" height="410" alt="A diagram showing how we believe Ignite will be the perfect mix of the network, HTML5 and civic innovators" />
             </figure>
-			<div class="columns equal">
-				<div class="col box">
-					<h3 class="wimper">But what do you do with a 1 Gbps connection?</h3>
-					<p>How can developers take advantage of that level of bandwidth, along with the smart networking capabilities that be built into the networks of the future? That is the question the Ignite Apps Challenge poses to developers, designers and civic innovation thinkers.</p>
-				</div>
-				<div class="col box">
-					<h3 class="wimper">There's a world of opportunity here...</h3>
-					<p>So we are building a community to explore the possibilities of a gigabit apps, and create public benefit in areas like health IT, education, clean energy, and more.<p>
-				</div>
-			</div>
 		</div>
 		<div class="col box bonus">
 			<div class="highlight">
-				<h3 class="box-title point">What would you build?</h3>
-				<p>Networks are getting faster and more programmable. Browsers are becoming incredibly powerful. We're more connectied than ever. What will you build?</p>
-				<a href="{{ url('create_entry') }}" class="cta">Get started</a>
-			</div>
-			<div class="highlight">
-				<h3 class="box-title point">How can I get involved?</h3>
+				<h3 class="box-title point">Designing for an internet without limits</h3>
+				<p>Imagine a digital world where:</p>
 				<ul>
-					<li>Join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>. Attend an <a href="resources.html#labs">instructional webcast</a>, or an in-person hackfest with other forward-thinking developers.</li>
-					<li>Through April, <a href="{{ url('create_entry') }}" class="cta">share your ideas for tomorrow's apps</a> in a group brainstorm.</li>
-					<li>Starting in May, <strong>apply to build your app on GENI</strong>, a fast experimental network. We're offering a total of $500k in funding, so you can get your app built, fast.</li>
+					<li>there are no limits on how fast information can travel.</li>
+					<li>processor speed is never a bottleneck.</li>
+					<li>your network adapts to your app, instead of the other way around.</li>
+					<li>you can place processing and data transport wherever you want on the network.</li>
+					<li>you can dynamically provision and program routers along the way, as if the network itself were one giant LAN.</li>
 				</ul>
 			</div>
 		</div>
 	</div>
 </section>
-<section class="judging">
-	<h2>How will apps be judged?</h2>
-	<div class="content_columns columns">
-		<div class="main col box">
-			<p class="intro">At the end of each round, you’ll log on and pitch your app to a <a href="{{ url('our_judges') }}">panel of esteemed judges</a>. They’ll have the opportunity to ask questions, along with anyone in attendance (like the rest of the Ignite Apps Challenge, these pitch sessions are open to all).</p>
-			<p class="intro">At each round, the stakes get higher—the judges will be looking for more polished apps, and giving away increasingly higher amounts of money.</p>
-			<p class="intro">With your help, we will prototype ways that the next generation of networks can drive urban renewal, innovation, and public benefit—and shape the future of the Internet as a public resource and force for good.</p>
-		</div>
-		<div class="bonus col box">
-			<div class="highlight">
-				<h3 class="point box-title">Measuring success</h3>
-				<p>Check out the <a href="#">judging scorecard</a> to see how the apps will be judged.</p>
-			</div>
-		</div>
-	</div>
-</section>
-<section class="build">
-	<h2>What Kind of Apps Can I Build?</h2>
-	<p class="intro">You can make something small and novel, or big and revolutionary. The challenge is open for apps that leverage gigabit smart networks for innovation in:</p>
-	<div class="columns equal">
-		<div class="col box" id="public-safety">
-			<h3 class="wimper">Emergency Preparedness and Public Safety</h3>
-			<p>Emergency preparedness and public safety are being revolutionized at nearly every stage by advanced information and communication technologies. Widespread sensor networks and sophisticated real-time analysis allow early detection of events ranging from severe weather and natural disasters to national security threats. Advanced simulations and predictive modeling allow sophisticated preparation as well as training for events before they occur by emergency first responders to every member of the public. Two-way flows of real-time data from diverse sources (e.g. cell phones, GPS, sensors) combined with computational models and communication technologies can provide detailed situational awareness and coordination of actions during an emergency.</p>
-			<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
-		</div>
-		<div class="col box" id="education">
-			<h3 class="wimper">Education and Workforce Technologies</h3>
-			<p>Telepresence can take students across the world to experience archeological dig sites, distant classrooms, or foreign cultures. Medical students, surgical residents or world experts can keep their skills sharp with advanced virtual surgeries, allowing them to practice on patient-specific, real image based models with accurate tissue movement and haptic feedback, simulating the nuances of real life surgery. Workers can expand skillsets through professional development courses and workforce training in areas such as advanced manufacturing or product development using modeling and simulation, accessing computing resources and data analysis tools that real workers use on the job for the actual jobs they hope to obtain.</p>
-			<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
-		</div>
-	</div>
-	<div class="columns equal">
-		<div class="col box" id="health-it">
-			<h3 class="wimper">Health Information Technologies</h3>
-			<p>Sliceable, programmable networks could provide high levels of privacy and security for health data. In-home sensor systems and real-time analysis of data might lead to early detection of conditions such as cognitive impairment or increased likelihood of falling to allow early intervention and even preemption of adverse health outcomes. Telemedicine will allow easy, efficient communication between patients and their caregivers and increased access to high quality health information from diverse sources in cheaper and more efficient ways. Rapid exchange of large amounts of medical data with high-resolution collaborative tools will enable the efficient exchange of ideas and knowledge between medical experts on the care team. Platforms for interoperable data exchange will allow “big data” in health from diverse sources to be pulled together and analyzed along with current knowledge and best practices to create a learning health system that provides customized, real-time decision support for all members of the care team when and where it is needed.</p>
-			<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
-		</div>
-		<div class="col box" id="clean-energy">
-			<h3 class="wimper">Clean Energy, including Advanced Vechile Technologies</h3>
-			<p>Sustainable living, ranging from smart grids with high temporal and spatial
-control of energy as well as intelligent homes, buildings, and
-transportation systems, even to prevention of unnecessary energy use.
-Advanced battery systems and increasing diversity and demands of different
-energy creation and storage systems need much smarter systems of control.
-The security of our energy systems is also a big issue that some of the GENI
-technologies like isolated network slices could dramatically transform.</p>
-			<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
-		</div>
-	</div>
-	<div class="columns equal">
-		<div class="col box" id="advanced-manufacturing">
-			<h3 class="wimper">Advanced Manufacturing</h3>
-			<p>Simulation as well as computational design processes and sharing of data,
-knowledge, tools, and expertise.  Many of these models and simulations
-require powerful supercomputing resources for product development and firms
-need access to these resources to be competitive both locally as well as
-globally.  Thus, high bandwidth, interactive computing systems are essential
-to the future of manufacturing in this country.</p>
-			<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
-		</div>
-		<div class="col box">
-			<div class="highlight">
-				<h3 class="box-title point">Choosing a Category</h3>
-				<p>If your app doesn’t fall squarely in one category, pick the one that most accurately describes the public benefit you want to create. So, for example, no games for games' sake—but an educational or workforce development game would be welcome.</p>
-			</div>
-		</div>
-	</div>
-</section>
-<section class="tech">
-	<h2>What technologies should I use?</h2>
+<section class="geni">
+	<h2>What is the GENI network?</h2>
 	<div class="content_columns columns">
 		<div class="col main box">
-			<p class="intro">On the network side, plan to build your app on <a href="http://www.geni.net/">GENI</a>—a fast, programmable, sliceable network sandbox. With GENI, you have a lot of flexibility, and opportunities to test your gigabit app in the lab or <a href="resources.html#field">in the field</a>. Learn more about <a href="resource.html">getting started with GENI here</a>.</p>
-
-			<p>You can build an app the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, OpenFlow routing, and lots of other future networking technologies. It’s up to you.</p>
-
-			<p>On the client side, you can use any technologies you want, but we ask that you favor open source and open standards. And no proprietary runtimes—i.e., no Flash or iOS apps.</p>
-			<div class="columns equal">
-				<div class="col box">
-					<h3 class="wimper">Browser Technologies</h3>
-					<p>Where possible, your apps should run in a browser or web runtime. We highly encourage you to explore edge web technologies, like <a href="https://developer.mozilla.org/en/HTML/HTML5">HTML5</a>, <a href="http://www.webrtc.org/">WebRTC</a>, <a href="https://developer.mozilla.org/en/WebGL">WebGL</a>, <a href="http://www.khronos.org/webcl/">WebCL</a>, <a href="https://developer.mozilla.org/en/WebSockets">Websockets</a>, and more.<p>
-				</div>
-				<div class="col box">
-					<h3 class="wimper">Web as Platform</h3>
-					<p>We think that the deeply connected future needs a common, freely implementable, consensus-based development platform. And even as the role of the browser changes—and the distinction between local and remote code begins to blur—we think the web will be the best and most universal platform to build apps from the future.</p>
-				</div>
-			</div>
 			<figure>
 				<figcaption>Fig. Three <h3 class="point fig_title"><span>The GENI Network</span></h3></figcaption>
 		    	<img src="{{ MEDIA_URL }}/ignite/img/infographics/geni.png" width="601" height="560" alt="Diagram explaining how Geni provides their network either by direct contact to one of their racks or point to point via their backbone and commodity internet" />
@@ -265,14 +279,65 @@ to the future of manufacturing in this country.</p>
 		</div>
 		<div class="col box bonus">
 			<div class="highlight">
-				<h3 class="box-title point">Is this just about network speed?</h3>
-				<p>Sure, gigabit networks are cool. But they’re not the whole story—we’re thinking much bigger.</p>
-				<p>We’re asking developers to suspend their assumptions about today’s internet. Imagine there are no limits on how fast information can travel; that processor speed is never a bottleneck; and that your network adapts to your app, instead of the other way around.</p>
-				<p>Imagine that you’re able to place both processing and data transport wherever you want on the network. You can dynamically provision and program routers along the middle of the network, as if the network itself were a giant LAN.</p>	
-				<p>We’re more interconnected than ever before, with smartphones, computers, appliances, and other devices. With a 1Gbps smart grid like the one in Chattanooga, you can turn a whole city into a giant supercomputer.</p> 
-				<p>So, how can we re-wire our communities and make people’s lives better? What kinds of impossible apps are made possible?</p>
-				<p>By partnering with GENI, we’re able to build and test some of these far out ideas. In this challenge, we’ll spend some time in the future—and explore how to make the Internet an even more powerful public resource.</p>
-				<a href="{{ url('create_entry') }}" class="cta">Share an idea</a>
+				<h3 class="point box-title">Welcome to GENI, one of the most advanced networks on the planet.</h3> 
+				<p>The Global Environment for Network Innovation is a National Science Foundation-funded research project. It’s goal: provide a virtual laboratory and national testbed for exploring the networks of the future.</p>
+				<p>GENI connects campuses and advanced infrastructure across the U.S., allowing next- generation applications like yours to be designed, tested and demonstrated. In short: it’s a pretty fun place for radical innovators to play.</p>
+				<p>Successful Mozilla Ignite challenge participants will get access to GENI to develop and test their apps.</p>
+				<h3 class="box-title point">What’s cool about GENI?</h3>
+				<ul>
+					<li><strong>Speed</strong> -- 100 Mbps+ and low latency. Enough for multiple bi-directional streams of uncompressed video.</li>
+					<li><strong>Programmability</strong> – software-defined networks (e.g.,OpenFlow) with dramatically improved control over network routing and optimization.</li>
+					<li><strong>Slice-based experimentation</strong> – remotely discover, reserve, configure, program, debug, operate, manage, and teardown distributed systems across the GENI suite. Match slices to your application requirements, and distribute programmable resources throughout the network.</li>
+					<li><strong>Integrated wireless networks</strong> – for sensor networks and continuous remote monitoring.</li>
+					<li><strong>And much more...</strong></li>
+				</ul>
+			</div>
+		</div>
+	</div>
+</section>
+<section class="tech">
+	<h2 class="announce">What technologies should I use?</h2>
+	<div class="questions">
+		<div class="columns">
+			<div class="box col">
+				<h3 class="wimper">On the network side:</h3>
+				<p>You’ll be building your app on GENI—a fast, programmable, sliceable network sandbox. GENI will provide plenty of flexibility and opportunities to test your Gigabit app, both in the lab and in the field.</p>
+				<p>You can build the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, OpenFlow routing, or other future networking technologies.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">On the client side:</h3>
+				<p>You’re free to use any technologies you want, but we ask that you favour open source and open standards. And no proprietary runtimes—e.g., no Flash or iOS apps.</p>
+			</div>
+			<div class="box col">
+				<h3 class="wimper">Browser technologies</h3>
+				<p>Where possible, your apps should run in a browser.We encourage you to explore edge web technologies like HTML5,WebRTC,WebGL,WebCL,Websockets and more.</p>
+			</div>
+		</div>
+    </div>
+</section>
+<section class="apps">
+	<h2>What do you mean by apps?</h2>
+	<div class="columns content_columns">
+		<div class="box col main">
+			<p class="intro">We mean "apps and services," in the broadest possible sense.We’re looking for applications and services that show off what next-generation networks like GENI can do that other networks -- like today's Internet -- can't.</p>
+			<div class="columns equal">
+				<div class="box col">
+					<h3 class="wimper">What is Mozilla’s vision for apps?</h3>
+					<p>When most people say "app," they're referring to a single-purpose binary that runs on a specific hardware platform. Colloquially: "an Android app" or "an iPhone app." By contrast, Mozilla has a vision for apps that run cross-device, in any context.We believe users should be able to buy an app once and have it work flawlessly on their desktop, laptop, phone, tablet,TV, car, etc.</p>
+					<p>This will establish the open web as the common development platform of choice, and overcome the proprietary technologies and walled gardens that characterize most app development. On the "web platform" side, Mozilla is working to make this vision a reality through technologies like HTML5 video and audio, 3D via WebGL, heavy computation via WebCL, realtime via sockets, realtime communication with WebRTC, and so on.</p>
+				</div>
+				<div class="box col">
+					<h3 class="wimper">What does that have to do with this challenge?</h3>
+					<p>While we’re encouraging the use of these edge web technologies, we’re not insisting on them.Their use is encouraged, but not absolutely required.</p>
+					<p>This is partly because much of the innovation we’re seeking won’t yet work in a browser. It’s difficult to do zero latency 3D telepresence, for instance, because browsers don't yet have the right APIs, codecs, and optimizations for it. And many of these apps won't yet work outside of the laboratory. It’s not just about speed: it's also about network programmability.</p>
+					<p>So please consider how your idea can help push the web forward as an app development platform -- but don’t feel restricted by it.We’re open.</p>
+				</div>
+			</div>
+		</div>
+		<div class="box col bonus">
+			<div class="highlight">
+				<h3 class="point box-title">The Web as the Platform</h3>
+				<p>We believe that our connected future requires a common, freely implementable, consensus-based development platform. Mozilla believes the web is that platform. As the role of the browser changes, and the distinction between local and remote code begins to blur, we believe the open web will continue to provide the best and most universal platform to build the next- generation apps of the future.</p>
 			</div>
 		</div>
 	</div>
@@ -282,40 +347,33 @@ to the future of manufacturing in this country.</p>
 	<ul class="faq">
 		<li>
 			<h3 class="wimper">What is US Ignite?</h3>
-			<p>US Ignite seeks to develop applications and services for ultra-fast broadband networks. It will foster the creation of novel applications and digital experiences that have the potential to transform areas of national priority such as healthcare, education and job skills training, public safety, energy, and advanced manufacturing. Read more at the <a href="http://us-ignite.org/">US Ignite website.</a></p>
+			<p>US Ignite is working to create a national network of communities with ultra-fast broadband services. It’s goal is to foster the creation of novel applications and digital experiences that have the potential to transform national priority areas like healthcare, education and training, public safety, energy, and advanced manufacturing.Read more at the <a href="http://us-ignite.org/">US Ignite website.</a></p>
 		</li>
 		<li>
-			<h3 class="wimper">Who should enter? Do I need to be a US citizen to compete?</h3>
-			<p>For web developers, university researchers, start-ups and visionaries, this is a great opportunity to build an app from the future—and get your work noticed. It's also a good way to pursue experimentation without investing a lot of time in a complex funding application.</p>
-			<p>Anyone can compete in the ideas challenge and the development challenge. However, as this is a federally-funded initiative, each team must designate a fiscal agent who will accept awards on the team's behalf. Only U.S.-incorporated organizations and citizens can accept awards.</p>
-			<p>Practically, this means that teams can have members from all over the world—but must also have at least one team member, or a host, in the United States.</p>
-		</li>
-		<li>
-			<h3 class="wimper">Do I need to compete in the brainstorm in order to compete in the development challenge?</h3>
-			<p>No—anyone can compete in the development challenge. The brainstorm is not a prerequisite. That said, the brainstorm is an excellent way to discover, synthesize, and refine thinking around "apps from the future." And through the brainstorm, you may find like-minded people to join your team and compete in the development challenge.</p>
+			<h3 class="wimper">Do I have to participate in the Brainstorming Round?</h3>
+			<p>No, participation in the Brainstorming Round is encourage but not required. But bear in mind that the brainstorm is an excellent opportunity to refine your application and find potential collaborators for your team.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Why are you running three rounds of development?</h3>
 			<p>Rather than a winner-takes-all approach, the Mozilla Ignite apps challenge uses an "iterative funding" process. Over three rounds, the challenge jury will meet and award teams for the progress and promise they show. This way, teams with crazy ambitious ideas can compete side-by-side with smaller experiments.</p>
 		</li>
 		<li>
-			<h3 class="wimper">How much money can I earn?</h3>
-			<p><strong>ADD MINIMUMS. </strong>The awards recognize your progress and achievements, and are meant to give you a launching pad for your work. (Of course, you could develop an app, take the money, and walk between rounds. But we hope you’re as excited about the future as we are, and want to keep building.)</p>
-			<p>Another benefit of this approach is that the community will up its game as more and more interesting apps emerge. Teams will develop their apps in public, in real-time. They'll be required to blog regularly and commit their code to public repositories so they can get help, advice, and contributions from the community.</p>
+			<h3 class="wimper">Do I get to keep my intellectual property?</h3>
+			<p>Absolutely. Our hope is that many of the apps developed in this challenge will become commercially viable, and we want to encourage entrepreneurial innovation at the edges of the network. Whatever you develop in this challenge is yours to go monetize, or not.</p>
+			<p>At the same time, building an open development community around GENI, the open web, and other open technologies is another key objective of the challenge, so all competing apps must publish their code under a suitably open license. Check the complete official rules for more.</p>
 		</li>
 		<li>
-			<h3 class="wimper">Do I keep my intellectual property?</h3>
-			<p>Absolutely.</p>
-			<p>We hope that some of the apps developed in this challenge will someday grow up and become commercially viable. And we want to encourage entrepreneurial exploration at the edges of the network. If you develop something awesome in this challenge, it's yours to go monetize (or not).</p>
-			<p>That said, another objective of this challenge is to build an open development community around GENI, the open web, and other open technologies. And we think that open source is one of the most powerful ways to do that. So all competing apps must publish their code under a <strong>suitably open license</strong>. Check the official rules for more details.</p>
+			<h3 class="wimper">Who should enter?</h3>
+			<p>Web developers, university researchers, network engineers, start-ups, civic innovators, and anyone interested in high-speed networks. Participation is open to all.<p>
+			<p>However, as this is a federally-funded initiative by the U.S. government, each team must designate a fiscal agent who will accept awards on the team's behalf. Only U.S.-incorporated organizations and citizens can accept awards. Practically, this means that teams can have members from all over the world—but must also have at least one team member, or a host, in the United States.</p>
+		</li>
+		<li>
+			<h3 class="wimper">How much funding am I eligible to receive?</h3>
+			<p>ADD MINIMUMS.The awards recognize your progress and achievements, and are meant to provide a launching pad for your work.The amount of funding available will increase in each of the three Development Rounds.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Why is Mozilla doing this?</h3>
-			<p>Mozilla's mission is to shape future of Internet as public resource—offering choice, transparency, and control to developers and users. By working with researchers, developers, and businesspeople, we can drive innovation that benefits people in their everyday lives—and that keeps the internet open and competitive.</p>
-		</li>
-		<li>
-			<h3 class="wimper">Are there rules?</h3>
-			<p>Yep, check out the full legal rules <a href="rules.html">here</a>.</p>
+			<p>Mozilla is a global non-profit with a mission is to shape the future of internet as a public resource— offering choice, transparency, and control to developers and users. By working with researchers, developers, civic planners and businesspeople, we can drive innovation that benefits people in their everyday lives, build a better web, and keep the internet open.</p>
 		</li>
 	</ul>
 </section>

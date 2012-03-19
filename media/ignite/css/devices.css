@@ -71,12 +71,12 @@ p {
     margin-top: 0;
     line-height: 22px;
 }
-p.page-intro {
+.page-intro {
     color: #2e2e2d;
     font-size: 24px;
     line-height: 30px;
 }
-p.intro,
+.intro,
 .faq p {
     font-size: 18px;
     line-height: 30px;
@@ -101,6 +101,7 @@ p.intro,
 }
 figure {
     border-top: 1px solid #C7DDEB;
+    margin-bottom: 1em;
 }
 figcaption {
     color: #7e7d7d;
@@ -773,6 +774,7 @@ h1 .sweet {
     padding-right: 60px;
     display: inline-block;
     background: transparent url(../img/css/homepage/brainstorm.png) no-repeat top right;
+    margin: 0;
 }
 .methods .hack .col-foot {
     background-image: url(../img/css/homepage/hack.png);
@@ -894,21 +896,16 @@ fieldset .focus_areas ul {
     margin-top: 0.2em;
 }
 /* About page */
-#about .entre section {
-    border-top: 0.625em solid #000;
-}
-#about .entre section:first-child {
-    border-top: 0;
-}
 /* how section */
 .how .questions h3 {
     border-top: 1px solid #C7DDEB;
     padding-top: 3em;
 }
+.ideation_stage h3,
+.development_stage h3,
+.examples h3,
 .how .questions h4,
-.what .columns h3,
-.tech .columns h3,
-.faq h3 {
+.what .columns h3 {
     color: #ed4619;
 }
 /* process diagram */
@@ -959,9 +956,6 @@ fieldset .focus_areas ul {
 }
 .development {
     width: 75%;
-    position: relative;
-    padding-bottom: 8em;
-    background: transparent url(../img/css/infographic_arrow.png) no-repeat 40px 80%;
 }
 .rounds .wimper {
     color: #878686;
@@ -1086,9 +1080,9 @@ fieldset .focus_areas ul {
     border-bottom: none;
     padding-bottom: 0;
 }
-.build h3 {
+.priority_areas h3 {
     margin: 0;
-    padding: 2em 0 2em 90px;
+    padding: 80px 0 1em 0;
     background: transparent url(../img/css/emergency-prep.png) no-repeat 0 0;
     color: #ed4619;
 }
@@ -1104,7 +1098,7 @@ fieldset .focus_areas ul {
 #advanced-manufacturing h3 {
     background-image: url(../img/css/manufacturing.png);
 }
-.build .highlight h3 {
+.priority_areas .highlight h3 {
     padding: 0 0 1em;
     background: none;
     color: #2E2E2D;
