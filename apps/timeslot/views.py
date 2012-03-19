@@ -13,7 +13,7 @@ from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
 from commons.helpers import get_page
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, Release
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
 
@@ -50,21 +50,31 @@ def lock_booking(func):
 
 
 def entry_available_decorator(func):
-    """Makes sure the ``entry`` is available to be Booked
-    - User owns the submission
-    - Submission is a winner
+    """Makes sure the ``Submission`` is available to be Booked:
+    - A ``Release`` is available
+    - ``Submission`` is in the same Phase/Round as the ``Release``
+    - ``User`` owns the ``Submission``
+    - ``Submission`` is green-lit
     """
     def _decorated(*args, **kwargs):
         request = args[0]
         entry_id = kwargs.pop('entry_id')
-        # user owns the submission and it's a winner
-        try:
-            entry = Submission.objects.get(id=entry_id, is_winner=True,
-                                           created_by__user=request.user)
-        except Submission.DoesNotExist:
+        # There is a current release
+        release = Release.objects.get_current()
+        if not release:
             raise Http404
-        # booking has been done
-        if TimeSlot.objects.filter(submission=entry, is_booked=True):
+        kwargs['release'] = release
+        # user owns the submission and it's green-lit
+        try:
+            entry = (Submission.objects
+                     .green_lit(phase=release.phase,
+                                phase_round=release.phase_round)
+                     .filter(created_by__user=request.user, id=entry_id))[0]
+        except IndexError:
+            raise Http404
+        # Booking has been done
+        if TimeSlot.objects.filter(submission=entry, is_booked=True,
+                                   release=release):
             message = _('You have already booked a timeslot for this entry')
             messages.success(request, message)
             return HttpResponseRedirect(entry.get_absolute_url())
@@ -75,11 +85,12 @@ def entry_available_decorator(func):
 
 @login_required
 @entry_available_decorator
-def object_list(request, entry, template='timeslot/object_list.html'):
+def object_list(request, entry, release, template='timeslot/object_list.html'):
     """Listing of the ``TimeSlots`` available for a given entry"""
     # Book timeslots start at least 24 hours in advance
     start_date = datetime.utcnow() + timedelta(hours=24)
-    timeslot_qs = TimeSlot.available.filter(start_date__gte=start_date)
+    timeslot_qs = TimeSlot.objects.filter(start_date__gte=start_date,
+                                          release=release, is_booked=False)
     paginator = Paginator(timeslot_qs, settings.PAGINATOR_SIZE)
     page_number = get_page(request.GET)
     try:
@@ -97,13 +108,14 @@ def object_list(request, entry, template='timeslot/object_list.html'):
 @require_POST
 @entry_available_decorator
 @lock_booking
-def object_detail(request, entry, object_id):
+def object_detail(request, entry, release, object_id):
     """Books a ``TimeSlot`` for the ``Entry``"""
     timeslot = unshorten_object(object_id)
     if not timeslot:
         raise Http404
     # make sure it hasn't been booked
-    if timeslot.is_booked:
+    start_date = datetime.utcnow() + timedelta(hours=24)
+    if timeslot.is_booked or timeslot.start_date < start_date:
         # someone has locked in this timeslot
         message = _('Unfortunately his slot has become unavailable')
         messages.error(request, message)

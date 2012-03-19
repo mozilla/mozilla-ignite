@@ -47,7 +47,8 @@ class TimeSlotTest(TimeSlotBaseTest):
 
     def generate_timeslots(self, total, release=None):
         """Create a number of ``TimeSlots`` with an active ``Release``"""
-        release = release if release else create_release('Release', True)
+        release = release if release else create_release('Release', True,
+                                                         self.ideation)
         return [self.create_timeslot(release) for i in range(total)]
 
     def generate_submissions(self, total, user=None, are_winners=True):
@@ -172,19 +173,19 @@ class TimeSlotTest(TimeSlotBaseTest):
 
     def test_timeslot_releases(self):
         """Test ``TimeSlots`` available for different releases"""
-        release_a = create_release('Release A', True)
+        release_a = create_release('Release A', True, self.ideation)
         self.generate_timeslots(self.SUBMISSIONS, release_a)
         self.client.login(username=self.name, password=self.name)
         response = self.client.get(self.listing_url)
         # timeslots available for this ``Release``
         self.assertEqual(response.context['page'].paginator.count,
                          self.SUBMISSIONS)
-        release_b = create_release('Release B', True)
+        release_b = create_release('Release B', True, self.development)
         response = self.client.get(self.listing_url)
-        # New current release hides other TimeSlots
-        self.assertEqual(response.context['page'].paginator.count, 0)
+        # New current release hides other TimeSlots not available for this entry
+        self.assertEqual(response.status_code, 404)
         self.generate_timeslots(self.SUBMISSIONS, release_b)
+        # New current release hides other TimeSlots not available
+        # for this entry even when available
         response = self.client.get(self.listing_url)
-        # New TimeSlot for this Release
-        self.assertEqual(response.context['page'].paginator.count,
-                         self.SUBMISSIONS)
+        self.assertEqual(response.status_code, 404)

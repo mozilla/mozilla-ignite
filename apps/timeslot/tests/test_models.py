@@ -26,16 +26,19 @@ class TimeSlotModelTest(TimeSlotBaseTest):
 
     def test_release_creation(self):
         """Create a Release with the minimum data"""
-        data = {'name': 'Release', 'is_current': True,}
+        data = {'name': 'Release',
+                'is_current': True,
+                'phase': self.ideation}
         release = Release.objects.create(**data)
+        assert release.id, "Failed to create release"
 
     def test_current_release_creation(self):
         """Test the current release mechanics"""
-        release = create_release('Release', True)
+        release = create_release('Release', True, self.ideation)
         self.assertEqual(release, Release.objects.get_current())
         self.assertEqual(Release.objects.filter(is_current=True).count(), 1)
         # add an extra current release
-        new_release = create_release('New release', True)
+        new_release = create_release('New release', True, self.development)
         self.assertEqual(new_release, Release.objects.get_current())
         self.assertEqual(Release.objects.filter(is_current=True).count(), 1)
 
@@ -52,13 +55,13 @@ class TimeSlotModelTest(TimeSlotBaseTest):
 
     def test_timeslot_releases(self):
         """Test the available ``TimeSlots`` for a given ``Release``"""
-        release_a = create_release('Release A', True)
-        for i in range(10):
+        release_a = create_release('Release A', True, self.ideation)
+        for i in range(5):
             self.create_timeslot(release_a)
-        self.assertEqual(TimeSlot.available.all().count(), 10)
-        release_b = create_release('Release B', True)
+        self.assertEqual(TimeSlot.available.all().count(), 5)
+        release_b = create_release('Release B', True, self.ideation)
         self.assertEqual(TimeSlot.available.all().count(), 0)
-        for i in range(10):
+        for i in range(5):
             self.create_timeslot(release_b)
-        self.assertEqual(TimeSlot.available.all().count(), 10)
-        self.assertEqual(TimeSlot.objects.all().count(), 20)
+        self.assertEqual(TimeSlot.available.all().count(), 5)
+        self.assertEqual(TimeSlot.objects.all().count(), 10)

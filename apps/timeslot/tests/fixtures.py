@@ -99,9 +99,10 @@ def create_phase_round(name, phase, extra_data=None):
     instance, created = PhaseRound.objects.get_or_create(**data)
     return instance
 
-def create_release(name, is_current, extra_data=None):
+
+def create_release(name, is_current, phase, extra_data=None):
     """Helper to create releases"""
-    data = {'name': name, 'is_current': is_current}
+    data = {'name': name, 'is_current': is_current, 'phase': phase}
     if extra_data:
         data.update(extra_data)
     instance, created = Release.objects.get_or_create(**data)

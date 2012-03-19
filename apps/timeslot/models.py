@@ -46,6 +46,9 @@ class Release(models.Model):
     name = models.CharField(max_length=255)
     slug = AutoSlugField(populate_from='name')
     is_current = models.BooleanField(default=True)
+    phase = models.ForeignKey('challenges.Phase')
+    phase_round = models.ForeignKey('challenges.PhaseRound',
+                                    blank=True, null=True)
 
     # managers
     objects = ReleaseManager()

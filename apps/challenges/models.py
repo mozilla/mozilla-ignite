@@ -258,6 +258,7 @@ class Category(BaseModel):
 
 
 class SubmissionManager(BaseModelManager):
+
     def eligible(self, phase, phase_round=None):
         """Return all eligible submissions
         - Not excluded

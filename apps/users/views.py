@@ -15,7 +15,7 @@ from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
 from challenges.models import Submission, JudgeAssignment
-from timeslot.models import TimeSlot
+from timeslot.models import TimeSlot, Release
 from settings import INSTALLED_APPS
 
 import jingo
@@ -69,14 +69,18 @@ def profile(request, username):
         else:
             submissions = Submission.objects.visible().filter(created_by=profile)
     # Show the all the submission related data when the user is the owner
-    submission_list = []
+    need_booking_list = []
     if settings.DEVELOPMENT_PHASE and profile.user == user:
-        booked_list = TimeSlot.objects.select_related('submission').\
-            filter(submission__created_by=profile, is_booked=True)
+        release = Release.objects.get_current()
+        booked_list = (TimeSlot.objects.select_related('submission')
+                       .filter(submission__created_by=profile,
+                               is_booked=True, release=release))
         booked_ids = [i.submission.id for i in booked_list]
-        submission_list = Submission.objects.green_lit().\
-            select_related('created_by').\
-            filter(~Q(id__in=booked_ids), created_by=profile)
+        need_booking_list = (Submission.objects
+                             .green_lit(release.phase, release.phase_round)
+                             .select_related('created_by')
+                             .filter(~Q(id__in=booked_ids),
+                                     created_by=profile))
     # User has assigned judging tasks
     webcast_list = []
     if settings.DEVELOPMENT_PHASE and request.user.is_authenticated():
@@ -94,7 +98,7 @@ def profile(request, username):
         'projects': profile.project_set.all() or False,
         'submissions': submissions or False,
         'booked_list': booked_list,
-        'submission_list': submission_list,
+        'need_booking_list': need_booking_list,
         'webcast_list': webcast_list,
     })
 
