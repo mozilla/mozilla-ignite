@@ -758,7 +758,6 @@ h1 .sweet {
 .methods h3 {
     color: #ed4619;
     margin: 0 0 0.5em;
-    padding-left: 60px;
 }
 .methods ul {
     overflow: hidden;
@@ -768,12 +767,17 @@ h1 .sweet {
 }
 .methods li {
     padding: 1em 0 0;
-    background: transparent url(../img/css/homepage/brainstorm.png) no-repeat 0 0.5em;
 }
-.methods .hack {
+.methods .col-foot {
+    line-height: 50px;
+    padding-right: 60px;
+    display: inline-block;
+    background: transparent url(../img/css/homepage/brainstorm.png) no-repeat top right;
+}
+.methods .hack .col-foot {
     background-image: url(../img/css/homepage/hack.png);
 }
-.methods .compete {
+.methods .compete .col-foot {
     background-image: url(../img/css/homepage/funding.png);
 }
 .highlight {
@@ -1123,7 +1127,6 @@ section footer {
     padding: 1em 0;
     overflow: hidden;
     clear: left;
-    text-align: right;
 }
 section footer .cta {
     margin-left: 20px;
@@ -1146,6 +1149,12 @@ section footer .cta {
     left: -9999em;
     height: 1px;
     overflow: hidden;
+}
+#splash .submissions .col {
+    width: 20%;
+}
+#splash .submissions .col:nth-child(3n+1) {
+    clear: none;
 }
 .submissions article .title {
     color: #454545;
