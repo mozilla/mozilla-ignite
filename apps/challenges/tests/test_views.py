@@ -20,7 +20,7 @@ from challenges.models import (Challenge, Submission, Phase, Category,
                                ExternalLink, SubmissionParent, SubmissionVersion)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions)
-from ignite.tests.decorators import ignite_skip
+from ignite.tests.decorators import ignite_skip, ignite_only
 from projects.models import Project
 
 
@@ -85,7 +85,6 @@ class ChallengeEntryTest(test_utils.TestCase):
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
-    # @ignite_skip
     @suppress_locale_middleware
     def test_entries_view(self):
         """Test the dedicated entries view.
@@ -101,7 +100,6 @@ class ChallengeEntryTest(test_utils.TestCase):
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
-    # @ignite_skip
     @suppress_locale_middleware
     def test_hidden_entries(self):
         """Test that draft entries are not visible on the entries page."""
@@ -115,6 +113,19 @@ class ChallengeEntryTest(test_utils.TestCase):
         # Check the draft submission is hidden
         assert_equal(set(response.context['entries'].object_list),
                      set(submissions[1:]))
+    
+    @ignite_only
+    def test_winning_entries(self):
+        """Test the winning entries view."""
+        create_submissions(5)
+        winners = Submission.objects.all()[1:3]
+        for entry in winners:
+            entry.is_winner = True
+            entry.save()
+        
+        response = self.client.get(reverse('entries_winning'))
+        self.assertEqual(set(e.title for e in response.context['entries']),
+                         set(e.title for e in winners))
 
 
 # Add this dictionary to a form for no external links
