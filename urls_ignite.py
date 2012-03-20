@@ -47,21 +47,18 @@ urlpatterns += patterns(
     'challenges.views',
     url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
         kwargs=_ignite_kwargs, name='entry_version'),
+    url(r'^ideas/(?P<entry_id>\d+)/help/$', 'submission_help',
+        kwargs=_ignite_kwargs, name='entry_help')
     )
 
 urlpatterns += patterns(
     '',
     (r'^resources/', include('resources.urls', namespace='resources')),
     (r'^award/', include('awards.urls', namespace='awards'), _ignite_kwargs),
+    (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
+    (r'^webcast/', include('webcast.urls', namespace='webcast'),),
     )
 
-
-if settings.DEVELOPMENT_PHASE:
-    urlpatterns += patterns(
-        '',
-        (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
-        (r'^webcast/', include('webcast.urls', namespace='webcast'),),
-        )
 
 # Handle 404 and 500 errors
 handler404 = 'innovate.views.handle404'
@@ -75,3 +72,8 @@ if settings.DEBUG:
         (r'^%s/(?P<path>.*)$' % media_url, 'django.views.static.serve',
          {'document_root': settings.MEDIA_ROOT}),
     )
+if settings.DEBUG and 'debug_toolbar_user_panel' in settings.INSTALLED_APPS:
+    urlpatterns += patterns(
+        '',
+        url(r'', include('debug_toolbar_user_panel.urls')),
+        )

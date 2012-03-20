@@ -6,7 +6,7 @@ from django.forms.util import ErrorDict
 
 from challenges.models import (Submission, ExternalLink, Category,
                                Judgement, JudgingCriterion, JudgingAnswer,
-                               PhaseRound)
+                               PhaseRound, SubmissionHelp)
 from challenges.widgets import CustomRadioSelect
 
 
@@ -249,3 +249,9 @@ class PhaseRoundAdminForm(forms.ModelForm):
             raise forms.ValidationError('This round dates overlap with other '
                                         'rounds')
         return self.cleaned_data
+
+
+class SubmissionHelpForm(forms.ModelForm):
+    class Meta:
+        model = SubmissionHelp
+        fields = ('notes', 'status',)

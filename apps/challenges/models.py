@@ -15,6 +15,7 @@ from django.db.models import signals, Q
 from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
+from challenges.managers import SubmissionHelpManager
 from django_extensions.db.fields import (AutoSlugField,
                                          CreationDateTimeField,
                                          ModificationDateTimeField)
@@ -405,6 +406,10 @@ class Submission(BaseModel):
     def get_judging_url(self):
         """Return the URL to judge this submission."""
         return self._lookup_url('entry_judge', {'pk': self.id})
+
+    def get_help_url(self):
+        """Return the URL to judge this submission."""
+        return self._lookup_url('entry_help', {'pk': self.id})
     
     # Permission shortcuts, for use in templates
     
@@ -697,3 +702,26 @@ class SubmissionVersion(models.Model):
 
     def __unicode__(self):
         return u'Version for %s on %s' % (self.submission, self.created)
+
+
+class SubmissionHelp(models.Model):
+    """Users can ask for help with a given submission"""
+    PUBLISHED = 1
+    DRAFT = 2
+    STATUS_CHOICES = (
+        (PUBLISHED, 'Published'),
+        (DRAFT, 'Draft'),
+        )
+    parent = models.OneToOneField('challenges.SubmissionParent')
+    created = CreationDateTimeField()
+    notes = models.TextField()
+    status = models.IntegerField(choices=STATUS_CHOICES, default=DRAFT)
+
+    # managers
+    objects = SubmissionHelpManager()
+
+    class Meta:
+        verbose_name_plural = 'Submission Help'
+
+    def __unicode__(self):
+        return u'Help needed for %s' % self.parent

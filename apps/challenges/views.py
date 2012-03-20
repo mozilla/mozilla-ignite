@@ -23,9 +23,11 @@ from awards.models import JudgeAllowance, SubmissionAward, Award
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page
-from challenges.decorators import phase_open_required, phase_closed_required
+from challenges.decorators import (phase_open_required, phase_closed_required,
+                                   project_challenge_required)
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
-                              JudgingForm, NewEntryForm)
+                              JudgingForm, NewEntryForm, SubmissionHelpForm,
+                              SubmissionHelp)
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
@@ -232,20 +234,15 @@ def extract_form_errors(form, link_form):
 
 @phase_open_required(methods_allowed=['GET'])
 @login_required
-def create_entry(request, project, slug):
+@project_challenge_required
+def create_entry(request, project, challenge):
     """Creates a ``Submission`` from the user details"""
-    try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    project = challenge.project
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
     if request.method == 'POST':
         # If there is not an active phase it shouldn't be able to get here
-        phase = Phase.objects.get_current_phase(slug)
+        phase = Phase.objects.get_current_phase(challenge.slug)
         if not phase:
             raise Http404
         form = NewEntryForm(data=request.POST,
@@ -289,15 +286,9 @@ def create_entry(request, project, slug):
         'errors': form_errors
     })
 
-
-def entry_version(request, project, slug, entry_id):
+@project_challenge_required
+def entry_version(request, project, challenge, entry_id):
     """Redirects an ``Submission`` version to the ``SubmissionParent``"""
-    try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    # Submisison is on the Parent
     try:
         parent = (SubmissionParent.objects
                   .get(submission__id=entry_id,
@@ -315,14 +306,9 @@ def entry_version(request, project, slug, entry_id):
     return HttpResponseRedirect(version.parent.get_absolute_url())
 
 
-def entry_show(request, project, slug, entry_id, judging_form=None):
+@project_challenge_required
+def entry_show(request, project, challenge, entry_id, judging_form=None):
     """Detail of an idea, show any related information to it"""
-    try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    project = challenge.project
     # SubmissionParent acts as an proxy for any of the revisions.
     # and it only shows the current revision
     try:
@@ -544,7 +530,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
     def get(self, request, *args, **kwargs):
         """Respond to a GET request by displaying the edit form."""
         self.object = self.get_object()
-        
+        self.parent = self.object.parent
         context = self.get_context_data(**self.get_forms())
         """
         We now access errrors direct in the template - so with no errors 
@@ -574,6 +560,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         messages.success(self.request, 'Your entry has been updated.')
         phase = Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
         object_phase = self.object.phase_round if self.object.phase_round else None
+        self.parent = self.object.parent
         if self.object.phase == phase and object_phase == phase.current_round:
             # No changes during a different Round and Phase update the
             # current entry
@@ -584,7 +571,6 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             # Phase / Round with the new details
             previous_submission = self.object
             profile = self.request.user.get_profile()
-            parent = previous_submission.parent
             submission = Submission(created_by=profile,
                                     category=previous_submission.category,
                                     phase=phase)
@@ -599,7 +585,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
                 if not kwargs['files']:
                     new_submission.sketh_note = previous_submission.sketh_note
                     new_submission.save()
-                parent.update_version(new_submission)
+                self.parent.update_version(new_submission)
                 # Duplicate links
                 for link in link_form.cleaned_data:
                     if not link:
@@ -671,3 +657,37 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
 entry_delete = DeleteEntryView.as_view()
+
+
+@login_required
+@project_challenge_required
+def submission_help(request, project, challenge, entry_id):
+    """``Submissions`` that need help"""
+    # SubmissionParent acts as an proxy for any of the revisions.
+    # and it only shows the current revision
+    try:
+        parent = (SubmissionParent.objects.select_related('submission')
+                  .get(slug=entry_id, submission__phase__challenge=challenge))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+    # Make sure the user can edit the submission
+    if not parent.submission.editable_by(request.user):
+        raise Http404
+    try:
+        help_instance = parent.submissionhelp
+    except SubmissionHelp.DoesNotExist:
+        help_instance = None
+    if request.method == 'POST':
+        form = SubmissionHelpForm(request.POST, instance=help_instance)
+        instance = form.save(commit=False)
+        instance.parent = parent
+        instance.save()
+        if instance.status == SubmissionHelp.PUBLISHED:
+            msg = _('Your message has been posted successfully and is now '
+                    'available on your Idea page')
+            messages.success(request, msg)
+        return HttpResponseRedirect(parent.submission.get_absolute_url())
+    else:
+        form = SubmissionHelpForm(instance=help_instance)
+    context = {'form': form}
+    return jingo.render(request, 'challenges/submission_help.html', context)

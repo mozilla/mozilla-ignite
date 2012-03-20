@@ -20,5 +20,6 @@ nose_progressive==1.3
 
 # Dev tools
 -e git://github.com/robhudson/django-debug-toolbar.git#egg=django-debug-toolbar
+-e git://github.com/playfire/django-debug-toolbar-user-panel.git#egg=django-debug-toolbar-user-panel
 fabric
 ipdb
