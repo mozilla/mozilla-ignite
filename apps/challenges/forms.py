@@ -1,47 +1,63 @@
 from django import forms
+from django.db.models import Q
 from django.forms import widgets
 from django.forms.models import inlineformset_factory, ModelChoiceField
 from django.forms.util import ErrorDict
 
-from challenges.models import Submission, ExternalLink, Category, \
-                              Judgement, JudgingCriterion, JudgingAnswer
+from challenges.models import (Submission, ExternalLink, Category,
+                               Judgement, JudgingCriterion, JudgingAnswer,
+                               PhaseRound)
 from challenges.widgets import CustomRadioSelect
 
+
+entry_widgets = {
+    'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
+    'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
+    'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
+    'description': forms.Textarea(attrs={'aria-describedby':'info_description',
+                                         'id':'wmd-input',}),
+    'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
+    }
+
+entry_fields = (
+    'title',
+    'brief_description',
+    'description',
+    'is_draft',
+    'sketh_note',
+    'category',
+    )
 
 class EntryForm(forms.ModelForm):
     # Need to specify this explicitly here to remove the empty option
     category = ModelChoiceField(queryset=Category.objects.all(),
                                 empty_label=None,
                                 widget=CustomRadioSelect())
+
     class Meta:
         model = Submission
- 
-        fields = (
-            'title',
-            'brief_description',
-            'description',
-            'is_draft',
-            'sketh_note',
-            'category',
-        )
-        
-        widgets = {
-            'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
-            'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
-            'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
-            'description': forms.Textarea(attrs={
-                'aria-describedby':'info_description',
-                'id':'wmd-input',
-            }),
-            'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
-        }
-    
+        widgets = entry_widgets
+        fields = entry_fields
+
     def clean(self):
         super(EntryForm, self).clean()
-        if self.errors.get('sketh_note'):
-            # Something is wrong with the image: remove it
+        if self.errors:
+            # Either something is wrong with the image, or there was another
+            # error on the form. In the former case, we don't want the image any
+            # more; in the latter, we've already lost it and it'll need
+            # re-uploading.
             self.files.pop(self.add_prefix('sketh_note'), None)
         return self.cleaned_data
+
+
+class NewEntryForm(EntryForm):
+    """New Entries require to accept the Terms and Conditions"""
+    terms_and_conditions = forms.BooleanField()
+
+    class Meta:
+        model = Submission
+        fields = entry_fields + ('terms_and_conditions',)
+        widgets = entry_widgets
 
 
 class AutoDeleteForm(forms.ModelForm):
@@ -187,3 +203,49 @@ class MinMaxIntegerField(forms.IntegerField):
     
     def widget_attrs(self, widget):
         return {'min': self.min_value, 'max': self.max_value}
+
+
+class PhaseRoundAdminForm(forms.ModelForm):
+    """Form for validating the ``PhaseRound`` dates"""
+
+    class Meta:
+        model = PhaseRound
+
+    def clean(self):
+        """Validate that
+        - The round dates don't overlap
+        - The round is inside the phase they are associated
+        """
+        data = self.cleaned_data
+        # ignore non_field_errors if the required fields are not in
+        # self.cleaned_data
+        if not all(k in data for k in ('start_date', 'end_date', 'phase')):
+            return data
+        start_date = data['start_date']
+        end_date = data['end_date']
+        phase = data['phase']
+        if end_date < start_date:
+            raise forms.ValidationError('Start date must be before the end date')
+        # Selected phase should contain the PhaseRound
+        if not all([phase.start_date <= start_date,
+                    phase.end_date >= end_date]):
+            raise forms.ValidationError('Dates should be inside the %s phase.'
+                                        ' Between  %s and %s' % \
+                                        (phase.name, phase.start_date,
+                                         phase.end_date))
+        # PhaseRound shouldn't overlap
+        query_args = []
+        if self.instance.id:
+            # this may be an update avoid it if so
+            query_args = [~Q(id=self.instance.id)]
+        # Make sure the dates don't overlap, are contained or contain other
+        # rounds
+        if PhaseRound.objects.filter(
+                (Q(start_date__lte=start_date) & Q(end_date__gte=start_date)) |
+                (Q(start_date__lte=end_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__lte=start_date) & Q(end_date__gte=end_date)) |
+                (Q(start_date__gte=start_date) & Q(end_date__lte=end_date)),
+                *query_args):
+            raise forms.ValidationError('This round dates overlap with other '
+                                        'rounds')
+        return self.cleaned_data

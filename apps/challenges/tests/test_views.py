@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.messages import SUCCESS
+from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.http import Http404
 from django.test.client import Client
@@ -15,10 +16,11 @@ import test_utils
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
-from challenges.models import Challenge, Submission, Phase, Category, ExternalLink
+from challenges.models import (Challenge, Submission, Phase, Category,
+                               ExternalLink, SubmissionParent, SubmissionVersion)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions)
-from ignite.tests.decorators import ignite_skip
+from ignite.tests.decorators import ignite_skip, ignite_only
 from projects.models import Project
 
 
@@ -83,7 +85,6 @@ class ChallengeEntryTest(test_utils.TestCase):
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
-    # @ignite_skip
     @suppress_locale_middleware
     def test_entries_view(self):
         """Test the dedicated entries view.
@@ -99,7 +100,6 @@ class ChallengeEntryTest(test_utils.TestCase):
         assert_equal([s.title for s in response.context['entries'].object_list],
                      list(reversed(submission_titles)))
     
-    # @ignite_skip
     @suppress_locale_middleware
     def test_hidden_entries(self):
         """Test that draft entries are not visible on the entries page."""
@@ -113,6 +113,19 @@ class ChallengeEntryTest(test_utils.TestCase):
         # Check the draft submission is hidden
         assert_equal(set(response.context['entries'].object_list),
                      set(submissions[1:]))
+    
+    @ignite_only
+    def test_winning_entries(self):
+        """Test the winning entries view."""
+        create_submissions(5)
+        winners = Submission.objects.all()[1:3]
+        for entry in winners:
+            entry.is_winner = True
+            entry.save()
+        
+        response = self.client.get(reverse('entries_winning'))
+        self.assertEqual(set(e.title for e in response.context['entries']),
+                         set(e.title for e in winners))
 
 
 # Add this dictionary to a form for no external links
@@ -203,6 +216,8 @@ class CreateEntryTest(test_utils.TestCase):
         submission = Submission.objects.get()
         assert_equal(submission.challenge.slug, self.challenge_slug)
         assert_equal(submission.created_by.user, alex)
+        parent = SubmissionParent.objects.get()
+        assert_equal(parent.submission, submission)
     
     @ignite_skip
     def test_invalid_form(self):
@@ -272,26 +287,37 @@ def test_wrong_project():
 
 class ShowEntryTest(test_utils.TestCase):
     """Test functionality of the single entry view."""
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
-        alex_profile = User.objects.get(username='alex').get_profile()
-        s = Submission.objects.create(phase=Phase.objects.get(),
-                                      title='A submission',
-                                      brief_description='My submission',
-                                      description='My wonderful submission',
-                                      created_by=alex_profile,
-                                      category=Category.objects.get())
-        s.save()
-        
+        self.alex_profile = User.objects.get(username='alex').get_profile()
+        s = self.create_submission()
+        self.submission = s
+        # Entries require a SubmissionParent which acts as a proxy for versions
+        self.parent = SubmissionParent.objects.create(submission=s)
         self.submission_path = s.get_absolute_url()
-    
+
+    def create_submission(self, **kwargs):
+        """Helper to create a ``Submission``"""
+        defaults = {
+            'phase': Phase.objects.get(),
+            'title': 'A submission',
+            'brief_description': 'My submission',
+            'description': 'My wonderful submission',
+            'created_by': self.alex_profile,
+            'category': Category.objects.get()
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
     @suppress_locale_middleware
     def test_show_entry(self):
-        response = self.client.get(self.submission_path)
+        url = reverse('entry_show', args=[self.submission.id])
+        response = self.client.get(url)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_entry_not_found(self):
         # Get an ID that doesn't exist
@@ -300,31 +326,65 @@ class ShowEntryTest(test_utils.TestCase):
         response = self.client.get(bad_path)
         assert_equal(response.status_code, 404, response.content)
 
+    @suppress_locale_middleware
+    def test_old_versioned_entry(self):
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        response = self.client.get(self.submission_path)
+        assert_equal(response.status_code, 200)
+        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+
+    @suppress_locale_middleware
+    def test_new_versioned_entry(self):
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        response = self.client.get(new_submission.get_absolute_url())
+        assert_equal(response.status_code, 200)
+        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+
+    @suppress_locale_middleware
+    def test_failed_versioned_entry(self):
+        """New versioned entries shouldn't change the url"""
+        new_submission = self.create_submission(title='Updated Submission!')
+        self.parent.update_version(new_submission)
+        url = reverse('entry_show', args=[new_submission.id])
+        response = self.client.get(url)
+        assert_equal(response.status_code, 404)
+
 
 class EditEntryTest(MessageTestCase):
     """Test functionality of the edit entry view."""
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
-        
         admin = User.objects.create_user('admin', 'admin@example.com',
                                          password='admin')
         admin.is_superuser = True
         admin.save()
-        
         # Fill in the profile name to stop nag redirects
         admin_profile = admin.get_profile()
         admin_profile.name = 'Admin Adminson'
         admin_profile.save()
-        
         alex_profile = User.objects.get(username='alex').get_profile()
         create_submissions(1, creator=alex_profile)
-        
         entry = Submission.objects.get()
         self.view_path = entry.get_absolute_url()
         self.edit_path = entry.get_edit_url()
-    
+
+
+    def open_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() + timedelta(hours=1)
+        phase.save()
+
+    def close_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() - timedelta(hours=1)
+        phase.save()
+
     def _edit_data(self, submission=None):
         if submission is None:
             submission = Submission.objects.get()
@@ -332,14 +392,13 @@ class EditEntryTest(MessageTestCase):
                     brief_description='A submission',
                     description='A really, seriously good submission',
                     category=submission.category.id)
-    
+
     @suppress_locale_middleware
     def test_edit_form(self):
         self.client.login(username='alex', password='alex')
-        
         response = self.client.get(self.edit_path)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_edit(self):
         self.client.login(username='alex', password='alex')
@@ -349,15 +408,23 @@ class EditEntryTest(MessageTestCase):
         self.assertRedirects(response, self.view_path)
         # Check for a success message
         self.assertSuccessMessage(response)
-        
         assert_equal(Submission.objects.get().description, data['description'])
-    
+
+    @suppress_locale_middleware
+    def test_edit_closed_phase(self):
+        self.close_phase()
+        self.client.login(username='alex', password='alex')
+        data = self._edit_data()
+        data.update(BLANK_EXTERNALS)
+        response = self.client.post(self.edit_path, data, follow=True)
+        self.assertEqual(response.status_code, 403)
+
     @suppress_locale_middleware
     def test_anonymous_access(self):
         """Check that anonymous users can't get at the form."""
         response = self.client.get(self.edit_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_anonymous_edit(self):
         """Check that anonymous users can't post to the form."""
@@ -478,41 +545,52 @@ class EditLinkTest(test_utils.TestCase):
 
 
 class DeleteEntryTest(MessageTestCase):
-    
+
     def setUp(self):
         challenge_setup()
         create_users()
-        
-        alex_profile = User.objects.get(username='alex').get_profile()
-        create_submissions(1, creator=alex_profile)
-        
-        submission = Submission.objects.get()
-        
+        self.alex_profile = User.objects.get(username='alex').get_profile()
+        submission = self.create_submission()
+        self.parent = SubmissionParent.objects.create(submission=submission)
         base_kwargs = {'project': Project.objects.get().slug,
                        'slug': Challenge.objects.get().slug}
-        
         self.view_path = submission.get_absolute_url()
         self.delete_path = submission.get_delete_url()
-    
+
+    def create_submission(self, **kwargs):
+        """Helper to create a ``Submission``"""
+        defaults = {
+            'phase': Phase.objects.get(),
+            'title': 'A submission',
+            'brief_description': 'My submission',
+            'description': 'My wonderful submission',
+            'created_by': self.alex_profile,
+            'category': Category.objects.get()
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+
     @suppress_locale_middleware
     def test_anonymous_delete_form(self):
         """Check that anonymous users can't get at the form."""
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_anonymous_delete(self):
         """Check that anonymous users can't delete entries."""
         response = self.client.post(self.delete_path)
         assert_equal(response.status_code, 302)
-    
+
     @suppress_locale_middleware
     def test_non_owner_access(self):
         """Check that non-owners cannot see the delete form."""
         self.client.login(username='bob', password='bob')
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 403)
-    
+
     @suppress_locale_middleware
     def test_non_owner_delete(self):
         """Check that users cannot delete each other's submissions."""
@@ -520,19 +598,135 @@ class DeleteEntryTest(MessageTestCase):
         response = self.client.post(self.delete_path, {})
         assert_equal(response.status_code, 403)
         assert Submission.objects.exists()
-    
+
     @suppress_locale_middleware
     def test_delete_form(self):
         self.client.login(username='alex', password='alex')
-        
         response = self.client.get(self.delete_path)
         assert_equal(response.status_code, 200)
-    
+
     @suppress_locale_middleware
     def test_delete(self):
         self.client.login(username='alex', password='alex')
         response = self.client.post(self.delete_path, {}, follow=True)
         assert_equal(response.redirect_chain[0][1], 302)
-        assert_equal(Submission.objects.count(), 0)
-        
+        assert_equal((Submission.objects.filter(created_by=self.alex_profile)
+                      .count()), 0)
         self.assertSuccessMessage(response)
+        assert_equal((SubmissionParent.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)
+
+    def test_delete_safety(self):
+        """Test delete doesn't remove any other user content"""
+        self.client.login(username='alex', password='alex')
+        submission_b = self.create_submission(title='b')
+        SubmissionParent.objects.create(submission=submission_b)
+        response = self.client.post(self.delete_path, {}, follow=True)
+        self.assertSuccessMessage(response)
+        submission_list = Submission.objects.filter(created_by=self.alex_profile)
+        assert_equal(len(submission_list), 1)
+        assert_equal(submission_list[0], submission_b)
+        parent_list = (SubmissionParent.objects
+                       .filter(submission__created_by=self.alex_profile))
+        assert_equal(len(parent_list), 1)
+        assert_equal(parent_list[0].submission, submission_b)
+
+    @suppress_locale_middleware
+    def test_delete_versioned_submission_past(self):
+        """Deleting an old versioned ``Submission`` should fail"""
+        submission_b = self.create_submission(title='b')
+        self.parent.update_version(submission_b)
+        self.client.login(username='alex', password='alex')
+        response = self.client.post(self.delete_path, {})
+        assert_equal(response.status_code, 404)
+
+    @suppress_locale_middleware
+    def test_delete_versioned_submission(self):
+        """Deleting a versioned ``Submission`` should take down all the related
+        content"""
+        submission_b = self.create_submission(title='b')
+        self.parent.update_version(submission_b)
+        self.client.login(username='alex', password='alex')
+        self.client.post(submission_b.get_delete_url(), {})
+        assert_equal((Submission.objects.filter(created_by=self.alex_profile)
+                      .count()), 0)
+        assert_equal((SubmissionParent.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)
+        assert_equal((SubmissionVersion.objects
+                      .filter(submission__created_by=self.alex_profile)
+                      .count()), 0)
+
+
+class EditEntryPhaseTest(MessageTestCase):
+    """Test functionality of the edit entry view for new versions."""
+
+    def setUp(self):
+        challenge_setup()
+        create_users()
+        admin = User.objects.create_user('admin', 'admin@example.com',
+                                         password='admin')
+        admin.is_superuser = True
+        admin.save()
+        # Fill in the profile name to stop nag redirects
+        admin_profile = admin.get_profile()
+        admin_profile.name = 'Admin Adminson'
+        admin_profile.save()
+        alex_profile = User.objects.get(username='alex').get_profile()
+        create_submissions(1, creator=alex_profile)
+        self.close_phase()
+        entry = Submission.objects.get()
+        self.view_path = entry.get_absolute_url()
+        self.edit_path = entry.get_edit_url()
+        # create new active phase
+        challenge = Challenge.objects.get()
+        start_date = datetime.utcnow() - timedelta(hours=1)
+        end_date = datetime.utcnow() + timedelta(hours=1)
+        self.phase = Phase.objects.create(challenge=challenge,
+                                          name='New Phase',
+                                          start_date=start_date,
+                                          end_date=end_date, order=2)
+
+    def open_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() + timedelta(hours=1)
+        phase.save()
+
+    def close_phase(self):
+        phase = Phase.objects.get()
+        phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        phase.end_date = datetime.utcnow() - timedelta(hours=1)
+        phase.save()
+
+    def _edit_data(self, submission=None):
+        if submission is None:
+            submission = Submission.objects.get()
+        return dict(title=submission.title,
+                    brief_description='Versioned Submission',
+                    description='A really, seriously good submission',
+                    category=submission.category.id)
+
+    @suppress_locale_middleware
+    def test_edit_form(self):
+        self.client.login(username='alex', password='alex')
+        response = self.client.get(self.edit_path)
+        assert_equal(response.status_code, 200)
+
+    @suppress_locale_middleware
+    def test_edit(self):
+        """Test an edit when there is a new Phase"""
+        self.client.login(username='alex', password='alex')
+        data = self._edit_data()
+        data.update(BLANK_EXTERNALS)
+        response = self.client.post(self.edit_path, data, follow=True)
+        self.assertRedirects(response, self.view_path)
+        # Check for a success message
+        self.assertSuccessMessage(response)
+        parent = SubmissionParent.objects.get()
+        self.assertEqual(parent.name, data['title'])
+        # Make sure it was cloned
+        assert_equal(parent.submission.brief_description, data['brief_description'])
+        assert_equal(parent.submission.phase, self.phase)
+        assert_equal(Submission.objects.count(), 2)

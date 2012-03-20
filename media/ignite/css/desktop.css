@@ -28,15 +28,20 @@
 .col img {
     width: 100%;
 }
+figure {
+    margin-top: 30px;
+    text-align: center
+}
+figure img {
+    width: auto !important;
+ }   
 #disqus_thread img {
     width: auto;
 }
 #user_profile .user_tools {
-    margin-top: -1.5em;
-}
-#user_profile .promo .entre  {
-    width: 67%;
-    padding-left: 110px;
+    position: absolute;
+    top: 0;
+    right: 0;
 }
 /* Masthead */
 .masthead .brand {
@@ -75,12 +80,6 @@
 .submissions .frame {
     width: 100%;
 }
-.shout {
-    font-size: 60px;
-}
-.announce {
-    font-size: 24px;
-}
 .partners h2 {
     line-height: 75px;
     margin-bottom: 1em;
@@ -95,21 +94,8 @@
 }
 /**= Main content */
 /* homepage */
-.submissions .col {
-    width: 20%;
-}
-.highlight .submissions .col,
-#splash .submissions .col {
-    width: 33%;
-}
-.submissions .col:nth-child(5n + 1) {
+.submissions .col:nth-child(3n + 1) {
     clear: left;
-}
-.lists .submissions .col:nth-child(3n + 1) {
-    clear: left;
-}
-.lists .submissions .col:nth-child(5n + 1) {
-    clear: none;
 }
 .sweet {
     padding: 0 2em 0 0;
@@ -174,12 +160,23 @@ header .meta em {
 .ignite_info br {
     display: block;
 }
+.methods:after {
+    content: "&nbsp;";
+    position: absolute;
+    height: 2em;
+    border-bottom: 1px solid #9BC4DF;
+    width: 100%;
+    left: 0;
+    top: 0;
+    display: block;
+    text-indent: -9999em;
+}
 .methods h3 {
     padding-left: 0;
 }
 .methods li {
     border-left: 1px solid #9bc4df;
-    padding: 2em 20px 60px 2em;
+    padding: 4em 20px 60px;
     background-position: 20px 90%;
 }
 .methods ul li:first-child {
@@ -191,7 +188,6 @@ header .meta em {
 }
 .focus_areas ul li:first-child {
     border-left: none;
-    margin-top: 10px;
 }
 /* single submission */
 #show_submission h1 {
@@ -201,17 +197,14 @@ header .meta em {
 #show_submission .entre div.col {
     width: 67%;
 }
-#user_profile .vcard {
-    padding-left: 0;
-}
 #wmd-input {
     padding-top: 50px;
+}
+/* User profile */
+header.vcard {
+    padding-right: 100px;
 }
 /* Index pages */
 .index {
     float: right;
-    width: 33%;
-}
-.index-content {
-    width: 67%;
 }

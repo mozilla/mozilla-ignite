@@ -25,7 +25,7 @@
         <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">All ideas</a></li>
         {% if categories %}
         {% for cat in categories %}
-            <li><a{% if category.slug==cat.slug %} class="current"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
+            <li><a{% if category.slug==cat.slug %} class="current wimper"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
         {% endfor %}
         {% endif %}
     </ul>
@@ -39,10 +39,10 @@
 {% for entry in entries.object_list %}
     <li class="box col">
         <article>
-            <a href="{{ entry.get_absolute_url() }}">
-                <h3>
+            <a class="title" href="{{ entry.get_absolute_url() }}">
+                <h3 class="title wimper">
                     <div class="frame box">
-                    <img src="{{ entry.get_image_src() }}" alt="">
+                    <img src="http://src.sencha.io/200/{{ app_url }}{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
                 </h3>

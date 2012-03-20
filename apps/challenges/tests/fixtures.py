@@ -4,7 +4,7 @@ from django.contrib.admin.models import User
 from django.conf import settings
 
 from challenges.models import (ExternalLink, Submission, Phase, Challenge,
-                               Category, Project)
+                               Category, Project, SubmissionParent)
 
 
 def challenge_setup():
@@ -29,7 +29,7 @@ def challenge_setup():
     c.slug = getattr(settings, 'IGNITE_CHALLENGE_SLUG', 'my-challenge')
     c.summary = 'Are you up to it?'
     c.description = 'This is a challenge of supreme challengingness.'
-    c.end_date = datetime.now() + timedelta(days=365)
+    c.end_date = datetime.utcnow() + timedelta(days=365)
     c.save()
     
     ph = Phase()
@@ -78,10 +78,13 @@ def create_submissions(count, phase=None, creator=None):
                                   phase=phase,
                                   created_by=creator,
                                   category=category)
+        # Make sure this submission has a parent
+        SubmissionParent.objects.create(submission=foo)
     return titles
 
 
 def create_users():
+    profile_list = []
     for name in ['alex', 'bob', 'charlie']:
         user = User.objects.create_user(name, '%s@example.com' % name,
                                         password=name)
@@ -89,3 +92,5 @@ def create_users():
         profile = user.get_profile()
         profile.name = '%(name)s %(name)sson' % {'name': name.capitalize()}
         profile.save()
+        profile_list.append(profile)
+    return profile_list

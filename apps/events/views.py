@@ -12,7 +12,7 @@ from events.models import Event
 
 def all(request):
     events = Event.objects.all().order_by('start')
-    upcoming = Event.objects.filter(start__gte=datetime.datetime.now())
+    upcoming = Event.objects.filter(start__gte=datetime.datetime.utcnow())
     return jingo.render(request, 'events/all.html', {
         'events': events,
         'upcoming': upcoming,

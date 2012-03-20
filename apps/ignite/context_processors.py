@@ -1,6 +1,8 @@
 from urllib import urlencode
 from urlparse import urljoin
 
+from django.conf import settings
+
 from django.contrib.auth import REDIRECT_FIELD_NAME
 from django.core.urlresolvers import reverse
 
@@ -25,3 +27,10 @@ def browserid_target_processor(request):
         query_string = urlencode({RFN: request.get_full_path()})
         form_target = urljoin(form_target, '?' + query_string)
     return {'browserid_target': form_target}
+
+def site_url(request):
+    """
+    As we're using an external service to resize images we need to pipe through
+    the FULL domain - https:// and everything
+    """
+    return {'app_url': settings.APP_URL}

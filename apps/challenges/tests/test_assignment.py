@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime, timedelta
 
 from django.contrib.auth.models import User, Group, Permission
 from test_utils import TestCase
@@ -11,7 +12,7 @@ from challenges.management.commands.assign import (get_judge_profiles,
                                                    get_submissions,
                                                    get_assignments)
 from challenges.models import (Submission, Judgement, JudgeAssignment,
-                               ExclusionFlag)
+                               ExclusionFlag, Phase)
 from ignite.tests.decorators import ignite_only
 
 
@@ -34,6 +35,7 @@ class AssignmentTest(TestCase):
     
     def setUp(self):
         assignment_setup()
+        self.phase = Phase.objects.get()
         self.judging_permission = Permission.objects.get(
                                       codename='judge_submission')
     
@@ -59,13 +61,13 @@ class AssignmentTest(TestCase):
                          set(['charlie']))
     
     def test_submissions(self):
-        self.assertEqual(len(get_submissions()), 5)
+        self.assertEqual(len(get_submissions(self.phase)), 5)
     
     def test_no_excluded_submissions(self):
         excluded = Submission.objects.get(title='Submission 3')
         ExclusionFlag.objects.create(submission=excluded)
         
-        self.assertEqual(set(s.title for s in get_submissions()),
+        self.assertEqual(set(s.title for s in get_submissions(self.phase)),
                          set(['Submission %d' % n for n in [1, 2, 4, 5]]))
     
     def test_no_judged_submissions(self):
@@ -74,7 +76,7 @@ class AssignmentTest(TestCase):
         submission = Submission.objects.get(title='Submission 3')
         Judgement.objects.create(judge=alex_profile, submission=submission,
                                  notes='Blah')
-        self.assertEqual(set(s.title for s in get_submissions()),
+        self.assertEqual(set(s.title for s in get_submissions(self.phase)),
                          set(['Submission %d' % n for n in [1, 2, 4, 5]]))
     
     def test_no_assigned_submissions(self):
@@ -83,7 +85,7 @@ class AssignmentTest(TestCase):
         submission = Submission.objects.get(title='Submission 2')
         JudgeAssignment.objects.create(submission=submission,
                                        judge=alex_profile)
-        self.assertEqual(set(s.title for s in get_submissions()),
+        self.assertEqual(set(s.title for s in get_submissions(self.phase)),
                          set(['Submission %d' % n for n in [1, 3, 4, 5]]))
     
     def test_no_assigned_judged_submissions(self):
@@ -95,11 +97,11 @@ class AssignmentTest(TestCase):
                                  notes='Blah')
         JudgeAssignment.objects.create(submission=submission_b,
                                        judge=alex_profile)
-        self.assertEqual(set(s.title for s in get_submissions()),
+        self.assertEqual(set(s.title for s in get_submissions(self.phase)),
                          set(['Submission %d' % n for n in [1, 3, 5]]))
     
     def test_assignments(self):
-        assignments = get_assignments(submissions=get_submissions(),
+        assignments = get_assignments(submissions=get_submissions(self.phase),
                                       judge_profiles=get_judge_profiles(),
                                       commit=False)
         self.assertEvenAssignment(assignments)
@@ -107,7 +109,7 @@ class AssignmentTest(TestCase):
         self.assertEqual(JudgeAssignment.objects.count(), 0)
     
     def test_assignment_commit(self):
-        assignments = get_assignments(submissions=get_submissions(),
+        assignments = get_assignments(submissions=get_submissions(self.phase),
                                       judge_profiles=get_judge_profiles(),
                                       commit=True)
         self.assertEvenAssignment(assignments)
@@ -121,7 +123,19 @@ class AssignmentContextTest(TestCase):
     
     def setUp(self):
         assignment_setup()
+        # Make sure the phase is closed
+        self.phase = Phase.objects.get()
+        date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.start_date = date
+        self.phase.end_date = date
+        self.phase.save()
         self.judge_profile = User.objects.get(username='alex').get_profile()
+
+    def open_phase(self):
+        date = datetime.utcnow() + timedelta(hours=1)
+        self.phase.start_date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.end_date = date
+        self.phase.save()
     
     @ignite_only
     def test_anonymous_context(self):
@@ -142,7 +156,17 @@ class AssignmentContextTest(TestCase):
         assert self.client.login(username='alex', password='alex')
         response = self.client.get('/')
         self.assertEqual(response.context.get('assignment_count'), 2)
-    
+
+    @ignite_only
+    def test_assigned_phase_open(self):
+        self.open_phase()
+        for submission in Submission.objects.all()[:2]:
+            JudgeAssignment.objects.create(submission=submission,
+                                           judge=self.judge_profile)
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get('/')
+        assert response.context.get('assignment_count') is None
+
     @ignite_only
     def test_assigned_and_judged(self):
         """Check that submissions don't count if the judge has judged them."""

@@ -3,10 +3,13 @@ from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
 from django.db.models import Q
 
+from challenges.forms import PhaseRoundAdminForm
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
-                               PhaseCriterion)
+                               PhaseCriterion, PhaseRound, SubmissionParent,
+                               SubmissionVersion)
+from badges.models import SubmissionBadge
 
 
 class JudgeAwareUserAdmin(UserAdmin):
@@ -26,7 +29,7 @@ class JudgeAwareUserAdmin(UserAdmin):
 class PhaseInline(admin.TabularInline):
     
     model = Phase
-
+    
 
 class PhaseCriterionInline(admin.TabularInline):
     
@@ -49,22 +52,30 @@ class ExclusionFlagInline(admin.StackedInline):
     extra = 1
 
 
+class PhaseRoundInline(admin.TabularInline):
+    model = PhaseRound
+    form = PhaseRoundAdminForm
+    extra = 1
+
 class PhaseAdmin(admin.ModelAdmin):
-    
-    inlines = (PhaseCriterionInline,)
+    inlines = (PhaseCriterionInline, PhaseRoundInline)
+
+
+class SubmissionBadgeInline(admin.TabularInline):
+    model = SubmissionBadge
 
 
 class SubmissionAdmin(admin.ModelAdmin):
-    
     model = Submission
-    list_display = ('title', 'created_by', 'category', 'phase', 'is_draft',
-                    'is_winner', 'excluded', 'judge_assignment',
+    list_display = ('title', 'created_by', 'category', 'phase',
+                    'is_draft', 'is_winner', 'excluded', 'judge_assignment',
                     'judgement_count')
-    list_filter = ('category', 'is_draft', 'is_winner')
+    list_filter = ('category', 'is_draft', 'is_winner', 'phase__name',
+                   'phase_round__name')
     list_select_related = True  # For the judgement fields
-    
-    inlines = (JudgeAssignmentInline, ExclusionFlagInline)
-    
+    inlines = (JudgeAssignmentInline, ExclusionFlagInline,
+               SubmissionBadgeInline)
+
     def judge_assignment(self, submission):
         """Return the names of all judges assigned to this submission."""
         assignments = submission.judgeassignment_set.all()
@@ -121,10 +132,26 @@ class JudgementAdmin(admin.ModelAdmin):
 
 
 class ExclusionFlagAdmin(admin.ModelAdmin):
-    
     model = ExclusionFlag
-    
     list_display = ('submission', 'notes')
+
+
+class PhaseRoundAdmin(admin.ModelAdmin):
+    model = PhaseRound
+    form = PhaseRoundAdminForm
+    list_display = ['name', 'start_date', 'end_date', 'phase']
+    list_filter = ['phase__name']
+
+
+class SubmissionVersionInline(admin.TabularInline):
+    model = SubmissionVersion
+
+
+class SubmissionParentAdmin(admin.ModelAdmin):
+    inlines = [SubmissionVersionInline]
+    list_display = ['name', 'submission', 'slug', 'is_featured']
+    list_filter = ['is_featured', 'status']
+    search_fields = ['name', 'submission__title', 'slug']
 
 
 admin.site.unregister(User)
@@ -140,3 +167,4 @@ admin.site.register(ExclusionFlag, ExclusionFlagAdmin)
 admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
+admin.site.register(SubmissionParent, SubmissionParentAdmin)

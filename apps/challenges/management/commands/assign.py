@@ -1,14 +1,15 @@
 import sys
+from datetime import datetime
 from itertools import cycle, izip
 from optparse import make_option
 import random
 
 from django.conf import settings
 from django.contrib.auth.models import User, Permission
-from django.core.management.base import NoArgsCommand
+from django.core.management.base import NoArgsCommand, CommandError
 from django.db.models import Q
 
-from challenges.models import Submission, JudgeAssignment
+from challenges.models import Submission, JudgeAssignment, Phase, PhaseRound
 
 def count_of(thing_list, thing_name, plural_name=None, colon=False):
     """Return a string representing a count of things, given in thing_list.
@@ -41,12 +42,12 @@ def get_judge_profiles():
     return [j.get_profile() for j in judges]
 
 
-def get_submissions():
+def get_submissions(phase, phase_round=None):
     """Return the submissions eligible for assignment."""
     is_judged = Q(judgement__isnull=False)
     is_assigned = Q(judgeassignment__isnull=False)
-    
-    return Submission.objects.eligible().exclude(is_judged | is_assigned)
+    return (Submission.objects.eligible(phase, phase_round)
+            .exclude(is_judged | is_assigned))
 
 
 def get_assignments(submissions, judge_profiles, commit):
@@ -88,15 +89,39 @@ class Command(NoArgsCommand):
     def handle_noargs(self, verbosity, dry_run, **options):
         verbosity = int(verbosity)  # Django doesn't do this by default
         verbose, quiet = verbosity >= 2, verbosity < 1
-        
-        submissions = get_submissions()
+        option_list = []
+        now = datetime.utcnow()
+        print("IMPORTANT: Only past Phases and Rounds can be assigned for "
+              ". Judging available Phases are:\n")
+        for phase in Phase.objects.all():
+            round_list = phase.phaseround_set.all()
+            if round_list:
+                # We can't assign challenges that are not finished
+                option_list += [i for i in round_list if i.end_date < now]
+            else:
+                if phase.end_date < now:
+                    option_list.append(phase)
+        for i, option in enumerate(option_list):
+            if isinstance(option, PhaseRound):
+                print "%s) %s: %s" % (i, option.phase, option.name)
+            else:
+                print "%s) %s" % (i, option)
+        selection = raw_input('\nSelect Phase or Round to assign: ')
+        try:
+            selected = option_list[int(selection)]
+        except (ValueError, IndexError):
+            raise CommandError('Select a valid option')
+        if isinstance(selected, PhaseRound):
+            phase, phase_round = selected.phase, selected
+        else:
+            phase, phase_round = selected, None
+        submissions = get_submissions(phase, phase_round)
         if not quiet:
-            print count_of(submissions, 'submission',
-                           colon=verbosity >= 2 and len(submissions))
+            print 'Assigned', count_of(submissions, 'submission',
+                                        colon=verbosity >= 2 and len(submissions))
             if verbose:
                 for submission in submissions:
                     print '    %s' % submission.title
-        
         judge_profiles = get_judge_profiles()
         if not quiet:
             print count_of(judge_profiles, 'judge',
