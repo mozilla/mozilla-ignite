@@ -39,3 +39,7 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
     return jingo.render(request, 'ignite/judges.html', {
         'profiles': profiles
     })
+
+
+def terms(request, project, slug, template_name='static/terms_conditions.html'):
+    return jingo.render(request, template_name, {})

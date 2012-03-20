@@ -1,5 +1,6 @@
 {% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
+{% from "layout/pagination.html" import footer_pagination with context %}
 
 {% block page_title %}{% if category %}{{ _('All submissions in {cat}')|f(cat = category) }} | {% else %}{{ _('All submissions') }} | {% endif %}{% endblock %}
 
@@ -61,29 +62,7 @@
     </li>
     {% endfor %}
     </ol>
-    {% if entries.paginator.num_pages > 1 %}
-    <footer class="pagination">
-    <nav>
-    {% if entries.has_previous() %}
-        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
-    {% endif %} 
-    <ol>
-    {% for i in range(entries.paginator.num_pages) %}
-    <li>
-        {% if i + 1 == entries.number %}
-            <span>{{ i + 1 }}</span>
-        {% else %}
-            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-    </ol>
-    {% if entries.has_next() %}
-        <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
-    {% endif %}
-    </nav>
-    </footer>
-    {% endif %}
+    {{ footer_pagination(entries) }}
     </div>
     </div>
     </div>

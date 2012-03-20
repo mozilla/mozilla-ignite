@@ -28,6 +28,45 @@
         <img class="photo" src="{{ profile.avatar_url(80) }}" alt="" width="80" height="80" />
     </div>
 </header>
+{% if profile.bio %}
+<p>{{ profile.bio }}</p>
+{% endif %}
+
+
+{% if webcast_list  %}
+<h2>Webcasts of assigned submissions</h2>
+<ul class="">
+  {% for object in webcast_list %}
+  <li>
+    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title  }} on {{ object.start_date }}</a>
+  </li>
+  {% endfor%}
+</ul>
+{% endif %}
+
+{% if profile.user == user %}
+
+{% if need_booking_list %}
+<h2>Winning submissions waiting to be booked</h2>
+<p>You need to book a timeslot for these submissions</p>
+<ul>
+  {% for object in need_booking_list %}
+  <li><a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object }}</a></li>
+  {% endfor%}
+</ul>
+{% endif %}
+
+
+{% if booked_list %}
+<h2>Your upcoming webcasts</h2>
+<ul>
+  {% for object in booked_list %}
+  <li><a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title }} on {{ object.start_date }}</a></li>
+  {% endfor%}
+</ul>
+{% endif %}
+{% endif %}
+
 {% if submissions %}
     <h2 class="wimper">{{ _('Ideas') }}</h2>
     <ul class="columns submissions">

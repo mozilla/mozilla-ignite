@@ -36,3 +36,9 @@ MANAGERS = ADMINS
 
 
 DEBUG = TEMPLATE_DEBUG = True
+
+
+# Change this
+HMAC_KEYS = {
+    '2011-01-01': 'cheesecake',
+}
