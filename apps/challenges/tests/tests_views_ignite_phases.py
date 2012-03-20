@@ -90,6 +90,7 @@ class SubmissionPhasesTest(test_utils.TestCase):
             'brief_description': 'This is amazing',
             'description': 'Explanation of why this is amazing',
             'is_draft': False,
+            'terms_and_conditions': True,
             }
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.url, data)
@@ -121,6 +122,7 @@ class SubmissionPhasesTest(test_utils.TestCase):
             'brief_description': 'This is amazing',
             'description': 'Explanation of why this is amazing',
             'is_draft': False,
+            'terms_and_conditions': True,
             }
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.url, data)
