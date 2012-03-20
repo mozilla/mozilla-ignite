@@ -25,7 +25,7 @@ from badges.models import SubmissionBadge
 from commons.helpers import get_page
 from challenges.decorators import phase_open_required, phase_closed_required
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
-                              JudgingForm)
+                              JudgingForm, NewEntryForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
@@ -38,6 +38,7 @@ challenge_humanised = {
     'description': 'Full description',
     'sketh_note': 'Napkin sketch',
     'category': 'Category',
+    'terms_and_conditions': 'Terms and conditions',
 }
 
 
@@ -233,15 +234,21 @@ def extract_form_errors(form, link_form):
 @login_required
 def create_entry(request, project, slug):
     """Creates a ``Submission`` from the user details"""
-    project = get_object_or_404(Project, slug=project)
-    phase = Phase.objects.get_current_phase(slug)
-    if not phase:
+    try:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
         raise Http404
+    project = challenge.project
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
     if request.method == 'POST':
-        form = EntryForm(data=request.POST,
+        # If there is not an active phase it shouldn't be able to get here
+        phase = Phase.objects.get_current_phase(slug)
+        if not phase:
+            raise Http404
+        form = NewEntryForm(data=request.POST,
             files=request.FILES)
         link_form = LinkFormSet(request.POST, prefix="externals")
         if form.is_valid() and link_form.is_valid():
@@ -272,11 +279,11 @@ def create_entry(request, project, slug):
         else:
             form_errors = extract_form_errors(form, link_form)
     else:
-        form = EntryForm()
+        form = NewEntryForm()
         link_form = LinkFormSet(prefix='externals')
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
-        'challenge': phase.challenge,
+        'challenge': challenge,
         'form': form,
         'link_form': link_form,
         'errors': form_errors

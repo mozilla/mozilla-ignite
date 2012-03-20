@@ -10,34 +10,35 @@ from challenges.models import (Submission, ExternalLink, Category,
 from challenges.widgets import CustomRadioSelect
 
 
+entry_widgets = {
+    'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
+    'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
+    'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
+    'description': forms.Textarea(attrs={'aria-describedby':'info_description',
+                                         'id':'wmd-input',}),
+    'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
+    }
+
+entry_fields = (
+    'title',
+    'brief_description',
+    'description',
+    'is_draft',
+    'sketh_note',
+    'category',
+    )
+
 class EntryForm(forms.ModelForm):
     # Need to specify this explicitly here to remove the empty option
     category = ModelChoiceField(queryset=Category.objects.all(),
                                 empty_label=None,
                                 widget=CustomRadioSelect())
+
     class Meta:
         model = Submission
- 
-        fields = (
-            'title',
-            'brief_description',
-            'description',
-            'is_draft',
-            'sketh_note',
-            'category',
-        )
-        
-        widgets = {
-            'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
-            'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
-            'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
-            'description': forms.Textarea(attrs={
-                'aria-describedby':'info_description',
-                'id':'wmd-input',
-            }),
-            'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
-        }
-    
+        widgets = entry_widgets
+        fields = entry_fields
+
     def clean(self):
         super(EntryForm, self).clean()
         if self.errors:
@@ -47,6 +48,16 @@ class EntryForm(forms.ModelForm):
             # re-uploading.
             self.files.pop(self.add_prefix('sketh_note'), None)
         return self.cleaned_data
+
+
+class NewEntryForm(EntryForm):
+    """New Entries require to accept the Terms and Conditions"""
+    terms_and_conditions = forms.BooleanField()
+
+    class Meta:
+        model = Submission
+        fields = entry_fields + ('terms_and_conditions',)
+        widgets = entry_widgets
 
 
 class AutoDeleteForm(forms.ModelForm):

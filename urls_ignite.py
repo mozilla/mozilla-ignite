@@ -40,6 +40,7 @@ urlpatterns = patterns('',
     url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
+    url(r'^terms/$', 'ignite.views.terms', kwargs=_ignite_kwargs,  name='terms_conditions')
 )
 
 urlpatterns += patterns(
