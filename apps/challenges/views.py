@@ -124,13 +124,15 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
     template_name = 'challenges/assigned.html'
     context_object_name = 'entries'
 
-    def get_context_data(self, **kwargs):
-        """Add green-lit entries to the context when:
+    def get_awards_context(self):
+        """Awards Add green-lit entries to the context when:
         - Judge has allowance
         - The Award money has been released
         - It is the same Phase/Round that was judged
         """
-        context = super(AssignedEntriesView, self).get_context_data(**kwargs)
+        context = {}
+        if not self.phase:
+            return context
         profile = self.request.user.get_profile()
         allowance = JudgeAllowance.objects.get_for_judge(profile)
         if not allowance:
@@ -150,10 +152,13 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
                                     .filter(~Q(id__in=awarded_ids)))
         return context
 
+    def get_context_data(self, **kwargs):
+        context = super(AssignedEntriesView, self).get_context_data(**kwargs)
+        context.update(self.get_awards_context())
+        return context
+
     def get_queryset(self):
         # Only show the listing when the phase is closed
-        if self.request.phase['is_open']:
-            return []
         try:
             self.challenge = (Challenge.objects.select_related('project')
                               .get(project__slug=self.kwargs['project'],
@@ -163,6 +168,8 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         self.project = self.challenge.project
         self.phase = (Phase.objects
                       .get_judging_phase(settings.IGNITE_CHALLENGE_SLUG))
+        if self.request.phase['is_open']:
+            return []
         qs = {
             'phase': self.phase,
             'phase__challenge': self.challenge,
@@ -302,6 +309,33 @@ def entry_version(request, project, challenge, entry_id):
     return HttpResponseRedirect(version.parent.get_absolute_url())
 
 
+def get_award_context(submission, user):
+    """Context for the judge released allocated ``Award`` for ``Submission``"""
+    if not user.is_judge:
+        return {}
+    profile = user.get_profile()
+    # Does judge have a ``RELEASED`` allowance
+    allowance = JudgeAllowance.objects.get_for_judge(profile)
+    if not allowance:
+        return {}
+    try:
+        award = (allowance.submissionaward_set
+                 .filter(submission=submission,
+                         judge_allowance__judge=profile))[0]
+        award_form = AwardForm({'amount': award.amount})
+    except IndexError:
+        award = None
+        award_form = None
+    # Hasn't awarded this submission but has allowance for this Round/Phase
+    if not award and award.is_same_round(submission):
+        award_form = AwardForm()
+    return {
+        'allowance': allowance,
+        'award_form': award_form,
+        'award': award,
+        }
+
+
 @project_challenge_required
 def entry_show(request, project, challenge, entry_id, judging_form=None):
     """Detail of an idea, show any related information to it"""
@@ -354,23 +388,6 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
             assignments = JudgeAssignment.objects
             judge_assigned = assignments.filter(judge__user=request.user,
                                                 submission=entry).exists()
-    award_form = None
-    allowance = None
-    if request.user.is_judge:
-        # Award form, judge has allowance for this Submission
-        profile = request.user.get_profile()
-        allowance = JudgeAllowance.objects.get_for_judge(profile)
-        if allowance:
-            award_list = (allowance.submissionaward_set
-                          .filter(submission=entry,
-                                  judge_allowance__judge=profile))
-            if award_list:
-                awarded = award_list[0]
-                award_form = AwardForm({'amount': awarded.amount})
-                if all([not awarded,
-                        allowance.award.phase == entry.phase,
-                        allowance.award.phase_round == entry.phase_round]):
-                    award_form = AwardForm()
     # Use all the submission ids to sumarize any information required for the
     # project homepage
     submission_ids = list(parent.submissionversion_set.all()
@@ -381,7 +398,7 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
     # Cache webcast list
     webcast_list = TimeSlot.objects.filter(is_booked=True,
                                            submission__in=submission_ids)
-    return jingo.render(request, 'challenges/show_entry.html', {
+    context = {
         'project': project,
         'challenge': challenge,
         'entry': entry,
@@ -396,9 +413,9 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
         'webcast_list': webcast_list,
         'badge_list': badge_list,
         'parent': parent,
-        'award_form': award_form,
-        'allowance': allowance,
-    })
+    }
+    context.update(get_award_context(entry, request.user))
+    return jingo.render(request, 'challenges/show_entry.html', context)
 
 
 def _get_judging_form(user, entry, data=None, form_class=JudgingForm):

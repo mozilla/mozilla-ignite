@@ -11,11 +11,11 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.template.defaultfilters import slugify
 from django.db import models
-from django.db.models import signals, Q
+from django.db.models import signals
 from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
-from challenges.managers import SubmissionHelpManager
+from challenges.managers import SubmissionHelpManager, PhaseManager
 from django_extensions.db.fields import (AutoSlugField,
                                          CreationDateTimeField,
                                          ModificationDateTimeField)
@@ -96,47 +96,6 @@ class Challenge(BaseModel):
         return self._lookup_url('entries_all')
 
 
-class PhaseManager(BaseModelManager):
-
-    def get_from_natural_key(self, challenge_slug, phase_name):
-        return self.get(challenge__slug=challenge_slug, name=phase_name)
-
-    def get_current_phase(self, slug):
-        now = datetime.utcnow()
-        try:
-            return self.filter(challenge__slug=slug,
-                               start_date__lte=now,
-                               end_date__gte=now)[0]
-        except IndexError:
-            return None
-
-    def get_judging_phase(self, slug):
-        """Determines the judging ``Phase`` if the end_date is in the past
-        or a ``PhaseRound`` has past"""
-        now = datetime.utcnow()
-        try:
-            return self.filter((Q(end_date__lte=now) |
-                                Q(phaseround__end_date__lte=now)),
-                                challenge__slug=slug).order_by('-end_date')[0]
-        except IndexError:
-            return None
-
-    def get_ideation_phase(self):
-        """Returns the ``Ideation`` phase"""
-        try:
-            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
-                            name=settings.IGNITE_IDEATION_NAME)
-        except self.model.DoesNotExist:
-            return None
-
-    def get_development_phase(self):
-        """Returns the ``Development`` phase"""
-        try:
-            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
-                            name=settings.IGNITE_DEVELOPMENT_NAME)
-        except self.model.DoesNotExist:
-            return None
-
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
 
@@ -175,7 +134,7 @@ class Phase(BaseModel):
         return '%s (%s)' % (self.name, self.challenge.title)
 
     def natural_key(self):
-        return self.challenge.natural_key() +  (self.name,)
+        return self.challenge.natural_key() + (self.name,)
     natural_key.dependencies = ['challenges.challenge']
 
     @cached_property
@@ -208,6 +167,7 @@ class Phase(BaseModel):
             if phase_round.end_date <= now:
                 return phase_round
         return None
+
 
 @receiver(signals.post_save, sender=Phase)
 def phase_update_cache(instance, **kwargs):

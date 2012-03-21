@@ -4,8 +4,8 @@ from django.db import models
 class JudgeAllowanceManager(models.Manager):
 
     def get_for_judge(self, user_profile):
-        """Gets the current Allowance for the Judge.
-        ``Award.RELEASED`` keeps the ``Allowance`` open"""
+        """Gets the current ``Allowance`` for the Judge, from the ``RELEASED``
+        ``Award``"""
         from awards.models import Award
         JudgeAllowance = self.model
         try:
