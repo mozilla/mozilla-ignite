@@ -661,7 +661,7 @@ entry_delete = DeleteEntryView.as_view()
 
 @login_required
 @project_challenge_required
-def submission_help(request, project, challenge, entry_id):
+def entry_help(request, project, challenge, entry_id):
     """``Submissions`` that need help"""
     # SubmissionParent acts as an proxy for any of the revisions.
     # and it only shows the current revision

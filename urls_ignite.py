@@ -47,7 +47,7 @@ urlpatterns += patterns(
     'challenges.views',
     url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
         kwargs=_ignite_kwargs, name='entry_version'),
-    url(r'^ideas/(?P<entry_id>\d+)/help/$', 'submission_help',
+    url(r'^ideas/(?P<entry_id>\d+)/help/$', 'entry_help',
         kwargs=_ignite_kwargs, name='entry_help')
     )
 

@@ -406,10 +406,6 @@ class Submission(BaseModel):
     def get_judging_url(self):
         """Return the URL to judge this submission."""
         return self._lookup_url('entry_judge', {'pk': self.id})
-
-    def get_help_url(self):
-        """Return the URL to judge this submission."""
-        return self._lookup_url('entry_help', {'pk': self.id})
     
     # Permission shortcuts, for use in templates
     

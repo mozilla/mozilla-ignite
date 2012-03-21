@@ -12,12 +12,13 @@ from django.http import Http404
 from django.test.client import Client
 from mock import Mock, patch
 from nose.tools import assert_equal, with_setup
-import test_utils
+from test_utils import TestCase
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
 from challenges.models import (Challenge, Submission, Phase, Category,
-                               ExternalLink, SubmissionParent, SubmissionVersion)
+                               ExternalLink, SubmissionParent,
+                               SubmissionVersion, SubmissionHelp)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions)
 from ignite.tests.decorators import ignite_skip, ignite_only
@@ -47,7 +48,7 @@ def test_show_challenge():
     assert_equal(response.status_code, 200)
 
 
-class MessageTestCase(test_utils.TestCase):
+class MessageTestCase(TestCase):
     """Test case class to check messaging."""
     
     def assertSuccessMessage(self, response):
@@ -56,7 +57,7 @@ class MessageTestCase(test_utils.TestCase):
         self.assertEqual(list(response.context['messages'])[0].level, SUCCESS)
 
 
-class ChallengeEntryTest(test_utils.TestCase):
+class ChallengeEntryTest(TestCase):
     # Need to inherit from this base class to get Jinja2 template hijacking
     
     def setUp(self):
@@ -151,7 +152,7 @@ def _form_from_link(link_object):
     return dict((k, getattr(link_object, k)) for k in ['id', 'name', 'url'])
 
 
-class CreateEntryTest(test_utils.TestCase):
+class CreateEntryTest(TestCase):
     """Tests related to posting a new entry."""
     
     def setUp(self):
@@ -285,7 +286,7 @@ def test_wrong_project():
         assert_equal(response.status_code, 404)
 
 
-class ShowEntryTest(test_utils.TestCase):
+class ShowEntryTest(TestCase):
     """Test functionality of the single entry view."""
 
     def setUp(self):
@@ -469,7 +470,7 @@ class EditEntryTest(MessageTestCase):
         assert_equal(Submission.objects.get().description, data['description'])
 
 
-class EditLinkTest(test_utils.TestCase):
+class EditLinkTest(TestCase):
     
     def setUp(self):
         challenge_setup()
@@ -730,3 +731,58 @@ class EditEntryPhaseTest(MessageTestCase):
         assert_equal(parent.submission.brief_description, data['brief_description'])
         assert_equal(parent.submission.phase, self.phase)
         assert_equal(Submission.objects.count(), 2)
+
+
+class SubmissionHelpViewTest(TestCase):
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.alex = profile_list[0]
+        self.category = Category.objects.all()[0]
+        create_submissions(1, self.phase, self.alex)
+        self.submission_a = Submission.objects.get()
+        self.parent = self.submission_a.parent
+        self.help_url = reverse('entry_help', args=[self.parent.slug])
+        self.valid_data = {
+            'notes': 'Help Wanted',
+            'status': SubmissionHelp.PUBLISHED,
+            }
+
+    def tearDown(self):
+        challenge_teardown()
+        for model in [SubmissionHelp]:
+            model.objects.all().delete()
+
+    def create_submission_help(self, **kwargs):
+        defaults = {'parent': self.parent}
+        if kwargs:
+            defaults.update(kwargs)
+        instance, created = SubmissionHelp.objects.get_or_create(**defaults)
+        return instance
+
+    def test_submission_help_anon(self):
+        response = self.client.get(self.help_url)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(reverse('login') in response['Location'])
+        response = self.client.post(self.help_url, self.valid_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(reverse('login') in response['Location'])
+
+    def test_submission_help_not_owner(self):
+        self.client.login(username='bob', password='bob')
+        response = self.client.get(self.help_url)
+        self.assertEqual(response.status_code, 404)
+        response = self.client.post(self.help_url, self.valid_data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_submission_published_help(self):
+        self.client.login(username='alex', password='alex')
+        response = self.client.get(self.help_url)
+        self.assertEqual(response.status_code, 200)
+        response = self.client.post(self.help_url, self.valid_data,
+                                    follow=True)
+        self.assertRedirects(response, self.submission_a.get_absolute_url())
+        for item in list(response.context['messages']):
+            self.assertEqual(item.tags, 'success')
+        self.assertEqual(SubmissionHelp.objects.get_active().count(), 1)
