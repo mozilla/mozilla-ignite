@@ -336,6 +336,30 @@ def get_award_context(submission, user):
         }
 
 
+def get_judging_context(user, submission, phase_dict):
+    """Context for the Judging submission"""
+    if not user.is_judge or phase_dict['is_open'] or \
+        not submission.judgeable_by(user):
+        return {}
+    # the ``Submission`` belongs to the current combination of
+    # Judging Phase and PhaseRound
+    phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+    if submission.phase != phase:
+        return {}
+    # Submission must be part of the Round it's being judged
+    if submission.phase_round and \
+        submission.phase_round != phase.judging_phase_round:
+        return {}
+    judging_form = _get_judging_form(user=user, entry=submission)
+    judge_assigned = (JudgeAssignment.objects
+                      .filter(judge__user=user, submission=submission)
+                      .exists())
+    return {
+        'judging_form': judging_form,
+        'judge_assigned': judge_assigned,
+        }
+
+
 @project_challenge_required
 def entry_show(request, project, challenge, entry_id, judging_form=None):
     """Detail of an idea, show any related information to it"""
@@ -370,24 +394,6 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-    if request.phase['is_open'] or not entry.judgeable_by(request.user):
-        judging_form = None
-        judge_assigned = False
-    else:
-        # the ``Submission`` belongs to the current combination of
-        # judging Phase and PhaseRound
-        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
-        if any([entry.phase != phase,
-                entry.phase_round != phase.judging_phase_round]):
-            judging_form = None
-            judge_assigned = None
-        else:
-            # Judging is only open if the submission has been assigned
-            if judging_form is None:
-                judging_form = _get_judging_form(user=request.user, entry=entry)
-            assignments = JudgeAssignment.objects
-            judge_assigned = assignments.filter(judge__user=request.user,
-                                                submission=entry).exists()
     # Use all the submission ids to sumarize any information required for the
     # project homepage
     submission_ids = list(parent.submissionversion_set.all()
@@ -408,12 +414,13 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
         'user_vote': user_vote,
         'votes': votes['score'],
         'excluded': entry.exclusionflag_set.exists(),
-        'judging_form': judging_form,
-        'judge_assigned': judge_assigned,
         'webcast_list': webcast_list,
         'badge_list': badge_list,
         'parent': parent,
     }
+    # Add extra context to the View. It is on regular django templates it is
+    # usually done on template tags. In this case we do it here
+    context.update(get_judging_context(request.user, entry, request.phase))
     context.update(get_award_context(entry, request.user))
     return jingo.render(request, 'challenges/show_entry.html', context)
 
