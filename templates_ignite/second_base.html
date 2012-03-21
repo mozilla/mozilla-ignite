@@ -44,19 +44,7 @@
                     {% endblock %}
                 </ul>
             </nav>
-            {% if user.is_authenticated() %}
-            <div class="toolbar">
-                <p>Signed in as {{ user.get_profile().display_name }}</p>
-                <ul>
-                    <li>
-                        <a href="{{ url('users_profile', username=user.username) }}">View profile</a>
-                    </li>
-                    <li>
-                        <a href="{{ url('users_edit') }}">Edit profile</a>
-                    </li>
-                </ul>
-            </div>
-            {% endif %}
+            {% include "includes/toolbar.html"%}
         </div>
     </header>
     <div role="main">

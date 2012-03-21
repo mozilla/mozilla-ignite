@@ -1,4 +1,13 @@
+from datetime import datetime
+
 from django.db import models
+
+
+class TimeSlotManager(models.Manager):
+    def upcoming(self):
+        """Returns the upcoming Webcasts"""
+        now = datetime.utcnow()
+        return self.filter(start_date__gte=now)
 
 
 class TimeSlotFreeManager(models.Manager):

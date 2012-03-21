@@ -20,6 +20,7 @@ MIDDLEWARE_CLASSES = filter(lambda m: m not in EXCLUDED_MIDDLEWARE,
 
 MIDDLEWARE_CLASSES += (
     'challenges.middleware.PhaseStatusMiddleware',
+    'challenges.middleware.JudgeMiddleware',
 )
 
 TEMPLATE_CONTEXT_PROCESSORS += (

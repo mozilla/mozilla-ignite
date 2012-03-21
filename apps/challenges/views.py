@@ -1,11 +1,10 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
@@ -14,17 +13,17 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import ProcessFormView, UpdateView, \
-                                      DeleteView, ModelFormMixin
+from django.views.generic.edit import (ProcessFormView, UpdateView,
+                                       DeleteView, ModelFormMixin)
 import jingo
 from tower import ugettext as _
 from awards.forms import AwardForm
-from awards.models import JudgeAllowance, SubmissionAward, Award
+from awards.models import JudgeAllowance
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page, get_paginator
 from challenges.decorators import (phase_open_required, phase_closed_required,
-                                   project_challenge_required)
+                                   project_challenge_required, judge_required)
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm, NewEntryForm, SubmissionHelpForm,
                               SubmissionHelp)
@@ -43,14 +42,8 @@ challenge_humanised = {
     'terms_and_conditions': 'Terms and conditions',
 }
 
-
 LOGGER = logging.getLogger(__name__)
 
-judge_required = permission_required('challenges.judge_submission')
-
-def is_judge(user):
-    """Helper to determine if user is a Judge"""
-    return user.has_perm('challenges.judge_submission')
 
 class JingoTemplateMixin(TemplateResponseMixin):
     """View mixin to render through Jingo rather than Django's renderer."""
@@ -158,10 +151,18 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         return context
 
     def get_queryset(self):
-        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
-        self.challenge = get_object_or_404(self.project.challenge_set,
-                                           slug=self.kwargs['slug'])
-        self.phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        # Only show the listing when the phase is closed
+        if self.request.phase['is_open']:
+            return []
+        try:
+            self.challenge = (Challenge.objects.select_related('project')
+                              .get(project__slug=self.kwargs['project'],
+                                   slug=self.kwargs['slug']))
+        except Challenge.DoesNotExist:
+            raise Http404
+        self.project = self.challenge.project
+        self.phase = (Phase.objects
+                      .get_judging_phase(settings.IGNITE_CHALLENGE_SLUG))
         qs = {
             'phase': self.phase,
             'phase__challenge': self.challenge,
@@ -355,7 +356,7 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
                                                 submission=entry).exists()
     award_form = None
     allowance = None
-    if is_judge(request.user):
+    if request.user.is_judge:
         # Award form, judge has allowance for this Submission
         profile = request.user.get_profile()
         allowance = JudgeAllowance.objects.get_for_judge(profile)

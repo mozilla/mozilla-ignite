@@ -38,3 +38,8 @@ def current_phase(request):
         'DEVELOPMENT_PHASE': settings.DEVELOPMENT_PHASE,
         'IDEATION_PHASE': has_phase_finished(settings.IGNITE_IDEATION_NAME),
         }
+
+
+def judge_processor(request):
+    """Determines if a user has judge privileges"""
+    
