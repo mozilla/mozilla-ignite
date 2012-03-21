@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% from "layout/pagination.html" import footer_pagination with context %}
 {% block content %}
-<h1>Book timeslot for {{ entry.title }}</h1>
+<h1>Book a timeslot for {{ entry.title }}</h1>
 <p>Select one of these timeslots available</p>
 <ul>
   {% for object in page.object_list %}
@@ -10,9 +10,11 @@
     {{ object.start_date }} - {{ object.end_date }}
     {% else %}
     <form method="post" action="{{ url('timeslot:object_detail', entry_id=entry.id, object_id=object.short_id) }}">
-      {{ object.start_date }} - {{ object.end_date }}
-      {{ csrf() }}
-      <button type="submit" name="_book">Book</button>
+      <h2>{{ object.start_date.strftime('%B %d, %Y') }}</h2>
+      <p>
+        From {{ object.start_date.strftime('%H:%M') }} hrs to {{ object.end_date.strftime('%H:%M') }} hrs
+        {{ csrf() }}<button type="submit" name="_book">Book</button>
+      </p>
     </form>
     {% endif %}
   </li>

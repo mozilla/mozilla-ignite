@@ -1,4 +1,5 @@
 {% extends "second_base.html" %}
+{% from "timeslot/includes/booking_list.html" import booking_listing  with context %}
 
 {% block page_title %}{{ profile.display_name }} | Users | {% endblock %}
 
@@ -32,38 +33,28 @@
 <p>{{ profile.bio }}</p>
 {% endif %}
 
-
+{# Judge assigned webcasts #}
 {% if webcast_list  %}
-<h2>Webcasts of assigned submissions</h2>
-<ul class="">
-  {% for object in webcast_list %}
-  <li>
-    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title  }} on {{ object.start_date }}</a>
-  </li>
-  {% endfor%}
-</ul>
+<h2>Webcasts of assigned Ideas</h2>
+{{ booking_listing(webcast_list) }}
 {% endif %}
 
 {% if profile.user == user %}
 
+{# User webcasts waiting to be booked #}
 {% if need_booking_list %}
-<h2>Winning submissions waiting to be booked</h2>
-<p>You need to book a timeslot for these submissions</p>
+<h2>Green-lit ideas ready for webcast booking</h2>
 <ul>
   {% for object in need_booking_list %}
-  <li><a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object }}</a></li>
+  <li><a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object.title }}</a></li>
   {% endfor%}
 </ul>
 {% endif %}
 
-
+{# User booked webcasts #}
 {% if booked_list %}
-<h2>Your upcoming webcasts</h2>
-<ul>
-  {% for object in booked_list %}
-  <li><a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title }} on {{ object.start_date }}</a></li>
-  {% endfor%}
-</ul>
+<h2>Your Upcoming webcasts</h2>
+{{ booking_listing(booked_list) }}
 {% endif %}
 {% endif %}
 
