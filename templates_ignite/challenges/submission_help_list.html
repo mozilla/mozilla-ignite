@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% from "layout/pagination.html" import footer_pagination with context %}
+{% block content %}
+<h1>Help wanted</h1>
+<p>These are Ideas that need help.</p>
+<ul>
+  {% for object in page.object_list %}
+  <li>
+    <h2><a href="{{ object.parent.get_absolute_url() }}">{{ object.parent.name }}</a></h2>
+    <p>On {{ object.updated }}</p>
+    <p>{{ object.notes }}</p>
+  </li>
+  {% endfor %}
+</ul>
+
+{{ footer_pagination(page) }}
+
+{% endblock %}

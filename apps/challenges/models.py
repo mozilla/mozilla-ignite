@@ -710,6 +710,7 @@ class SubmissionHelp(models.Model):
         )
     parent = models.OneToOneField('challenges.SubmissionParent')
     created = CreationDateTimeField()
+    updated = ModificationDateTimeField()
     notes = models.TextField()
     status = models.IntegerField(choices=STATUS_CHOICES, default=DRAFT)
 
@@ -718,6 +719,7 @@ class SubmissionHelp(models.Model):
 
     class Meta:
         verbose_name_plural = 'Submission Help'
+        ordering = ('-updated',)
 
     def __unicode__(self):
         return u'Help needed for %s' % self.parent

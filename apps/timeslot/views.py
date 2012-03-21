@@ -7,12 +7,11 @@ from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.views.decorators.http import require_POST
 from django.http import Http404, HttpResponseRedirect
-from commons.helpers import get_page
+from commons.helpers import get_page, get_paginator
 from timeslot.models import TimeSlot, Release
 from timeslot.utils import unshorten_object
 from tower import ugettext as _
@@ -91,12 +90,8 @@ def object_list(request, entry, release, template='timeslot/object_list.html'):
     start_date = datetime.utcnow() + timedelta(hours=24)
     timeslot_qs = TimeSlot.objects.filter(start_date__gte=start_date,
                                           release=release, is_booked=False)
-    paginator = Paginator(timeslot_qs, settings.PAGINATOR_SIZE)
     page_number = get_page(request.GET)
-    try:
-        page = paginator.page(page_number)
-    except (EmptyPage, InvalidPage):
-        page = paginator.page(paginator.num_pages)
+    page = get_paginator(timeslot_qs, page_number)
     context = {
         'page': page,
         'entry': entry,
@@ -151,7 +146,6 @@ def object_detail(request, entry, release, object_id):
 def pending(request, template='timeslot/pending.html'):
     """Lists the Pending ideas to be booked for this User"""
     profile = request.user.get_profile()
-    now = datetime.utcnow()
     # already booked timeslots for this user
     booked_qs = (TimeSlot.objects.select_related('submission').
                  filter(submission__created_by=profile, is_booked=True))

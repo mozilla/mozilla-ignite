@@ -22,7 +22,7 @@ from awards.forms import AwardForm
 from awards.models import JudgeAllowance, SubmissionAward, Award
 from voting.models import Vote
 from badges.models import SubmissionBadge
-from commons.helpers import get_page
+from commons.helpers import get_page, get_paginator
 from challenges.decorators import (phase_open_required, phase_closed_required,
                                    project_challenge_required)
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
@@ -66,7 +66,6 @@ class JingoTemplateMixin(TemplateResponseMixin):
         return jingo.render(self.request, template_name, context,
                             **response_kwargs)
 
-
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
     try:
@@ -80,12 +79,8 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
         entry_set = entry_set.filter(category__name=category)
-    paginator = Paginator(entry_set, 6)
-    page = get_page(request.GET)
-    try:
-        entries = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        entries = paginator.page(paginator.num_pages)
+    page_number = get_page(request.GET)
+    entries = get_paginator(entry_set, page_number, 6)
     try:
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
@@ -691,3 +686,14 @@ def entry_help(request, project, challenge, entry_id):
         form = SubmissionHelpForm(instance=help_instance)
     context = {'form': form}
     return jingo.render(request, 'challenges/submission_help.html', context)
+
+
+@project_challenge_required
+def entry_help_list(request, project, challenge):
+    """Lists all the ``Submissions`` that need help"""
+    object_list = SubmissionHelp.objects.get_active()
+    page_number = get_page(request.GET)
+    paginated_query = get_paginator(object_list, page_number)
+    context = {'page': paginated_query}
+    return jingo.render(request, 'challenges/submission_help_list.html',
+                        context)

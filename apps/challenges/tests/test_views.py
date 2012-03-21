@@ -755,7 +755,8 @@ class SubmissionHelpViewTest(TestCase):
             model.objects.all().delete()
 
     def create_submission_help(self, **kwargs):
-        defaults = {'parent': self.parent}
+        defaults = {'parent': self.parent,
+                    'status': SubmissionHelp.PUBLISHED}
         if kwargs:
             defaults.update(kwargs)
         instance, created = SubmissionHelp.objects.get_or_create(**defaults)
@@ -786,3 +787,17 @@ class SubmissionHelpViewTest(TestCase):
         for item in list(response.context['messages']):
             self.assertEqual(item.tags, 'success')
         self.assertEqual(SubmissionHelp.objects.get_active().count(), 1)
+
+    def test_submission_help_listing(self):
+        self.create_submission_help()
+        response = self.client.get(reverse('entry_help_list'))
+        self.assertEqual(response.status_code, 200)
+        page = response.context['page']
+        self.assertEqual(page.paginator.count, 1)
+
+    def test_submission_help_list_hidden(self):
+        self.create_submission_help(status=SubmissionHelp.DRAFT)
+        response = self.client.get(reverse('entry_help_list'))
+        self.assertEqual(response.status_code, 200)
+        page = response.context['page']
+        self.assertEqual(page.paginator.count, 0)
