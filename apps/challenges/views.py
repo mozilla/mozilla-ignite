@@ -327,7 +327,9 @@ def get_award_context(submission, user):
         award = None
         award_form = None
     # Hasn't awarded this submission but has allowance for this Round/Phase
-    if not award and award.is_same_round(submission):
+    # and the submission has been green ilt
+    if not award and allowance.is_same_round(submission) \
+        and submission.is_green_lit:
         award_form = AwardForm()
     return {
         'allowance': allowance,
