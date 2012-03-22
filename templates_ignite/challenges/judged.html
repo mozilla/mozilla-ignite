@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 
 {% block page_title %}{{ _('All judged submissions') }} |{% endblock %}
 
@@ -6,11 +6,8 @@
 
 {% block section_class %}entries{% endblock %}
 
-{% block header %}
-<h1 class="shout">All judged submissions</h1>
-{% endblock %}
-
 {% block content %}
+<h1 class="shout">All judged submissions</h1>
 <table>
     <thead>
         <tr><th>Submission</th><th>Average rating</th></tr>

@@ -89,12 +89,12 @@ SUPPORTED_NONLOCALES = ['media', 'push']
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = path('media')
+MEDIA_ROOT = path('media/ignite')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
 # Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = '/media/'
+MEDIA_URL = '/media/ignite/'
 
 # URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
 # trailing slash.
@@ -154,26 +154,19 @@ def JINJA_CONFIG():
 # and js files that can be bundled together by the minify app.
 MINIFY_BUNDLES = {
     'css': {
-        'innovate_css': (
-            'css/innovate/normalise.css',
-            'css/innovate/devices.css',
-        ),
         'ignite_devices' : (
-            'css/innovate/normalise.css',
-            'ignite/css/devices.css',
+            'css/normalise.css',
+            'css/devices.css',
+        ),
+        'ignite_desktop' : (
+            'css/desktop.css',
         ),
     },
     'js': {
-        'innovate_js': (
-            'js/common/ext/jquery-1.6.1.min.js',
-            'js/common/ext/LAB.min.js',
-            'js/common/betafarm.page.js',
-            'js/common/core.js',
-        ),
         'ignite_core': (
             'js/common/ext/jquery-1.6.1.min.js',
             'js/common/ext/LAB.min.js',
-            'ignite/js/common/core.js',
+            'js/common/core.js',
             'js/common/lacky.js',
         ),
     }

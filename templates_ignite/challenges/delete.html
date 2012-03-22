@@ -1,14 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'second_base.html' %}
 
 {% block page_title %}{{ _('Delete') }} | {{ object.title }} | {% endblock %}
 
 {% block page_id %}delete_submission{% endblock %}
 
 {% block section_class %}entries{% endblock %}
-
-{% block header %}
-<h1 class="shout">{% block page_heading %}{{ _('Delete your submission') }}{% endblock %}</h1>
-{% endblock %}
 
 {% block alerts %}
 {% if errors %}
@@ -23,7 +19,8 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}   
+{% block content %} 
+<h1 class="shout">{% block page_heading %}{{ _('Delete your submission') }}{% endblock %}</h1>  
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
     <p class="announce">{{ _('Are you <em>certain</em> you want to remove your submission?') }}</p>

@@ -8,12 +8,12 @@
     {% block site_css %}
         {{ css('ignite_devices') }}
     {% endblock %}
-    <link rel="stylesheet" media="all and (min-width:30em)" href="{{ MEDIA_URL }}ignite/css/desktop.css" />
+    {{ css('ignite_desktop', 'all and (min-width:30em)') }}
     <!--[if lt IE 9]>
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <link rel="stylesheet" media="screen" href="{{ MEDIA_URL }}ignite/css/desktop.css" />
+        {{ css('ignite_desktop') }}
     <![endif]-->
-    <link rel="icon" href="{{ MEDIA_URL }}ignite/img/favicon.ico" />
+    <link rel="icon" href="{{ MEDIA_URL }}img/favicon.ico" />
     {% block social_meta %}{% endblock %}
 </head>
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
@@ -21,13 +21,13 @@
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
         var ignite = window.ignite || {};
         ignite.data = {
-            MEDIA_URL : {{ MEDIA_URL }},
+            MEDIA_URL : '{{ MEDIA_URL }}',
             JS_BUILD_ID: 'foo'
         };
     </script>
     <header class="masthead">
         <div class="busta clearfix">
-            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}ignite/img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
+            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
             <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
             <nav>
                 <ul>
@@ -97,12 +97,12 @@
             <div class="busta">
             <h2 class="point">Our partners</h2>
             <ul>
-                <li><a href="http://www.nsf.gov"><img src="{{ MEDIA_URL }}ignite/img/partners/nsf.png" width="90" height="75" alt="National Science Foundation" /></a></li>
-                <li><a href="http://www.geni.net"><img src="{{ MEDIA_URL }}ignite/img/partners/geni.png" width="90" height="75" alt="geni - exploring networks of the future" /></a></li>
-                <li><a href="http://www.zerodivide.org"><img width="90" height="75" alt="Zero Divide" src="{{ MEDIA_URL }}ignite/img/partners/zd.png"></a></li>
-                <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}ignite/img/partners/webfwd.png"></a></li>
-                <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}ignite/img/partners/mdn.png"></a></li>
-                <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}ignite/img/partners/ignite.png"></a></li>
+                <li><a href="http://www.nsf.gov"><img src="{{ MEDIA_URL }}img/partners/nsf.png" width="90" height="75" alt="National Science Foundation" /></a></li>
+                <li><a href="http://www.geni.net"><img src="{{ MEDIA_URL }}img/partners/geni.png" width="90" height="75" alt="geni - exploring networks of the future" /></a></li>
+                <li><a href="http://www.zerodivide.org"><img width="90" height="75" alt="Zero Divide" src="{{ MEDIA_URL }}img/partners/zd.png"></a></li>
+                <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}img/partners/webfwd.png"></a></li>
+                <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}img/partners/mdn.png"></a></li>
+                <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}img/partners/ignite.png"></a></li>
             </ul>
             </div>
         </section>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}{{ _('All submissions assigned to you') }} |{% endblock %}
@@ -7,14 +7,11 @@
 
 {% block section_class %}entries{% endblock %}
 
-{% block header %}
-<h1 class="shout">Submissions assigned to you</h1>
-{% endblock %}
-
 {# No need to display the judge call on this page #}
 {% block judgecall %}{% endblock %}
 
 {% block content %}
+<h1 class="shout">Submissions assigned to you</h1>
 {% for group in entries|groupby('has_judged') %}
     {% if group.grouper %}
     <h2>{% trans %}Judged by you{% endtrans %}</h2>
