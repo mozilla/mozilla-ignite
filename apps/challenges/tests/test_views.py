@@ -9,7 +9,6 @@ from django.contrib.messages import SUCCESS
 from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.http import Http404
-from django.test.client import Client
 from mock import Mock, patch
 from nose.tools import assert_equal, with_setup
 from test_utils import TestCase
