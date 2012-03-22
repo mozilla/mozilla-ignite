@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
-from timeslot.models import Release
+from timeslot.models import Release, TimeSlot
+
 from challenges.models import (Submission, Phase, Challenge, Category,
                                Project, PhaseRound, SubmissionParent)
 
@@ -99,6 +100,15 @@ def create_phase_round(name, phase, extra_data=None):
     instance, created = PhaseRound.objects.get_or_create(**data)
     return instance
 
+def create_judge(handle):
+    judge = create_user(handle)
+    submission_type = ContentType.objects.get_for_model(Submission)
+    judge_permission, created = (Permission.objects
+                                 .get_or_create(codename='judge_submission',
+                                                content_type=submission_type))
+    judge.user.user_permissions.add(judge_permission)
+    return judge
+
 
 def create_release(name, is_current, phase, extra_data=None):
     """Helper to create releases"""
@@ -108,12 +118,17 @@ def create_release(name, is_current, phase, extra_data=None):
     instance, created = Release.objects.get_or_create(**data)
     return instance
 
+def create_timeslot(release, **kwargs):
+    """Helper to add ``TimeSlots`` with the minium required data"""
+    # booking of timeslots start at least 24 hours in advance
+    start_date = datetime.utcnow() + timedelta(hours=25)
+    end_date = start_date + timedelta(minutes=60)
+    defaults = {
+        'start_date': start_date,
+        'end_date': end_date,
+        'release': release,
+        }
+    if kwargs:
+        defaults.update(kwargs)
+    return TimeSlot.objects.create(**defaults)
 
-def create_judge(handle):
-    judge = create_user(handle)
-    submission_type = ContentType.objects.get_for_model(Submission)
-    judge_permission, created = (Permission.objects
-                                 .get_or_create(codename='judge_submission',
-                                                content_type=submission_type))
-    judge.user.user_permissions.add(judge_permission)
-    return judge

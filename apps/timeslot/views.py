@@ -75,7 +75,7 @@ def entry_available_decorator(func):
         if TimeSlot.objects.filter(submission=entry, is_booked=True,
                                    release=release):
             message = _('You have already booked a timeslot for this entry')
-            messages.success(request, message)
+            messages.error(request, message)
             return HttpResponseRedirect(entry.get_absolute_url())
         kwargs['entry'] = entry
         return func(*args, **kwargs)

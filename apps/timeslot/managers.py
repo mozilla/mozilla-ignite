@@ -7,7 +7,7 @@ class TimeSlotManager(models.Manager):
     def upcoming(self):
         """Returns the upcoming Webcasts"""
         now = datetime.utcnow()
-        return self.filter(start_date__gte=now)
+        return self.filter(start_date__gte=now, is_booked=True)
 
 
 class TimeSlotFreeManager(models.Manager):
