@@ -252,8 +252,10 @@ def create_entry(request, project, challenge):
         }
     # Determine form according to the current Phase
     # Fallback to the ideation phase form
-    PhaseNewEntryForm = (phase_forms[phase.name] if phase.name in phase_forms
-                     else NewEntryForm)
+    if phase and phase.name in phase_forms:
+        PhaseNewEntryForm = phase_forms[phase.name]
+    else:
+        PhaseNewEntryForm = NewEntryForm
     if request.method == 'POST':
         # If there is not an active phase it shouldn't be able to get here
         if not phase:
@@ -539,7 +541,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
     @cached_property
     def current_phase(self):
         # Query and cache it here since we need it in two different
-        # methods on this Class Based View.
+        # methods on this Class Based view.
         return Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
 
     def get_form_class(self):
@@ -554,7 +556,8 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             PhaseEntryForm = phase_forms[phase.name]
         else:
             PhaseEntryForm = EntryForm
-        return PhaseEntryForm
+        self.form_class = PhaseEntryForm
+        return self.form_class
     
     def _check_permission(self, submission, user):
         return submission.editable_by(user)

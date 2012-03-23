@@ -67,8 +67,8 @@ class DevelopmentEntryForm(EntryForm):
     """Fields for a new Submission during the Development phase"""
     # Any required field should be described here and called the same as
     # it is called on the Submission model
-    # e.g to make the stkety_note required:
-    sketh_note = forms.ImageField()
+    # e.g. to make the stkety_note required:
+    # sketh_note = forms.ImageField()
     class Meta:
         model = Submission
         fields = development_entry_fields
