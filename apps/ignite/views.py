@@ -39,3 +39,11 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
     return jingo.render(request, 'ignite/judges.html', {
         'profiles': profiles
     })
+
+
+def fail(request, template_name='404.html'):
+    return jingo.render(request, template_name, {})
+
+ 
+def app_fail(request, template_name='500.html'):
+    return jingo.render(request, template_name, {})
