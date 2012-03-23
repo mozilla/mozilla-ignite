@@ -30,6 +30,7 @@
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if entry.owned_by(user) %}
+            <li><a href="{{ url('entry_help', entry_id=entry.parent.slug) }}" class="cta do">Ask for help</a></li>
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
             {% if entry.needs_booking %}

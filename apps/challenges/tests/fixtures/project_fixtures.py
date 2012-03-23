@@ -6,6 +6,9 @@ from django.conf import settings
 from challenges.models import (ExternalLink, Submission, Phase, Challenge,
                                Category, Project, SubmissionParent)
 
+__all__ = ['challenge_setup', 'challenge_teardown', 'create_submissions',
+           'create_users']
+
 
 def challenge_setup():
     """Set up some sample data to test with.

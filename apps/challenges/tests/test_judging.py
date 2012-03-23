@@ -232,7 +232,7 @@ class JudgingViewTest(MessageTestCase):
         """Test the form doesn't show if the user doesn't have permission."""
         submission = Submission.objects.get()
         response = self.client.get(submission.get_absolute_url(), follow=True)
-        assert response.context['judging_form'] is None
+        assert response.context.get('judging_form') is None
     
     @ignite_only
     def test_judge_form(self):
@@ -254,7 +254,7 @@ class JudgingViewTest(MessageTestCase):
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
         response = self.client.get(submission.get_absolute_url(), follow=True)
-        assert response.context['judging_form'] is None
+        assert response.context.get('judging_form') is None
 
     @ignite_only
     def test_non_eliminated_entry(self):

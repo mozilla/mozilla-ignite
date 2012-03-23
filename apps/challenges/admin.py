@@ -8,7 +8,7 @@ from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
                                PhaseCriterion, PhaseRound, SubmissionParent,
-                               SubmissionVersion)
+                               SubmissionVersion, SubmissionHelp)
 from badges.models import SubmissionBadge
 
 
@@ -168,3 +168,4 @@ admin.site.register(JudgingCriterion, JudgingCriterionAdmin)
 admin.site.register(Judgement, JudgementAdmin)
 admin.site.register(JudgeAssignment)
 admin.site.register(SubmissionParent, SubmissionParentAdmin)
+admin.site.register(SubmissionHelp)

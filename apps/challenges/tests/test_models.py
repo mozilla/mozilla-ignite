@@ -13,9 +13,9 @@ from projects.models import Project
 from challenges.models import (Challenge, Submission, Phase, Category,
                               ExclusionFlag, Judgement, JudgingCriterion,
                               PhaseCriterion, PhaseRound, SubmissionParent,
-                              SubmissionVersion)
+                              SubmissionVersion, SubmissionHelp)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
-                                       create_users)
+                                       create_users, challenge_teardown)
 from challenges.tests.test_base import TestPhasesBase
 from timeslot.tests.fixtures import (create_user, create_submission,
                                       create_phase_round)
@@ -512,3 +512,34 @@ class SubmissionParentVersioningTest(TestCase):
         self.parent.update_version(self.submission_b)
         assert self.submission_a not in Submission.objects.visible()
         assert self.submission_a in Submission.objects.all()
+
+
+class SubmissionHelpTest(TestCase):
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+        create_submissions(1, self.phase, self.created_by)
+        self.submission_a = Submission.objects.get()
+        self.parent = self.submission_a.parent
+
+    def tearDown(self):
+        challenge_teardown()
+        for model in [SubmissionHelp]:
+            model.objects.all().delete()
+
+    def create_submission_help(self):
+        submission_help = SubmissionHelp.objects.create(parent=self.parent,
+                                                        notes='Help Wanted')
+        assert submission_help.created, "SubmissionHelp failed"
+        self.assertEqual(submission_help.status, SubmissionHelp.DRAFT)
+
+    def submission_help_manager(self):
+        submission_help = SubmissionHelp.objects.create(parent=self.parent,
+                                                        notes='Help Wanted')
+        self.assertEqual(SubmissionHelp.objects.get_active().count(), 0)
+        submission_help.status = SubmissionHelp.PUBLISHED
+        submission_help.save()
+        self.assertEqual(SubmissionHelp.objects.get_active().count(), 1)

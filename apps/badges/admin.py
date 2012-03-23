@@ -21,9 +21,14 @@ def publish_objects(modeladmin, request, queryset):
 publish_objects.short_description = "Publish Badges on Submission page"
 
 
+class SubmissionBadgeInline(admin.TabularInline):
+    model = SubmissionBadge
+
+
 class BadgeAdmin(admin.ModelAdmin):
     list_display = ('badge_type', 'body')
     list_filter = ('badge_type',)
+    inlines = [SubmissionBadgeInline]
 
 
 class SubmissionBadgeAdmin(admin.ModelAdmin):

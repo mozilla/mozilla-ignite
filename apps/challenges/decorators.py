@@ -1,5 +1,6 @@
 import functools
 
+from challenges.models import Challenge
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User, Permission
@@ -47,3 +48,25 @@ def phase_open_required(func=None, methods_allowed=None):
 def phase_closed_required(func=None, methods_allowed=None):
     return phase_required(func=func, methods_allowed=methods_allowed,
                           is_open=False)
+
+
+def project_challenge_required(func):
+    """Makes sure a valid project and a challenge are passed to a view"""
+    @functools.wraps(func)
+    def wrapper(request, *args, **kwargs):
+        if not all(['project' in kwargs, 'slug' in kwargs]):
+            raise ValueError('``project_challenge_required`` decorator '
+                             'requires ``slug`` and ``project`` arguments'
+                             ' as part of the view')
+        project_slug = kwargs.pop('project')
+        challenge_slug = kwargs.pop('slug')
+        # Make sure we have a challenge and a project by those slugs
+        try:
+            challenge = (Challenge.objects.select_related('project')
+                         .get(project__slug=project_slug,
+                              slug=challenge_slug))
+        except Challenge.DoesNotExist:
+            raise Http404
+        # pass the challenge and project instances to the view
+        return func(request, challenge.project, challenge, *args, **kwargs)
+    return wrapper

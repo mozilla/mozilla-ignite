@@ -63,8 +63,22 @@ class JudgeAllowance(models.Model):
     def amount_free(self):
         return self.amount - self.amount_used
 
+    def is_same_round(self, submission):
+        """Determines if Submission is in the same Phase/Round combination"""
+        if self.award.phase != submission.phase:
+            return False
+        if self.award.phase_round and \
+            self.award.phase_round != submission.phase_round:
+            return False
+        return True
+
     def can_award(self, amount_requested, submission):
-        """Determines if the amount can be awarded to the submission"""
+        """Determines if the amount can be awarded to the ``Submission``
+        - Submission must be in the same Phase/Round combination
+        - Must have funds available
+        """
+        if not self.is_same_round(submission):
+            return False
         amount_available = self.amount - self.get_amount_used(submission)
         return amount_available >= amount_requested and amount_requested > 0
 

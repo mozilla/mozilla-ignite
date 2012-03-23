@@ -45,3 +45,15 @@ class PhaseStatusMiddleware(object):
             logging.debug(defaults)
         request.phase = defaults
         return
+
+
+class JudgeMiddleware(object):
+
+    def process_view(self, request, *args, **kwargs):
+        """Adds a flag to determine if the user is a judge"""
+        if request.user.is_authenticated() and \
+            request.user.has_perm('challenges.judge_submission'):
+            request.user.is_judge = True
+        else:
+            request.user.is_judge = False
+        return

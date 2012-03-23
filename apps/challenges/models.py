@@ -4,17 +4,18 @@ from decimal import Decimal
 from markdown import markdown
 
 from django.conf import settings
-from django.contrib.auth.models import AnonymousUser
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.core.urlresolvers import reverse, NoReverseMatch
 from django.core.validators import MaxLengthValidator
 from django.template.defaultfilters import slugify
 from django.db import models
-from django.db.models import signals, Q
+from django.db.models import signals
 from django.dispatch import receiver
 
 from challenges.lib import cached_bleach, cached_property
+from challenges.managers import (SubmissionHelpManager, PhaseManager,
+                                 SubmissionManager)
 from django_extensions.db.fields import (AutoSlugField,
                                          CreationDateTimeField,
                                          ModificationDateTimeField)
@@ -95,47 +96,6 @@ class Challenge(BaseModel):
         return self._lookup_url('entries_all')
 
 
-class PhaseManager(BaseModelManager):
-
-    def get_from_natural_key(self, challenge_slug, phase_name):
-        return self.get(challenge__slug=challenge_slug, name=phase_name)
-
-    def get_current_phase(self, slug):
-        now = datetime.utcnow()
-        try:
-            return self.filter(challenge__slug=slug,
-                               start_date__lte=now,
-                               end_date__gte=now)[0]
-        except IndexError:
-            return None
-
-    def get_judging_phase(self, slug):
-        """Determines the judging ``Phase`` if the end_date is in the past
-        or a ``PhaseRound`` has past"""
-        now = datetime.utcnow()
-        try:
-            return self.filter((Q(end_date__lte=now) |
-                                Q(phaseround__end_date__lte=now)),
-                                challenge__slug=slug).order_by('-end_date')[0]
-        except IndexError:
-            return None
-
-    def get_ideation_phase(self):
-        """Returns the ``Ideation`` phase"""
-        try:
-            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
-                            name=settings.IGNITE_IDEATION_NAME)
-        except self.model.DoesNotExist:
-            return None
-
-    def get_development_phase(self):
-        """Returns the ``Development`` phase"""
-        try:
-            return self.get(challenge__slug=settings.IGNITE_CHALLENGE_SLUG,
-                            name=settings.IGNITE_DEVELOPMENT_NAME)
-        except self.model.DoesNotExist:
-            return None
-
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
 
@@ -174,7 +134,7 @@ class Phase(BaseModel):
         return '%s (%s)' % (self.name, self.challenge.title)
 
     def natural_key(self):
-        return self.challenge.natural_key() +  (self.name,)
+        return self.challenge.natural_key() + (self.name,)
     natural_key.dependencies = ['challenges.challenge']
 
     @cached_property
@@ -207,6 +167,7 @@ class Phase(BaseModel):
             if phase_round.end_date <= now:
                 return phase_round
         return None
+
 
 @receiver(signals.post_save, sender=Phase)
 def phase_update_cache(instance, **kwargs):
@@ -257,75 +218,20 @@ class Category(BaseModel):
         verbose_name_plural = 'Categories'
 
 
-class SubmissionManager(BaseModelManager):
-
-    def eligible(self, phase, phase_round=None):
-        """Return all eligible submissions
-        - Not excluded
-        - With an entry in the current phase.
-        - Submission must be in the current ``SubmissionParent``
-        - Is not a draft
-        Older submissions when edited will always have an entry in the current
-        phase"""
-        qs = {'phase': phase}
-        if phase_round:
-            qs.update({'phase_round': phase_round})
-        return self.filter(exclusionflag__isnull=True, is_draft=False,
-                           submissionparent__status=SubmissionParent.ACTIVE,
-                           **qs)
-
-    # Note: normally anything mutable wouldn't go into a default, but we can be
-    # sure this method doesn't modify the anonymous user
-    def visible(self, user=AnonymousUser()):
-        """Return all submissions that are visible.
-        If a user is provided, return all submissions visible to that user; if
-        not, return all submissions visible to the general public."""
-        if user.is_superuser:
-            return self.current()
-        criteria = models.Q(is_draft=False)
-        if not user.is_anonymous():
-            criteria |= models.Q(created_by__user=user)
-        # Return only active submissions
-        return self.current().filter(criteria)
-
-    def green_lit(self, phase, phase_round=None):
-        """Returns all the ``Submissions`` that have been green-lit.
-        Each ``Submission`` belongs to a ``Phase`` or ``PhaseRound``
-        hence once it is marked as winner is green-lit for this phase"""
-        return self.eligible(phase, phase_round).filter(is_winner=True)
-
-    def current(self):
-        """Returns all the ``Submissions`` that are active"""
-        return self.filter(submissionparent__status=SubmissionParent.ACTIVE)
-
-
 class Submission(BaseModel):
     """A user's entry into a challenge."""
-    
-    objects = SubmissionManager()
-    
     title = models.CharField(verbose_name=_(u'Title'), max_length=60)
     brief_description = models.CharField(
-        max_length=200,
-        verbose_name=_(u'Brief Description'),
-        help_text = _(u'Think of this as an elevator pitch - keep it short and sweet'))
+        max_length=200, verbose_name=_(u'Brief Description'),
+        help_text = _(u"Think of this as an elevator pitch - keep it short and sweet"))
     description = models.TextField(verbose_name=_(u'Description'))
     sketh_note = models.ImageField(
-        verbose_name=_(u'Featured image'),
-        blank=True,
-        null=True,
+        verbose_name=_(u'Featured image'), blank=True, null=True,
         help_text=_(u"This will be used in our summary and list views. You "
                     u"can add more images in your description or link out to "
                     u"sets or images out on the web by adding in an external link"),
         upload_to=settings.CHALLENGE_IMAGE_PATH)
-    
     category = models.ForeignKey(Category)
-
-    @property
-    def description_html(self):
-        """Challenge description with bleached HTML."""
-        return cached_bleach(markdown(self.description))
-    
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(default=datetime.utcnow)
     updated_on = ModificationDateTimeField()
@@ -339,6 +245,20 @@ class Submission(BaseModel):
                                     blank=True, null=True,
                                     on_delete=models.SET_NULL)
 
+    # managers
+    objects = SubmissionManager()
+
+    class Meta:
+        ordering = ['-id']
+
+    def __unicode__(self):
+        return self.title
+
+    @property
+    def description_html(self):
+        """Challenge description with bleached HTML."""
+        return cached_bleach(markdown(self.description))
+
     @property
     def challenge(self):
         return self.phase.challenge
@@ -347,9 +267,6 @@ class Submission(BaseModel):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
         return path(self.sketh_note) or path('img/project-default.gif')
-    
-    def __unicode__(self):
-        return self.title
     
     def _lookup_url(self, view_name, kwargs=None):
         """Look up a URL related to this submission.
@@ -457,9 +374,6 @@ class Submission(BaseModel):
     @property
     def is_green_lit(self):
         return self.is_winner
-
-    class Meta:
-        ordering = ['-id']
 
 
 class ExclusionFlag(models.Model):
@@ -697,3 +611,28 @@ class SubmissionVersion(models.Model):
 
     def __unicode__(self):
         return u'Version for %s on %s' % (self.submission, self.created)
+
+
+class SubmissionHelp(models.Model):
+    """Users can ask for help with a given submission"""
+    PUBLISHED = 1
+    DRAFT = 2
+    STATUS_CHOICES = (
+        (PUBLISHED, 'Published'),
+        (DRAFT, 'Draft'),
+        )
+    parent = models.OneToOneField('challenges.SubmissionParent')
+    created = CreationDateTimeField()
+    updated = ModificationDateTimeField()
+    notes = models.TextField()
+    status = models.IntegerField(choices=STATUS_CHOICES, default=DRAFT)
+
+    # managers
+    objects = SubmissionHelpManager()
+
+    class Meta:
+        verbose_name_plural = 'Submission Help'
+        ordering = ('-updated',)
+
+    def __unicode__(self):
+        return u'Help needed for %s' % self.parent

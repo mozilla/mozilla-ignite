@@ -1,0 +1,11 @@
+{% macro booking_listing(object_list) -%}
+{% if object_list %}
+<ul>
+  {% for object in object_list %}
+  <li>
+    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title }} on {{ object.start_date.strftime('%B %d, %Y at  %H:%M') }} hrs</a>
+  </li>
+  {% endfor%}
+</ul>
+{% endif %}
+{%- endmacro %}

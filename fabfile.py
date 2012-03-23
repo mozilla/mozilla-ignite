@@ -75,7 +75,7 @@ def test(*args):
         # TODO: add the rest of the apps and make sure the tests pass!
         apps = 'challenges timeslot webcast awards activity badges events users'
     print yellow('Testing: %s' % apps)
-    local('python manage.py test %s --settings=settings_test' % apps)
+    local('python manage_test.py test %s --settings=settings_test' % apps)
 
 
 def deploy(branch):

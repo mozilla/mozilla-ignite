@@ -70,6 +70,7 @@ def profile(request, username):
             submissions = Submission.objects.visible().filter(created_by=profile)
     # Show the all the submission related data when the user is the owner
     need_booking_list = []
+    booked_list = []
     if settings.DEVELOPMENT_PHASE and profile.user == user:
         release = Release.objects.get_current()
         booked_list = (TimeSlot.objects.select_related('submission')

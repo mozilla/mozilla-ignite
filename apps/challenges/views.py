@@ -1,11 +1,10 @@
 import logging
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required, permission_required
+from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404
@@ -14,18 +13,20 @@ from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import ProcessFormView, UpdateView, \
-                                      DeleteView, ModelFormMixin
+from django.views.generic.edit import (ProcessFormView, UpdateView,
+                                       DeleteView, ModelFormMixin)
 import jingo
 from tower import ugettext as _
 from awards.forms import AwardForm
-from awards.models import JudgeAllowance, SubmissionAward, Award
+from awards.models import JudgeAllowance
 from voting.models import Vote
 from badges.models import SubmissionBadge
-from commons.helpers import get_page
-from challenges.decorators import phase_open_required, phase_closed_required
+from commons.helpers import get_page, get_paginator
+from challenges.decorators import (phase_open_required, phase_closed_required,
+                                   project_challenge_required, judge_required)
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
-                              JudgingForm, NewEntryForm)
+                              JudgingForm, NewEntryForm, SubmissionHelpForm,
+                              SubmissionHelp)
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
@@ -41,14 +42,8 @@ challenge_humanised = {
     'terms_and_conditions': 'Terms and conditions',
 }
 
-
 LOGGER = logging.getLogger(__name__)
 
-judge_required = permission_required('challenges.judge_submission')
-
-def is_judge(user):
-    """Helper to determine if user is a Judge"""
-    return user.has_perm('challenges.judge_submission')
 
 class JingoTemplateMixin(TemplateResponseMixin):
     """View mixin to render through Jingo rather than Django's renderer."""
@@ -64,7 +59,6 @@ class JingoTemplateMixin(TemplateResponseMixin):
         return jingo.render(self.request, template_name, context,
                             **response_kwargs)
 
-
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
     try:
@@ -78,12 +72,8 @@ def show(request, project, slug, template_name='challenges/show.html', category=
     entry_set = entry_set.filter(phase__challenge=challenge)
     if category:
         entry_set = entry_set.filter(category__name=category)
-    paginator = Paginator(entry_set, 6)
-    page = get_page(request.GET)
-    try:
-        entries = paginator.page(page)
-    except (EmptyPage, InvalidPage):
-        entries = paginator.page(paginator.num_pages)
+    page_number = get_page(request.GET)
+    entries = get_paginator(entry_set, page_number, 6)
     try:
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
@@ -134,13 +124,15 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
     template_name = 'challenges/assigned.html'
     context_object_name = 'entries'
 
-    def get_context_data(self, **kwargs):
-        """Add green-lit entries to the context when:
+    def get_awards_context(self):
+        """Awards Add green-lit entries to the context when:
         - Judge has allowance
         - The Award money has been released
         - It is the same Phase/Round that was judged
         """
-        context = super(AssignedEntriesView, self).get_context_data(**kwargs)
+        context = {}
+        if not self.phase:
+            return context
         profile = self.request.user.get_profile()
         allowance = JudgeAllowance.objects.get_for_judge(profile)
         if not allowance:
@@ -160,11 +152,24 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
                                     .filter(~Q(id__in=awarded_ids)))
         return context
 
+    def get_context_data(self, **kwargs):
+        context = super(AssignedEntriesView, self).get_context_data(**kwargs)
+        context.update(self.get_awards_context())
+        return context
+
     def get_queryset(self):
-        self.project = get_object_or_404(Project, slug=self.kwargs['project'])
-        self.challenge = get_object_or_404(self.project.challenge_set,
-                                           slug=self.kwargs['slug'])
-        self.phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+        # Only show the listing when the phase is closed
+        try:
+            self.challenge = (Challenge.objects.select_related('project')
+                              .get(project__slug=self.kwargs['project'],
+                                   slug=self.kwargs['slug']))
+        except Challenge.DoesNotExist:
+            raise Http404
+        self.project = self.challenge.project
+        self.phase = (Phase.objects
+                      .get_judging_phase(settings.IGNITE_CHALLENGE_SLUG))
+        if self.request.phase['is_open']:
+            return []
         qs = {
             'phase': self.phase,
             'phase__challenge': self.challenge,
@@ -232,20 +237,15 @@ def extract_form_errors(form, link_form):
 
 @phase_open_required(methods_allowed=['GET'])
 @login_required
-def create_entry(request, project, slug):
+@project_challenge_required
+def create_entry(request, project, challenge):
     """Creates a ``Submission`` from the user details"""
-    try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    project = challenge.project
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
     if request.method == 'POST':
         # If there is not an active phase it shouldn't be able to get here
-        phase = Phase.objects.get_current_phase(slug)
+        phase = Phase.objects.get_current_phase(challenge.slug)
         if not phase:
             raise Http404
         form = NewEntryForm(data=request.POST,
@@ -289,15 +289,9 @@ def create_entry(request, project, slug):
         'errors': form_errors
     })
 
-
-def entry_version(request, project, slug, entry_id):
+@project_challenge_required
+def entry_version(request, project, challenge, entry_id):
     """Redirects an ``Submission`` version to the ``SubmissionParent``"""
-    try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    # Submisison is on the Parent
     try:
         parent = (SubmissionParent.objects
                   .get(submission__id=entry_id,
@@ -315,14 +309,62 @@ def entry_version(request, project, slug, entry_id):
     return HttpResponseRedirect(version.parent.get_absolute_url())
 
 
-def entry_show(request, project, slug, entry_id, judging_form=None):
-    """Detail of an idea, show any related information to it"""
+def get_award_context(submission, user):
+    """Context for the judge released allocated ``Award`` for ``Submission``"""
+    if not user.is_judge:
+        return {}
+    profile = user.get_profile()
+    # Does judge have a ``RELEASED`` allowance
+    allowance = JudgeAllowance.objects.get_for_judge(profile)
+    if not allowance:
+        return {}
     try:
-        challenge = (Challenge.objects.select_related('project')
-                     .get(project__slug=project, slug=slug))
-    except Challenge.DoesNotExist:
-        raise Http404
-    project = challenge.project
+        award = (allowance.submissionaward_set
+                 .filter(submission=submission,
+                         judge_allowance__judge=profile))[0]
+        award_form = AwardForm({'amount': award.amount})
+    except IndexError:
+        award = None
+        award_form = None
+    # Hasn't awarded this submission but has allowance for this Round/Phase
+    # and the submission has been green ilt
+    if not award and allowance.is_same_round(submission) \
+        and submission.is_green_lit:
+        award_form = AwardForm()
+    return {
+        'allowance': allowance,
+        'award_form': award_form,
+        'award': award,
+        }
+
+
+def get_judging_context(user, submission, phase_dict):
+    """Context for the Judging submission"""
+    if not user.is_judge or phase_dict['is_open'] or \
+        not submission.judgeable_by(user):
+        return {}
+    # the ``Submission`` belongs to the current combination of
+    # Judging Phase and PhaseRound
+    phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
+    if submission.phase != phase:
+        return {}
+    # Submission must be part of the Round it's being judged
+    if submission.phase_round and \
+        submission.phase_round != phase.judging_phase_round:
+        return {}
+    judging_form = _get_judging_form(user=user, entry=submission)
+    judge_assigned = (JudgeAssignment.objects
+                      .filter(judge__user=user, submission=submission)
+                      .exists())
+    return {
+        'judging_form': judging_form,
+        'judge_assigned': judge_assigned,
+        }
+
+
+@project_challenge_required
+def entry_show(request, project, challenge, entry_id, judging_form=None):
+    """Detail of an idea, show any related information to it"""
     # SubmissionParent acts as an proxy for any of the revisions.
     # and it only shows the current revision
     try:
@@ -354,41 +396,6 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-    if request.phase['is_open'] or not entry.judgeable_by(request.user):
-        judging_form = None
-        judge_assigned = False
-    else:
-        # the ``Submission`` belongs to the current combination of
-        # judging Phase and PhaseRound
-        phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
-        if any([entry.phase != phase,
-                entry.phase_round != phase.judging_phase_round]):
-            judging_form = None
-            judge_assigned = None
-        else:
-            # Judging is only open if the submission has been assigned
-            if judging_form is None:
-                judging_form = _get_judging_form(user=request.user, entry=entry)
-            assignments = JudgeAssignment.objects
-            judge_assigned = assignments.filter(judge__user=request.user,
-                                                submission=entry).exists()
-    award_form = None
-    allowance = None
-    if is_judge(request.user):
-        # Award form, judge has allowance for this Submission
-        profile = request.user.get_profile()
-        allowance = JudgeAllowance.objects.get_for_judge(profile)
-        if allowance:
-            award_list = (allowance.submissionaward_set
-                          .filter(submission=entry,
-                                  judge_allowance__judge=profile))
-            if award_list:
-                awarded = award_list[0]
-                award_form = AwardForm({'amount': awarded.amount})
-                if all([not awarded,
-                        allowance.award.phase == entry.phase,
-                        allowance.award.phase_round == entry.phase_round]):
-                    award_form = AwardForm()
     # Use all the submission ids to sumarize any information required for the
     # project homepage
     submission_ids = list(parent.submissionversion_set.all()
@@ -399,7 +406,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     # Cache webcast list
     webcast_list = TimeSlot.objects.filter(is_booked=True,
                                            submission__in=submission_ids)
-    return jingo.render(request, 'challenges/show_entry.html', {
+    context = {
         'project': project,
         'challenge': challenge,
         'entry': entry,
@@ -409,14 +416,15 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         'user_vote': user_vote,
         'votes': votes['score'],
         'excluded': entry.exclusionflag_set.exists(),
-        'judging_form': judging_form,
-        'judge_assigned': judge_assigned,
         'webcast_list': webcast_list,
         'badge_list': badge_list,
         'parent': parent,
-        'award_form': award_form,
-        'allowance': allowance,
-    })
+    }
+    # Add extra context to the View. It is on regular django templates it is
+    # usually done on template tags. In this case we do it here
+    context.update(get_judging_context(request.user, entry, request.phase))
+    context.update(get_award_context(entry, request.user))
+    return jingo.render(request, 'challenges/show_entry.html', context)
 
 
 def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
@@ -544,7 +552,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
     def get(self, request, *args, **kwargs):
         """Respond to a GET request by displaying the edit form."""
         self.object = self.get_object()
-        
+        self.parent = self.object.parent
         context = self.get_context_data(**self.get_forms())
         """
         We now access errrors direct in the template - so with no errors 
@@ -574,6 +582,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         messages.success(self.request, 'Your entry has been updated.')
         phase = Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
         object_phase = self.object.phase_round if self.object.phase_round else None
+        self.parent = self.object.parent
         if self.object.phase == phase and object_phase == phase.current_round:
             # No changes during a different Round and Phase update the
             # current entry
@@ -584,7 +593,6 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
             # Phase / Round with the new details
             previous_submission = self.object
             profile = self.request.user.get_profile()
-            parent = previous_submission.parent
             submission = Submission(created_by=profile,
                                     category=previous_submission.category,
                                     phase=phase)
@@ -599,7 +607,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
                 if not kwargs['files']:
                     new_submission.sketh_note = previous_submission.sketh_note
                     new_submission.save()
-                parent.update_version(new_submission)
+                self.parent.update_version(new_submission)
                 # Duplicate links
                 for link in link_form.cleaned_data:
                     if not link:
@@ -671,3 +679,48 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
 entry_delete = DeleteEntryView.as_view()
+
+
+@login_required
+@project_challenge_required
+def entry_help(request, project, challenge, entry_id):
+    """``Submissions`` that need help"""
+    # SubmissionParent acts as an proxy for any of the revisions.
+    # and it only shows the current revision
+    try:
+        parent = (SubmissionParent.objects.select_related('submission')
+                  .get(slug=entry_id, submission__phase__challenge=challenge))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+    # Make sure the user can edit the submission
+    if not parent.submission.editable_by(request.user):
+        raise Http404
+    try:
+        help_instance = parent.submissionhelp
+    except SubmissionHelp.DoesNotExist:
+        help_instance = None
+    if request.method == 'POST':
+        form = SubmissionHelpForm(request.POST, instance=help_instance)
+        instance = form.save(commit=False)
+        instance.parent = parent
+        instance.save()
+        if instance.status == SubmissionHelp.PUBLISHED:
+            msg = _('Your message has been posted successfully and is now '
+                    'available on your Idea page')
+            messages.success(request, msg)
+        return HttpResponseRedirect(parent.submission.get_absolute_url())
+    else:
+        form = SubmissionHelpForm(instance=help_instance)
+    context = {'form': form}
+    return jingo.render(request, 'challenges/submission_help.html', context)
+
+
+@project_challenge_required
+def entry_help_list(request, project, challenge):
+    """Lists all the ``Submissions`` that need help"""
+    object_list = SubmissionHelp.objects.get_active()
+    page_number = get_page(request.GET)
+    paginated_query = get_paginator(object_list, page_number)
+    context = {'page': paginated_query}
+    return jingo.render(request, 'challenges/submission_help_list.html',
+                        context)
