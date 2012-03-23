@@ -1,40 +1,41 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 
 {% block page_id %}judges{% endblock %}
 
 {% block section_class %}content{% endblock %}
 
 {% block header %}
-<h1 class="shout">{{ _('Judges') }}</h1>
+
 {% endblock %}
 
 {% block content %}
+<h1 class="shout">{{ _('Judges') }}</h1>
 <div class="content_columns columns">
-<nav class="index col box">
-<h2 class="wimper">Index</h2>
-<ol>
-{% for profile in profiles %}
-<li><a href="#{{ profile.user.username }}">{{ profile.display_name }}</a></li>
-{% endfor %}
-</ol>
-</nav>
-<div class="main index-content col box">
-<ol>
-{% for profile in profiles %}
-<li id={{ profile.user.username }} tabIndex="0" class="vcard">
-<h2 class="fn">{{ profile.display_name }}</h2>
-{% if profile.website %}
-<a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
-{% endif %}
-<div class="frame box">
-<img src="{{ profile.avatar_url(80) }}" alt="" width="80" height="80" />
-</div>
-{% if profile.bio %}
-<p>{{ profile.bio }}</p>
-{% endif %}
-</li>
-{% endfor %}
-</ol>
-</div>
+    <nav class="index col box">
+        <h2 class="wimper">Index</h2>
+        <ol>
+            {% for profile in profiles %}
+            <li><a href="#{{ profile.user.username }}">{{ profile.display_name }}</a></li>
+            {% endfor %}
+        </ol>
+    </nav>
+    <div class="main index-content col box">
+        <ol>
+            {% for profile in profiles %}
+            <li id={{ profile.user.username }} tabIndex="0" class="vcard">
+                <h2 class="fn">{{ profile.display_name }}</h2>
+                {% if profile.website %}
+                <a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
+                {% endif %}
+                <div class="frame box">
+                    <img src="{{ profile.avatar_url(80) }}" alt="" width="80" height="80" />
+                </div>
+                {% if profile.bio %}
+                <p>{{ profile.bio }}</p>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+    </div>
 </div>
 {% endblock %}
