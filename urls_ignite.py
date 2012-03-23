@@ -64,8 +64,8 @@ if settings.DEVELOPMENT_PHASE:
         )
 
 # Handle 404 and 500 errors
-handler404 = 'innovate.views.handle404'
-handler500 = 'innovate.views.handle500'
+handler404 = 'ignite.views.fail'
+handler500 = 'ignite.views.app_fail'
 
 ## In DEBUG mode, serve media files through Django.
 if settings.DEBUG:
