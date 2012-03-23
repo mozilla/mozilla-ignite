@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}{{ _('All submissions assigned to you') }} |{% endblock %}
@@ -19,6 +19,7 @@
 Evaluating Ideas is not allowed while the {% if request.phase['phase_round'] %}{{ request.phase['phase_round'] }} of the {% endif %} {{ request.phase['name'] }} phase is open
 {% endif %}
 
+<h1 class="shout">Submissions assigned to you</h1>
 {% for group in entries|groupby('has_judged') %}
     {% if group.grouper %}
     <h2>{% trans %}Judged by you{% endtrans %}</h2>

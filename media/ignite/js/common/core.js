@@ -4,7 +4,7 @@
  */
 ignite.media_url = function(loc) {
     var id = ignite.data;
-    return id.MEDIA_URL + 'ignite/' + loc + '?build=' + id.JS_BUILD_ID;
+    return id.MEDIA_URL + loc + '?build=' + id.JS_BUILD_ID;
 };
 /**
  * Object containing file resourced for the site and specific paages

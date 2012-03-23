@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "second_base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}{{ _('Winning submissions') }} | {% endblock %}
@@ -7,11 +7,8 @@
 
 {% block section_class %}entries{% endblock %}
 
-{% block header %}
-<h1 class="shout">Winners</h1>
-{% endblock %}
-
 {% block content %}
+<h1 class="shout">Winners</h1>
 <ol class="submissions columns">
 {% for entry in entries %}
     <li class="box col">
