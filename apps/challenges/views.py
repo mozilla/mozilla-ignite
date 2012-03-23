@@ -26,7 +26,9 @@ from challenges.decorators import (phase_open_required, phase_closed_required,
                                    project_challenge_required, judge_required)
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm, NewEntryForm, SubmissionHelpForm,
-                              SubmissionHelp)
+                              SubmissionHelp, DevelopmentEntryForm,
+                              NewDevelopmentEntryForm)
+from challenges.lib import cached_property
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
@@ -243,13 +245,20 @@ def create_entry(request, project, challenge):
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
     form_errors = False
+    phase = Phase.objects.get_current_phase(challenge.slug)
+    phase_forms = {
+        settings.IGNITE_IDEATION_NAME: NewEntryForm,
+        settings.IGNITE_DEVELOPMENT_NAME: NewDevelopmentEntryForm,
+        }
+    # Determine form according to the current Phase
+    # Fallback to the ideation phase form
+    PhaseNewEntryForm = (phase_forms[phase.name] if phase.name in phase_forms
+                     else NewEntryForm)
     if request.method == 'POST':
         # If there is not an active phase it shouldn't be able to get here
-        phase = Phase.objects.get_current_phase(challenge.slug)
         if not phase:
             raise Http404
-        form = NewEntryForm(data=request.POST,
-            files=request.FILES)
+        form = PhaseNewEntryForm(request.POST, request.FILES)
         link_form = LinkFormSet(request.POST, prefix="externals")
         if form.is_valid() and link_form.is_valid():
             entry = form.save(commit=False)
@@ -279,7 +288,7 @@ def create_entry(request, project, challenge):
         else:
             form_errors = extract_form_errors(form, link_form)
     else:
-        form = NewEntryForm()
+        form = PhaseNewEntryForm()
         link_form = LinkFormSet(prefix='externals')
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
@@ -523,10 +532,29 @@ entry_judge = EntryJudgementView.as_view()
 
 
 class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
-    
-    form_class = EntryForm
+
     link_form_class = InlineLinkFormSet
     template_name = 'challenges/edit.html'
+
+    @cached_property
+    def current_phase(self):
+        # Query and cache it here since we need it in two different
+        # methods on this Class Based View.
+        return Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
+
+    def get_form_class(self):
+        """Returns the appropiate form according to the current Phase.
+        Falls back to the ideation Form"""
+        phase = self.current_phase
+        phase_forms = {
+            settings.IGNITE_IDEATION_NAME: EntryForm,
+            settings.IGNITE_DEVELOPMENT_NAME: DevelopmentEntryForm,
+            }
+        if phase and phase.name in phase_forms:
+            PhaseEntryForm = phase_forms[phase.name]
+        else:
+            PhaseEntryForm = EntryForm
+        return PhaseEntryForm
     
     def _check_permission(self, submission, user):
         return submission.editable_by(user)
@@ -580,7 +608,7 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
         """Saves updates the ``Submission`` if it is on the same ``Round`` and
         ``Phase`` else archive the old submission and create a new entry"""
         messages.success(self.request, 'Your entry has been updated.')
-        phase = Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
+        phase = self.current_phase
         object_phase = self.object.phase_round if self.object.phase_round else None
         self.parent = self.object.parent
         if self.object.phase == phase and object_phase == phase.current_round:

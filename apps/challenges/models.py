@@ -223,13 +223,15 @@ class Submission(BaseModel):
     title = models.CharField(verbose_name=_(u'Title'), max_length=60)
     brief_description = models.CharField(
         max_length=200, verbose_name=_(u'Brief Description'),
-        help_text = _(u"Think of this as an elevator pitch - keep it short and sweet"))
+        help_text = _(u"Think of this as an elevator pitch - keep it short"
+                      u" and sweet"))
     description = models.TextField(verbose_name=_(u'Description'))
     sketh_note = models.ImageField(
         verbose_name=_(u'Featured image'), blank=True, null=True,
         help_text=_(u"This will be used in our summary and list views. You "
                     u"can add more images in your description or link out to "
-                    u"sets or images out on the web by adding in an external link"),
+                    u"sets or images out on the web by adding in an external"
+                    u" link"),
         upload_to=settings.CHALLENGE_IMAGE_PATH)
     category = models.ForeignKey(Category)
     created_by = models.ForeignKey(Profile)
@@ -239,11 +241,16 @@ class Submission(BaseModel):
                                     default=False,
                                     help_text=_(u'Mark this entry as green lit'))
     is_draft = models.BooleanField(verbose_name=_(u'Draft?'),
-        help_text=_(u"If you would like some extra time to polish your submission before making it publically then you can set it as draft. When you're ready just un-tick and it will go live"))
+        help_text=_(u"If you would like some extra time to polish your submission"
+                    u" before making it publically then you can set it as draft. "
+                    u"When you're ready just un-tick and it will go live"))
     phase = models.ForeignKey('challenges.Phase')
     phase_round = models.ForeignKey('challenges.PhaseRound',
                                     blank=True, null=True,
                                     on_delete=models.SET_NULL)
+    # Add Development Phase fields.
+    # Make sure they are not required at the Database level.
+    # We will make them required at the ``DevelopmentEntryForm`` Level.
 
     # managers
     objects = SubmissionManager()

@@ -28,6 +28,9 @@ entry_fields = (
     'category',
     )
 
+# List new fields for the Submission
+development_entry_fields = entry_fields + ()
+
 class EntryForm(forms.ModelForm):
     # Need to specify this explicitly here to remove the empty option
     category = ModelChoiceField(queryset=Category.objects.all(),
@@ -57,6 +60,28 @@ class NewEntryForm(EntryForm):
     class Meta:
         model = Submission
         fields = entry_fields + ('terms_and_conditions',)
+        widgets = entry_widgets
+
+
+class DevelopmentEntryForm(EntryForm):
+    """Fields for a new Submission during the Development phase"""
+    # Any required field should be described here and called the same as
+    # it is called on the Submission model
+    # e.g to make the stkety_note required:
+    sketh_note = forms.ImageField()
+    class Meta:
+        model = Submission
+        fields = development_entry_fields
+        widgets = entry_widgets
+
+
+class NewDevelopmentEntryForm(DevelopmentEntryForm):
+    """New entries during the Development phase require a Terms and conditions
+    flag"""
+    terms_and_conditions = forms.BooleanField()
+    class Meta:
+        model = Submission
+        fields = development_entry_fields + ('terms_and_conditions',)
         widgets = entry_widgets
 
 
