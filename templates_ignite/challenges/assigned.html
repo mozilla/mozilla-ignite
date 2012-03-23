@@ -18,8 +18,6 @@
 {% if request.phase['is_open']%}
 Evaluating Ideas is not allowed while the {% if request.phase['phase_round'] %}{{ request.phase['phase_round'] }} of the {% endif %} {{ request.phase['name'] }} phase is open
 {% endif %}
-
-<h1 class="shout">Submissions assigned to you</h1>
 {% for group in entries|groupby('has_judged') %}
     {% if group.grouper %}
     <h2>{% trans %}Judged by you{% endtrans %}</h2>
