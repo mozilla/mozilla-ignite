@@ -52,7 +52,7 @@ class Challenge(BaseModel):
     
     image = models.ImageField(verbose_name=_(u'Project image'),
                               null=True, blank=True,
-                              upload_to=settings.CHALLENGE_IMAGE_PATH)
+                             upload_to=settings.CHALLENGE_IMAGE_PATH)
     start_date = models.DateTimeField(verbose_name=_(u'Start date'),
                                       default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'))
@@ -248,6 +248,7 @@ class Submission(BaseModel):
     phase_round = models.ForeignKey('challenges.PhaseRound',
                                     blank=True, null=True,
                                     on_delete=models.SET_NULL)
+    collaborators = models.TextField(blank=True)
     # Add Development Phase fields.
     # Make sure they are not required at the Database level.
     # We will make them required at the ``DevelopmentEntryForm`` Level.

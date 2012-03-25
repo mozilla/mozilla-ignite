@@ -27,7 +27,7 @@ from challenges.decorators import (phase_open_required, phase_closed_required,
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm, NewEntryForm, SubmissionHelpForm,
                               SubmissionHelp, DevelopmentEntryForm,
-                              NewDevelopmentEntryForm)
+                              NewDevelopmentEntryForm, BaseExternalLinkFormSet)
 from challenges.lib import cached_property
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
@@ -233,7 +233,6 @@ def extract_form_errors(form, link_form):
         form_errors[humanised_key] =  form.errors[k].as_text()
     if not link_form.is_valid():
         form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
-    
     return form_errors
 
 
@@ -243,7 +242,8 @@ def extract_form_errors(form, link_form):
 def create_entry(request, project, challenge):
     """Creates a ``Submission`` from the user details"""
     profile = request.user.get_profile()
-    LinkFormSet = formset_factory(EntryLinkForm, extra=2)
+    LinkFormSet = formset_factory(EntryLinkForm, extra=2,
+                                  formset=BaseExternalLinkFormSet)
     form_errors = False
     phase = Phase.objects.get_current_phase(challenge.slug)
     phase_forms = {

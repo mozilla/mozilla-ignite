@@ -1,7 +1,8 @@
 from django import forms
 from django.db.models import Q
 from django.forms import widgets
-from django.forms.models import inlineformset_factory, ModelChoiceField
+from django.forms.formsets import BaseFormSet
+from django.forms.models import inlineformset_factory, ModelChoiceField, BaseInlineFormSet
 from django.forms.util import ErrorDict
 
 from challenges.models import (Submission, ExternalLink, Category,
@@ -138,8 +139,25 @@ class EntryLinkForm(AutoDeleteForm):
         )
 
 
+url_error = u'Please provide a valid URL and name for each link provided'
+
+class BaseExternalLinkFormSet(BaseFormSet):
+    def clean(self):
+        """Custom error validation to raise a single error message"""
+        if any(self.errors):
+            raise forms.ValidationError(url_error)
+
+
+class BaseExternalLinkInlineFormSet(BaseInlineFormSet):
+    def clean(self):
+        """Custom error validation to raise a single error message"""
+        if any(self.errors):
+            raise forms.ValidationError(url_error)
+
+
 InlineLinkFormSet = inlineformset_factory(Submission, ExternalLink,
-                                          can_delete=False, form=EntryLinkForm)
+                                          can_delete=False, form=EntryLinkForm,
+                                          formset=BaseExternalLinkInlineFormSet)
 
 
 class JudgingForm(forms.ModelForm):
