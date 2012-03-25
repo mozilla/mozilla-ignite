@@ -65,6 +65,21 @@
         </div>
      </div>
 
+{% if form.collaborators %}
+    <div class="highlight {% if form.collaborators.errors %}fail{% endif %}">
+        <label for="{{ form.collaborators.auto_id }}" class="announce">{% if form.collaborators.errors %}<em>Error in</em> {% endif %}{{ _('Tell us about your collaborators') }}</label>
+        <p class="hint">{{ _('Add your collaborators') }}</p>
+        <div class="ed">
+          {% for error in form.collaborators.errors %}
+          <strong>* {{ error }}</strong>
+          {% endfor%}
+        <div class="wmd-region">
+          {{ form.collaborators }}
+        </div>
+        </div>
+     </div>
+{% endif %}
+
      <div class="image_field highlight">
         <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
         <p class="hint" id="info_annouce">{{ _('If your idea makes more sense on paper please include a diagram. <em>(png, jpg, gif)</em>') }}</p>

@@ -24,6 +24,7 @@ entry_fields = (
     'title',
     'brief_description',
     'description',
+    'collaborators',
     'is_draft',
     'sketh_note',
     'category',
