@@ -7,9 +7,9 @@
 {% block section_class %}entries{% endblock %}
 
 {% block alerts %}
-{% if errors %}
+{% if error_count %}
 <section class="alerts errors">
-    {% trans count=errors|length %}
+    {% trans count=error_count %}
     <p>You have {{ count }} error in your submission. Please correct this before you can submit an idea.</p>
     {% pluralize %}
     <p>You have {{ count }} errors in your submission. Please correct this before you can submit an idea.</p>
@@ -21,7 +21,7 @@
 {% block content %}
 {% block greeting %}
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
-<p class="page-intro">{{ _("Congratulations! You've taken the first setp towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
+<p class="page-intro">{{ _("Congratulations! You've taken the first step towards making the world, and the internet, a better place. By submitting your idea you're one step closer to making your vision a reality. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
 {% endblock %}
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}

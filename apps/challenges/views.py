@@ -1,3 +1,4 @@
+import itertools
 import logging
 
 from django.contrib import messages
@@ -35,14 +36,6 @@ from challenges.models import (Challenge, Phase, Submission, Category,
 from projects.models import Project
 from timeslot.models import TimeSlot
 
-challenge_humanised = {
-    'title': 'Title',
-    'brief_description': 'Summary',
-    'description': 'Full description',
-    'sketh_note': 'Napkin sketch',
-    'category': 'Category',
-    'terms_and_conditions': 'Terms and conditions',
-}
 
 LOGGER = logging.getLogger(__name__)
 
@@ -60,6 +53,10 @@ class JingoTemplateMixin(TemplateResponseMixin):
         
         return jingo.render(self.request, template_name, context,
                             **response_kwargs)
+
+def get_list_count(*args):
+    """Calculates the number of elements in the list of lists passed"""
+    return len(list(itertools.chain(*args)))
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
@@ -222,18 +219,8 @@ entries_judged = judge_required(JudgedEntriesView.as_view())
 
 def entries_category(request, project, slug, category):
     """Show all entries to a specific category"""
-    return show(request, project, slug, template_name='challenges/all.html', category=category)
-
-
-def extract_form_errors(form, link_form):
-    form_errors = {}
-    # this feels horrible but I think required to create a custom error list
-    for k in form.errors.keys():
-        humanised_key = challenge_humanised[k]
-        form_errors[humanised_key] =  form.errors[k].as_text()
-    if not link_form.is_valid():
-        form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
-    return form_errors
+    return show(request, project, slug,
+                template_name='challenges/all.html', category=category)
 
 
 @phase_open_required(methods_allowed=['GET'])
@@ -244,7 +231,6 @@ def create_entry(request, project, challenge):
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2,
                                   formset=BaseExternalLinkFormSet)
-    form_errors = False
     phase = Phase.objects.get_current_phase(challenge.slug)
     phase_forms = {
         settings.IGNITE_IDEATION_NAME: NewEntryForm,
@@ -252,6 +238,7 @@ def create_entry(request, project, challenge):
         }
     # Determine form according to the current Phase
     # Fallback to the ideation phase form
+    error_count = 0
     if phase and phase.name in phase_forms:
         PhaseNewEntryForm = phase_forms[phase.name]
     else:
@@ -287,8 +274,7 @@ def create_entry(request, project, challenge):
                         'available for public review')
             messages.success(request, msg)
             return HttpResponseRedirect(phase.challenge.get_entries_url())
-        else:
-            form_errors = extract_form_errors(form, link_form)
+        error_count = get_list_count(form.errors, link_form.non_form_errors())
     else:
         form = PhaseNewEntryForm()
         link_form = LinkFormSet(prefix='externals')
@@ -297,7 +283,7 @@ def create_entry(request, project, challenge):
         'challenge': challenge,
         'form': form,
         'link_form': link_form,
-        'errors': form_errors
+        'error_count': error_count,
     })
 
 @project_challenge_required
@@ -655,9 +641,9 @@ class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
 
     def form_invalid(self, form, link_form):
         """Display the form with errors."""
-        form_errors = extract_form_errors(form, link_form)
+        error_count = get_list_count(form.errors, link_form.non_form_errors())
         context = self.get_context_data(form=form, link_form=link_form,
-                                        errors=form_errors)
+                                        error_count=error_count)
         return self.render_to_response(context)
     
     def get_context_data(self, **kwargs):
