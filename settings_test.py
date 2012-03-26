@@ -54,3 +54,10 @@ NOSE_ARGS = [
     ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
+
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.simple_backend.SimpleEngine',
+    },
+}
