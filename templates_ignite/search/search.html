@@ -16,6 +16,7 @@
   </form>
 </nav>
 
+    {% if page.object_list %}
   <div class="highlight col box main">
     <ol class="submissions columns">
       {% for result in page.object_list %}
@@ -39,8 +40,10 @@
     {% if query %}
     {{ footer_pagination(page, query) }}
     {% endif %}
-
   </div>
+  {% else %}
+  <p>No results found</p>
+  {% endif %}
 </div>
 </div>
 </div>
