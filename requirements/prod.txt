@@ -6,3 +6,5 @@
 -e git://github.com/brosner/django-voting.git#egg=django-voting
 markdown==2.0.3
 django-extensions==0.8
+-e git+https://github.com/toastdriven/django-haystack.git@ec1f917588b3be1ce89f077a6c3c72be1551f84d#egg=django_haystack-dev
+whoosh==2.3.2

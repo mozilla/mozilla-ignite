@@ -60,6 +60,7 @@ urlpatterns += patterns(
     (r'^award/', include('awards.urls', namespace='awards'), _ignite_kwargs),
     (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
     (r'^webcast/', include('webcast.urls', namespace='webcast'),),
+    (r'^search/', include('search.urls', namespace='search'),),
     )
 
 

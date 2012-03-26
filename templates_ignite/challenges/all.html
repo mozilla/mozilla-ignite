@@ -10,7 +10,7 @@
 
 {% block header %}
 <header class="busta">
-<h1 class="shout">Ideas</h1>
+<h1 class="shout">{% block title_listing  %}Ideas{% endblock  %}</h1>
 <div class="meta">
     <p class="intro">You have <em>{{ days_remaining }}</em> days to submit ideas</p>
     <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>

@@ -236,6 +236,7 @@ INSTALLED_APPS = (
 
     # Feature flipping
     'waffle',
+    'haystack',   # search
 
     # Ignite specific
     'innovate',
@@ -253,6 +254,7 @@ INSTALLED_APPS = (
     'badges',
     'awards',
     'blogs',
+    'search',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -376,3 +378,13 @@ MIDDLEWARE_URL_EXCEPTIONS = [
     '/admin/',
     MEDIA_URL,
     ]
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
+        'PATH': path('whoosh_index'),
+    },
+}
+# High number since we don't want pagination
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
