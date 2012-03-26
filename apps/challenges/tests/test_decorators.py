@@ -1,27 +1,32 @@
 from challenges.decorators import phase_open_required
-from challenges.tests.test_base import TestPhasesBase
-from dateutil.relativedelta import relativedelta
+from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
+                                                       teardown_ignite_challenge,
+                                                       setup_ideation_phase,
+                                                       setup_development_phase,
+                                                       create_submission,
+                                                       create_user)
 from django.http import HttpResponseForbidden, HttpResponse
 from django.test.client import RequestFactory
+from test_utils import TestCase
 
 
-class TestPhasesOpenDecorator(TestPhasesBase):
+class TestPhasesOpenDecorator(TestCase):
 
     def setUp(self):
         """Setup the ideation phase as close"""
-        super(TestPhasesOpenDecorator, self).setUp()
-        self.ideation.start_date = self.past
-        self.ideation.end_date = self.now - relativedelta(days=1)
-        self.ideation.save()
-        self.development.start_date = self.future
-        self.development.end_date = self.future + self.delta
-        self.development.save()
+        self.initial_data = setup_ideation_phase(is_open=False,
+                                                 **setup_ignite_challenge())
+        self.ideation = self.initial_data['ideation_phase']
+        self.development = self.initial_data['dev_phase']
         self.phase_data = {
             'is_open': False,
             'name': None,
             'days_remaining': -1,
             'phase_round': None,
             }
+
+    def tearDown(self):
+        teardown_ignite_challenge()
 
     def test_default_block(self):
         """Test all the views are blocked by default"""

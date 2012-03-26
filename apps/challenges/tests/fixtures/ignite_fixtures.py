@@ -98,8 +98,9 @@ def create_category(**kwargs):
 
 
 def create_submission(with_parent=True, **kwargs):
+    created_by = kwargs['created_by'] if 'created_by' in kwargs else create_user('bob')
     defaults = {
-        'created_by': kwargs['created_by'] if 'created_by' in kwargs else create_user('bob'),
+        'created_by': created_by,
         'phase': kwargs['phase'] if 'phase' in kwargs else create_phase(),
         'category': kwargs['category'] if 'category' in kwargs else create_category(),
         'title': 'My Awesome submission',

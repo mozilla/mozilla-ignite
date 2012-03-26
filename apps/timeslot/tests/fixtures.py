@@ -131,4 +131,3 @@ def create_timeslot(release, **kwargs):
     if kwargs:
         defaults.update(kwargs)
     return TimeSlot.objects.create(**defaults)
-

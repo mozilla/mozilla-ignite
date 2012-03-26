@@ -1,5 +1,3 @@
-import test_utils
-
 from datetime import datetime
 
 from challenges.models import (Submission, Phase, Challenge, Category,
@@ -8,11 +6,12 @@ from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.test.client import RequestFactory
+from test_utils import TestCase
 from timeslot.tests.fixtures import (create_project, create_challenge,
                                      create_phase)
 
 
-class TestPhasesBase(test_utils.TestCase):
+class TestPhasesBase(TestCase):
 
     def setUp(self):
         # setup ignite challenge
