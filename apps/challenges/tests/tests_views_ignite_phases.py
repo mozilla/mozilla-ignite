@@ -152,6 +152,7 @@ class SubmissionDevelopmentOpenPhaseTests(SubmissionPhasesBaseTest):
     def setUp(self):
         self.initial_data = setup_development_phase(**setup_ignite_challenge())
         super(SubmissionDevelopmentOpenPhaseTests, self).setUp()
+        self.valid_data.update({'repository_url': 'http://mozilla.com'})
 
     def test_development_phase_anon_submission(self):
         response = self.client.get(self.url)
@@ -223,6 +224,7 @@ class SubmissionDevelopmentClosedRoundTests(SubmissionPhasesBaseTest):
         self.initial_data = setup_development_phase(is_round_open=False,
                                                     **setup_ignite_challenge())
         super(SubmissionDevelopmentClosedRoundTests, self).setUp()
+        self.valid_data.update({'repository_url': 'http://mozilla.com'})
 
     def test_development_phase_anon_submission(self):
         response = self.client.get(self.url)

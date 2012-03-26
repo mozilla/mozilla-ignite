@@ -95,6 +95,22 @@
             {{ form.sketh_note }}
         {% endif %}
      </div>
+
+
+{% if form.repository_url  %}
+     <div class="highlight {% if form.repository_url.errors %}fail{% endif %}">
+       <label for="{{ form.repository_url.auto_id }}" class="announce">{% if form.repository_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL where your work is visible') }}</label>
+       <div class="ed">
+         {% for error in form.repository_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.repository_url }}
+       </div>
+     </div>
+     {% endif %}
+
+
+
      <fieldset class="external_links highlight {% if link_form.non_form_errors() %}fail{% endif %}">
        <legend><span class="announce">{% if link_form.non_form_errors() %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
         <p class="hint">If you've got additional information about your idea elsewhere on the internet (like youtube, extra napkin sketches or blog posts) please include them here. The more information you provide, the better!</p>

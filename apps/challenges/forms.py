@@ -31,7 +31,9 @@ entry_fields = (
     )
 
 # List new fields for the Submission
-development_entry_fields = entry_fields + ()
+development_entry_fields = entry_fields + (
+    'repository_url',
+    )
 
 class EntryForm(forms.ModelForm):
     # Need to specify this explicitly here to remove the empty option
@@ -71,6 +73,8 @@ class DevelopmentEntryForm(EntryForm):
     # it is called on the Submission model
     # e.g. to make the stkety_note required:
     # sketh_note = forms.ImageField()
+    repository_url = forms.URLField()
+
     class Meta:
         model = Submission
         fields = development_entry_fields

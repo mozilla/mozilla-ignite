@@ -252,6 +252,8 @@ class Submission(BaseModel):
     # Add Development Phase fields.
     # Make sure they are not required at the Database level.
     # We will make them required at the ``DevelopmentEntryForm`` Level.
+    repository_url = models.URLField(max_length=500, verify_exists=False,
+                                     blank=True)
 
     # managers
     objects = SubmissionManager()

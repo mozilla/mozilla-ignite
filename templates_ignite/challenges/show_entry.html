@@ -63,8 +63,11 @@
             </div>
             {% endif %}
             <div class="description">
-            {{ entry.description_html }}
+              {{ entry.description_html }}
             </div>
+            {% if entry.repository_url %}
+            <p><a href="{{ entry.repository_url }}">Project Repository</a></p>
+            {% endif %}
             {% if links %}
             <div class="links">
             <h2 class="wimper">See also</h2>
