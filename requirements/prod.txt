@@ -8,3 +8,4 @@ markdown==2.0.3
 django-extensions==0.8
 -e git+https://github.com/toastdriven/django-haystack.git@ec1f917588b3be1ce89f077a6c3c72be1551f84d#egg=django_haystack-dev
 whoosh==2.3.2
+-e git://github.com/toastdriven/pyelasticsearch.git@0c7824695f32ea8efa4fb14c3a0db52cb55e3217#egg=pyelasticsearch-dev

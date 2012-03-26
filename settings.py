@@ -381,10 +381,13 @@ MIDDLEWARE_URL_EXCEPTIONS = [
 
 HAYSTACK_CONNECTIONS = {
     'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': path('whoosh_index'),
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
     },
 }
+
 # High number since we don't want pagination
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
 HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
