@@ -232,7 +232,7 @@ INSTALLED_APPS = (
     'django_push.subscriber',
     'feeds',
     # email queue
-    # 'django_mailer',
+    #'django_mailer',
 
     # Feature flipping
     'waffle',
@@ -327,6 +327,7 @@ AUTH_PROFILE_MODULE = 'users.Profile'
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 # EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
+SERVER_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',

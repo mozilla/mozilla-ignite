@@ -9,6 +9,8 @@ IGNITE_CHALLENGE_SLUG = 'ignite-challenge'
 IGNITE_IDEATION_NAME = 'Ideation'
 IGNITE_DEVELOPMENT_NAME = 'Development'
 
+EMAIL_SUBJECT_PREFIX = '[Mozilla Ignite] '
+
 FIXTURE_DIRS = (path('fixtures'),)
 
 TEMPLATE_DIRS = (path('templates_ignite'),) + TEMPLATE_DIRS
