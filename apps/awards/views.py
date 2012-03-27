@@ -7,6 +7,7 @@ from django.http import Http404, HttpResponseRedirect
 from django.views.decorators.http import require_POST
 from tower import ugettext as _
 
+
 @judge_required
 @require_POST
 def award(request, submission_id, project=None, slug=None):

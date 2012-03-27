@@ -21,7 +21,7 @@ def assigned_submissions_processor(request):
     # Determine which is the phase that is being Judged at the moment
     phase = Phase.objects.get_judging_phase(settings.IGNITE_CHALLENGE_SLUG)
     qs = {'phase': phase}
-    if phase.judging_phase_round:
+    if phase and phase.judging_phase_round:
         qs.update({'phase_round': phase.judging_phase_round})
     # Count the submissions assigned but not judged
     assigned = (Submission.objects

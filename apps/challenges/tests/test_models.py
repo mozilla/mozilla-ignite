@@ -16,11 +16,9 @@ from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users, challenge_teardown)
 from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
                                                        teardown_ignite_challenge,
-                                                       setup_ideation_phase,
-                                                       setup_development_phase)
-from challenges.tests.test_base import TestPhasesBase
-from timeslot.tests.fixtures import (create_user, create_submission,
-                                      create_phase_round)
+                                                       setup_development_rounds_phase,
+                                                       create_submission,
+                                                       create_user)
 from ignite.tests.decorators import ignite_skip
 
 
@@ -313,49 +311,45 @@ class TestSubmissions(TestCase):
         self.assertEqual(Submission.objects.eligible(self.phase).count(), 2)
 
 
-class TestSubmissionsMultiplePhases(TestPhasesBase):
+class TestSubmissionsMultiplePhases(TestCase):
 
     def setUp(self):
-        super(TestSubmissionsMultiplePhases, self).setUp()
+        self.initial_data = setup_development_rounds_phase(**setup_ignite_challenge())
+        self.ideation = self.initial_data['ideation_phase']
+        self.development = self.initial_data['dev_phase']
         self.user = create_user('bob')
-        self.round_a = create_phase_round('A', self.development)
-        self.round_b = create_phase_round('B', self.development)
+        self.round_a = self.initial_data['round_a']
+        self.round_b = self.initial_data['round_b']
+
+    def tearDown(self):
+        teardown_ignite_challenge()
 
     def test_exclude_submission_phases(self):
-        for i in range(3):
-            create_submission('Submision %s' % i, self.user, self.ideation)
-        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 3)
+        create_submission(created_by=self.user, phase=self.ideation)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 1)
         self.assertEqual(Submission.objects.eligible(self.development).count(), 0)
-        self.assertEqual(Submission.objects.count(), 3)
+        self.assertEqual(Submission.objects.count(), 1)
 
     def test_exclude_submission_rounds(self):
-        extra = {'phase_round': self.round_a}
-        for i in range(3):
-            create_submission('Submision %s' % i, self.user, self.ideation, extra)
-        self.assertEqual(Submission.objects.eligible(self.ideation,
-                                                     self.round_a).count(), 3)
-        self.assertEqual((Submission.objects.eligible(self.ideation,
+        create_submission(created_by=self.user, phase=self.development,
+                          phase_round=self.round_a)
+        self.assertEqual(Submission.objects.eligible(self.development,
+                                                     self.round_a).count(), 1)
+        self.assertEqual((Submission.objects.eligible(self.development,
                                                       self.round_b).count()), 0)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
 
     def test_exclude_submission_version(self):
-        i_list = [create_submission('Submision %s' % i,
-                                    self.user, self.ideation) for i in range(3)]
-        item = i_list[0]
-        new_sub = create_submission('Replacement', self.user, self.development,
-                                    parent=False)
-        self.assertEqual(Submission.objects.count(), 4)
-        parent = item.submissionparent_set.all()[0]
-        parent.update_version(new_sub)
-        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 2)
+        submission_ideation = create_submission(created_by=self.user,
+                                                phase=self.ideation)
+        new_sub = create_submission(title='Replacement', created_by=self.user,
+                                    phase=self.development, with_parent=False)
+        submission_ideation.parent.update_version(new_sub)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
         self.assertEqual(Submission.objects.eligible(self.development).count(), 1)
 
     def test_exclude_drafts(self):
-        i_list = [create_submission('Submision %s' % i,
-                                    self.user, self.ideation) for i in range(3)]
-        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 3)
-        for item in i_list:
-            item.is_draft = True
-            item.save()
+        create_submission(created_by=self.user, phase=self.ideation, is_draft=True)
         self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
 
 
