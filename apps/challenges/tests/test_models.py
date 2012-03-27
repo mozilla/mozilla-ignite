@@ -2,12 +2,10 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from mock import Mock, patch
 
 from projects.models import Project
 from challenges.models import (Challenge, Submission, Phase, Category,
@@ -16,6 +14,10 @@ from challenges.models import (Challenge, Submission, Phase, Category,
                               SubmissionVersion, SubmissionHelp)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
                                        create_users, challenge_teardown)
+from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
+                                                       teardown_ignite_challenge,
+                                                       setup_ideation_phase,
+                                                       setup_development_phase)
 from challenges.tests.test_base import TestPhasesBase
 from timeslot.tests.fixtures import (create_user, create_submission,
                                       create_phase_round)

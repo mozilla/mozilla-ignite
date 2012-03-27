@@ -1,12 +1,10 @@
 from datetime import datetime
 
 from challenges.middleware import PhaseStatusMiddleware
-from challenges.models import PhaseRound
 from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
                                                        teardown_ignite_challenge,
                                                        setup_ideation_phase,
                                                        setup_development_phase)
-from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.test.client import RequestFactory
 from test_utils import TestCase

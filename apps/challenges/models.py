@@ -370,14 +370,10 @@ class Submission(BaseModel):
     def needs_booking(self):
         """Determines if this entry needs to book a Timeslot.
         - Entry has been gren lit
-        - Ideation phase has finished
-        - Development phase has been enabled
         - User hasn't booked a timeslot
         """
         return all([
             self.is_winner,
-            has_phase_finished(settings.IGNITE_IDEATION_NAME),
-            settings.DEVELOPMENT_PHASE,
             not self.timeslot_set.all(),
             ])
 

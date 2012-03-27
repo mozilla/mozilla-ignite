@@ -179,6 +179,36 @@ def setup_development_phase(is_round_open=True, **kwargs):
     return kwargs
 
 
+def setup_development_rounds_phase(is_round_open=True, **kwargs):
+    """Ideation phase is in the past and the Development phase and a Round are
+    open"""
+    now = datetime.utcnow()
+    delta = relativedelta(days=10)
+    ideation_phase = kwargs['ideation_phase']
+    ideation_phase.start_date = now - (delta * 3)
+    ideation_phase.end_date = now - (delta * 2)
+    ideation_phase.save()
+    dev_phase = kwargs['dev_phase']
+    dev_phase.start_date = now - delta
+    dev_phase.end_date = now + delta
+    dev_phase.save()
+    round_a = kwargs['round_a']
+    round_a.start_date = dev_phase.start_date
+    round_a.end_date = now - relativedelta(hours=1)
+    round_a.save()
+    start_date = now if is_round_open else now + relativedelta(hours=1)
+    round_b = create_phase_round(name='Round B', phase=dev_phase,
+                                 start_date=start_date,
+                                 end_date=dev_phase.end_date)
+    kwargs.update({
+        'ideation_phase': ideation_phase,
+        'dev_phase': dev_phase,
+        'round_a': round_a,
+        'round_b': round_b,
+        })
+    return kwargs
+
+
 def teardown_ignite_challenge():
     for model in [PhaseRound, Phase, Challenge, Project]:
         model.objects.all().delete()

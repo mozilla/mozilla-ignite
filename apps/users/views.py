@@ -71,7 +71,7 @@ def profile(request, username):
     # Show the all the submission related data when the user is the owner
     need_booking_list = []
     booked_list = []
-    if settings.DEVELOPMENT_PHASE and profile.user == user:
+    if profile.user == user:
         release = Release.objects.get_current()
         booked_list = (TimeSlot.objects.select_related('submission')
                        .filter(submission__created_by=profile,
@@ -85,7 +85,7 @@ def profile(request, username):
                                          created_by=profile))
     # User has assigned judging tasks
     webcast_list = []
-    if settings.DEVELOPMENT_PHASE and request.user.is_authenticated():
+    if request.user.is_authenticated() and request.user.is_judge:
         # Determining if a user is a judge is quite expensive query-wise,
         # so we use the JudgeAssignment model to list the judge
         # booked webcasts, past and present.

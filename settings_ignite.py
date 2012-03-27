@@ -26,10 +26,9 @@ MIDDLEWARE_CLASSES += (
 TEMPLATE_CONTEXT_PROCESSORS += (
     'ignite.context_processors.browserid_target_processor',
     'challenges.context_processors.assigned_submissions_processor',
-    'challenges.context_processors.current_phase',
     )
 
-# Adds extra bits when the DEVELOPMENT_PHASE is enabled
+# Enables the templating overriding
 if DEVELOPMENT_PHASE:
     TEMPLATE_DIRS = (
         path('templates_ignite', 'development'),
