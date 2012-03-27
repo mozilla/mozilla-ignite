@@ -232,7 +232,7 @@ INSTALLED_APPS = (
     'django_push.subscriber',
     'feeds',
     # email queue
-    'django_mailer',
+    # 'django_mailer',
 
     # Feature flipping
     'waffle',
@@ -324,8 +324,8 @@ PASSWORD_BLACKLIST = (
 AUTH_PROFILE_MODULE = 'users.Profile'
 
 # Email goes to the console by default.  s/console/smtp/ for regular delivery
-# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
