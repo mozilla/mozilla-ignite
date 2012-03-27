@@ -28,7 +28,9 @@ TEMPLATE_CONTEXT_PROCESSORS += (
     'challenges.context_processors.assigned_submissions_processor',
     )
 
-# Enables the templating overriding
+# ``DEVELOPMENT_PHASE`` only enables templating overriding
+# any other functionality has been implemented using
+# Phases/Rounds start and end dates.
 if DEVELOPMENT_PHASE:
     TEMPLATE_DIRS = (
         path('templates_ignite', 'development'),
