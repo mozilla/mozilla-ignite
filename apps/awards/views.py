@@ -23,9 +23,10 @@ def award(request, submission_id, project=None, slug=None):
     judge_data = {
         'judge': request.user.get_profile(),
         'award__phase': submission.phase,
+        'award__is_released': True,
         }
-    if submission.phase.current_round:
-        judge_data.update({'phase_round': submission.phase_current_round})
+    if submission.phase_round:
+        judge_data.update({'award__phase_round': submission.phase_round})
     try:
         judge_allowance = JudgeAllowance.objects.get(**judge_data)
     except JudgeAllowance.DoesNotExist:
