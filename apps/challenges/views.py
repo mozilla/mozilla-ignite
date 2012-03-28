@@ -27,11 +27,15 @@ from challenges.models import (Challenge, Phase, Submission, Category,
 from projects.models import Project
 
 challenge_humanised = {
-    'title': 'Title',
-    'brief_description': 'Summary',
-    'description': 'Full description',
+    'title': 'Name',
+    'brief_description': 'The problem',
+    'description': 'The solution',
     'sketh_note': 'Napkin sketch',
-    'category': 'Category',
+    'category': 'Focus area',
+    'life_improvements': 'Life benefit',
+    'take_advantage': 'GENI Network',
+    'interest_making': 'Interested to make',
+    'team_members': 'Team members',
 }
 
 

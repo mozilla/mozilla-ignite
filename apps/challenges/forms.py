@@ -23,17 +23,32 @@ class EntryForm(forms.ModelForm):
             'is_draft',
             'sketh_note',
             'category',
+            'life_improvements',
+            'take_advantage',
+            'interest_making',
+            'team_members',
         )
         
         widgets = {
-            'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
-            'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
-            'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
+            'brief_description': forms.TextInput(attrs={'aria-describedby': 'info_brief_description'}),
+            'sketh_note': forms.FileInput(attrs={'aria-describedby': 'info_sketh_note'}),
             'description': forms.Textarea(attrs={
-                'aria-describedby':'info_description',
-                'id':'wmd-input',
+                'aria-describedby': 'info_description',
+                'id': 'wmd-input',
             }),
-            'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
+            'life_improvements': forms.Textarea(attrs={
+                'aria-describedby': 'info_life_improvements',
+            }),
+            'take_advantage': forms.Textarea(attrs={
+                'aria-describedby': 'info_take_advantage',
+            }),
+            'interest_making': forms.Textarea(attrs={
+                'aria-describedby': 'info_intertest_making',
+            }),
+            'team_members': forms.Textarea(attrs={
+                'aria-describedby': 'info_team_members'
+            }),
+            'is_draft': forms.CheckboxInput(attrs={'aria-describedby': 'info_is_draft'}),
         }
     
     def clean(self):

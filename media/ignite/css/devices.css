@@ -180,6 +180,12 @@ textarea {
     padding: 0.2em;
     font-size: 15px;
 }
+textarea {
+    height: 100px;
+}
+.wmd-region textarea {
+    height: 250px;
+}
 fieldset {
     border: none;
     padding-left: 0;

@@ -244,7 +244,16 @@ class Submission(BaseModel):
                     u"as draft. When you're ready just un-tick and it will go live"))
     
     phase = models.ForeignKey(Phase)
-    
+
+    life_improvements = models.TextField(default="",
+                                            verbose_name=_(u'How does this improve the lives of people?'))
+    take_advantage = models.TextField(blank=True, null=True,
+                                        verbose_name=_(u'How does this make the most of the GENI network?'))
+    interest_making = models.TextField(blank=True, null=True,
+                                        verbose_name=_(u'Are you interested in making this app?'))
+    team_members = models.TextField(blank=True, null=True,
+                                    verbose_name=_(u'Tell us about your team making this app'))
+ 
     @property
     def challenge(self):
         return self.phase.challenge
