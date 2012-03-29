@@ -1397,6 +1397,9 @@ address.vcard .frame {
 .index-content li h2 {
     margin: 0;
 }
+.index-content li .job {
+    font-weight: normal;
+}
 .index-content li .url {
     margin-bottom: 1em;
     display: inline-block;
