@@ -849,7 +849,8 @@ fieldset .focus_areas ul {
 .focus_areas .education {
     background-image: url(../img/css/homepage/education.png);
 }
-.focus_areas .clean-energy {
+.focus_areas .clean-energy,
+.focus_areas .clean-energy-and-transportation {
     background-image: url(../img/css/homepage/energy.png);
 }
 .events {
