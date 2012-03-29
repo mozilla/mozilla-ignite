@@ -904,6 +904,9 @@ fieldset .focus_areas ul {
 }
 /* About page */
 /* how section */
+.how figure {
+    border-top: none;
+}
 .how .questions h3 {
     border-top: 1px solid #C7DDEB;
     padding-top: 3em;
@@ -920,10 +923,9 @@ fieldset .focus_areas ul {
     overflow: hidden;
 }
 .application {
-    float: left;
     color: #F25D1D;
     text-align: center;
-    margin-top: 4em;
+    margin: 2em 0;
 }
 .application .small_print {
     position: absolute;
@@ -953,16 +955,11 @@ fieldset .focus_areas ul {
 }
 .rounds {
     overflow: hidden;
-    float: left;
     border-top: none !important;
     text-align: left;
-    width: 18%;
 }
 .ideation {
     margin-right: 3%;
-}
-.development {
-    width: 75%;
 }
 .rounds .wimper {
     color: #878686;
@@ -990,23 +987,9 @@ fieldset .focus_areas ul {
 .development .round:nth-child(2) {
     z-index: 20;
 }
-.development .round:before {
-    content: ".";
-    text-indent: -9999em;
-    width: 1440px;
-    height: 150px;
-    position: absolute;
-    z-index: 1;
-    background: transparent url(../img/css/process_bg.png) no-repeat 0 0;;
-    left: -104px;
-    bottom: -28px;
-}
 .development .all .round:first-child {
     margin-left: 0;
     z-index: 30;
-}
-.development .all .round:first-child:before {
-    content: none;
 }
 .round strong {
     display: block;
@@ -1024,7 +1007,6 @@ fieldset .focus_areas ul {
 .ideation .round strong {
     font-size: 18px;
     line-height: 24px;
-    width: 70px;
 }
 .round .ribbon {
     color: #fff;
