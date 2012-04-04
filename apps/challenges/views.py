@@ -215,6 +215,8 @@ def create_entry(request, project, slug):
     if request.method == 'POST':
         # If there is not an active phase it shouldn't be able to get here
         phase = Phase.objects.get_current_phase(slug)
+        print '### Phase ###'
+        print phase
         if not phase:
             raise Http404
         form = NewEntryForm(data=request.POST,

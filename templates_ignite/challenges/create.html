@@ -129,10 +129,9 @@
 
      {% if form.terms_and_conditions %}
      <div class="highlight inline_field {% if errors['Terms and conditions']%}fail{% endif %}">
-       <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if errors['Terms and conditions'] %}<em>Error in</em> {% endif %}{{ _('I agree to the Challenge rules') }}</label>
-       <p>I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a></p>
-       <div class="ed">
-         <strong>{{ errors['Terms and conditions'] }}</strong>
+        <div class="ed">
+            <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if errors['Terms and conditions'] %}<em>Error in</em> {% endif %}I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a></label>
+            <p><strong>{{ errors['Terms and conditions'] }}</strong></p>
        </div>
      </div>
      {% endif %}

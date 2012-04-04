@@ -222,7 +222,8 @@ legend span {
     color: #fff;
     font-size: 15px;
 }
-.fail .ed label {
+.fail .ed label,
+.fail .ed a {
     color: #fff !important;
 }
 
