@@ -649,9 +649,23 @@ legend span {
 .external .learn h2 {
     background-position: 0 -440px;
 }
+.external .post h2 {
+    background-position: 0 -590px;
+}
 .external p {
     font-size: 14px;
     color: #454545;
+}
+.external label {
+    font-size: 14px;
+    color: #454545;
+    font-weight: normal;
+}
+.external label.indent {
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    left: -9999em;
 }
 .external ul {
     padding-left: 0;
