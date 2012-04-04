@@ -44,11 +44,11 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
 
 
 def fail(request, template_name='404.html'):
-    return jingo.render(request, template_name, {})
+    return jingo.render(request, template_name, {}, status=404)
 
 
 def app_fail(request, template_name='500.html'):
-    return jingo.render(request, template_name, {})
+    return jingo.render(request, template_name, {}, status=500)
 
 
 def terms(request, project, slug, template_name='static/terms_conditions.html'):

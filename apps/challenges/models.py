@@ -96,9 +96,6 @@ class PhaseManager(BaseModelManager):
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
-    """
-    Additions to views.py mean that we now need to return an instance
-    """
     def get_current_phase(self, slug):
         now = datetime.utcnow()
         return self.filter(
@@ -107,7 +104,7 @@ class PhaseManager(BaseModelManager):
             start_date__lte=now
         ).filter(
             end_date__gte=now
-        )[0]
+        )
 
 
 def in_six_months():
