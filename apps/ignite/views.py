@@ -17,7 +17,7 @@ def splash(request, project, slug, template_name='challenges/show.html'):
     entries = (Submission.objects.visible()
                                  .filter(phase__challenge=challenge)
                                  .order_by("?"))
-    
+
     return jingo.render(request, 'ignite/splash.html', {
         'challenge': challenge,
         'project': project,
@@ -27,8 +27,10 @@ def splash(request, project, slug, template_name='challenges/show.html'):
         'blogs': blogs
     })
 
+
 def about(request, project, slug):
     return jingo.render(request, 'ignite/about.html')
+
 
 def judges(request, project, slug, template_name='challenges/all_judges.html'):
     """ List all judges we have in the system """
@@ -44,6 +46,10 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
 def fail(request, template_name='404.html'):
     return jingo.render(request, template_name, {})
 
- 
+
 def app_fail(request, template_name='500.html'):
+    return jingo.render(request, template_name, {})
+
+
+def terms(request, project, slug, template_name='static/terms_conditions.html'):
     return jingo.render(request, template_name, {})

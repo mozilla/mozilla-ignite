@@ -8,49 +8,53 @@ from challenges.models import Submission, ExternalLink, Category, \
 from challenges.widgets import CustomRadioSelect
 
 
+entry_widgets = {
+    'brief_description': forms.TextInput(attrs={'aria-describedby': 'info_brief_description'}),
+    'sketh_note': forms.FileInput(attrs={'aria-describedby': 'info_sketh_note'}),
+    'description': forms.Textarea(attrs={
+        'aria-describedby': 'info_description',
+        'id': 'wmd-input',
+    }),
+    'life_improvements': forms.Textarea(attrs={
+        'aria-describedby': 'info_life_improvements',
+    }),
+    'take_advantage': forms.Textarea(attrs={
+        'aria-describedby': 'info_take_advantage',
+    }),
+    'interest_making': forms.Textarea(attrs={
+        'aria-describedby': 'info_intertest_making',
+    }),
+    'team_members': forms.Textarea(attrs={
+        'aria-describedby': 'info_team_members'
+    }),
+    'is_draft': forms.CheckboxInput(attrs={'aria-describedby': 'info_is_draft'}),
+    }
+
+entry_fields = (
+    'title',
+    'brief_description',
+    'description',
+    'is_draft',
+    'sketh_note',
+    'category',
+    'life_improvements',
+    'take_advantage',
+    'interest_making',
+    'team_members',
+    )
+
+
 class EntryForm(forms.ModelForm):
     # Need to specify this explicitly here to remove the empty option
     category = ModelChoiceField(queryset=Category.objects.all(),
                                 empty_label=None,
                                 widget=CustomRadioSelect())
+
     class Meta:
         model = Submission
- 
-        fields = (
-            'title',
-            'brief_description',
-            'description',
-            'is_draft',
-            'sketh_note',
-            'category',
-            'life_improvements',
-            'take_advantage',
-            'interest_making',
-            'team_members',
-        )
-        
-        widgets = {
-            'brief_description': forms.TextInput(attrs={'aria-describedby': 'info_brief_description'}),
-            'sketh_note': forms.FileInput(attrs={'aria-describedby': 'info_sketh_note'}),
-            'description': forms.Textarea(attrs={
-                'aria-describedby': 'info_description',
-                'id': 'wmd-input',
-            }),
-            'life_improvements': forms.Textarea(attrs={
-                'aria-describedby': 'info_life_improvements',
-            }),
-            'take_advantage': forms.Textarea(attrs={
-                'aria-describedby': 'info_take_advantage',
-            }),
-            'interest_making': forms.Textarea(attrs={
-                'aria-describedby': 'info_intertest_making',
-            }),
-            'team_members': forms.Textarea(attrs={
-                'aria-describedby': 'info_team_members'
-            }),
-            'is_draft': forms.CheckboxInput(attrs={'aria-describedby': 'info_is_draft'}),
-        }
-    
+        widgets = entry_widgets
+        fields = entry_fields
+
     def clean(self):
         super(EntryForm, self).clean()
         if self.errors:
@@ -62,9 +66,18 @@ class EntryForm(forms.ModelForm):
         return self.cleaned_data
 
 
+class NewEntryForm(EntryForm):
+    """New Entries require to accept the Terms and Conditions"""
+    terms_and_conditions = forms.BooleanField()
+
+    class Meta:
+        model = Submission
+        fields = entry_fields + ('terms_and_conditions',)
+        widgets = entry_widgets
+
+
 class AutoDeleteForm(forms.ModelForm):
     """Form class which deletes its instance if all fields are empty."""
-    
     def is_blank(self):
         # Using base_fields here to ignore any foreign key or ID fields added
         for name, field in self.base_fields.iteritems():
@@ -72,24 +85,22 @@ class AutoDeleteForm(forms.ModelForm):
                               self.files, self.add_prefix(name))
             if field_value:
                 return False
-        
         return True
-    
+
     def full_clean(self):
         if self.is_blank():
             # Blank forms are always valid
             self._errors = ErrorDict()
             self.cleaned_data = {}
             return
-        
         super(AutoDeleteForm, self).full_clean()
-    
+
     def save(self, commit=True):
         """Save the contents of this form.
-        
+
         Note that this form will fail if the commit argument is set to False
         and all fields are empty.
-        
+
         """
         if self.is_blank() and self.instance.pk:
             if not commit:
@@ -97,11 +108,11 @@ class AutoDeleteForm(forms.ModelForm):
                                    'uncommitted saves.')
             self.instance.delete()
             return None
-        
+
         if self.is_blank() and not self.instance.pk:
             # Nothing to do
             return None
-        
+
         return super(AutoDeleteForm, self).save()
 
 
@@ -121,13 +132,13 @@ InlineLinkFormSet = inlineformset_factory(Submission, ExternalLink,
 
 class JudgingForm(forms.ModelForm):
     """A form for judges to rate submissions.
-    
+
     The form is generated dynamically using a list of JudgingCriterion objects,
     each of which is a question about some aspect of the submission. Each of
     these criteria has a numeric range (0 to 10 by default).
-    
+
     """
-    
+
     def __init__(self, *args, **kwargs):
         criteria = kwargs.pop('criteria')
         initial = kwargs.pop('initial', {})
@@ -146,17 +157,17 @@ class JudgingForm(forms.ModelForm):
                 except JudgingAnswer.DoesNotExist:
                     # No answer for this question yet
                     pass
-        
+
         super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
-        
+
         self.fields.update(new_fields)
-    
+
     def _field_from_criterion(self, criterion):
         return MinMaxIntegerField(label=criterion.question,
                                   min_value=criterion.min_value,
                                   max_value=criterion.max_value,
                                   widget=RangeInput())
-    
+
     @property
     def answer_data(self):
         """The cleaned data from this form related to criteria answers."""
@@ -165,10 +176,10 @@ class JudgingForm(forms.ModelForm):
         extract_key = lambda k: k.split('_', 1)[1]
         return dict((extract_key(k), v) for k, v in self.cleaned_data.items()
                     if k.startswith('criterion_'))
-    
+
     def save(self):
         judgement = super(JudgingForm, self).save()
-        
+
         for key, value in self.answer_data.items():
             # If this fails, we want to fall over fairly horribly
             criterion = JudgingCriterion.objects.get(pk=key)
@@ -177,31 +188,31 @@ class JudgingForm(forms.ModelForm):
                 answer = JudgingAnswer.objects.get(**kwargs)
             except JudgingAnswer.DoesNotExist:
                 answer = JudgingAnswer(**kwargs)
-            
+
             answer.rating = value
             answer.save()
-        
+
         return judgement
-    
+
     class Meta:
         model = Judgement
         exclude = ('submission', 'judge')
 
 
 class NumberInput(widgets.Input):
-    
+
     input_type = 'number'
 
 
 class RangeInput(widgets.Input):
-    
+
     input_type = 'range'
 
 
 class MinMaxIntegerField(forms.IntegerField):
     """An integer field that supports passing min/max values to its widget."""
-    
+
     widget = NumberInput
-    
+
     def widget_attrs(self, widget):
         return {'min': self.min_value, 'max': self.max_value}

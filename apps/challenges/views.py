@@ -20,7 +20,7 @@ from tower import ugettext as _
 from voting.models import Vote
 
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
-                              JudgingForm)
+                              JudgingForm, NewEntryForm)
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, JudgingCriterion,
                                JudgeAssignment)
@@ -36,6 +36,7 @@ challenge_humanised = {
     'take_advantage': 'GENI Network',
     'interest_making': 'Interested to make',
     'team_members': 'Team members',
+    'terms_and_conditions': 'Terms and conditions',
 }
 
 
@@ -46,7 +47,7 @@ judge_required = permission_required('challenges.judge_submission')
 
 class JingoTemplateMixin(TemplateResponseMixin):
     """View mixin to render through Jingo rather than Django's renderer."""
-    
+
     def render_to_response(self, context, **response_kwargs):
         """Render using Jingo and return the response."""
         template_names = self.get_template_names()
@@ -54,7 +55,7 @@ class JingoTemplateMixin(TemplateResponseMixin):
             LOGGER.info('Jingo only works with a single template name; '
                         'discarding ' + ', '.join(template_names[1:]))
         template_name = template_names[0]
-        
+
         return jingo.render(self.request, template_name, context,
                             **response_kwargs)
 
@@ -103,15 +104,15 @@ def entries_all(request, project, slug):
 
 class WinningEntriesView(ListView, JingoTemplateMixin):
     """Show entries that have been marked as winners."""
-    
+
     template_name = 'challenges/winning.html'
     context_object_name = 'entries'
-    
+
     def get_context_data(self, **kwargs):
         context = super(WinningEntriesView, self).get_context_data(**kwargs)
         context.update(project=self.project, challenge=self.challenge)
         return context
-    
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
@@ -127,20 +128,20 @@ entries_winning = WinningEntriesView.as_view()
 
 class AssignedEntriesView(ListView, JingoTemplateMixin):
     """Show entries assigned to be judged by the current user."""
-    
+
     template_name = 'challenges/assigned.html'
     context_object_name = 'entries'
-    
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
                                            slug=self.kwargs['slug'])
-        
+
         ss = Submission.objects
         submissions = (ss.filter(phase__challenge=self.challenge)
                          .filter(judgeassignment__judge__user=self.request.user)
                          .select_related('judgement__judge__user'))
-        
+
         # Add a custom attribute for whether user has judged this submission
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
@@ -153,10 +154,10 @@ entries_assigned = judge_required(AssignedEntriesView.as_view())
 
 class JudgedEntriesView(ListView, JingoTemplateMixin):
     """Show all entries that have been judged."""
-    
+
     template_name = 'challenges/judged.html'
     context_object_name = 'entries'
-    
+
     def get_queryset(self):
         self.project = get_object_or_404(Project, slug=self.kwargs['project'])
         self.challenge = get_object_or_404(self.project.challenge_set,
@@ -164,7 +165,7 @@ class JudgedEntriesView(ListView, JingoTemplateMixin):
         submissions = Submission.objects.filter(judgement__isnull=False)
         submissions = submissions.distinct()
         submissions = submissions.select_related('judgement__judginganswer__criterion')
-        
+
         for submission in submissions:
             judgements = [j for j in submission.judgement_set.all() if j.complete]
             total = sum(j.get_score() for j in judgements)
@@ -173,7 +174,7 @@ class JudgedEntriesView(ListView, JingoTemplateMixin):
             else:
                 submission.average_score = 0
             submission.judgement_count = len(judgements)
-        
+
         submissions = sorted(submissions, key=lambda s: s.average_score,
                              reverse=True)
         return submissions
@@ -192,27 +193,31 @@ def extract_form_errors(form, link_form):
     # this feels horrible but I think required to create a custom error list
     for k in form.errors.keys():
         humanised_key = challenge_humanised[k]
-        form_errors[humanised_key] =  form.errors[k].as_text()
+        form_errors[humanised_key] = form.errors[k].as_text()
     if not link_form.is_valid():
         form_errors['External links'] = "* Please provide a valid URL and name for each link provided"
-    
+
     return form_errors
 
 
 @login_required
 def create_entry(request, project, slug):
-    project = get_object_or_404(Project, slug=project)
-    
+    """Creates a ``Submission`` from the user details"""
     try:
-        phase = Phase.objects.get_current_phase(slug)[0]
-    except IndexError:
+        challenge = (Challenge.objects.select_related('project')
+                     .get(project__slug=project, slug=slug))
+    except Challenge.DoesNotExist:
         raise Http404
-    
+    project = challenge.project
     profile = request.user.get_profile()
     LinkFormSet = formset_factory(EntryLinkForm, extra=2)
-    form_errors = False 
+    form_errors = False
     if request.method == 'POST':
-        form = EntryForm(data=request.POST,
+        # If there is not an active phase it shouldn't be able to get here
+        phase = Phase.objects.get_current_phase(slug)
+        if not phase:
+            raise Http404
+        form = NewEntryForm(data=request.POST,
             files=request.FILES)
         link_form = LinkFormSet(request.POST, prefix="externals")
         if form.is_valid() and link_form.is_valid():
@@ -221,11 +226,11 @@ def create_entry(request, project, slug):
             entry.phase = phase
             entry.save()
             for link in link_form.cleaned_data:
-                if all(i in link for i in ("name", "url")): 
+                if all(i in link for i in ("name", "url")):
                     ExternalLink.objects.create(
-                        name = link['name'],
-                        url = link['url'],
-                        submission = entry
+                        name=link['name'],
+                        url=link['url'],
+                        submission=entry
                     )
             if entry.is_draft:
                 msg = _('<strong>Your entry has been saved as draft.</strong> When you want the world to see it then uncheck the "Save as draft?" option from your idea editting page')
@@ -236,11 +241,11 @@ def create_entry(request, project, slug):
         else:
             form_errors = extract_form_errors(form, link_form)
     else:
-        form = EntryForm()
+        form = NewEntryForm()
         link_form = LinkFormSet(prefix='externals')
     return jingo.render(request, 'challenges/create.html', {
         'project': project,
-        'challenge': phase.challenge,
+        'challenge': challenge,
         'form': form,
         'link_form': link_form,
         'errors': form_errors
@@ -252,15 +257,15 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     entry = get_object_or_404(Submission.objects, pk=entry_id,
                               phase__challenge=challenge)
-    
+
     if not entry.visible_to(request.user):
         raise Http404
-    
+
     # Sidebar
     ## Voting
     user_vote = Vote.objects.get_for_user(entry, request.user)
     votes = Vote.objects.get_score(entry)
-    
+
     ## Previous/next modules
     # We can't use Django's built-in methods here, because we need to restrict
     # to entries the current user is allowed to see
@@ -277,7 +282,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         next = next_entries.order_by('created_on')[0]
     except IndexError:
         next = entries.order_by('created_on')[0]
-    
+
     # Judging
     if not entry.judgeable_by(request.user):
         judging_form = None
@@ -288,7 +293,7 @@ def entry_show(request, project, slug, entry_id, judging_form=None):
         assignments = JudgeAssignment.objects
         judge_assigned = assignments.filter(judge__user=request.user,
                                             submission=entry).exists()
-    
+
     return jingo.render(request, 'challenges/show_entry.html', {
         'project': project,
         'challenge': challenge,
@@ -312,72 +317,72 @@ def _get_judging_form(user, entry, data=None, form_class=JudgingForm):
     except Judgement.DoesNotExist:
         judgement = Judgement(judge=user.get_profile(), submission=entry)
         criteria = entry.phase.judgement_criteria.all()
-    
+
     return form_class(data, instance=judgement, criteria=criteria)
 
 
 class SingleSubmissionMixin(SingleObjectMixin):
     """Mixin for views operating on a single submission.
-    
+
     This mixin handles looking up the submission and checking user permissions.
-    
+
     """
-    
+
     def _get_challenge(self):
         return get_object_or_404(Challenge,
                                  project__slug=self.kwargs['project'],
                                  slug=self.kwargs['slug'])
-    
+
     def get_queryset(self):
         return Submission.objects.filter(phase__challenge=self._get_challenge())
-    
+
     def get_object(self, *args, **kwargs):
         obj = super(SingleSubmissionMixin, self).get_object(*args, **kwargs)
         if not self._check_permission(obj, self.request.user):
             raise PermissionDenied()
         return obj
-    
+
     def _check_permission(self, submission, user):
         """Check the given user is allowed to use this view.
-        
+
         Return True if the operation is allowed; otherwise return False.
-        
+
         Inheriting views should override this with the appropriate permission
         checks.
-        
+
         """
         return True
 
 
 class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMixin, ProcessFormView):
-    
+
     form_class = JudgingForm
-    
+
     @property
     def success_url(self):
         # Need to implement this as a property so it's only called after load
         return reverse('entries_assigned')
-    
+
     def _check_permission(self, submission, user):
         return submission.judgeable_by(user)
-    
+
     def get_form(self, form_class):
         return _get_judging_form(data=self.request.POST, user=self.request.user,
                                  entry=self.get_object(), form_class=form_class)
-    
+
     def get(self, request, *args, **kwargs):
         # Redirect back to the entry view
         # Strictly speaking, this view shouldn't accept GET requests, but in
         # case someone submits theform, gets errors and reloads this URL,
         # redirecting back to the entry seems the sanest choice
         return HttpResponseRedirect(self.get_object().get_absolute_url())
-    
+
     def form_invalid(self, form):
         # Show the entry page with the form (and errors)
         return entry_show(self.request, self.kwargs['project'],
                           self.kwargs['slug'], self.kwargs['pk'],
                           judging_form=form)
-    
+
     def form_valid(self, form):
         response = super(EntryJudgementView, self).form_valid(form)
         messages.success(self.request,
@@ -389,80 +394,79 @@ entry_judge = EntryJudgementView.as_view()
 
 
 class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
-    
+
     form_class = EntryForm
     link_form_class = InlineLinkFormSet
     template_name = 'challenges/edit.html'
-    
+
     def _check_permission(self, submission, user):
         return submission.editable_by(user)
-    
+
     # The following two methods are analogous to Django's generic form methods
-    
     def get_link_form(self, link_form_class):
         return link_form_class(**self.get_link_form_kwargs())
-    
+
     def get_link_form_kwargs(self):
         form_kwargs = super(EditEntryView, self).get_form_kwargs()
         # Initial data doesn't apply to formsets
         del form_kwargs['initial']
         form_kwargs.update(instance=self.object, prefix='externals')
         return form_kwargs
-    
+
     def get_forms(self):
         """Return the forms available to this view as a dictionary."""
         form = self.get_form(self.get_form_class())
         link_form = self.get_link_form(self.link_form_class)
         return {'form': form, 'link_form': link_form}
-    
+
     def get(self, request, *args, **kwargs):
         """Respond to a GET request by displaying the edit form."""
         self.object = self.get_object()
-        
+
         context = self.get_context_data(**self.get_forms())
         """
-        We now access errrors direct in the template - so with no errors 
+        We now access errrors direct in the template - so with no errors
         it throws undefined
         """
         context['errors'] = {}
         return self.render_to_response(context)
-    
+
     def post(self, request, *args, **kwargs):
         """Handle a POST request.
-        
+
         If the forms are both valid, save them and redirect to the success URL.
         If either form is invalid, render the form with the errors displayed.
-        
+
         """
         self.object = self.get_object()
-        
+
         forms = self.get_forms()
         form, link_form = forms['form'], forms['link_form']
-        
+
         if form.is_valid() and link_form.is_valid():
             return self.form_valid(form, link_form)
         else:
             return self.form_invalid(form, link_form)
-    
+
     def form_valid(self, form, link_form):
         messages.success(self.request, 'Your entry has been updated.')
         response = super(EditEntryView, self).form_valid(form)
         link_form.save()
         return response
-    
+
     def form_invalid(self, form, link_form):
         """Display the form with errors."""
         form_errors = extract_form_errors(form, link_form)
         context = self.get_context_data(form=form, link_form=link_form,
                                         errors=form_errors)
         return self.render_to_response(context)
-    
+
     def get_context_data(self, **kwargs):
         context = super(EditEntryView, self).get_context_data(**kwargs)
         context['challenge'] = self._get_challenge()
         context['project'] = context['challenge'].project
         return context
-    
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(EditEntryView, self).dispatch(*args, **kwargs)
@@ -472,19 +476,19 @@ entry_edit = EditEntryView.as_view()
 
 
 class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
-    
+
     template_name = 'challenges/delete.html'
     success_url = '/'
-    
+
     def _check_permission(self, submission, user):
         return submission.deletable_by(user)
-    
+
     def get_context_data(self, **kwargs):
         context = super(DeleteEntryView, self).get_context_data(**kwargs)
         context['challenge'] = self._get_challenge()
         context['project'] = context['challenge'].project
         return context
-    
+
     def delete(self, request, *args, **kwargs):
         # Unfortunately, we can't sensibly hook into the superclass version of
         # this method and still get things happening in the right order. We
@@ -494,7 +498,7 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
         self.object.delete()
         messages.success(request, "Your submission has been deleted.")
         return HttpResponseRedirect(self.get_success_url())
-    
+
     @method_decorator(login_required)
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
