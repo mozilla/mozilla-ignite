@@ -7,7 +7,7 @@
     src: url(../fonts/League_Gothic.woff) format('woff');
 }
 body {
-    background: #ebf7fe url(../img/css/header_artwork.png) no-repeat center 10px;
+    background: #ebf7fe url(../img/css/header_artwork.png) no-repeat center 60px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     color: #5C5C5C;
@@ -705,7 +705,7 @@ legend span {
 /**= Main content */
 div[role=main] {
     background: #fff;
-    margin-top: 0.625em; /* 0.625 * 16 = 10 */
+    margin-top: 1.6667em; /* 1.666 * 12 = 20 */
     border-bottom: 0.625em solid #000;
     padding-bottom: 4em;
     padding-top: 2em;
@@ -756,6 +756,7 @@ h1 .sweet {
 .ignite_info {
     border-bottom: 1px solid #9bc4df;
     background: #e8f2f8;
+    position: relative;
 }
 .ignite_info p {
     margin-bottom: 0;
@@ -806,9 +807,8 @@ h1 .sweet {
 .highlight {
     padding: 20px;
     background: #f1f1f1;
-    border-top: 1px solid #e2e2e2;
     margin-bottom: 2em;
-    border-radius: 0 0 10px 10px;
+    border-radius: 10px;
 }
 #about .highlight + .highlight {
     margin-top: -2em;
@@ -1139,9 +1139,6 @@ section footer .cta {
     text-align: left;
     margin-bottom: 0.5em;
 }
-.hentry .entry-title {
-    margin-bottom: 0;
-}
 .hentry a[rel=bookmark] span {
     position: absolute;
     left: -9999em;
@@ -1155,7 +1152,7 @@ section footer .cta {
     clear: none;
 }
 .submissions article .title {
-    color: #454545;
+    color: #EF4619;
 }
 .submissions .title {
     margin: 0 0 1em;
