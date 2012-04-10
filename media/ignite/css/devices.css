@@ -67,6 +67,13 @@ figure img {
     width: 100%;
     height: auto;
 }
+ul, 
+ol {
+    padding-left: 20px;
+}
+li {
+    line-height: 1.6;
+}
 p {
     margin-top: 0;
     line-height: 22px;
@@ -154,6 +161,7 @@ figcaption .fig_title span {
 .col {
     list-style-type: none;
     overflow: hidden;
+    line-height: normal;
 }
 /* forms */
 label {
