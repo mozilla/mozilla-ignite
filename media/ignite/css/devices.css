@@ -462,7 +462,7 @@ legend span {
     box-shadow: 0 3px 3px #bdbdbd;
 }
 .frame:before {
-    content: "&nbsp";
+    content: ".";
     height: 4px;
     background: #fff;
     width: 100%;
@@ -484,6 +484,7 @@ legend span {
     position: relative;
     min-height: 70px;
     padding-left: 80px;
+    padding-top: 10px;
 }
 .tags a:after {
     background: transparent url(../img/css/clean-energy.png) no-repeat 0 0;
@@ -1252,6 +1253,7 @@ section footer .cta {
 }
 div.widgets {
     border-width: 1px 0;
+    padding-left: 0;
 }
 .widgets h2 {
     margin-top: 0;
@@ -1280,6 +1282,9 @@ div.widgets {
 }
 .widgets .popularity .comment {
     background-image: url(../img/css/comments_icon.png);
+}
+#show_submission h1 {
+    margin-bottom: 0.2em;
 }
 #show_submission .promo .cta {
     float: left;
