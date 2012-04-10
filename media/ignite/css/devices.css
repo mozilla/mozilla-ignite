@@ -927,6 +927,40 @@ fieldset .focus_areas ul {
     margin-top: 0.2em;
 }
 /* About page */
+/* JS panels */
+.panel,
+.trigger .inst {
+    position: absolute;
+    height: 1px;
+    overflow: hidden;
+    left: -9999em;
+}
+.no-js .panel,
+.open-panel,
+.faux_trigger {
+    position: static;
+    height: auto;
+    left: 0;
+    background: none !important;
+}
+.trigger button,
+.faux_trigger {
+    display: block;
+    text-align: left;
+    width: 100%;
+    background: none;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 0.3em #DBDBDB;
+    background: transparent url(../img/css/trigger-arrow.png) no-repeat right center;
+}
+.trigger button:focus {
+    border-width: 3px;
+    outline: none;
+    box-shadow: none;
+    padding: 18px;
+}
 /* how section */
 .how figure {
     border-top: none;
