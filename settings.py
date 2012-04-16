@@ -116,7 +116,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
-    'django.core.context_processors.csrf',
+    'session_csrf.context_processor',
     'django.contrib.messages.context_processors.messages',
 
     'commons.context_processors.i18n',
@@ -179,10 +179,10 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
 
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-
+    
+    'session_csrf.CsrfMiddleware',
     'commonware.middleware.FrameOptionsHeader',
     'ignite.middleware.ProfileMiddleware',
 
@@ -346,3 +346,6 @@ SITE_FEED_URLS = {
 }
 
 JUDGES_PER_SUBMISSION = 2
+
+ANON_TIMEOUT = 60
+ANON_ALWAYS = True
