@@ -116,7 +116,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
-    'django.core.context_processors.csrf',
+    'session_csrf.context_processor',
     'django.contrib.messages.context_processors.messages',
 
     'commons.context_processors.i18n',
@@ -182,7 +182,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     
-    'django.middleware.csrf.CsrfViewMiddleware',
+    'session_csrf.CsrfMiddleware',
     'commonware.middleware.FrameOptionsHeader',
     'ignite.middleware.ProfileMiddleware',
 
