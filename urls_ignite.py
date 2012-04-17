@@ -8,9 +8,6 @@ from voting.views import vote_on_object
 
 from challenges.models import Submission
 
-import session_csrf
-session_csrf.monkeypatch()
-
 admin.autodiscover()
 
 _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
