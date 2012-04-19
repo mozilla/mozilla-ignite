@@ -313,6 +313,9 @@ legend span {
 .image_form .announce {
     margin-bottom: 0.5em;
 }
+.image_form .hint {
+    display: inline-block;
+}
 .cta {
     font-family: "LeagueGothic";
     text-transform: uppercase;
