@@ -1,6 +1,7 @@
 import hashlib
 import math
 import os
+import time
 
 import Image
 
@@ -36,7 +37,7 @@ class ImageStorage(FileSystemStorage):
         image = Image.open(content)
         if image.format not in self.format_extensions:
             raise Exception("Unknown image format: %s" % (image.format,))
-        name = "%s.%s" % (name, self.format_extensions[image.format])
-        name = super(ImageStorage, self)._save(name, content)
+        format = self.format_extensions[image.format]
+        name = "%s%s.%s" % (name, str(time.time()), format)
         image.save(self.path(name), image.format)
         return name

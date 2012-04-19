@@ -16,6 +16,7 @@ from tower import ugettext_lazy as _
 
 from challenges.lib import cached_bleach
 from innovate.models import BaseModel, BaseModelManager
+from innovate.utils import ImageStorage
 from projects.models import Project
 from users.models import Profile
 
@@ -225,7 +226,8 @@ class Submission(BaseModel):
         help_text=_(u"This will be used in our summary and list views. You "
                     u"can add more images in your description or link out to "
                     u"sets or images out on the web by adding in an external link"),
-        upload_to=settings.CHALLENGE_IMAGE_PATH)
+        upload_to=settings.CHALLENGE_IMAGE_PATH,
+        storage=ImageStorage())
 
     category = models.ForeignKey(Category)
 
