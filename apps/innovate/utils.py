@@ -6,7 +6,7 @@ import time
 import Image
 
 from django.core.files.storage import FileSystemStorage
-
+from django.conf import settings
 
 def get_partition_id(pk, chunk_size=1000):
     """
