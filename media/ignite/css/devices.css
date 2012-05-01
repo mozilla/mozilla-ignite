@@ -1217,6 +1217,12 @@ section footer .cta {
     min-height: 40px;
     line-height: 1;
 }
+.lists .highlight .all {
+    background: none;
+    padding-left: 0;
+    border: none;
+    min-height: 0;
+}
 .lists .highlight .advanced-manufacturing {
     background-image: url(../img/css/manufacturing.png);
 }
