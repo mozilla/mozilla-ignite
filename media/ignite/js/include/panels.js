@@ -1,5 +1,6 @@
 ignite.panels = function() {
-    var init;
+    var init,
+        hash = window.location.hash;
     init = function() {
         var triggers = $('h2.trigger'),
             open,
@@ -25,6 +26,13 @@ ignite.panels = function() {
                 open_trigger.focus();
             });
         });
+        // quick fix to ensure that if we're linking direct to an ID the relevant section is open
+        if (hash) {
+            var origin = $(hash);
+            if (origin.length) {
+                origin.closest('section').find('button').click();
+            }
+        }
     };
     return {
         'init': init
