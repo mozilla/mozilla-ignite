@@ -1,6 +1,7 @@
 # Django settings file for a project based on the playdoh template.
 
 import os
+import logging
 
 from django.utils.functional import lazy
 
@@ -21,6 +22,21 @@ DATABASES = {}  # See settings_local.
 
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
+
+## Logging
+LOG_LEVEL = logging.DEBUG
+HAS_SYSLOG = False
+SYSLOG_TAG = "http_app_playdoh" # Change this after you fork.
+LOGGING_CONFIG = None
+LOGGING = {
+    }
+
+# CEF Logging
+CEF_PRODUCT = 'Playdoh'
+CEF_VENDOR = 'Mozilla'
+CEF_VERSION = '0'
+CEF_DEVICE_VERSION = '0'
+
 
 #Bleach settings
 TAGS = ('h1', 'h2', 'a', 'b', 'em', 'i', 'strong',
@@ -178,14 +194,11 @@ MIDDLEWARE_CLASSES = (
     'commons.middleware.LocaleURLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    
     'session_csrf.CsrfMiddleware',
     'commonware.middleware.FrameOptionsHeader',
     'ignite.middleware.ProfileMiddleware',
-
     'waffle.middleware.WaffleMiddleware',
 )
 
