@@ -335,7 +335,14 @@ PUSH_DEFAULT_HUB_PASSWORD = ''
 PUSH_CREDENTIALS = 'projects.utils.push_hub_credentials'
 
 SOUTH_TESTS_MIGRATE = False
-CACHE_BACKEND = 'caching.backends.locmem://'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 # Don't cache count queries at all, because there's no way to invalidate them
 CACHE_COUNT_TIMEOUT = None
 

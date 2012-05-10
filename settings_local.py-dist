@@ -36,3 +36,7 @@ MANAGERS = ADMINS
 
 
 DEBUG = TEMPLATE_DEBUG = True
+
+# Install memcache and remove this to make djangobrowser id
+# https://github.com/mozilla/django-session-csrf#differences-from-django
+CACHE_BACKEND = 'caching.backends.locmem://'
