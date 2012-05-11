@@ -181,15 +181,15 @@ class Phases(TestCase):
             name=u'Phase 1',
             order=1,
             challenge=self.challenge,
-            start_date = datetime.now(),
-            end_date = datetime.now() + relativedelta( months = +1 )
+            start_date = datetime.utcnow(),
+            end_date = datetime.utcnow() + relativedelta( months = +1 )
         )
         self.p2 = Phase.objects.create(
             name=u'Phase 2',
             order=2,
             challenge=self.challenge,
-            start_date = datetime.now() + relativedelta( months = +2 ),
-            end_date = datetime.now() + relativedelta( months = +3 )
+            start_date = datetime.utcnow() + relativedelta( months = +2 ),
+            end_date = datetime.utcnow() + relativedelta( months = +3 )
         )
  
     
