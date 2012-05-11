@@ -5,7 +5,6 @@ settings_local.py
 .coverage
 pip-log.txt
 build/
-src/
 graveyard.css
 docs/_gh-pages
 build.py
@@ -14,7 +13,6 @@ build.py
 *-all.css
 *-min.js
 *-all.js
-vendor
 .noseids
 tmp/*
 *~
@@ -23,3 +21,5 @@ media/img/uploads/*
 notes.rst
 media/ignite/img/uploads*
 whoosh_index/
+#*
+.#*

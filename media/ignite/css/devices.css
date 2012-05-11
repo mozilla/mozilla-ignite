@@ -7,7 +7,7 @@
     src: url(../fonts/League_Gothic.woff) format('woff');
 }
 body {
-    background: #ebf7fe url(../img/css/header_artwork.png) no-repeat center 10px;
+    background: #ebf7fe url(../img/css/header_artwork.png) no-repeat center 60px;
     font-family: Arial, Helvetica, sans-serif;
     font-size: 12px;
     color: #5C5C5C;
@@ -66,6 +66,13 @@ h5,
 figure img {
     width: 100%;
     height: auto;
+}
+ul, 
+ol {
+    padding-left: 20px;
+}
+li {
+    line-height: 1.6;
 }
 p {
     margin-top: 0;
@@ -154,6 +161,7 @@ figcaption .fig_title span {
 .col {
     list-style-type: none;
     overflow: hidden;
+    line-height: normal;
 }
 /* forms */
 label {
@@ -179,6 +187,12 @@ textarea {
     box-sizing: border-box;
     padding: 0.2em;
     font-size: 15px;
+}
+textarea {
+    height: 100px;
+}
+.wmd-region textarea {
+    height: 250px;
 }
 fieldset {
     border: none;
@@ -216,7 +230,8 @@ legend span {
     color: #fff;
     font-size: 15px;
 }
-.fail .ed label {
+.fail .ed label,
+.fail .ed a {
     color: #fff !important;
 }
 
@@ -297,6 +312,9 @@ legend span {
 }
 .image_form .announce {
     margin-bottom: 0.5em;
+}
+.image_form .hint {
+    display: inline-block;
 }
 .cta {
     font-family: "LeagueGothic";
@@ -447,7 +465,7 @@ legend span {
     box-shadow: 0 3px 3px #bdbdbd;
 }
 .frame:before {
-    content: "&nbsp";
+    content: ".";
     height: 4px;
     background: #fff;
     width: 100%;
@@ -469,6 +487,7 @@ legend span {
     position: relative;
     min-height: 70px;
     padding-left: 80px;
+    padding-top: 10px;
 }
 .tags a:after {
     background: transparent url(../img/css/clean-energy.png) no-repeat 0 0;
@@ -642,9 +661,23 @@ legend span {
 .external .learn h2 {
     background-position: 0 -440px;
 }
+.external .post h2 {
+    background-position: 0 -590px;
+}
 .external p {
     font-size: 14px;
     color: #454545;
+}
+.external label {
+    font-size: 14px;
+    color: #454545;
+    font-weight: normal;
+}
+.external label.indent {
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    left: -9999em;
 }
 .external ul {
     padding-left: 0;
@@ -684,7 +717,7 @@ legend span {
 /**= Main content */
 div[role=main] {
     background: #fff;
-    margin-top: 0.625em; /* 0.625 * 16 = 10 */
+    margin-top: 1.6667em; /* 1.666 * 12 = 20 */
     border-bottom: 0.625em solid #000;
     padding-bottom: 4em;
     padding-top: 2em;
@@ -735,6 +768,7 @@ h1 .sweet {
 .ignite_info {
     border-bottom: 1px solid #9bc4df;
     background: #e8f2f8;
+    position: relative;
 }
 .ignite_info p {
     margin-bottom: 0;
@@ -785,9 +819,8 @@ h1 .sweet {
 .highlight {
     padding: 20px;
     background: #f1f1f1;
-    border-top: 1px solid #e2e2e2;
     margin-bottom: 2em;
-    border-radius: 0 0 10px 10px;
+    border-radius: 10px;
 }
 #about .highlight + .highlight {
     margin-top: -2em;
@@ -843,7 +876,8 @@ fieldset .focus_areas ul {
 .focus_areas .education {
     background-image: url(../img/css/homepage/education.png);
 }
-.focus_areas .clean-energy {
+.focus_areas .clean-energy,
+.focus_areas .clean-energy-and-transportation {
     background-image: url(../img/css/homepage/energy.png);
 }
 .events {
@@ -896,7 +930,44 @@ fieldset .focus_areas ul {
     margin-top: 0.2em;
 }
 /* About page */
+/* JS panels */
+.panel,
+.trigger .inst {
+    position: absolute;
+    height: 1px;
+    overflow: hidden;
+    left: -9999em;
+}
+.no-js .panel,
+.open-panel,
+.faux_trigger {
+    position: static;
+    height: auto;
+    left: 0;
+    background: none !important;
+}
+.trigger button,
+.faux_trigger {
+    display: block;
+    text-align: left;
+    width: 100%;
+    background: none;
+    border: 1px solid #e1e1e1;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 0 0.3em #DBDBDB;
+    background: transparent url(../img/css/trigger-arrow.png) no-repeat right center;
+}
+.trigger button:focus {
+    border-width: 3px;
+    outline: none;
+    box-shadow: none;
+    padding: 18px;
+}
 /* how section */
+.how figure {
+    border-top: none;
+}
 .how .questions h3 {
     border-top: 1px solid #C7DDEB;
     padding-top: 3em;
@@ -913,10 +984,9 @@ fieldset .focus_areas ul {
     overflow: hidden;
 }
 .application {
-    float: left;
     color: #F25D1D;
     text-align: center;
-    margin-top: 4em;
+    margin: 2em 0;
 }
 .application .small_print {
     position: absolute;
@@ -946,16 +1016,11 @@ fieldset .focus_areas ul {
 }
 .rounds {
     overflow: hidden;
-    float: left;
     border-top: none !important;
     text-align: left;
-    width: 18%;
 }
 .ideation {
     margin-right: 3%;
-}
-.development {
-    width: 75%;
 }
 .rounds .wimper {
     color: #878686;
@@ -983,23 +1048,9 @@ fieldset .focus_areas ul {
 .development .round:nth-child(2) {
     z-index: 20;
 }
-.development .round:before {
-    content: ".";
-    text-indent: -9999em;
-    width: 1440px;
-    height: 150px;
-    position: absolute;
-    z-index: 1;
-    background: transparent url(../img/css/process_bg.png) no-repeat 0 0;;
-    left: -104px;
-    bottom: -28px;
-}
 .development .all .round:first-child {
     margin-left: 0;
     z-index: 30;
-}
-.development .all .round:first-child:before {
-    content: none;
 }
 .round strong {
     display: block;
@@ -1017,7 +1068,6 @@ fieldset .focus_areas ul {
 .ideation .round strong {
     font-size: 18px;
     line-height: 24px;
-    width: 70px;
 }
 .round .ribbon {
     color: #fff;
@@ -1135,9 +1185,6 @@ section footer .cta {
     text-align: left;
     margin-bottom: 0.5em;
 }
-.hentry .entry-title {
-    margin-bottom: 0;
-}
 .hentry a[rel=bookmark] span {
     position: absolute;
     left: -9999em;
@@ -1151,7 +1198,7 @@ section footer .cta {
     clear: none;
 }
 .submissions article .title {
-    color: #454545;
+    color: #EF4619;
 }
 .submissions .title {
     margin: 0 0 1em;
@@ -1169,6 +1216,12 @@ section footer .cta {
     background: url("../img/css/emergency-prep.png") no-repeat scroll 0 0 transparent;
     min-height: 40px;
     line-height: 1;
+}
+.lists .highlight .all {
+    background: none;
+    padding-left: 0;
+    border: none;
+    min-height: 0;
 }
 .lists .highlight .advanced-manufacturing {
     background-image: url(../img/css/manufacturing.png);
@@ -1243,6 +1296,7 @@ section footer .cta {
 }
 div.widgets {
     border-width: 1px 0;
+    padding-left: 0;
 }
 .widgets h2 {
     margin-top: 0;
@@ -1271,6 +1325,9 @@ div.widgets {
 }
 .widgets .popularity .comment {
     background-image: url(../img/css/comments_icon.png);
+}
+#show_submission h1 {
+    margin-bottom: 0.2em;
 }
 #show_submission .promo .cta {
     float: left;
@@ -1407,6 +1464,9 @@ address.vcard .frame {
 }
 .index-content li h2 {
     margin: 0;
+}
+.index-content li .job {
+    font-weight: normal;
 }
 .index-content li .url {
     margin-bottom: 1em;

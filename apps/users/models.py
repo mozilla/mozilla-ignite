@@ -45,6 +45,8 @@ class Profile(BaseModel):
                                 verbose_name=_(u'User'))
     name = models.CharField(max_length=255, blank=True,
                             verbose_name=_(u'Display name'))
+    title = models.CharField(max_length=255, blank=True, null=True,
+                            verbose_name=(u'Job title'))
     avatar = models.ImageField(upload_to=determine_upload_path, null=True,
                                blank=True, verbose_name=_(u'Avatar'),
                                max_length=settings.MAX_FILEPATH_LENGTH,

@@ -24,6 +24,9 @@
             {% for profile in profiles %}
             <li id={{ profile.user.username }} tabIndex="0" class="vcard">
                 <h2 class="fn">{{ profile.display_name }}</h2>
+                {% if profile.title %}
+                <p class="job point">{{ profile.title }}</p>
+                {% endif %}
                 {% if profile.website %}
                 <a href="{{ profile.website }}" class="url">{{ profile.website }}</a>
                 {% endif %}

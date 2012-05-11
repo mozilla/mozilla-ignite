@@ -196,6 +196,32 @@ header .meta em {
 .focus_areas ul li:first-child {
     border-left: none;
 }
+/* the about diagram */
+.rounds {
+    float: left;
+    width: 18%;
+}
+.development {
+    width: 75%;
+}
+.application {
+    float: left;
+    margin: 4em 0 0;
+}
+.development .round:before {
+    content: ".";
+    text-indent: -9999em;
+    width: 1440px;
+    height: 150px;
+    position: absolute;
+    z-index: 1;
+    background: transparent url(../img/css/process_bg.png) no-repeat 0 0;
+    left: -104px;
+    bottom: -28px;
+}
+.development .all .round:first-child:before {
+    content: none;
+}
 /* single submission */
 #show_submission h1 {
     float: left;

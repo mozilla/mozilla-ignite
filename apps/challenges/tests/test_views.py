@@ -391,6 +391,7 @@ class EditEntryTest(MessageTestCase):
         return dict(title=submission.title,
                     brief_description='A submission',
                     description='A really, seriously good submission',
+                    life_improvements='This will benefit mankind',
                     category=submission.category.id)
 
     @suppress_locale_middleware
@@ -467,6 +468,7 @@ class EditEntryTest(MessageTestCase):
         response = self.client.post(self.edit_path, data)
         self.assertRedirects(response, self.view_path)
         assert_equal(Submission.objects.get().description, data['description'])
+        self.client.logout()
 
 
 class EditLinkTest(TestCase):
@@ -494,6 +496,7 @@ class EditLinkTest(TestCase):
         return {'title': submission.title,
                 'brief_description': submission.brief_description,
                 'description': submission.description,
+                'life_improvements': 'This will benefit mankind',
                 'category': submission.category.id}
     
     @suppress_locale_middleware

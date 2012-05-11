@@ -3,6 +3,7 @@ from django.db import models
 
 from tower import ugettext_lazy as _
 
+from events.managers import EventManager
 from innovate.models import BaseModel
 from users.models import Profile
 
@@ -48,6 +49,7 @@ class Event(BaseModel):
     description = models.TextField(verbose_name=_(u'Description'))
     attendees = models.ManyToManyField(Profile, verbose_name=_(u'Attendees'),
                                        blank=True)
+    url = models.URLField()
     venue = models.ForeignKey(Venue, null=True, default=None)
     featured = models.BooleanField(
         verbose_name=_(u'Featured?'), default=False,
@@ -59,6 +61,12 @@ class Event(BaseModel):
                     'is a featured project'))
     created_by = models.ForeignKey('users.Profile', related_name='events',
                                    null=True, default=None)
+
+    # managers
+    objects = EventManager()
+
+    class Meta:
+        ordering = ('-featured', 'start')
 
     @property
     def featured_image_or_default(self):

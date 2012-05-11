@@ -1,6 +1,7 @@
 # This is an example settings_local.py file.
 # Copy it and add your local settings here.
 import os
+import logging
 # This might be better implemented as a module name, as with Django's
 # DJANGO_SETTINGS_MODULE environment variable, but Python doesn't like
 # importing '*' from a module determined at runtime
@@ -37,8 +38,22 @@ MANAGERS = ADMINS
 
 DEBUG = TEMPLATE_DEBUG = True
 
+# Install memcache and remove this to make djangobrowser id
+# https://github.com/mozilla/django-session-csrf#differences-from-django
+CACHE_BACKEND = 'caching.backends.locmem://'
 
-# Change this
-HMAC_KEYS = {
-    '2011-01-01': 'cheesecake',
+# Browser ID performs the assertion with this url e.g. http://localhost:8000
+SITE_URL = ''
+
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = False
+
+
+debug = dict(level=logging.DEBUG)
+
+LOGGING = {
+    'loggers': {
+        'django_browserid': debug,
+    },
 }
+

@@ -7,6 +7,9 @@ from challenges.models import SubmissionParent
 from voting.views import vote_on_object
 
 
+from funfactory.monkeypatches import patch
+patch()
+
 admin.autodiscover()
 
 _ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,

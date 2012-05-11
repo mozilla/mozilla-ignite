@@ -1,6 +1,7 @@
 # Django settings file for a project based on the playdoh template.
 
 import os
+import logging
 
 from django.utils.functional import lazy
 
@@ -21,6 +22,21 @@ DATABASES = {}  # See settings_local.
 
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
+
+## Logging
+LOG_LEVEL = logging.DEBUG
+HAS_SYSLOG = False
+SYSLOG_TAG = "http_app_playdoh" # Change this after you fork.
+LOGGING_CONFIG = None
+LOGGING = {
+    }
+
+# CEF Logging
+CEF_PRODUCT = 'Playdoh'
+CEF_VENDOR = 'Mozilla'
+CEF_VERSION = '0'
+CEF_DEVICE_VERSION = '0'
+
 
 #Bleach settings
 TAGS = ('h1', 'h2', 'a', 'b', 'em', 'i', 'strong',
@@ -116,7 +132,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
-    'django.core.context_processors.csrf',
+    'session_csrf.context_processor',
     'django.contrib.messages.context_processors.messages',
 
     'commons.context_processors.i18n',
@@ -178,14 +194,11 @@ MIDDLEWARE_CLASSES = (
     'commons.middleware.LocaleURLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-
+    'session_csrf.CsrfMiddleware',
     'commonware.middleware.FrameOptionsHeader',
     'ignite.middleware.ProfileMiddleware',
-
     'waffle.middleware.WaffleMiddleware',
 )
 
@@ -347,7 +360,14 @@ PUSH_DEFAULT_HUB_PASSWORD = ''
 PUSH_CREDENTIALS = 'projects.utils.push_hub_credentials'
 
 SOUTH_TESTS_MIGRATE = False
-CACHE_BACKEND = 'caching.backends.locmem://'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 # Don't cache count queries at all, because there's no way to invalidate them
 CACHE_COUNT_TIMEOUT = None
 
@@ -391,4 +411,9 @@ HAYSTACK_CONNECTIONS = {
 # High number since we don't want pagination
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
 HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+
+ANON_ALWAYS = True
 

@@ -56,7 +56,7 @@
             <a href="{{ url('about_ignite') }}#health-it"><strong>Health</strong></a>
         </li>
         <li class="box col clean-energy">
-            <a href="{{ url('about_ignite') }}#clean-energy"><strong>Clean Energy</strong></a>
+            <a href="{{ url('about_ignite') }}#clean-energy"><strong>Clean Energy and Transportation</strong></a>
         </li>
         <li class="box col advanced-manufacturing">
             <a href="{{ url('about_ignite') }}#advanced-manufacturing"><strong>Advanced Manufacturing</strong></a>
@@ -66,7 +66,7 @@
         </li>
     </ul>
 </section>
-<h2 class="point">Now to May 7: let's Brainstorm</h2>
+<h2 class="faux_trigger box">Now to May 7: let's Brainstorm</h2>
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
         <p class="intro"><strong>How can next-generation apps change the world?</strong> Submit your rough ideas and brainstorm with innovators now. You don't need to be a developer or technologist to participate -- at this stage we're just seeking written ideas. All are welcome!</p>
@@ -99,7 +99,7 @@
 <footer>
     <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
 </footer>
-<h2>Latest news and events</h2>
+<h2 class="faux_trigger box">Latest news and events</h2>
 <div class="columns content_columns">
     <div class="col box main">
         <section class="blogs">
@@ -107,7 +107,7 @@
                 {% for blog in blogs %}
                 <li class="col box">
                     <article class="hentry">
-                        <h2 class="wimper entry-title">{{ blog.title }}</h2>
+                        <h2 class="wimper entry-title"><a href="{{ blog.link }}">{{ blog.title }}</a></h2>
                         <footer>
                             <span class="updated"><span class="value-title" title="{{ blog.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>{{ blog.updated.strftime('%B %d, %Y') }}</span> by <address class="author hcard"><span class="fn">{{ blog.autor }}</span></address>
                         </footer>
@@ -126,21 +126,13 @@
         <div class="events">
             <h2 class="wimper">Upcoming Events</h2>
             <ol>
-                <li>
-                    <h3 class="wimper">Gigabit Apps Hackfest</h3>
-                    <p class="date">March <span>15</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
-                <li>
-                    <h3 class="wimper">Webcast: History of Geni</h3>
-                    <p class="date">March <span>25</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
-                <li>
-                    <h3 class="wimper">Webcast: Mozilla Ignite Q/A</h3>
-                    <p class="date">April <span>25</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
+              {% for event in event_list %}
+              <li>
+                <h3 class="wimper">{{ event.name }}</h3>
+                <p class="date">{{ event.start.strftime('%b') }} <span>{{ event.start.day }}</span></p>
+                <p>{{ event.venue.name }} - <a href="{{ event.url }}">register</a></p>
+              </li>
+              {% endfor%}
             </ol>
         </div>
     </div>

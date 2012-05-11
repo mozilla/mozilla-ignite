@@ -57,14 +57,23 @@
                     <li>Votes: <span class="total_votes">{{ votes }}</span></li>
                 </ul>
             </div>
-            {% if entry.sketh_note %}
-            <div class="frame box sketh">
-                <img src="{{ MEDIA_URL }}/{{ entry.sketh_note }}" alt="" />
-            </div>
-            {% endif %}
             <div class="description">
-              {{ entry.description_html }}
-            </div>
+                <h2 class="point">The problem</h2>
+                <p>{{ entry.brief_description }}</p>
+                <h2 class="point">The solution</h2>
+                {{ entry.description_html }}
+                {% if entry.sketh_note %}
+                <div class="frame box sketh">
+                    <img src="http://src.sencha.io/640/{{ app_url }}{{ entry.get_image_src() }}" alt="" />
+                </div>
+                {% endif %}
+                <h2 class="wimper">How will your idea make people's live's better?</h2>
+                <p>{{ entry.life_improvements }}</p>
+                {% if entry.take_advantage %}
+                <h2 class="wimper">How does your idea take advantage of next-generation networks?</h2>
+                <p>{{ entry.take_advantage }}</p>
+                {% endif %}
+    </div>
             {% if entry.repository_url %}
             <p><a href="{{ entry.repository_url }}">Project Repository</a></p>
             {% endif %}
@@ -81,6 +90,10 @@
             <address class="vcard">
                 <p class="wimper"><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
+                {% if entry.team_members %}
+                <p class="wimper">and team members</p>
+                <p>{{ entry.team_members }}</p>
+                {% endif %}
                 <div class="frame box">
                     <img class="photo" src="{{ entry.created_by.get_gravatar_url(80) }}" width="80" height="80" alt="" />
                 </div>
@@ -182,7 +195,7 @@
             </section>
             <section class="widgets">
                 <nav class="tags">
-                <h2 class="wimper">Category</h2>
+                <h2 class="wimper">Focus area</h2>
                 <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
@@ -216,7 +229,7 @@
     /* * * DON'T EDIT BELOW THIS LINE * * */
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-        dsq.src = 'http://' + disqus_shortname + '.disqus.com/embed.js';
+        dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
         (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
     })();
 </script>
@@ -228,7 +241,7 @@
     (function () {
         var s = document.createElement('script'); s.async = true;
         s.type = 'text/javascript';
-        s.src = 'http://' + disqus_shortname + '.disqus.com/count.js';
+        s.src = '//' + disqus_shortname + '.disqus.com/count.js';
         (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
     }());
 </script>

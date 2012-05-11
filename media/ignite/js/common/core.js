@@ -27,6 +27,12 @@ ignite.areas = {
             }
         }
     ],
+    about : {
+        requires : ignite.media_url('js/include/panels.js'),
+        onload : function() {
+            ignite.panels.init();
+        }
+    },
     show_submission : {
         requires : ignite.media_url('js/include/voting.js'),
         onload : function() {

@@ -33,7 +33,8 @@
 <div class="highlight col box main">
 {% if category %}
 <h2 class="{{category.slug }}">{{ category.name }}</h2>
-<p class="intro">Category descriptions should go in here, once we have added them to the app</p>
+{% else %}
+<h2 class="all">All ideas</h2>
 {% endif %}
 <ol class="submissions columns">
 {% for entry in entries.object_list %}
