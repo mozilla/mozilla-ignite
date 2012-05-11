@@ -6,6 +6,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ('challenges', '0031_auto__add_field_submission_life_improvements__add_field_submission_tak'),
+        )
+
     def forwards(self, orm):
         
         # Adding model 'PhaseRound'

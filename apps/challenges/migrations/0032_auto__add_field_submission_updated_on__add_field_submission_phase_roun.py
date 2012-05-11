@@ -6,6 +6,11 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+
+    depends_on = (
+        ('challenges', '0031_auto__add_phaseround'),
+        )
+
     def forwards(self, orm):
         
         # Adding field 'Submission.updated_on'
