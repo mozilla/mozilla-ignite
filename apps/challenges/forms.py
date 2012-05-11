@@ -12,7 +12,6 @@ from challenges.widgets import CustomRadioSelect
 
 
 entry_widgets = {
-<<<<<<< HEAD
     'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
     'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
     'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
