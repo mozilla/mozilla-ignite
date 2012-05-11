@@ -126,21 +126,13 @@
         <div class="events">
             <h2 class="wimper">Upcoming Events</h2>
             <ol>
-                <li>
-                    <h3 class="wimper">Gigabit Apps Hackfest</h3>
-                    <p class="date">March <span>15</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
-                <li>
-                    <h3 class="wimper">Webcast: History of Geni</h3>
-                    <p class="date">March <span>25</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
-                <li>
-                    <h3 class="wimper">Webcast: Mozilla Ignite Q/A</h3>
-                    <p class="date">April <span>25</span></p>
-                    <p>Los Angeles - <a href="#">register</a></p>
-                </li>
+              {% for event in event_list %}
+              <li>
+                <h3 class="wimper">{{ event.name }}</h3>
+                <p class="date">{{ event.start.strftime('%b') }} <span>{{ event.start.day }}</span></p>
+                <p>{{ event.venue.name }} - <a href="{{ event.url }}">register</a></p>
+              </li>
+              {% endfor%}
             </ol>
         </div>
     </div>
