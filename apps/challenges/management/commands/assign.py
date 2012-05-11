@@ -92,7 +92,7 @@ class Command(NoArgsCommand):
         submissions = get_submissions()
         if not quiet:
             print count_of(submissions, 'submission',
-                           colon=verbosity >= 2 and len(submissions))
+                           colon=verbosity >= 2 and len(submissions)), "to be assigned"
             if verbose:
                 for submission in submissions:
                     print '    %s' % submission.title
@@ -100,7 +100,7 @@ class Command(NoArgsCommand):
         judge_profiles = get_judge_profiles()
         if not quiet:
             print count_of(judge_profiles, 'judge',
-                           colon=verbosity >= 2 and len(judge_profiles))
+                           colon=verbosity >= 2 and len(judge_profiles)), "available"
             if verbose:
                 for judge in judge_profiles:
                     print '    %s [%s]' % (judge.display_name,

@@ -165,8 +165,7 @@ class JudgingForm(forms.ModelForm):
     def _field_from_criterion(self, criterion):
         return MinMaxIntegerField(label=criterion.question,
                                   min_value=criterion.min_value,
-                                  max_value=criterion.max_value,
-                                  widget=RangeInput())
+                                  max_value=criterion.max_value)
 
     @property
     def answer_data(self):
@@ -209,10 +208,14 @@ class RangeInput(widgets.Input):
     input_type = 'range'
 
 
-class MinMaxIntegerField(forms.IntegerField):
+class MinMaxIntegerField(forms.ChoiceField):
     """An integer field that supports passing min/max values to its widget."""
 
-    widget = NumberInput
+    widget = widgets.RadioSelect
 
-    def widget_attrs(self, widget):
-        return {'min': self.min_value, 'max': self.max_value}
+    def __init__(self, *args, **kwargs):
+        min_value = kwargs.pop('min_value')
+        max_value = kwargs.pop('max_value')
+        choices = [(x, x) for x in range(min_value, max_value)]
+        kwargs.update({'choices': choices})
+        super(MinMaxIntegerField, self).__init__(*args, **kwargs)
