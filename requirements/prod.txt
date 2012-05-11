@@ -1,5 +1,5 @@
 # Django stuff
--e git://github.com/django/django@36c82ac8#egg=django
+Django==1.3.1
 
 # Templates
 -e git://github.com/jbalogh/jingo.git#egg=jingo
@@ -28,6 +28,7 @@ feedparser==5.0.1
 BeautifulSoup==3.2.0
 -e git://github.com/brosner/django-voting.git#egg=django-voting
 markdown==2.0.3
+requests=0.12.1
 
 # Caching
 django-cache-machine==0.6
