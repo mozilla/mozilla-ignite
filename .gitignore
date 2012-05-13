@@ -19,5 +19,7 @@ tmp/*
 locale/*
 media/img/uploads/*
 media/ignite/img/uploads*
+requirements/src/*
+/src/
 #*
 .#*
