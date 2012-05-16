@@ -30,6 +30,8 @@ You've need git and pip installed on the machine you want to install it on
     * ./manage.py syncdb
 8. Create mozilla-ignite specific database tables:
     * ./manage.py migrate
+9. Compress your assets
+    * ./manage.py compress_assets
 
 License
 -------
