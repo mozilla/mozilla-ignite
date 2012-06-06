@@ -1,5 +1,5 @@
 <form method="POST" action="{{ browserid_target }}" class="browserid_form">
-    {{ csrf()|safe }}
+    {{ csrf() }}
     <input type="hidden" name="assertion" class="id_assertion" />
     <a class="login" href="#">{{ _('Log in') }}</a>
 </form>
