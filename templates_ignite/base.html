@@ -136,15 +136,5 @@
         {{ js('ignite_core') }}
     {% endblock %}
     {% block page_js %}{% endblock %}
-    {% if not waffle.switch('in_dev') %}
-        <script type="text/javascript">
-            var uvOptions = {};
-            (function() {
-                var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-                uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/s399jcs76KmYlVNnbr8hKQ.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-            })();
-        </script>
-    {% endif %}
 </body>
 </html>
