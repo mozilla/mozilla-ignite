@@ -25,24 +25,24 @@
 {% endblock %}
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
-    <div class="highlight  {% if errors['Title of Submission']%}fail{% endif %}">
-        <label for="id_title" class="announce">{% if errors['Title'] %}<em>Error in</em> {% endif %}{{ _('Title of Submission') }}</label>
+    <div class="highlight  {% if errors['Name']%}fail{% endif %}">
+        <label for="id_title" class="announce">{% if errors['Name'] %}<em>Error in</em> {% endif %}{{ _('Title of Submission') }}</label>
         <div class="ed">
-        <strong>{{ errors['Title of Submission'] }}</strong>
+        <strong>{{ errors['Name'] }}</strong>
         {{ form.title }}
         </div>
     </div>
-    <div class="highlight {% if errors['The pitch']%}fail{% endif %}">
-        <label for="id_brief_description" class="announce">{% if errors['Summary'] %}<em>Error in</em> {% endif %}{{ _('The pitch') }}</label>
+    <div class="highlight {% if errors['The problem']%}fail{% endif %}">
+        <label for="id_brief_description" class="announce">{% if errors['The problem'] %}<em>Error in</em> {% endif %}{{ _('The pitch') }}</label>
         <p class="hint" id="info_brief_description">{{ _('Summarize the problem or opportunity you\'re looking to address in 140 characters or less') }}</p>
         <div class="ed">
-        <strong>{{ errors['The pitch'] }}</strong>
+        <strong>{{ errors['The problem'] }}</strong>
         {{ form.brief_description }}
         </div>
     </div>
     <div class="highlight {% if errors['The solution']%}fail{% endif %}">
         <label for="wmd-input" class="announce">{% if errors['Full description'] %}<em>Error in</em> {% endif %}{{ _('The solution') }}</label>
-        <p class="hint" id="info_description">{{ _('Describe your proposed solution. How does it address the problem or opportunity you've identified? (Aim for 400 words or less — brevity is the soul of wit.)') }}</p>
+        <p class="hint" id="info_description">{{ _('Describe your proposed solution. How does it address the problem or opportunity you\'ve identified? (Aim for 400 words or less — brevity is the soul of wit.)') }}</p>
         <div class="ed">
         <strong>{{ errors['The solution'] }}</strong>
         <div class="wmd-region">
