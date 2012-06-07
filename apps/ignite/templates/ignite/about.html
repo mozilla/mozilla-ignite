@@ -13,8 +13,8 @@
 
 {% block content %}
 <section class="challenge_info">
-	<h2 class="announce">What is the Mozilla Ignite Challenge?</h2>
-	<div class="columns content_columns">
+	<h2 class="announce trigger">What is the Mozilla Ignite Challenge?</h2>
+	<div class="panel columns content_columns">
 		<div class="main col box">
 			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
 			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
@@ -30,7 +30,8 @@
 	</div>
 </section>
 <section class="how">
-	<h2 class="announce">How does the challenge work?</h2>
+	<h2 class="announce trigger">How does the challenge work?</h2>
+	<div class="panel">
 	<figure>
     	<div class="process">
             <section class="rounds ideation">
@@ -97,10 +98,11 @@
 			</div>
 		</div>
 	</div>
+	</div>
 </section>
 <section class="what">
-	<h2>Combining smart networks, civic innovation and the open web</h2>
-	<div class="content_columns columns">
+	<h2 class="trigger">Combining smart networks, civic innovation and the open web</h2>
+	<div class="panel content_columns columns">
 		<div class="main col box">
 			<p class="intro">As networks become faster and more programmable, we’re looking for innovative civic uses of new potential like:</p>
 			<ul class="intro">
@@ -131,8 +133,8 @@
 	</div>
 </section>
 <section class="ideation_stage">
-	<h2 class="announce">How does the <strong>Brainstorming Round</strong> work?</h2>
-    <div class="questions">
+	<h2 class="trigger announce">How does the <strong>Brainstorming Round</strong> work?</h2>
+    <div class="panel questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">What is the Brainstorming Round?</h3>
@@ -166,8 +168,8 @@
 	</div>
 </section>
 <section class="development_stage">
-	<h2 class="announce">How do the <strong>Development Rounds</strong> work?</h2>
-	<div class="questions">
+	<h2 class="trigger announce">How do the <strong>Development Rounds</strong> work?</h2>
+	<div class="panel questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">Win funding</h3>
@@ -188,6 +190,8 @@
     </div>
 </section>
 <section class="how_start">
+<h2 class="trigger">How do I get started?</h2>
+<div class="panel">
 <p class="intro">The gigabit space is uncharted and presents many avenues of possibility. To help developers get into the groove, Mozilla Ignite is building a community of practice to share resources, code, and learnings. Over summer 2012, we'll be facilitating:</p>
 	<ul class="intro">
 		<li class="intro">a slate of free online learning labs, where we'll go over the latest open web technologies and how they can be leveraged in gigabit apps—as well as on-ramping materials for networking engineering sandboxes like GENI.</li>
@@ -197,9 +201,11 @@
 	</ul>
 <p class="intro">Whether you want to build a traditional, client-server application that uses ultra-high bandwidth, or an experimental application that uses special technologies like <a href="http://www.openflow.org/">OpenFlow</a>, you'll find a community of designers, developers and civic innovators who are imagining and building the next generation of apps.</p>	
 <p class="intro">Working together, we can accelerate development of these apps and model the future of public benefit internet applications.</p>
+</div>
 </section>
 <section class="priority_areas">
-	<h2 class="announce">How can gigabit apps change the world?</h2>
+	<h2 class="trigger announce">How can gigabit apps change the world?</h2>
+	<div class="panel">
 	<p class="intro">In the next 10 years, what might gigabit apps make possible? Here's some food for thought. What are your ideas?</p>
 	<div class="columns">
 		<div class="col box" id="public-safety">
@@ -257,9 +263,11 @@
 	<footer>
 		<a href="{{ url('create_entry') }}" class="cta">Submit your idea now</a>
 	</footer>
+	</div>
 </section>
 <section class="examples">
-	<h2 class="announce">What already exists? What are some real-world examples?</h2>
+	<h2 class="trigger announce">What already exists? What are some real-world examples?</h2>
+	<div class="panel">
 	<p class="intro">Gigabit networks provide a great opportunity to let your imagination run wild. Imagine apps that are built for a network where scarcity isn't a concern—-where information can travel as fast as it needs to and processing power ceases to be a bottleneck. Here are some current-day examples. What can you think of?</p>
 	<div class="questions">
 		<div class="columns">
@@ -277,10 +285,11 @@
 			</div>
 		</div>
     </div>
+    </div>
 </section>
 <section class="geni">
-	<h2>What is the GENI network?</h2>
-	<div class="content_columns columns">
+	<h2 class="trigger">What is the GENI network?</h2>
+	<div class="panel content_columns columns">
 		<div class="col main box">
 			<figure>
 				<figcaption>Fig. Three <h3 class="point fig_title"><span>The GENI Network</span></h3></figcaption>
@@ -306,13 +315,13 @@
 	</div>
 </section>
 <section class="tech">
-	<h2 class="announce">What technologies should I use?</h2>
-	<div class="questions">
+	<h2 class="trigger announce">What technologies should I use?</h2>
+	<div class="panel questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">On the network side:</h3>
 				<p>You can prototype your app however you'd like, but we strongly recommend using GENI—a fast, programmable, sliceable network sandbox. GENI will provide plenty of flexibility and opportunities to test your gigabit app, both in the lab and in the field.</p>
-				<p>You can build the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, <a href=
+				<p>You can build the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, <a href="
 				http://www.openflow.org/">OpenFlow</a> routing, or other future networking technologies.</p>
 			</div>
 			<div class="box col">
@@ -327,8 +336,8 @@
     </div>
 </section>
 <section class="apps">
-	<h2>What do you mean by "apps?"</h2>
-	<div class="columns content_columns">
+	<h2 class="trigger">What do you mean by "apps?"</h2>
+	<div class="panel columns content_columns">
 		<div class="box col main">
 			<p class="intro">We mean "apps and services," in the broadest possible sense. We’re looking for applications and services that show off what next-generation networks like GENI can do that other networks -- like today's Internet -- can't.</p>
 			<div class="columns equal">
@@ -354,7 +363,8 @@
 	</div>
 </section>
 <section class="questions">
-	<h2>Frequently Asked Questions</h2>
+	<h2 class="trigger">Frequently Asked Questions</h2>
+	<div class="panel">
 	<ul class="faq">
 		<li>
 			<h3 class="wimper">What is US Ignite?</h3>
@@ -390,5 +400,6 @@
 			<p>Mozilla is a global non-profit with a mission is to shape the future of internet as a public resource— offering choice, transparency, and control to developers and users. By working with researchers, developers, civic planners and businesspeople, we can drive innovation that benefits people in their everyday lives, build a better web, and keep the internet open.</p>
 		</li>
 	</ul>
+	</div>
 </section>
 {% endblock %}
