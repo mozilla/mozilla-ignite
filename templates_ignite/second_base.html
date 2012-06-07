@@ -156,5 +156,12 @@
         {{ js('ignite_core') }}
     {% endblock %}
     {% block page_js %}{% endblock %}
+    {% if waffle.switch('track_hits') %}
+    <!-- START OF SmartSource Data Collector TAG v10.2.0 -->
+    <!-- Copyright (c) 2012 Webtrends Inc. All rights reserved. -->
+    <script src="{{ MEDIA_URL }}js/include/ext/webtrends/webtrends.load.js"></script>
+    <noscript><img alt="dcsimg" id="dcsimg" width="1" height="1" src="//statse.webtrendslive.com/dcs7ggi1tvz5bdbvfb86i75xm_9b9v/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=10.2.10&amp;dcssip=www.mozillaignite.org"/></noscript>
+    <!-- END OF SmartSource Data Collector TAG v10.2.0 -->
+    {% endif %}
 </body>
 </html>
