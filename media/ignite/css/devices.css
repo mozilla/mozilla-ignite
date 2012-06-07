@@ -207,6 +207,20 @@ legend span {
     left: 20px;
     top: 20px;
 }
+span.error-hint {
+    color: #DA1C21;
+    position: relative;
+    display: inline-block;
+    top: auto;
+    left: auto;
+}
+form span.error-hint span {
+    position: absolute;
+    left: -9999em;
+}
+form span.error-hint:before {
+    content: "*";
+}
 .fail label, 
 .fail legend span {
     color: #DA1C21;
