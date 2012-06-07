@@ -35,6 +35,7 @@
 {% else %}
 <h2 class="all">All ideas</h2>
 {% endif %}
+{% if entries.object_list.count() != 0 %}
 <ol class="submissions columns">
 {% for entry in entries.object_list %}
     <li class="box col">
@@ -84,6 +85,9 @@
     {% endif %}
     </nav>
     </footer>
+    {% endif %}
+    {% else %}
+        <p class="point">We currently don't have any ideas for {{ category.name }} - be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
     {% endif %}
     </div>
     </div>

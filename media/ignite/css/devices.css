@@ -1217,6 +1217,10 @@ section footer .cta {
     min-height: 40px;
     line-height: 1;
 }
+.lists .highlight p {
+    font-weight: normal;
+    line-height: 2;
+}
 .lists .highlight .all {
     background: none;
     padding-left: 0;

@@ -49,21 +49,11 @@
 <section class="focus_areas columns">
     <h2 class="point">Design and build apps that revolutionize focus areas like these:</h2>
     <ul>
-        <li class="box col education">
-            <a href="{{ url('about_ignite') }}#education"><strong>Education and Workforce Technologies</strong></a>
-        </li>    
-        <li class="box col health-it">
-            <a href="{{ url('about_ignite') }}#health-it"><strong>Healthcare Technologies</strong></a>
-        </li>
-        <li class="box col clean-energy">
-            <a href="{{ url('about_ignite') }}#clean-energy"><strong>Clean Energy and Transportation</strong></a>
-        </li>
-        <li class="box col advanced-manufacturing">
-            <a href="{{ url('about_ignite') }}#advanced-manufacturing"><strong>Advanced Manufacturing</strong></a>
-        </li>
-        <li class="box col public-safety">
-            <a href="{{ url('about_ignite') }}#public-safety"><strong>Emergency Preparedness and Public Safety</strong></a>
-        </li>
+    {% for cat in categories %}
+    <li class="box col {{ cat.slug }}">
+        <a href="{{ url('entries_for_category', category=cat.slug) }}"><strong>{{ cat.name }}</strong></a>
+    </li>
+    {% endfor %}
     </ul>
 </section>
 <h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
