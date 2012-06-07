@@ -87,7 +87,11 @@
     </footer>
     {% endif %}
     {% else %}
+        {% if category.name %}
         <p class="point">We currently don't have any ideas for {{ category.name }} - be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        {% else %}
+        <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        {% endif %}
     {% endif %}
     </div>
     </div>
