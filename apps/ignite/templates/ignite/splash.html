@@ -33,7 +33,11 @@
             <li class="col hack box">
                 <h3 class="exclaim">Hack</h3>
                 <p class="intro">Meet like-minded collaborators at code sprints, design jams and webinars. Gain access to one of the fastest networks on the planet.</p>
+                {% if waffle.switch('show_events') %}
                 <a class="col-foot" href="#upcoming_events">Register for an upcoming event</a>
+                {% else %}
+                <p class="col-foot">Ignite events being announced soon</p>
+                {% endif %}
             </li>
             <li class="col compete box">
                 <h3 class="exclaim">Compete</h3>
@@ -89,6 +93,7 @@
 <footer>
     <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
 </footer>
+{% if waffle.switch('show_blog') and waffle.switch('show_events') %}
 <h2 class="faux_trigger box">Latest news and events</h2>
 <div class="columns content_columns">
     <div class="col box main">
@@ -127,4 +132,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
