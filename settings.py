@@ -363,7 +363,7 @@ CACHE_COUNT_TIMEOUT = None
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 SITE_FEED_URLS = {
-    'splash': 'https://mozillaignite.org/blog/feed',
+    'splash': 'https://blog.mozillaignite.org/feed/',
 }
 
 JUDGES_PER_SUBMISSION = 2
