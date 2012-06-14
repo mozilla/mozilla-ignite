@@ -37,7 +37,7 @@
             <a class="title" href="{{ idea.get_absolute_url() }}">
                 <h3 class="title wimper">
                     <div class="frame box">
-                        <img src="http://src.sencha.io/200/{{ app_url }}{{ idea.get_image_src() }}" alt="" />
+                        <img src="{{ idea.get_image_src() }}" alt="" />
                     </div>
                     {{ idea.title }}
                 </h3>
