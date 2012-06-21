@@ -64,7 +64,7 @@
                 {{ entry.description_html }}
                 {% if entry.sketh_note %}
                 <div class="frame box sketh">
-                    <img src="http://src.sencha.io/640/{{ app_url }}{{ entry.get_image_src() }}" alt="" />
+                  <img src="{{ entry.get_image_src() }}" alt="" />
                 </div>
                 {% endif %}
                 <h2 class="wimper">How will your idea make people's live's better?</h2>

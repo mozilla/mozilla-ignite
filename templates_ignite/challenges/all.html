@@ -36,6 +36,7 @@
 {% else %}
 <h2 class="all">All ideas</h2>
 {% endif %}
+{% if entries.object_list.count() != 0 %}
 <ol class="submissions columns">
 {% for entry in entries.object_list %}
     <li class="box col">
@@ -43,7 +44,7 @@
             <a class="title" href="{{ entry.get_absolute_url() }}">
                 <h3 class="title wimper">
                     <div class="frame box">
-                    <img src="http://src.sencha.io/200/{{ app_url }}{{ entry.get_image_src() }}" alt="">
+                    <img src="{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
                 </h3>
@@ -63,7 +64,36 @@
     </li>
     {% endfor %}
     </ol>
-    {{ footer_pagination(entries) }}
+    {% if entries.paginator.num_pages > 1 %}
+    <footer class="pagination">
+    <nav>
+    {% if entries.has_previous() %}
+        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
+    {% endif %} 
+    <ol>
+    {% for i in range(entries.paginator.num_pages) %}
+    <li>
+        {% if i + 1 == entries.number %}
+            <span>{{ i + 1 }}</span>
+        {% else %}
+            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
+        {% endif %}
+    </li>
+    {% endfor %}
+    </ol>
+    {% if entries.has_next() %}
+        <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
+    {% endif %}
+    </nav>
+    </footer>
+    {% endif %}
+    {% else %}
+        {% if category.name %}
+        <p class="point">We currently don't have any ideas for {{ category.name }} - be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        {% else %}
+        <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        {% endif %}
+    {% endif %}
     </div>
     </div>
     </div>

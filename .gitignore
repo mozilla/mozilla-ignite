@@ -21,6 +21,8 @@ media/img/uploads/*
 notes.rst
 media/ignite/img/uploads*
 whoosh_index/
+requirements/src/*
+/src/
 #*
 .#*
 .vagrant

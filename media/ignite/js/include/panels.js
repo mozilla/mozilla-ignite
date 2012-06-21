@@ -10,15 +10,15 @@ ignite.panels = function() {
                 btn = $('<button class="box" tab-index="-1">' + that.text() + ' <span class="inst">(click to expand)</span></button>'),
                 nxt = that.next('div.panel');
             that.html(btn);
-            if (index === 0) {
+            if (index <= 2) {
                 nxt.addClass('open-panel');
                 btn.addClass('open-panel');
                 open = nxt;
                 open_trigger = btn;
             }
             btn.click(function() {
-                open.removeClass('open-panel');
-                open_trigger.removeClass('open-panel');
+                $('div.open-panel').removeClass('open-panel');
+                $('h2.open-panel').removeClass('open-panel');
                 nxt.addClass('open-panel');
                 btn.addClass('open-panel');
                 open = nxt;

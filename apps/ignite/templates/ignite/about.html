@@ -13,102 +13,136 @@
 
 {% block content %}
 <section class="challenge_info">
-	<h2 class="trigger">What is the Mozilla Ignite Challenge?</h2>
+	<h2 class="announce trigger">What is the Mozilla Ignite Challenge?</h2>
 	<div class="panel columns content_columns">
 		<div class="main col box">
-			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong>. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
-			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 Gbps? How would you take advantage of deeply programmable, sliceable networks? How can we leverage speeds up to 250x faster than today's?</p>
-			<p class="intro"><strong>The best ideas will win funding and support</strong>. And help shape the internet’s future.</p>
+			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
+			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
+			<p class="intro"><strong>The best ideas will win funding and support</strong>, and help shape the internet’s future.</p>
+			<p><a href="{{ url('entries_all') }}">Check out</a> what's been submitted so far.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
-				<h3 class="point box-title">Now to May 7: Brainstorm, connect and collaborate</h3>
-				<p>Between now and May 7 we’re hosting a big <a href="{{ url('entries_all') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
+				<h3 class="point box-title">Now to August 23rd: Brainstorm, connect and collaborate</h3>
+				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
 				<a class="cta" href="{{ url('create_entry') }}">Submit your idea now</a>
 			</div>
 		</div>
 	</div>
 </section>
 <section class="how">
-	<h2 class="trigger">How does the challenge work?</h2>
+	<h2 class="announce trigger">How does the challenge work?</h2>
 	<div class="panel">
-		<figure>
-    		<div class="process">
-            	<section class="rounds ideation">
-            		<div class="all">
-                		<div class="round">
-                    		<div class="info cf">
-                        		<strong>Brainstorming Round</strong>
-                        		<span class="ribbon">$15k in awards</span>
-                    		</div>
-                    		<em  class="date wimper">Now to May 7</em>
-                		</div>
-            		</div>
-            	</section>
-            	<section class="rounds development">
-            	<div class="application">
-                	<span class="sweet wimper"><em>Applications open</em></span>
-                	May 14
-            	</div>
-            	<div class="all"> 
-                	<div class="round">
-                    	<div class="info cf">
-                        	<strong>Development Round <em>1</em></strong>
-                        	<span class="ribbon">$85k in funding</span>
-                    	</div>
-                    	<em class="date wimper">June 11 - July 9</em>
-                	</div>
-                	<div class="round">
-                    	<div class="info cf">
-                        	<strong>Development Round <em>2</em></strong>
-                        	<span class="ribbon">$150k in funding</span>
-                    	</div>
-                    	<em class="date wimper">July 23 - Sep 10</em>
-                	</div>
-                	<div class="round">
-                    	<div class="info cf">
-                        	<strong>Development Round <em>3</em></strong>
-                        	<span class="ribbon">$250k in funding</span>
-                    	</div>
-                    	<em class="date wimper">Sep 24 - Jan 7</em>
-                	</div>
-            	</div>
-            	</section>
-        	</div>
-		</figure>
-		<div class="columns content_columns">
-			<div class="col main box">
-				<p class="intro"><strong>The Mozilla Ignite Challenge is broken into four rounds</strong></p>
-				<ul class="intro">
-					<li>an initial <strong>Brainstorming Round</strong>,</li>
-					<li>followed by three <strong>Development Rounds</strong></li>
+	<figure>
+    	<div class="process">
+            <section class="rounds ideation">
+            <div class="all">
+                <div class="round">
+                    <div class="info cf">
+                        <strong>Brainstorming Round</strong>
+                        <span class="ribbon">$15k in awards</span>
+                    </div>
+                    <em class="date wimper"><strong>Now through August 23</strong></em>
+                </div>
+            </div>
+            </section>
+            <section class="rounds development">
+            <div class="application">
+                <span class="sweet wimper"><em>Applications open</em></span>
+                August 1
+            </div>
+            <div class="all"> 
+                <div class="round">
+                    <div class="info cf">
+                        <strong>Development Round <em>1</em></strong>
+                        <span class="ribbon">$85k in funding</span>
+                    </div>
+                    <em class="date wimper">Oct 4 - Oct 25</em>
+                </div>
+                <div class="round">
+                    <div class="info cf">
+                        <strong>Development Round <em>2</em></strong>
+                        <span class="ribbon">$150k in funding</span>
+                    </div>
+                    <em class="date wimper">Nov 8 - Dec 19</em>
+                </div>
+                <div class="round">
+                    <div class="info cf">
+                        <strong>Development Round <em>3</em></strong>
+                        <span class="ribbon">$250k in funding</span>
+                    </div>
+                    <em class="date wimper">Jan 16 - March 27</em>
+                </div>
+            </div>
+            </section>
+        </div>
+	</figure>
+	<div class="columns content_columns">
+		<div class="col main box">
+			<p class="intro"><strong>The Mozilla Ignite Challenge is broken into four rounds</strong></p>
+			<ul class="intro">
+				<li class="intro">an initial <strong>Brainstorming Round</strong>,</li>
+				<li>followed by three <strong>Development Rounds</strong></li>
+			</ul>
+			<p class="intro">Submissions for the Brainstorming Round are open now through August 23. Participation in the Brainstorming Round is optional, but encouraged. Applications for the Development Phase will open August 1, and must be received by September 20 to be approved for the very start of the development challenge.</p>
+			<p class="intro">Funding will be awarded by our <strong><a href="{{ url('our_judges') }}">panel of expert judges</a></strong> at the end of each round. <strong>$500,000 US will be awarded in all.</strong> You can compete in a single development round, or in all three.</p>
+		</div>
+		<div class="col bonux box">
+			<div class="highlight">
+				<h3 class="point box-title">Get Involved</h3>
+				<ul>
+					<li><strong><a href="{{ url('create_entry') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+					<li><strong><a href="{{ url('entries_all') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
+					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
+					<li><strong>Stay in touch.</strong> Follow <a href="https://twitter.com/#!/mozillaignite">Mozilla Ignite</a> on Twitter or join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>.</li>
+					<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
 				</ul>
-				<p class="intro">Submissions for the Brainstorming Round are open now to May 7. Participation in the Brainstorming Round is optional, but encouraged. Applications for the Development Phase will open May 14, and close on Sep 24.
-				<p class="intro">Funding will be awarded by our panel of expert judges at the end of each round. <strong>$500,000 US will be awarded in all.</strong> You can compete in a single development round, or in all three.</p>
 			</div>
-			<div class="col bonux box">
-				<div class="highlight">
-					<h3 class="point box-title">Get Involved</h3>
-					<ul>
-						<li><strong>Submit your idea.</strong> What’s your next- generation Gigabit app?</li>
-						<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
-						<li><strong>Stay in touch.</strong> Follow Mozilla Ignite on twitter or join our community discussion list.</li>
-						<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
-					</ul>
-				</div>
+		</div>
+	</div>
+	</div>
+</section>
+<section class="what">
+	<h2 class="trigger">Combining smart networks, civic innovation and the open web</h2>
+	<div class="panel content_columns columns">
+		<div class="main col box">
+			<p class="intro">As networks become faster and more programmable, we’re looking for innovative civic uses of new potential like:</p>
+			<ul class="intro">
+				<li><strong>Speed.</strong> How can developers take advantage of gigabit-per-second connections?</li>
+				<li><strong>Video.</strong> What can we do with zero-latency, high definition video?</li>
+				<li><strong>Big Data.</strong> How can we leverage complex calculations at super high-speed?</li>
+				<li><strong>Programmable networks.</strong> What can we do with unique routing, slicing and more?</li>
+			</ul>
+			<figure>
+    			<figcaption>Fig. Two <h3 class="point fig_title"><span>The Sweet Spot</span></h3></figcaption>
+    		    <img src="{{ MEDIA_URL }}img/infographics/sweet-spot.png" width="600" height="410" alt="A diagram showing how we believe Ignite will be the perfect mix of smart networks, HTML5 and civic innovators" />
+            </figure>
+		</div>
+		<div class="col box bonus">
+			<div class="highlight">
+				<h3 class="box-title point">Designing for an internet without limits</h3>
+				<p><strong>Imagine a digital world where:</strong></p>
+				<ul>
+					<li>There are no limits on how fast information can travel.</li>
+					<li>Processor speed is never a bottleneck.</li>
+					<li>Your network adapts to your app, instead of the other way around.</li>
+					<li>You can place processing and data transport wherever you want on the network.</li>
+					<li>You can dynamically provision and program routers along the way, as if the network itself were one giant LAN.</li>
+				</ul>
+				<p><strong>What would you build?</strong></p>
 			</div>
-		</div>	
+		</div>
 	</div>
 </section>
 <section class="ideation_stage">
-	<h2 class="trigger">How does the <strong>Brainstorming Round</strong> work?</h2>
+	<h2 class="trigger announce">How does the <strong>Brainstorming Round</strong> work?</h2>
     <div class="panel questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">What is the Brainstorming Round?</h3>
 				<p>The Brainstorming Round is an opportunity for everyone interested in the potential of next-generation application to participate.</p>
-				<p><strong>You don't have to be a developer or technologist -- you just need a Big Idea.</strong> In fact, we may be able to help pair you with a development team to bring your idea to life in the Development Phase.</p>
-				<p>The best ideas will win prizes ranging from $1,000 to $4,000. They'll also be eligible to win a Notable Idea Award or People's Choice Award.</p>
+				<p>We are seeking your creative ideas, sketches and blue sky proposals. The best ideas will get attention, funding and support to hopefully become reality. All are welcome. <strong>You don't have to be a developer or technologist -- you just need a Big Idea.</strong></p>
+				<p>The best ideas will win prizes ranging from $1,000 to $5,000. They'll also be eligible to win a Notable Idea Award or People's Choice Award.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Why a Brainstorming Round?</h3>
@@ -122,21 +156,21 @@
 			</div>
 			<div class="box col">
 				<h3 class="wimper">What do I need to submit?</h3>
-				<p><a href="https://ignite-stage.mozillalabs.com/ideas/add/">Use the submission form</a> to clearly explain how your idea will make use of 1 Gbps networks to create broad public benefit in one of these areas:</p>
+				<p><a href="{{ url('create_entry') }}">Use the submission form</a> to clearly explain how your idea will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
 				<ul>
-					<li>healthcare</li>
-					<li>education and training</li>
+					<li>healthcare technologies</li>
+					<li>education and workforce technologies</li>
 					<li>clean energy &amp; transportation</li>
 					<li>advanced manufacturing</li>
 					<li>emergency preparedness and public safety</li>
 				</ul>
-				<p>The deadline for submitting your ideas to the Brainstorming Round is May 7.</p>
+				<p>The deadline for submitting your ideas to the Brainstorming Round is August 23.</p>
 			</div>
 		</div>
 	</div>
 </section>
 <section class="development_stage">
-	<h2 class="trigger">How do the <strong>Development Rounds</strong> work?</h2>
+	<h2 class="trigger announce">How do the <strong>Development Rounds</strong> work?</h2>
 	<div class="panel questions">
 		<div class="columns">
 			<div class="box col">
@@ -146,45 +180,60 @@
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Get support</h3>
-				<p>This is not a traditional “competition.” The goal is to create an open and collaborative community of practise.</p>
+				<p>This is not a traditional “competition.” The goal is to create an open and collaborative community of practice.</p>
 				<p>Participants will get access to expert mentors, build in the open, and receive feedback and help from the Ignite community.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">How to apply</h3>
-				<p><strong>Development applications open May 14</strong>. To enter, assemble your team and fill out the online application form.</p>
-				<p>Successful applicants will be greenlit and given access to the GENI sandbox, an ultra-fast next-generation network for you to develop and test your apps.</p>
+				<p><strong>Development applications open August 1</strong>. To enter, assemble your team and fill out the online application form.</p>
+				<p>Successful applicants will be greenlit and given access to <a href="http://geni.net">GENI</a>, an ultra-fast next-generation network for you to develop and test your apps.</p>
 			</div>
 		</div>
     </div>
 </section>
-<section class="priority_areas">
-	<h2 class="trigger">How can 1 Gbps apps change the world?</h2>
+<section class="how_start">
+	<h2 class="trigger">How do I get started?</h2>
 	<div class="panel">
+		<p class="intro">The gigabit space is uncharted and presents many avenues of possibility. To help developers get into the groove, Mozilla Ignite is building a community of practice to share resources, code, and learnings. Over summer 2012, we'll be facilitating:</p>
+		<ul class="intro">
+			<li>a slate of free online learning labs, where we'll go over the latest open web technologies and how they can be leveraged in gigabit apps—as well as on-ramping materials for networking engineering sandboxes like GENI.</li>
+			<li>a weekly <a href="https://wiki.mozilla.org/Ignite">conference call</a> where developers and institutions can coordinate around specific projects and meet like-minded collaborators.</li>
+			<li>a community <a href="https://lists.mozilla.org/listinfo/community-ignite">discussion list</a>, where practitioners can come together to solve problems and tackle technical questions.</li>
+			<li>a list of institutions in each Gigabit city that are ready to work with developers to address specific needs. In some cities, special test environments will be provisioned so you can install and test your app with real-world users.</li>
+		</ul>
+		<p class="intro">Whether you want to build a traditional, client-server application that uses ultra-high bandwidth, or an experimental application that uses special technologies like <a href="http://www.openflow.org/">OpenFlow</a>, you'll find a community of designers, developers and civic innovators who are imagining and building the next generation of apps.</p>	
+		<p class="intro">Working together, we can accelerate development of these apps and model the future of public benefit internet applications.</p>
+	</div>
+</section>
+<section class="priority_areas">
+	<h2 class="trigger announce">How can gigabit apps change the world?</h2>
+	<div class="panel">
+	<p class="intro">In the next 10 years, what might gigabit apps make possible? Here's some food for thought. What are your ideas?</p>
 	<div class="columns">
 		<div class="col box" id="public-safety">
-			<h3 class="wimper">for Public Safety?</h3>
+			<h3 class="wimper">in Public Safety?</h3>
 			<p>First-responders could access secure communication channels, without fear of “man-in-the-middle” attacks. Dispatchers could use a slice of the network to create a private VLAN, with all responders communicating through this secure direct link.</p>
 			<ul>
-				<li><strong>Early detection.</strong> Widespread sensor networks and real-time analysis can enable earlier detection of emergencies, from severe weather and natural disasters to national security threats.</li>
+				<li><strong>Early detection.</strong> Widespread sensor networks and real-time analysis might enable earlier detection of emergencies, from severe weather and natural disasters to national security threats.</li>
 				<li><strong>Preparation and training.</strong> Advanced simulations and predictive modelling allow first responders and the public to prepare and train for emergencies before they happen.</li> 
-				<li><strong>Co-ordination.</strong> Two-way flows of real-time data from diverse sources (cell phones, GPS, sensors) can combine with computational models for greater situational awareness and coordination.</li>
+				<li><strong>Co-ordination.</strong> Two-way flows of real-time data from diverse sources (cell phones, GPS, sensors) might combine with computational models for greater situational awareness and coordination.</li>
 			</ul>
 		</div>
 		<div class="col box" id="education">
-			<h3 class="wimper">for Education and Training?</h3>
+			<h3 class="wimper">in Education and Training?</h3>
 			<p>Students could produce hybrid video essays, running apps that search every digitized book andTV newscast in history. They could query any term and instantly download datasets, collaborating with remote partners through HD, zero-latency video.</p>
 			<ul>
 				<li><strong>Telepresence</strong> can take students around the world to experience archeological dig sites, distant classrooms, or foreign cultures.</li>
-				<li><strong>Virtual surgery.</strong> Medical students and surgical residents can sharpen their skills with advanced virtual surgeries. Practice on image-based models with life-like tissue movement and haptic feedback, simulating the nuances of real life surgery.</li>
-				<li><strong>21st century skills.</strong> Workers can access professional development courses and workforce training in areas like advanced manufacturing and product development. Use modelling, simulation and data analysis tools that 21st century workers need.</li>
+				<li><strong>Virtual surgery.</strong> Medical students and surgical residents might sharpen their skills with advanced virtual surgeries. Practice on image-based models with life-like tissue movement and haptic feedback, simulating the nuances of real life surgery.</li>
+				<li><strong>21st century skills.</strong> Workers will access professional development courses and workforce training in areas like advanced manufacturing and product development. Use modelling, simulation and data analysis tools that 21st century workers need.</li>
 			</ul>
 		</div>
 		<div class="col box" id="health-it">
-			<h3 class="wimper">for Healthcare?</h3>
+			<h3 class="wimper">in Healthcare?</h3>
 			<p>Expert physicians could instantly video conference about their most difficult cases, sharing 3D medical files in high definition with colleagues across the country in real time.</p>
 			<ul>
-				<li><strong>Telemedicine</strong> can allow easier, more efficient communication between patients and caregivers and increase access to health information.</li>
-				<li><strong>Privacy and security.</strong> Sliceable, programmable networks can provide unprecedented levels of privacy and security for health data.</li>
+				<li><strong>Telemedicine</strong> might enable easier, more efficient communication between patients and caregivers and increase access to health information.</li>
+				<li><strong>Privacy and security.</strong> Sliceable, programmable networks could provide unprecedented levels of privacy and security for health data.</li>
 				<li><strong>Collaboration.</strong> Rapid exchange of medical data with high-resolution collaboration tools between medical experts on the care team.</li>
 				<li><strong>Big data.</strong> Aggregate huge amounts of health data from diverse sources for customized, real-time decision support.</li>
 			</ul>
@@ -192,15 +241,15 @@
 	</div>
 	<div class="columns">
 		<div class="col box" id="clean-energy">
-			<h3 class="wimper">for Clean Energy and Transportation?</h3>
+			<h3 class="wimper">in Clean Energy and Transportation?</h3>
 			<ul>
 				<li><strong>Sustainable living.</strong> From smart grids with high temporal and spatial control of energy to intelligent homes, buildings and transportation systems.</li>
 				<li><strong>Smarter control systems</strong> for advanced batteries and other new energy creation and storage systems.</li>
-				<li><strong>Security.</strong> GENI technologies like isolated network slices can help safeguard power grids.</li>
+				<li><strong>Security.</strong> Future network technologies like isolated network slices could help safeguard power grids.</li>
 			</ul>
 		</div>
 		<div class="col box" id="advanced-manufacturing">
-			<h3 class="wimper">for Advanced Manufacturing?</h3>
+			<h3 class="wimper">in Advanced Manufacturing?</h3>
 			<ul>
 				<li><strong>Economic competitiveness.</strong> Computational design processes and more effective sharing of data, knowledge, tools, and expertise.</li>
 				<li><strong>Rapid innovation.</strong> Computational modelling and detailed simulation. Distributed access to supercomputing resources.</li>
@@ -219,16 +268,18 @@
 	</div>
 </section>
 <section class="examples">
-	<h2 class="trigger">What already exists? What are some real-world examples?</h2>
-	<div class="panel questions">
+	<h2 class="trigger announce">What already exists? What are some real-world examples?</h2>
+	<div class="panel">
+	<p class="intro">Gigabit networks provide a great opportunity to let your imagination run wild. Imagine apps that are built for a network where scarcity isn't a concern—-where information can travel as fast as it needs to and processing power ceases to be a bottleneck. Here are some current-day examples. What can you think of?</p>
+	<div class="questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">Healthcare</h3>
-				<p><strong>Remote Nursing Care via Multipoint HD Video Conferencing --</strong> This collaboration between Case Western University in Cleveland and the University of Missouri remotely tracks, analyzes and intervenes to support elders’ health care. High definition videoconferencing allows patients to reduce their travel time and cost for follow-up visits.</p>
+				<p><strong>Remote Nursing Care via Multipoint HD Video Conferencing --</strong> This collaboration between Case Western University in Cleveland and the University of Missouri aims to remotely track, analyze and intervene to support elders’ health care. High definition videoconferencing allows patients to reduce their travel time and cost for follow-up visits.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Emergency Preparedness</h3>
-				<p><strong>UMass Radar</strong> is able to provide early warning for severe weather, predicting the touchdown of events like tornados or hurricanes. In technical speak, it’s “on-demand, high-spatial/temporal resolution, low-level weather hazard information from a low-cost, dense RADAR network.” Put simply, it’s about making communities safer from by providing extremely accurate severe weather prediction.</p>
+				<p><strong>UMass Radar</strong> is working to provide early warning for severe weather, predicting the touchdown of events like tornados or hurricanes. In technical speak, it’s “on-demand, high-spatial/temporal resolution, low-level weather hazard information from a low-cost, dense RADAR network.” Put simply, it’s about making communities safer from by providing extremely accurate severe weather prediction.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Advanced Manufactiring</h3>
@@ -236,37 +287,7 @@
 			</div>
 		</div>
     </div>
-</section>
-<section class="what">
-	<h2 class="trigger">Combining smart networks, civic innovation and the open web</h2>
-	<div class="panel content_columns columns">
-		<div class="main col box">
-			<p class="intro">As networks become faster and more programmable, we’re looking for innovative civic uses of new potential like:</p>
-			<ul class="intro">
-				<li><strong>Speed.</strong> How can developers take advantage of 1 Gbps connections?</li>
-				<li><strong>Video.</strong> What can we do with zero-latenct, high defination video?</li>
-				<li><strong>Big Data.</strong> How can we leverage complex calculations at super high-speed?</li>
-				<li><strong>Programmable networks.</strong> What can we do with unique routing, slicing and more?</li>
-			</ul>
-			<figure>
-    			<figcaption>Fig. Two <h3 class="point fig_title"><span>The Sweet Spot</span></h3></figcaption>
-    		    <img src="{{ MEDIA_URL }}img/infographics/sweet-spot.png" width="600" height="410" alt="A diagram showing how we believe Ignite will be the perfect mix of smart networks, HTML5 and civic innovators" />
-            </figure>
-		</div>
-		<div class="col box bonus">
-			<div class="highlight">
-				<h3 class="box-title point">Designing for an internet without limits</h3>
-				<p><strong>Imagine a digital world where:</strong></p>
-				<ul>
-					<li>there are no limits on how fast information can travel.</li>
-					<li>processor speed is never a bottleneck.</li>
-					<li>your network adapts to your app, instead of the other way around.</li>
-					<li>you can place processing and data transport wherever you want on the network.</li>
-					<li>you can dynamically provision and program routers along the way, as if the network itself were one giant LAN.</li>
-				</ul>
-			</div>
-		</div>
-	</div>
+    </div>
 </section>
 <section class="geni">
 	<h2 class="trigger">What is the GENI network?</h2>
@@ -280,13 +301,13 @@
 		<div class="col box bonus">
 			<div class="highlight">
 				<h3 class="point box-title">Welcome to one of the most advanced networks on the planet.</h3> 
-				<p>The Global Environment for Network Innovation is a National Science Foundation-funded research project. It’s goal: provide a national testbed for exploring the networks of the future.</p>
+				<p>The Global Environment for Network Innovation is a National Science Foundation-funded research project. Its goal: provide a national testbed for exploring the networks of the future.</p>
 				<p>GENI connects campuses and advanced infrastructure across the U.S., allowing next- generation applications like yours to be designed, tested and demonstrated. In short: it’s a pretty fun place for radical innovators to play.</p>
 				<p>Successful Mozilla Ignite participants will get access to GENI to develop and test their apps.</p>
 				<h3 class="box-title point">What’s cool about GENI?</h3>
 				<ul>
 					<li><strong>Speed</strong> -- 100 Mbps+ and low latency. Enough for multiple bi-directional streams of uncompressed video.</li>
-					<li><strong>Programmability</strong> – software-defined networks (e.g.,OpenFlow) with dramatically improved control over network routing and optimization.</li>
+					<li><strong>Programmability</strong> – software-defined networks (e.g., <a href="http://www.openflow.org/">OpenFlow</a>) with dramatically improved control over network routing and optimization.</li>
 					<li><strong>Slice-based experimentation</strong> – remotely discover, reserve, configure, program, debug, operate, manage, and teardown distributed systems across the GENI suite. Match slices to your application requirements, and distribute programmable resources throughout the network.</li>
 					<li><strong>Integrated wireless networks</strong> – for sensor networks and continuous remote monitoring.</li>
 					<li><strong>And much more...</strong></li>
@@ -296,17 +317,18 @@
 	</div>
 </section>
 <section class="tech">
-	<h2 class="trigger">What technologies should I use?</h2>
+	<h2 class="trigger announce">What technologies should I use?</h2>
 	<div class="panel questions">
 		<div class="columns">
 			<div class="box col">
 				<h3 class="wimper">On the network side:</h3>
-				<p>You’ll be building your app on GENI—a fast, programmable, sliceable network sandbox. GENI will provide plenty of flexibility and opportunities to test your Gigabit app, both in the lab and in the field.</p>
-				<p>You can build the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, OpenFlow routing, or other future networking technologies.</p>
+				<p>You can prototype your app however you'd like, but we strongly recommend using GENI—a fast, programmable, sliceable network sandbox. GENI will provide plenty of flexibility and opportunities to test your gigabit app, both in the lab and in the field.</p>
+				<p>You can build the old fashioned way, using TCP/IP and a client-server model. Or you can experiment with custom protocols, <a href="
+				http://www.openflow.org/">OpenFlow</a> routing, or other future networking technologies.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">On the client side:</h3>
-				<p>You’re free to use any technologies you want, but we ask that you favour open source and open standards. And no proprietary runtimes—e.g., no Flash or iOS apps.</p>
+				<p>You’re free to use any technologies you want, but we ask that you favour open source and open standards. And we strongly prefer non-proprietary runtimes—e.g., no Flash or iOS apps.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Browser technologies</h3>
@@ -323,14 +345,14 @@
 			<div class="columns equal">
 				<div class="box col">
 					<h3 class="wimper">What is Mozilla’s vision for apps?</h3>
-					<p>When most people say "app," they're referring to a single-purpose binary that runs on a specific hardware platform. Colloquially: "an Android app" or "an iPhone app." By contrast, Mozilla has a vision for apps that run cross-device, in any context.We believe users should be able to buy an app once and have it work flawlessly on their desktop, laptop, phone, tablet,TV, car, etc.</p>
-					<p>This will establish the open web as the common development platform of choice, and overcome the proprietary technologies and walled gardens that characterize most app development. On the "web platform" side, Mozilla is working to make this vision a reality through technologies like HTML5 video and audio, 3D via WebGL, heavy computation via WebCL, realtime via sockets, realtime communication with WebRTC, and so on.</p>
+					<p>When most people say "app," they're referring to a single-purpose binary that runs on a specific hardware platform. Colloquially: "an Android app" or "an iPhone app." By contrast, Mozilla has a vision for apps that run cross-device, in any context. We call it the "web runtime," and it includes things like HTML5, WebGL, WebCL, and other technologies that bring the web to parity with native development.</p>
+					<p>We want to establish the open web as a viable, common development platform, and help overcome the proprietary technologies and walled gardens that characterize most app development.</p>
 				</div>
 				<div class="box col">
 					<h3 class="wimper">What does that have to do with this challenge?</h3>
-					<p>While we’re encouraging the use of these edge web technologies, we’re not insisting on them.Their use is encouraged, but not absolutely required.</p>
-					<p>This is partly because much of the innovation we’re seeking won’t yet work in a browser. It’s difficult to do zero latency 3D telepresence, for instance, because browsers don't yet have the right APIs, codecs, and optimizations for it. And many of these apps won't yet work outside of the laboratory. It’s not just about speed: it's also about network programmability.</p>
-					<p>So please consider how your idea can help push the web forward as an app development platform -- but don’t feel restricted by it.We’re open.</p>
+					<p>While we’re encouraging the use of these edge web technologies, we’re not insisting on them. Their use is encouraged, but not absolutely required.</p>
+					<p>This is partly because much of the innovation we’re seeking won’t yet work in a browser. It’s difficult to do zero latency 3D telepresence, for instance, because browsers don't yet have the right APIs, codecs, and optimizations for this. And many of these apps won't yet work outside of the laboratory. It’s not just about speed: it's also about network programmability.</p>
+					<p>So please consider how your idea can help push the web forward as an app development platform -- but don’t feel restricted by it. We’re open.</p>
 				</div>
 			</div>
 		</div>
@@ -348,7 +370,11 @@
 	<ul class="faq">
 		<li>
 			<h3 class="wimper">What is US Ignite?</h3>
-			<p>US Ignite is working to create a national network of communities with ultra-fast broadband services. It’s goal is to foster the creation of novel applications and digital experiences that have the potential to transform national priority areas like healthcare, education and training, public safety, energy, and advanced manufacturing. Read more at the <a href="http://us-ignite.org/">US Ignite website.</a></p>
+			<p>US Ignite is working to create a national network of communities with ultra-fast broadband services. Its goal is to foster the creation of novel applications and digital experiences that have the potential to transform national priority areas like healthcare, education and training, public safety, energy, and advanced manufacturing. Read more at the <a href="http://us-ignite.org/">US Ignite website.</a></p>
+		</li>
+		<li>
+			<h3 class="wimper">Where are the official rules?</h3>
+			<p>You can check out the official rules <a href="{{ url('terms_conditions') }}" target="_blank">right here</a>.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Do I have to participate in the Brainstorming Round?</h3>
@@ -361,7 +387,7 @@
 		<li>
 			<h3 class="wimper">Do I get to keep my intellectual property?</h3>
 			<p>Absolutely. Our hope is that many of the apps developed in this challenge will become commercially viable, and we want to encourage entrepreneurial innovation at the edges of the network. Whatever you develop in this challenge is yours to go monetize, or not.</p>
-			<p>At the same time, building an open development community around GENI, the open web, and other open technologies is another key objective of the challenge, so all competing apps must publish their code under a suitably open license. Check the complete official rules for more.</p>
+			<p>At the same time, building an open development community around GENI, the open web, and other open technologies is another key objective of the challenge, so all competing apps must publish their code under a suitably open license. Check the complete <a href="{{ url('terms_conditions') }}" target="_blank">official rules</a> for more.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Who should enter?</h3>
@@ -370,7 +396,7 @@
 		</li>
 		<li>
 			<h3 class="wimper">How much funding am I eligible to receive?</h3>
-			<p>ADD MINIMUMS.The awards recognize your progress and achievements, and are meant to provide a launching pad for your work.The amount of funding available will increase in each of the three Development Rounds.</p>
+			<p>The awards recognize your progress and achievements, and are meant to provide a launching pad for your work. The amount of funding available will increase in each of the three Development Rounds. The first round will be awarding $85,000 in awards to teams as judges see fit. The second round will award $150,000 and the third round will award $250,000.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Why is Mozilla doing this?</h3>

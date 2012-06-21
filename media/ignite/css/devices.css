@@ -207,6 +207,20 @@ legend span {
     left: 20px;
     top: 20px;
 }
+span.error-hint {
+    color: #DA1C21;
+    position: relative;
+    display: inline-block;
+    top: auto;
+    left: auto;
+}
+form span.error-hint span {
+    position: absolute;
+    left: -9999em;
+}
+form span.error-hint:before {
+    content: "*";
+}
 .fail label, 
 .fail legend span {
     color: #DA1C21;
@@ -1216,6 +1230,10 @@ section footer .cta {
     background: url("../img/css/emergency-prep.png") no-repeat scroll 0 0 transparent;
     min-height: 40px;
     line-height: 1;
+}
+.lists .highlight p {
+    font-weight: normal;
+    line-height: 2;
 }
 .lists .highlight .all {
     background: none;

@@ -209,6 +209,7 @@ INSTALLED_APPS = (
     'commons',  # Content common to most playdoh-based apps.
     'jingo_minify',
     'tower',  # for ./manage.py extract (L10n)
+    'cronjobs',  # for ./manage.py cron * cmd line tasks
 
     # We need this so the jsi18n view will pick up our locale directory.
     ROOT_PACKAGE,
@@ -321,7 +322,7 @@ USER_AVATAR_PATH = 'img/uploads/avatars/'
 TOPIC_IMAGE_PATH = 'img/uploads/topics/'
 PROJECT_IMAGE_PATH = 'img/uploads/projects/'
 EVENT_IMAGE_PATH = 'img/uploads/events/'
-CHALLENGE_IMAGE_PATH = 'img/uploads/challenges'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.
@@ -374,7 +375,7 @@ CACHE_COUNT_TIMEOUT = None
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 SITE_FEED_URLS = {
-    'splash': 'https://mozillaignite.org/blog/feed',
+    'splash': 'https://blog.mozillaignite.org/feed/',
 }
 
 JUDGES_PER_SUBMISSION = 2

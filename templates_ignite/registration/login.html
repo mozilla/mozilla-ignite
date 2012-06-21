@@ -10,7 +10,7 @@
 <h1 class="shout">Please login or register</h1>
 <p>To participate in the Mozilla Ignite Apps Challenge, you'll need to create an account. Don't worry, this is super simple.</p>
 <form method="POST" action="{{ browserid_target }}" class="browserid_form">
-    {{ csrf()|safe }}
+    {{ csrf() }}
     <input type="hidden" name="assertion" class="id_assertion" />
     <a class="cta login" href="#">{{ _('Log in or register') }}</a> 
 </form>

@@ -17,9 +17,8 @@ def determine_upload_path(instance, filename):
     chunk_size = 1000  # max files per directory
     path = getattr(settings, 'USER_AVATAR_PATH', 'images/profiles/')
     path = path.lstrip('/').rstrip('/')
-    return "%(path)s/%(partition)d/%(filename)s" % {
+    return "%(path)s/%(filename)s" % {
         'path': path,
-        'partition': get_partition_id(instance.pk, chunk_size),
         'filename': safe_filename(filename)
     }
 

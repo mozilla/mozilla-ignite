@@ -10,7 +10,7 @@
 {% block header %}
 <div class="tagline">
     <h2 class="busta">
-        <span class="wimper sweet"><em>Calling all</em> developers, network engineers and civic innovators...</span>
+        <span class="wimper sweet"><em>Calling all</em> developers, network engineers and community catalysts...</span>
         <strong><img src="{{ MEDIA_URL }}img/build.png" alt="Build apps from the future" width="940" height="182" /></strong>
     </h2>
 </div>
@@ -28,17 +28,21 @@
             <li class="col brainstorm box">
                 <h3 class="exclaim">Brainstorm</h3>
                 <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
-                <a class="col-foot" href="{{ url('create_entry') }}">Submit your idea</a>
+                <a class="col-foot" href="{{ url('create_entry') }}">Submit your ideas</a>
             </li>
             <li class="col hack box">
                 <h3 class="exclaim">Hack</h3>
                 <p class="intro">Meet like-minded collaborators at code sprints, design jams and webinars. Gain access to one of the fastest networks on the planet.</p>
-                <a class="col-foot" href="#">Register for an upcoming event</a>
+                {% if waffle.switch('show_events') %}
+                <a class="col-foot" href="#upcoming_events">Register for an upcoming event</a>
+                {% else %}
+                <p class="col-foot">Ignite events being announced soon</p>
+                {% endif %}
             </li>
             <li class="col compete box">
                 <h3 class="exclaim">Compete</h3>
-                <p class="intro">Win funding and support to make your app a reality. $500,000 U.S. is availiable to be won.</p>
-                <p class="col-foot">Applications open May 14</p>
+                <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
+                <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a></p>
             </li>
         </ul>
     </div>
@@ -49,27 +53,17 @@
 <section class="focus_areas columns">
     <h2 class="point">Design and build apps that revolutionize focus areas like these:</h2>
     <ul>
-        <li class="box col education">
-            <a href="{{ url('about_ignite') }}#education"><strong>Education</strong></a>
-        </li>    
-        <li class="box col health-it">
-            <a href="{{ url('about_ignite') }}#health-it"><strong>Health</strong></a>
-        </li>
-        <li class="box col clean-energy">
-            <a href="{{ url('about_ignite') }}#clean-energy"><strong>Clean Energy and Transportation</strong></a>
-        </li>
-        <li class="box col advanced-manufacturing">
-            <a href="{{ url('about_ignite') }}#advanced-manufacturing"><strong>Advanced Manufacturing</strong></a>
-        </li>
-        <li class="box col public-safety">
-            <a href="{{ url('about_ignite') }}#public-safety"><strong>Public Safety</strong></a>
-        </li>
+    {% for cat in categories %}
+    <li class="box col {{ cat.slug }}">
+        <a href="{{ url('entries_for_category', category=cat.slug) }}"><strong>{{ cat.name }}</strong></a>
+    </li>
+    {% endfor %}
     </ul>
 </section>
-<h2 class="faux_trigger box">Now to May 7: let's Brainstorm</h2>
+<h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
-        <p class="intro"><strong>How can next-generation apps change the world?</strong> Submit your rough ideas and brainstorm with innovators now. You don't need to be a developer or technologist to participate -- at this stage we're just seeking written ideas. All are welcome!</p>
+        <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
     </div>
     <div class="bonus col box">
         <div class="highlight">
@@ -85,7 +79,7 @@
             <a class="title" href="{{ entry.get_absolute_url() }}">
                 <h3 class="title wimper">
                     <div class="frame box">
-                        <img src="http://src.sencha.io/200/{{ app_url }}{{ entry.get_image_src() }}" alt="">
+                        <img src="{{ entry.get_image_src() }}" alt="">
                     </div>
                     {{ entry.title }}
                 </h3>
@@ -99,6 +93,7 @@
 <footer>
     <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
 </footer>
+{% if waffle.switch('show_blog') and waffle.switch('show_events') %}
 <h2 class="faux_trigger box">Latest news and events</h2>
 <div class="columns content_columns">
     <div class="col box main">
@@ -118,12 +113,12 @@
                 {% endfor %}
             </ol>
             <footer>
-                <p class="intro">Stay up to date <a href="/blog/" class="cta do">View all posts</a>
+                <p class="intro">Stay up to date <a href="https://blog.mozillaignite.org/" class="cta do">View all posts</a>
             </footer>
         </section>
     </div>
     <div class="bonus col box">
-        <div class="events">
+        <div class="events" id="upcoming_events">
             <h2 class="wimper">Upcoming Events</h2>
             <ol>
               {% for event in event_list %}
@@ -137,4 +132,5 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
