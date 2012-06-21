@@ -19,6 +19,7 @@ class dev {
     init: ;
     memcached: ;
     versioning: ;
+    sun_java_6: ;
   }
   class { "mysql":
     require => Class[init],

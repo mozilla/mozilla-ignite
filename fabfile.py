@@ -11,7 +11,7 @@ git_repo = 'https://github.com/rossbruniges/mozilla-ignite.org.git'
 def run_manage_cmd(cmd):
     """Run a manage.py command."""
     with cd(env.proj_root):
-        run('python manage.py %s' % (cmd,))
+        run('python manage.py %s' % cmd)
 
 
 def restart_celeryd():
@@ -75,6 +75,10 @@ def test(*args):
         apps = 'challenges timeslot webcast awards activity badges events users'
     print yellow('Testing: %s' % apps)
     local('python manage_test.py test %s --settings=settings_test' % apps)
+
+
+def load_initial_data():
+    run_manage_cmd('loaddata fixtures/ignite.json')
 
 
 def deploy(branch):
