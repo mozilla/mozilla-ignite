@@ -23,3 +23,5 @@ media/ignite/img/uploads*
 whoosh_index/
 #*
 .#*
+.vagrant
+vagrantconfig_local.yaml

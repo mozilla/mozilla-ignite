@@ -14,9 +14,9 @@ else:
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'NAME': 'mozilla-ignite',
+        'USER': 'mozilla-ignite',
+        'PASSWORD': 'mozilla-ignite',
         'HOST': '',
         'PORT': '',
         'OPTIONS': {
@@ -38,12 +38,19 @@ MANAGERS = ADMINS
 
 DEBUG = TEMPLATE_DEBUG = True
 
+SECRET_KEY = ''
+
 # Install memcache and remove this to make djangobrowser id
 # https://github.com/mozilla/django-session-csrf#differences-from-django
-CACHE_BACKEND = 'caching.backends.locmem://'
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
 # Browser ID performs the assertion with this url e.g. http://localhost:8000
-SITE_URL = ''
+SITE_URL = 'https://local.mozillaignite.org'
 
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = False

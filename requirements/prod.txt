@@ -1,3 +1,6 @@
+# Requirements are provided as part of ``vendor`` and ``vendor-local``
+# This file should not be installed. It is only kept as a reference.
+
 # Django stuff
 Django==1.3.1
 
@@ -23,7 +26,6 @@ Babel>=0.9.4
 -e git://github.com/fwenzel/django-mozilla-product-details#egg=django-mozilla-product-details
 
 # Misc
--e git://github.com/SmileyChris/django-mailer-2.git@1bd21d4#egg=django-mailer-2
 -e git://github.com/brosner/django-voting.git#egg=django-voting
 markdown==2.0.3
 django-extensions==0.8
