@@ -709,7 +709,8 @@ class EditEntryPhaseTest(MessageTestCase):
         return dict(title=submission.title,
                     brief_description='Versioned Submission',
                     description='A really, seriously good submission',
-                    category=submission.category.id)
+                    category=submission.category.id,
+                    life_improvements='A lot of improvement')
 
     @suppress_locale_middleware
     def test_edit_form(self):

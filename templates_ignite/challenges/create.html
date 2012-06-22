@@ -82,8 +82,8 @@
         {{ form.team_members }}
         </div>
     </div>
-     <div class="highlight {% if errors['Interested to make']%}fail{% endif %}">
-        <label for="id_interest_making" class="announce">{% if errors['Interested to make'] %}<em>Error in</em> {% endif %}{{ _('Are you interested in making your idea a reality?') }}</label>
+     <div class="highlight {% if form.interest_making.errors %}fail{% endif %}">
+        <label for="id_interest_making" class="announce">{% if form.interest_making.errors %}<em>Error in</em> {% endif %}{{ _('Are you interested in making your idea a reality?') }}</label>
         <p class="hint" id="info_intertest_making">{{ _('Do you want to try and build it? If so, do you need help? For example, guidance, mentorship, learning materials, more team members? (This won’t have an impact on how your idea is judged -- we’re just curious.)') }}</p>
         <div class="ed">
           {% for error in form.interest_making.errors %}<strong>{{ error }}</strong>{% endfor %}

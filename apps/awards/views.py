@@ -23,7 +23,6 @@ def award(request, submission_id, project=None, slug=None):
     judge_data = {
         'judge': request.user.get_profile(),
         'award__phase': submission.phase,
-        'award__is_released': True,
         }
     if submission.phase_round:
         judge_data.update({'award__phase_round': submission.phase_round})

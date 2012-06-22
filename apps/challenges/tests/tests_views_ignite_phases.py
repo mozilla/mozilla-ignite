@@ -22,6 +22,7 @@ class SubmissionPhasesBaseTest(TestCase):
             'title': 'This is full of awesomeness',
             'brief_description': 'Short description',
             'description': 'A bit longer description',
+            'life_improvements': 'A lot of improvements',
             'is_draft': False,
             'terms_and_conditions': True,
             }
