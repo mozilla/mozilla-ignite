@@ -113,26 +113,14 @@ Update the server by running in your local machine from the root of the project:
 Runing the test suite
 =====================
 
-SSH into the virtualbox:
-
-    vagrant ssh
-
-And run the test suite:
+From inside the VM run the test suite:
 
     fab test
 
 Compress the assets
 ===================
 
-SSH into the virtual box:
-
-    vagrant ssh
-
-Stop apache:
-
-    sudo /etc/init.d/apache2 stop
-
-Run the development server
+From inside the VM run:
 
     python manage.py compress_assets
 
