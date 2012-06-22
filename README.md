@@ -2,7 +2,7 @@
 Mozilla Ignite
 ===============
 
-mozilla-ignite is a challenge and participation platform that's being built on-top of the [betafarm architecture]: https://github.com/mozilla/betafarm
+``mozilla-ignite`` is a challenge and participation platform that's being built on-top of the [betafarm architecture]: https://github.com/mozilla/betafarm
 
 The Project structure is based on Mozilla Playdoh http://playdoh.readthedocs.org/en/latest/index.html
 
@@ -51,10 +51,10 @@ From the root of the repository copy the local python settings.
 
     cp settings_local.py-dist settings_local.py
 
-Amend ``popcorn_gallery/settings/local.py``  adding your details:
+Amend ``settings_local.py``  adding your details:
 
 - ADMINS: Add an email address and a name.
-- SECRET_KEY: This can be anything.
+- SECRET_KEY: Used to provide a seed in secret-key hashing algorithms. Set this to a random string -- the longer, the better
 - HMAC_KEYS: Uncomment or add your own key inside it.
 
 
@@ -66,7 +66,6 @@ Now we are ready to provision the machine run.
     vagrant up
 
 This will take a few minutes, so go on and reward yourself with a nice cup of tea!
-
 
 
 Add a host alias
@@ -85,6 +84,59 @@ Now the application should be available at:
     http://local.mozillaignite.org
 
 
+Updating the application
+========================
+
+The application is under develpment and from time to time there could be database changes.
+
+There is an script is provided to make sure it is keep in sync
+
+SSH into the VM:
+
+    vagrant ssh
+
+Run the update script
+
+    fab update_local
+
+
+Updating the VM
+===============
+
+The virtual machine can be updated from time to time, and it is done via Puppet http://puppetlabs.com/
+
+Update the server by running in your local machine from the root of the project:
+
+    vagrant provision
+
+
+Runing the test suite
+=====================
+
+SSH into the virtualbox:
+
+    vagrant ssh
+
+And run the test suite:
+
+    fab test
+
+Compress the assets
+===================
+
+SSH into the virtual box:
+
+    vagrant ssh
+
+Stop apache:
+
+    sudo /etc/init.d/apache2 stop
+
+Run the development server
+
+    python manage.py compress_assets
+
+
 Creating a superuser
 ====================
 
@@ -93,28 +145,26 @@ From inside the VM run:
     python manage.py createsuperuser
 
 
-Setup the application
----------------------
+Speed up the server
+===================
 
-You've need git and pip installed on the machine you want to install it on
+At the moment the wsgi application is served via apache, which it's a bit hacky in order to pick up the file changes and reload automaticaly.
 
-1. Clone the repo
-2. Install the dependancies:
-    * pip install -r requirements/dev.txt
-    * pip install -r requirements/compiled.txt
-    * git submodule update --init --recursive
-3. Create local settings file
-    * cp settings_local.py-dist settings_local.py
-4. Create local database
-5. Insert name and login details in settings_local.py
-6. Uncomment and specify an HMAC_KEYS entry
-7. Create generic database tables:
-    * ./manage.py syncdb
-8. Create mozilla-ignite specific database tables:
-    * ./manage.py migrate
-9. Compress your assets
-    * ./manage.py compress_assets
+If you want to speed up the application you could try stop apache and run the application via the development server.
 
+NGINX is proxy-passing the port 8000 to 80 and serving most of the static and media  files.
+
+SSH into the virtual box:
+
+    vagrant ssh
+
+Stop apache:
+
+    sudo /etc/init.d/apache2 stop
+
+Run the development server
+
+    python manage.py runserver
 
 
 License

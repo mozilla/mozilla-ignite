@@ -4,6 +4,13 @@ from fabric.api import cd, env, run, local
 from fabric.operations import sudo
 from fabric.colors import yellow
 
+from fabric.context_managers import lcd
+
+PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
+
+path = lambda *a: os.path.join(PROJECT_ROOT, *a)
+
+
 env.proj_root = '/var/webapps/mozilla-ignite/'
 git_repo = 'https://github.com/rossbruniges/mozilla-ignite.org.git'
 
@@ -67,6 +74,19 @@ def submodules():
         run('git submodule sync')
         run('git submodule update')
 
+def deploy(branch):
+    """Deploy latest code from ``branch``."""
+    update(branch)
+    syncdb()
+    migrate()
+    compress()
+    submodules()
+    restart_apache()
+    restart_celeryd()
+
+
+# Local environment
+
 def test(*args):
     """Run the tests locally takes a list of apps to test as arguments"""
     if args:
@@ -77,16 +97,14 @@ def test(*args):
     local('python manage_test.py test %s --settings=settings_test' % apps)
 
 
-def load_initial_data():
-    run_manage_cmd('loaddata fixtures/ignite.json')
+def syncdb_local():
+    """Syncronizes the local database"""
+    print yellow('Syncing the database')
+    with lcd(PROJECT_ROOT):
+        local('python manage.py syncdb --noinput')
+        local('python manage.py migrate --noinput')
 
 
-def deploy(branch):
-    """Deploy latest code from ``branch``."""
-    update(branch)
-    syncdb()
-    migrate()
-    compress()
-    submodules()
-    restart_apache()
-    restart_celeryd()
+def update_local():
+    """Steps to update the local application"""
+    syncdb_local()
