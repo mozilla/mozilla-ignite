@@ -25,9 +25,6 @@ HMAC_KEYS = {
 }
 
 
-app_list = []
-
-
 EXCLUDED_APPS = ('django_mailer', 'south', 'admin_tools',
                  'debug_toolbar')
 INSTALLED_APPS = filter(lambda a: a not in EXCLUDED_APPS, INSTALLED_APPS)

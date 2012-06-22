@@ -92,7 +92,7 @@ def test(*args):
     if args:
         apps = ' '.join(args)
     else:
-        apps = 'challenges timeslot webcast awards activity badges events users'
+        apps = '' # 'challenges timeslot webcast awards activity badges events users'
     print yellow('Testing: %s' % apps)
     local('python manage_test.py test %s --settings=settings_test' % apps)
 

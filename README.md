@@ -2,9 +2,9 @@
 Mozilla Ignite
 ===============
 
-``mozilla-ignite`` is a challenge and participation platform that's being built on-top of the [betafarm architecture]: https://github.com/mozilla/betafarm
+``mozilla-ignite`` is a challenge and participation platform that's being built on-top of the [betafarm architecture](https://github.com/mozilla/betafarm)
 
-The Project structure is based on Mozilla Playdoh http://playdoh.readthedocs.org/en/latest/index.html
+The Project structure is based on [Mozilla Playdoh](http://playdoh.readthedocs.org/en/latest/index.html)
 
 
 Contributing
