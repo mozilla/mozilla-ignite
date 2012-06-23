@@ -59,7 +59,7 @@
         </div>
     </fieldset>
     <div class="highlight {% if form.life_improvements.errors%}fail{% endif %}">
-        <label for="id_life_improvements" class="announce">{% if form.life_improvements.errors %}<em>Error in</em> {% endif %}{ _('How will your idea make people\'s lives better?') }} <span class="error-hint"><span>(required)</span></span><</label>
+        <label for="id_life_improvements" class="announce">{% if form.life_improvements.errors %}<em>Error in</em> {% endif %}{{ _('How will your idea make people\'s lives better?') }} <span class="error-hint"><span>(required)</span></span></label>
         <p class="hint" id="info_life_improvements">{{ _('Specifically, who will benefit and at what scale?') }}</p>
         <div class="ed">
           {% for error in form.life_improvements.errors %}<strong>{{ error }}</strong>{% endfor %}
