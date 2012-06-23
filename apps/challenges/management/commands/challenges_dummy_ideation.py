@@ -107,7 +107,7 @@ class Command(BaseCommand):
                     'interest_making': _random_paragraphs(2),
                     'phase': ideation,
                     'created_by': profile,
-                    'sketh_note': _random_image(_random_words(1)),
+                    'sketh_note': _random_image(slugify(_random_words(1))),
                     }
                 submission = Submission.objects.create(**data)
         print "DONE!"
