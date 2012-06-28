@@ -114,7 +114,6 @@ def has_phase_finished(phase):
     return datetime.utcnow() > end_date
 
 
-
 class Phase(BaseModel):
     """A phase of a challenge."""
     challenge = models.ForeignKey(Challenge, related_name='phases')
@@ -142,7 +141,8 @@ class Phase(BaseModel):
 
     @cached_property
     def days_remaining(self):
-        return self.end_date - datetime.utcnow()
+        time_remaining = self.end_date - datetime.utcnow()
+        return time_remaining.days if time_remaining.days >= 0 else -1
 
     @cached_property
     def phase_rounds(self):
@@ -150,10 +150,11 @@ class Phase(BaseModel):
 
     @cached_property
     def current_round(self):
-        """Determines the current round for this ``Phase``"""
+        """Determines the current open ``PhaseRound`` for this ``Phase``"""
         now = datetime.utcnow()
+        # we have a phase ``Round`` open
         for item in self.phase_rounds:
-            if item.start_date <= now and item.end_date >= now:
+            if item.start_date < now and item.end_date > now:
                 return item
         return None
 
@@ -170,6 +171,18 @@ class Phase(BaseModel):
             if phase_round.end_date <= now:
                 return phase_round
         return None
+
+    @cached_property
+    def is_open(self):
+        """Determines if this ``Phase`` is opened for ``Submissions``"""
+        now = datetime.utcnow()
+        # If the ``Phase`` has any ``phase_rounds`` its status
+        # is determined by the ``current_round``
+        if self.phase_rounds:
+            if self.current_round:
+                return True
+            return False
+        return self.start_date < now and now < self.end_date
 
 
 @receiver(signals.post_save, sender=Phase)

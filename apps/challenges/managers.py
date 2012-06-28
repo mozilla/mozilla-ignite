@@ -56,15 +56,6 @@ class PhaseManager(BaseModelManager):
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
-    def get_current_phase(self, slug):
-        now = datetime.utcnow()
-        try:
-            return self.filter(challenge__slug=slug,
-                               start_date__lte=now,
-                               end_date__gte=now)[0]
-        except IndexError:
-            return None
-
     def get_judging_phase(self, slug):
         """Determines the judging ``Phase`` if the end_date is in the past
         or a ``PhaseRound`` has past"""

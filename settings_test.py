@@ -32,8 +32,8 @@ INSTALLED_APPS = filter(lambda a: a not in EXCLUDED_APPS, INSTALLED_APPS)
 
 NOSE_ARGS = [
     '-s',
-    '--failed',
-    '--stop',
+    # '--failed',
+    # '--stop',
     '--nocapture',
     '--failure-detail',
     '--with-progressive',

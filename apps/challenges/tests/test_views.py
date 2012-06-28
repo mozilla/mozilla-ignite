@@ -1,6 +1,7 @@
 # Note: not using cStringIO here because then we can't set the "filename"
 from StringIO import StringIO
 
+from copy import copy
 from datetime import datetime, timedelta
 
 from django.conf import settings
@@ -9,9 +10,12 @@ from django.contrib.messages import SUCCESS
 from django.core.urlresolvers import reverse
 from django.db.models import Max
 from django.http import Http404
-from mock import Mock, patch
-from nose.tools import assert_equal, with_setup
-from test_utils import TestCase
+from django.test.utils import ContextList
+from django.test import signals
+from django.utils.functional import curry
+from mock import Mock, patch, MagicMock
+from nose.tools import assert_equal, with_setup, eq_, ok_
+from test_utils import TestCase, RequestFactory
 
 from commons.middleware import LocaleURLMiddleware
 from challenges import views
@@ -19,7 +23,8 @@ from challenges.models import (Challenge, Submission, Phase, Category,
                                ExternalLink, SubmissionParent,
                                SubmissionVersion, SubmissionHelp)
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
-                                       create_users, create_submissions)
+                                       create_users, create_submissions,
+                                       BLANK_EXTERNALS)
 from ignite.tests.decorators import ignite_skip, ignite_only
 from projects.models import Project
 
@@ -126,12 +131,6 @@ class ChallengeEntryTest(TestCase):
         response = self.client.get(reverse('entries_winning'))
         self.assertEqual(set(e.title for e in response.context['entries']),
                          set(e.title for e in winners))
-
-
-# Add this dictionary to a form for no external links
-BLANK_EXTERNALS = {'externals-TOTAL_FORMS': '1',
-                   'externals-INITIAL_FORMS': '0',
-                   'externals-MAX_NUM_FORMS': ''}
 
 
 def _build_links(initial_count, *forms):
@@ -804,3 +803,41 @@ class SubmissionHelpViewTest(TestCase):
         self.assertEqual(response.status_code, 200)
         page = response.context['page']
         self.assertEqual(page.paginator.count, 0)
+
+
+def store_rendered_templates(store, signal, sender, template, context, **kwargs):
+    """
+    Stores templates and contexts that are rendered.
+
+    The context is copied so that it is an accurate representation at the time
+    of rendering.
+    Entirely based on the Django Test Client
+    https://github.com/django/django/blob/master/django/test/client.py#L88
+    """
+    store.setdefault('templates', []).append(template)
+    store.setdefault('context', ContextList()).append(copy(context))
+
+
+
+class TestAddSubmissionView(TestCase):
+
+    def __init__(self, *args, **kwargs):
+        super(TestAddSubmissionView, self).__init__(*args, **kwargs)
+        # Add context and template to the response
+        on_template_render = curry(store_rendered_templates, {})
+        signals.template_rendered.connect(on_template_render,
+                                          dispatch_uid="template-render")
+
+    def setUp(self):
+        self.factory = RequestFactory()
+        self.ideation = MagicMock()
+
+    def test_add_submission_get(self):
+        request = self.factory.get('/')
+        response = views.add_submission(request, self.ideation)
+        eq_(response.status_code, 200)
+
+    def test_invalid_form(self):
+        request = self.factory.post('/', {})
+        response = views.add_submission(request, self.ideation)
+        eq_(response.status_code, 200)

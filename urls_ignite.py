@@ -12,8 +12,16 @@ patch()
 
 admin.autodiscover()
 
-_ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
-                  'slug': settings.IGNITE_CHALLENGE_SLUG}
+_ignite_kwargs = {
+    'project': settings.IGNITE_PROJECT_SLUG,
+    'slug': settings.IGNITE_CHALLENGE_SLUG
+    }
+
+_development_kwargs = {
+    'project': settings.IGNITE_PROJECT_SLUG,
+    'slug': settings.IGNITE_CHALLENGE_SLUG,
+    'phase': 'development',
+    }
 
 vote_dict = {
     'model': SubmissionParent,
@@ -35,15 +43,39 @@ urlpatterns = patterns('',
     url(r'^ideas/list/$', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
     url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
     url(r'^ideas/(?P<pk>\d+)/judgement/$', 'challenges.views.entry_judge', kwargs=_ignite_kwargs, name='entry_judge'),
-    url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
     url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
     url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
         vote_on_object, vote_dict, name='entry_vote'),
-    url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
     url(r'^terms/$', 'ignite.views.terms', kwargs=_ignite_kwargs,  name='terms_conditions')
 )
+
+# Ideation phase: Ideas URLs
+
+_ideation_kwargs = {
+    'project': settings.IGNITE_PROJECT_SLUG,
+    'slug': settings.IGNITE_CHALLENGE_SLUG,
+    'phase': 'ideation',
+    }
+
+urlpatterns += patterns(
+    'challenges.views',
+    url(r'^ideas/add/$', 'create_entry', kwargs=_ignite_kwargs,
+        name='create_entry'),
+    url(r'^ideas/(?P<pk>\d+)/edit/$', 'entry_edit', kwargs=_ignite_kwargs,
+        name='entry_edit'),
+    )
+
+# Development phase: Proposal URLs
+urlpatterns += patterns(
+    'challenges.views',
+    url(r'^proposal/add/$', 'create_proposal', kwargs=_ignite_kwargs,
+        name='create_proposal'),
+    url(r'^proposal/(?P<pk>\d+)/edit/$', 'proposal_edit', kwargs=_ignite_kwargs,
+        name='proposal_edit'),
+    )
+
 
 urlpatterns += patterns(
     'challenges.views',

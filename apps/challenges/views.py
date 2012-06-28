@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.formsets import formset_factory
-from django.http import HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.generic.base import TemplateResponseMixin
@@ -54,9 +54,11 @@ class JingoTemplateMixin(TemplateResponseMixin):
         return jingo.render(self.request, template_name, context,
                             **response_kwargs)
 
+
 def get_list_count(*args):
     """Calculates the number of elements in the list of lists passed"""
     return len(list(itertools.chain(*args)))
+
 
 def show(request, project, slug, template_name='challenges/show.html', category=False):
     """Show an individual project challenge."""
@@ -77,7 +79,8 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
         category = False
-
+    # 'days_remaining': request.phase['days_remaining']
+    days_remaning = request.ideation.days_remaining
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -85,7 +88,7 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
-        'days_remaining': request.phase['days_remaining']
+        'days_remaining': days_remaning,
     })
 
 
@@ -222,47 +225,38 @@ def entries_category(request, project, slug, category):
     return show(request, project, slug,
                 template_name='challenges/all.html', category=category)
 
-@phase_open_required(methods_allowed=['GET'])
-@login_required
-@project_challenge_required
-def create_entry(request, project, challenge):
-    """Creates a ``Submission`` from the user details"""
-    profile = request.user.get_profile()
-    LinkFormSet = formset_factory(EntryLinkForm, extra=2,
+LinkFormSet = formset_factory(EntryLinkForm, extra=2,
                                   formset=BaseExternalLinkFormSet)
-    phase = Phase.objects.get_current_phase(challenge.slug)
-    phase_forms = {
-        settings.IGNITE_IDEATION_NAME: NewEntryForm,
-        settings.IGNITE_DEVELOPMENT_NAME: NewDevelopmentEntryForm,
-        }
-    # Determine form according to the current Phase
-    # Fallback to the ideation phase form
+
+
+def get_submissionparent_or_404(challenge, **kwargs):
+    try:
+        return (SubmissionParent.objects.select_related('submission')
+                .get(submission__phase__challenge=challenge, **kwargs))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+
+
+def add_submission(request, phase, form_class=NewEntryForm,
+                   template='challenges/create.html', extra_context=None):
+    """Adds a ``Submission`` to the selected ``Phase``"""
     error_count = 0
-    if phase and phase.name in phase_forms:
-        PhaseNewEntryForm = phase_forms[phase.name]
-    else:
-        PhaseNewEntryForm = NewEntryForm
     if request.method == 'POST':
-        # If there is not an active phase it shouldn't be able to get here
-        if not phase:
-            raise Http404
-        form = PhaseNewEntryForm(request.POST, request.FILES)
+        form = form_class(request.POST, request.FILES)
         link_form = LinkFormSet(request.POST, prefix="externals")
         if form.is_valid() and link_form.is_valid():
+            # prepare fields to be saved
             entry = form.save(commit=False)
-            entry.created_by = profile
+            entry.created_by = request.user.get_profile()
             entry.phase = phase
             if phase.current_round:
                 entry.phase_round = phase.current_round
             entry.save()
             for link in link_form.cleaned_data:
                 if all(i in link for i in ("name", "url")):
-                    ExternalLink.objects.create(
-                        name=link['name'],
-                        url=link['url'],
-                        submission=entry
-                    )
-            # create the ``SubmissionParent`` for this entry
+                    ExternalLink.objects.create(name=link['name'],
+                                                url=link['url'],
+                                                submission=entry)
             SubmissionParent.objects.create(submission=entry)
             if entry.is_draft:
                 msg = _('<strong>Your entry has been saved as draft.</strong>'
@@ -275,15 +269,53 @@ def create_entry(request, project, challenge):
             return HttpResponseRedirect(phase.challenge.get_entries_url())
         error_count = get_list_count(form.errors, link_form.non_form_errors())
     else:
-        form = PhaseNewEntryForm()
+        form = form_class()
         link_form = LinkFormSet(prefix='externals')
-    return jingo.render(request, 'challenges/create.html', {
-        'project': project,
-        'challenge': challenge,
+    context = {
         'form': form,
         'link_form': link_form,
         'error_count': error_count,
-    })
+        }
+    if extra_context:
+        context.update(extra_context)
+    return jingo.render(request, template, context)
+
+
+@login_required
+@project_challenge_required
+def create_proposal(request, project, challenge):
+    """Creates a ``Submission`` in the development phase from the provided
+    details.
+    If the phase is not open we 404.
+    """
+    phase = Phase.objects.get_development_phase()
+    # Development phase must be open
+    if not phase or not phase.is_open:
+        raise Http404
+    extra_context = {
+        'project': project,
+        'challenge': challenge,
+        }
+    return add_submission(request, phase, form_class=NewDevelopmentEntryForm,
+                          extra_context=extra_context)
+
+
+@login_required
+@project_challenge_required
+def create_entry(request, project, challenge):
+    """Creates a Ideation ``Submission`` with the details provided.
+    Once the phase is closed we 404.
+    """
+    phase = Phase.objects.get_ideation_phase()
+    # Ideation phase must be open
+    if not phase or not phase.is_open:
+        raise Http404
+    extra_context = {
+        'project': project,
+        'challenge': challenge,
+        }
+    return add_submission(request, phase, extra_context=extra_context)
+
 
 @project_challenge_required
 def entry_version(request, project, challenge, entry_id):
@@ -334,8 +366,10 @@ def get_award_context(submission, user):
         }
 
 
-def get_judging_context(user, submission, phase_dict):
+def get_judging_context(user, submission, phase_dict=None):
     """Context for the Judging submission"""
+    # TODO: prepare the right context for this data
+    return {}
     if not user.is_judge or phase_dict['is_open'] or \
         not submission.judgeable_by(user):
         return {}
@@ -418,7 +452,7 @@ def entry_show(request, project, challenge, entry_id, judging_form=None):
     }
     # Add extra context to the View. It is on regular django templates it is
     # usually done on template tags. In this case we do it here
-    context.update(get_judging_context(request.user, entry, request.phase))
+    context.update(get_judging_context(request.user, entry))
     context.update(get_award_context(entry, request.user))
     return jingo.render(request, 'challenges/show_entry.html', context)
 
@@ -518,146 +552,117 @@ class EntryJudgementView(JingoTemplateMixin, SingleSubmissionMixin, ModelFormMix
 entry_judge = EntryJudgementView.as_view()
 
 
-class EditEntryView(UpdateView, JingoTemplateMixin, SingleSubmissionMixin):
+def archive_submission(submission, form, link_form, phase):
+    """Archive the old ``Submisssion`` and create a new entry for the currrent
+    ``Phase`` ``PhaseRound`` combination"""
+    previous_submission = submission
+    new_submission = Submission(created_by=previous_submission.created_by,
+                                category=previous_submission.category,
+                                phase=phase)
+    # ``Submission`` enters to tne open ``PhaseRound``
+    if phase.current_round:
+        new_submission.phase_round = phase.current_round
+    # Reuse the existing image if one hasn't been provided
+    if not form.cleaned_data.get('sketh_note'):
+        new_submission.sketh_note = submission.sketh_note
+    # Create a new instance of the ``ModelForm`` since we want to duplicate
+    # and call whatever mechanisms might be triggered through the form
+    new_form = form.__class__(form.data, form.files, instance=new_submission)
+    new_submission = new_form.save()
+    submission.parent.update_version(new_submission)
+    # Duplicate the links sent for this ``Submission``
+    create_link = lambda link: ExternalLink.objects.create(
+        url=link['url'], name=link['name'], submission=new_submission)
+    link_form = [create_link(link) for link in link_form.cleaned_data if link]
+    return new_submission
 
-    link_form_class = InlineLinkFormSet
-    template_name = 'challenges/edit.html'
 
-    @cached_property
-    def current_phase(self):
-        # Query and cache it here since we need it in two different
-        # methods on this Class Based view.
-        return Phase.objects.get_current_phase(settings.IGNITE_CHALLENGE_SLUG)
-
-    def get_form_class(self):
-        """Returns the appropiate form according to the current Phase.
-        Falls back to the ideation Form"""
-        phase = self.current_phase
-        phase_forms = {
-            settings.IGNITE_IDEATION_NAME: EntryForm,
-            settings.IGNITE_DEVELOPMENT_NAME: DevelopmentEntryForm,
-            }
-        if phase and phase.name in phase_forms:
-            PhaseEntryForm = phase_forms[phase.name]
-        else:
-            PhaseEntryForm = EntryForm
-        self.form_class = PhaseEntryForm
-        return self.form_class
-    
-    def _check_permission(self, submission, user):
-        return submission.editable_by(user)
-
-    # The following two methods are analogous to Django's generic form methods
-    def get_link_form(self, link_form_class):
-        return link_form_class(**self.get_link_form_kwargs())
-
-    def get_link_form_kwargs(self):
-        form_kwargs = super(EditEntryView, self).get_form_kwargs()
-        # Initial data doesn't apply to formsets
-        del form_kwargs['initial']
-        form_kwargs.update(instance=self.object, prefix='externals')
-        return form_kwargs
-
-    def get_forms(self):
-        """Return the forms available to this view as a dictionary."""
-        form = self.get_form(self.get_form_class())
-        link_form = self.get_link_form(self.link_form_class)
-        return {'form': form, 'link_form': link_form}
-
-    def get(self, request, *args, **kwargs):
-        """Respond to a GET request by displaying the edit form."""
-        self.object = self.get_object()
-        self.parent = self.object.parent
-        context = self.get_context_data(**self.get_forms())
-        """
-        We now access errrors direct in the template - so with no errors
-        it throws undefined
-        """
-        context['errors'] = {}
-        return self.render_to_response(context)
-
-    def post(self, request, *args, **kwargs):
-        """Handle the ``Submission`` update, only available when a phase is open
-        If the forms are both valid, save them and redirect to the success URL.
-        If either form is invalid, render the form with the errors displayed.
-        If a different round is active:
-        - Archive the old submission, add the new one with the changes
-        """
-        self.object = self.get_object()
-        forms = self.get_forms()
-        form, link_form = forms['form'], forms['link_form']
+def submission_edit(request, submission, phase, form_class=EntryForm,
+                    template='challenges/edit.html', extra_context=None):
+    """Updates a given ``Submission``
+    Keeps versions the ``Submission``
+    If the edit happens after a ``PhaseRound`` is closed it enters the current
+    open phase"""
+    error_count = 0
+    if request.method == 'POST':
+        form = form_class(request.POST, request.FILES, instance=submission)
+        link_form = InlineLinkFormSet(request.POST, instance=submission,
+                                      prefix='externals')
         if form.is_valid() and link_form.is_valid():
-            return self.form_valid(form, link_form)
-        else:
-            return self.form_invalid(form, link_form)
-
-    def form_valid(self, form, link_form):
-        """Saves updates the ``Submission`` if it is on the same ``Round`` and
-        ``Phase`` else archive the old submission and create a new entry"""
-        messages.success(self.request, 'Your entry has been updated.')
-        phase = self.current_phase
-        object_phase = self.object.phase_round if self.object.phase_round else None
-        self.parent = self.object.parent
-        if self.object.phase == phase and object_phase == phase.current_round:
-            # No changes during a different Round and Phase update the
-            # current entry
-            response = super(EditEntryView, self).form_valid(form)
-            link_form.save()
-        else:
-            #  Archive the old submission and create a new entry for the current
-            # Phase / Round with the new details
-            previous_submission = self.object
-            profile = self.request.user.get_profile()
-            submission = Submission(created_by=profile,
-                                    category=previous_submission.category,
-                                    phase=phase)
-            if phase.current_round:
-                submission.phase_round = phase.current_round
-            # Pass the form data to the new submission
-            kwargs = self.get_form_kwargs()
-            kwargs['instance'] = submission
-            new_form = self.form_class(**kwargs)
-            if new_form.is_valid():
-                new_submission = new_form.save()
-                if not kwargs['files']:
-                    new_submission.sketh_note = previous_submission.sketh_note
-                    new_submission.save()
-                self.parent.update_version(new_submission)
-                # Duplicate links
-                for link in link_form.cleaned_data:
-                    if not link:
-                        continue
-                    ExternalLink.objects.create(url=link['url'],
-                                                name=link['name'],
-                                                submission=new_submission)
+            if submission.phase == phase \
+                and submission.phase_round == phase.current_round:
+                # Same ``Phase`` and ``PhaseRound`` update the current phase
+                submission = form.save()
+                link_form.save()
             else:
-                # This is the best way to handle invalid details
-                # from the form when duplicating the submission
-                return self.form_invalid(new_form, link_form)
-            response = HttpResponseRedirect(self.get_success_url())
-        return response
-
-    def form_invalid(self, form, link_form):
-        """Display the form with errors."""
-        error_count = get_list_count(form.errors, link_form.non_form_errors())
-        context = self.get_context_data(form=form, link_form=link_form,
-                                        error_count=error_count)
-        return self.render_to_response(context)
-
-    def get_context_data(self, **kwargs):
-        context = super(EditEntryView, self).get_context_data(**kwargs)
-        context['challenge'] = self._get_challenge()
-        context['project'] = context['challenge'].project
-        return context
-
-    @method_decorator(login_required)
-    @method_decorator(phase_open_required(methods_allowed=['GET']))
-    def dispatch(self, *args, **kwargs):
-        return super(EditEntryView, self).dispatch(*args, **kwargs)
+                # ``Submission`` enters the new open ``PhaseRound`` and
+                # it is duplicated and archived
+                submission = archive_submission(submission, form, link_form,
+                                                phase)
+            return HttpResponseRedirect(submission.parent.get_absolute_url())
+        else:
+            error_count = get_list_count(form.errors,
+                                         link_form.non_form_errors())
+    else:
+        form = form_class(instance=submission)
+        link_form = InlineLinkFormSet(instance=submission, prefix='externals')
+    context = {
+        'form': form,
+        'link_form': link_form,
+        'error_count': error_count,
+        }
+    if extra_context:
+        context.update(extra_context)
+    return jingo.render(request, template, context)
 
 
-# This view is only available when there is a Phase open
-entry_edit = EditEntryView.as_view()
+@login_required
+@project_challenge_required
+def entry_edit(request, project, challenge, pk):
+    """Edit ``Submission`` ideas mechanics"""
+    phase = Phase.objects.get_ideation_phase()
+    # Ideation phase must be open
+    if not phase or not phase.is_open:
+        raise Http404
+    extra_context = {
+        'project': project,
+        'challenge': challenge,
+        }
+    parent = get_submissionparent_or_404(challenge, slug=pk,
+                                         submission__phase=phase)
+    submission = parent.submission
+    if not submission.editable_by(request.user):
+        return HttpResponseForbidden()
+    # Ideas ``Submissions`` can't be turned into Proposals
+    if not submission.phase == phase:
+        raise Http404
+    return submission_edit(request, submission, phase,
+                           extra_context=extra_context)
+
+
+@login_required
+@project_challenge_required
+def proposal_edit(request, project, challenge, pk):
+    """Edit ``Submission`` proposal mechanics"""
+    phase = Phase.objects.get_development_phase()
+    # Development phase must be open
+    if not phase or not phase.is_open:
+        raise Http404
+    extra_context = {
+        'project': project,
+        'challenge': challenge,
+        }
+    # Proposals only can be moved between ``PhaseRounds``
+    parent = get_submissionparent_or_404(challenge, slug=pk,
+                                         submission__phase=phase)
+    submission = parent.submission
+    if not submission.editable_by(request.user):
+        return HttpResponseForbidden()
+    if not submission.phase == phase:
+        raise Http404
+    return submission_edit(request, submission, phase,
+                           form_class=DevelopmentEntryForm,
+                           extra_context=extra_context)
 
 
 class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
