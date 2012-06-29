@@ -58,6 +58,10 @@ class Profile(BaseModel):
                                        blank=True, null=True,
                                        upload_to=settings.USER_AVATAR_PATH)
 
+    @models.permalink
+    def get_absolute_url(self):
+        return ('users_profile', [self.user.username])
+
     def get_gravatar_url(self, size=140):
         base_url = getattr(settings, 'GRAVATAR_URL', None)
         if not base_url:

@@ -18,7 +18,7 @@
     <div class="busta">
         <p class="box intro"><strong>Design and build apps for the faster, smarter internet of the future</strong>. Mozilla and the National Science Foundation invite you to take part in an open innovation challenge. The goal: show how next-generation networks can revolutionize healthcare, education, public safety, energy and more.</p>
        <div class="gather wimper">
-            <a href="{{ url('create_entry') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
+            <a href="{{ url('create_entry', phase='ideas') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
        </div>
     </div>
 </div>
@@ -28,7 +28,7 @@
             <li class="col brainstorm box">
                 <h3 class="exclaim">Brainstorm</h3>
                 <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
-                <a class="col-foot" href="{{ url('create_entry') }}">Submit your ideas</a>
+                <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
             </li>
             <li class="col hack box">
                 <h3 class="exclaim">Hack</h3>
@@ -55,7 +55,7 @@
     <ul>
     {% for cat in categories %}
     <li class="box col {{ cat.slug }}">
-        <a href="{{ url('entries_for_category', category=cat.slug) }}"><strong>{{ cat.name }}</strong></a>
+      <a href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}"><strong>{{ cat.name }}</strong></a>
     </li>
     {% endfor %}
     </ul>
@@ -68,7 +68,7 @@
     <div class="bonus col box">
         <div class="highlight">
             <h2 class="point box-title">What's your big idea?</h2>
-            <a class="cta" href="{{ url('create_entry') }}">Get started</a>
+            <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Get started</a>
         </div>
     </div>
 </div>
@@ -91,7 +91,7 @@
     {% endfor %}
 </ul>
 <footer>
-    <p class="intro">Discover great ideas <a href="{{ url('entries_all') }}" class="cta do">See all submissions</a></p>
+    <p class="intro">Discover great ideas <a href="{{ url('entries_all', phase='ideas') }}" class="cta do">See all submissions</a></p>
 </footer>
 {% if waffle.switch('show_blog') and waffle.switch('show_events') %}
 <h2 class="faux_trigger box">Latest news and events</h2>

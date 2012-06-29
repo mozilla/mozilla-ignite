@@ -30,6 +30,11 @@ TEMPLATE_CONTEXT_PROCESSORS += (
     'challenges.context_processors.assigned_submissions_processor',
     )
 
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: "/profile/%s/" % u.username,
+}
+
 # ``DEVELOPMENT_PHASE`` only enables templating overriding
 # any other functionality has been implemented using
 # Phases/Rounds start and end dates.

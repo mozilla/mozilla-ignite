@@ -23,7 +23,7 @@
 {% endblock %}
 
 {% block content %} 
-    <a href="{{ url('entries_all') }}" class="back wimper">See all submissions</a>
+    <a href="{{ url('entries_all', phase='ideas') }}" class="back wimper">See all submissions</a>
     <article>
       <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
@@ -196,7 +196,7 @@
             <section class="widgets">
                 <nav class="tags">
                 <h2 class="wimper">Focus area</h2>
-                <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
+                <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug, phase='ideas') }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
             <section class="widgets">
@@ -214,7 +214,7 @@
             </section> 
             <div class="highlight">
                 <h2 class="point box-title">How would you push the web further?</h2>
-                <a class="cta" href="{{ url('create_entry') }}">Create an idea</a>
+                <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Create an idea</a>
             </div>
         </aside>
         </div>

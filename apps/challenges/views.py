@@ -11,6 +11,7 @@ from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
+from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
@@ -29,7 +30,6 @@ from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm, NewEntryForm, SubmissionHelpForm,
                               SubmissionHelp, DevelopmentEntryForm,
                               NewDevelopmentEntryForm, BaseExternalLinkFormSet)
-from challenges.lib import cached_property
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
@@ -38,6 +38,19 @@ from timeslot.models import TimeSlot
 
 
 LOGGER = logging.getLogger(__name__)
+
+
+def get_phase_or_404(slug):
+    """Returns the appropriate ``Phase`` to the given slug
+    ``ideas`` or ``proposals`` or raise ``Http404``"""
+    phase = None
+    if slug == 'ideas':
+        phase = Phase.objects.get_ideation_phase()
+    if slug == 'proposals':
+        phase = Phase.objects.get_development_phase()
+    if phase:
+        return phase
+    raise Http404
 
 
 class JingoTemplateMixin(TemplateResponseMixin):
@@ -60,7 +73,8 @@ def get_list_count(*args):
     return len(list(itertools.chain(*args)))
 
 
-def show(request, project, slug, template_name='challenges/show.html', category=False):
+def show(request, project, slug, phase, template_name='challenges/show.html',
+         category=False):
     """Show an individual project challenge."""
     try:
         challenge = (Challenge.objects.select_related('project')
@@ -89,12 +103,14 @@ def show(request, project, slug, template_name='challenges/show.html', category=
         'categories': Category.objects.get_active_categories(),
         'category': category,
         'days_remaining': days_remaning,
+        'phase': phase,
     })
 
 
-def entries_all(request, project, slug):
+def entries_all(request, project, slug, phase):
     """Show all entries (submissions) to a challenge."""
-    return show(request, project, slug, template_name='challenges/all.html')
+    phase = get_phase_or_404(phase)
+    return show(request, project, slug, phase, template_name='challenges/all.html')
 
 
 class WinningEntriesView(ListView, JingoTemplateMixin):
@@ -220,9 +236,10 @@ class JudgedEntriesView(ListView, JingoTemplateMixin):
 entries_judged = judge_required(JudgedEntriesView.as_view())
 
 
-def entries_category(request, project, slug, category):
+def entries_category(request, project, slug, category, phase):
     """Show all entries to a specific category"""
-    return show(request, project, slug,
+    phase = get_phase_or_404(phase)
+    return show(request, project, slug, phase,
                 template_name='challenges/all.html', category=category)
 
 LinkFormSet = formset_factory(EntryLinkForm, extra=2,
@@ -266,7 +283,7 @@ def add_submission(request, phase, form_class=NewEntryForm,
                 msg = _('Your entry has been posted successfully and is now '
                         'available for public review')
             messages.success(request, msg)
-            return HttpResponseRedirect(phase.challenge.get_entries_url())
+            return HttpResponseRedirect(phase.get_absolute_url())
         error_count = get_list_count(form.errors, link_form.non_form_errors())
     else:
         form = form_class()
@@ -283,38 +300,21 @@ def add_submission(request, phase, form_class=NewEntryForm,
 
 @login_required
 @project_challenge_required
-def create_proposal(request, project, challenge):
-    """Creates a ``Submission`` in the development phase from the provided
-    details.
-    If the phase is not open we 404.
-    """
-    phase = Phase.objects.get_development_phase()
-    # Development phase must be open
-    if not phase or not phase.is_open:
-        raise Http404
-    extra_context = {
-        'project': project,
-        'challenge': challenge,
-        }
-    return add_submission(request, phase, form_class=NewDevelopmentEntryForm,
-                          extra_context=extra_context)
-
-
-@login_required
-@project_challenge_required
-def create_entry(request, project, challenge):
+def create_entry(request, project, challenge, phase):
     """Creates a Ideation ``Submission`` with the details provided.
     Once the phase is closed we 404.
     """
-    phase = Phase.objects.get_ideation_phase()
-    # Ideation phase must be open
+    phase = get_phase_or_404(phase)
+    form_class = NewEntryForm if phase.is_ideation else NewDevelopmentEntryForm
+    # Phase must be open
     if not phase or not phase.is_open:
         raise Http404
     extra_context = {
         'project': project,
         'challenge': challenge,
         }
-    return add_submission(request, phase, extra_context=extra_context)
+    return add_submission(request, phase, form_class=form_class,
+                          extra_context=extra_context)
 
 
 @project_challenge_required
@@ -393,13 +393,17 @@ def get_judging_context(user, submission, phase_dict=None):
 
 
 @project_challenge_required
-def entry_show(request, project, challenge, entry_id, judging_form=None):
-    """Detail of an idea, show any related information to it"""
-    # SubmissionParent acts as an proxy for any of the revisions.
-    # and it only shows the current revision
+def entry_show(request, project, challenge, entry_id, phase, judging_form=None):
+    """Detail of an ``Submission``
+    ``SubmissionParent`` acts as an proxy for any of the revisions only
+    shows the current revision
+    ``phase`` determines the slug on which this ``Submission`` was accesed
+    """
+    phase = get_phase_or_404(phase)
     try:
         parent = (SubmissionParent.objects.select_related('submission')
-                  .get(slug=entry_id, submission__phase__challenge=challenge))
+                  .get(slug=entry_id, submission__phase__challenge=challenge,
+                       submission__phase=phase))
     except SubmissionParent.DoesNotExist:
         raise Http404
     entry = parent.submission
@@ -599,7 +603,7 @@ def submission_edit(request, submission, phase, form_class=EntryForm,
                 # it is duplicated and archived
                 submission = archive_submission(submission, form, link_form,
                                                 phase)
-            return HttpResponseRedirect(submission.parent.get_absolute_url())
+            return HttpResponseRedirect(submission.get_absolute_url())
         else:
             error_count = get_list_count(form.errors,
                                          link_form.non_form_errors())
@@ -618,9 +622,10 @@ def submission_edit(request, submission, phase, form_class=EntryForm,
 
 @login_required
 @project_challenge_required
-def entry_edit(request, project, challenge, pk):
+def entry_edit(request, project, challenge, pk, phase):
     """Edit ``Submission`` ideas mechanics"""
-    phase = Phase.objects.get_ideation_phase()
+    phase = get_phase_or_404(phase)
+    form_class = EntryForm if phase.is_ideation else DevelopmentEntryForm
     # Ideation phase must be open
     if not phase or not phase.is_open:
         raise Http404
@@ -637,31 +642,7 @@ def entry_edit(request, project, challenge, pk):
     if not submission.phase == phase:
         raise Http404
     return submission_edit(request, submission, phase,
-                           extra_context=extra_context)
-
-
-@login_required
-@project_challenge_required
-def proposal_edit(request, project, challenge, pk):
-    """Edit ``Submission`` proposal mechanics"""
-    phase = Phase.objects.get_development_phase()
-    # Development phase must be open
-    if not phase or not phase.is_open:
-        raise Http404
-    extra_context = {
-        'project': project,
-        'challenge': challenge,
-        }
-    # Proposals only can be moved between ``PhaseRounds``
-    parent = get_submissionparent_or_404(challenge, slug=pk,
-                                         submission__phase=phase)
-    submission = parent.submission
-    if not submission.editable_by(request.user):
-        return HttpResponseForbidden()
-    if not submission.phase == phase:
-        raise Http404
-    return submission_edit(request, submission, phase,
-                           form_class=DevelopmentEntryForm,
+                           form_class=form_class,
                            extra_context=extra_context)
 
 
@@ -698,8 +679,39 @@ class DeleteEntryView(DeleteView, JingoTemplateMixin, SingleSubmissionMixin):
     def dispatch(self, *args, **kwargs):
         return super(DeleteEntryView, self).dispatch(*args, **kwargs)
 
-entry_delete = DeleteEntryView.as_view()
+# entry_delete = DeleteEntryView.as_view()
 
+@login_required
+@project_challenge_required
+def entry_delete(request, project, challenge, pk, phase):
+    """Removes a user ``Submission``"""
+    phase = get_phase_or_404(phase)
+    profile = request.user.get_profile()
+    try:
+        parent = (SubmissionParent.objects.select_related('submission')
+                  .get(slug=pk, submission__phase__challenge=challenge,
+                       submission__phase=phase,
+                       submission__created_by=profile))
+    except SubmissionParent.DoesNotExist:
+        raise Http404
+    if request.method == 'POST':
+        # Remove all the versioned content from the Parent, since
+        # the User don't want to keep any versions of this ``Submission``
+        for old_submission in parent.submissionversion_set.all():
+            old_submission.delete()
+        # Remove the current ``Submission``
+        parent.submission.delete()
+        # Remove the ``SubmissionParent``
+        parent.delete()
+        messages.success(request, "Your submission has been deleted.")
+        return HttpResponseRedirect(profile.get_absolute_url())
+    context = {
+        'project': project,
+        'challenge': challenge,
+        'object': parent.submission,
+        'parent': parent,
+        }
+    return jingo.render(request, 'challenges/delete.html', context)
 
 @login_required
 @project_challenge_required

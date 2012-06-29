@@ -32,7 +32,7 @@
             <nav>
                 <ul>
                     <li><a href="{{ url('about_ignite') }}">{{ _('About the challenge') }}</a></li>
-                    <li><a href="{{ url('entries_all') }}">{{ _('Ideas') }}</a></li>
+                    <li><a href="{{ url('entries_all', phase='ideas') }}">{{ _('Ideas') }}</a></li>
                     {% if waffle.switch('show_judges') %}
                     <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
                     {% endif %}

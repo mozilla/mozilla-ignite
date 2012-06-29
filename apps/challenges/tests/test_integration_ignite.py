@@ -22,8 +22,8 @@ class SubmissionBaseTest(TestCase):
 
     def setUp(self):
         self.profile = create_user('bob')
-        self.ideation_url = reverse('create_entry')
-        self.development_url = reverse('create_proposal')
+        self.ideation_url = reverse('create_entry', args=['ideas'])
+        self.development_url = reverse('create_entry', args=['proposals'])
 
     def _get_valid_data(self, **kwargs):
         defaults = {
@@ -93,7 +93,7 @@ class SubmissionIdeationOpenTest(SubmissionBaseTest):
         data possible"""
         self.valid_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.ideation_url, self.valid_data)
-        self.assertRedirects(response, reverse('entries_all'))
+        self.assertRedirects(response, reverse('entries_all', args=['ideas']))
         submission = Submission.objects.get()
         eq_(submission.phase, self.initial_data['ideation_phase'])
         eq_(submission.phase_round, None)
@@ -103,7 +103,7 @@ class SubmissionIdeationOpenTest(SubmissionBaseTest):
     def test_ideation_phase_valid_submission_inline_links(self):
         self.valid_data.update(EXTERNALS)
         response = self.client.post(self.ideation_url, self.valid_data)
-        self.assertRedirects(response, reverse('entries_all'))
+        self.assertRedirects(response, reverse('entries_all', args=['ideas']))
         submission = Submission.objects.get()
         link = ExternalLink.objects.get()
         eq_(link.name, 'Mozilla')
@@ -124,9 +124,10 @@ class SubmissionEditIdeationOpenAnonTest(SubmissionBaseTest):
     def setUp(self):
         super(SubmissionEditIdeationOpenAnonTest, self).setUp()
         initial_data = setup_ideation_phase(**setup_ignite_challenge())
-        submission = create_submission(created_by=self.profile,
-                                       phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[submission.parent.slug])
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=initial_data['ideation_phase'])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', self.submission.parent.slug])
 
     def test_ideation_edit_get(self):
         response = self.client.get(self.edit_url)
@@ -135,6 +136,24 @@ class SubmissionEditIdeationOpenAnonTest(SubmissionBaseTest):
     def test_ideation_edit_post(self):
         response = self.client.post(self.edit_url, {})
         self.assertRedirectsLogin(response)
+
+    def test_ideation_show_get(self):
+        url = reverse('entry_show', args=['ideas', self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        context = response.context
+        eq_(context['entry'], self.submission)
+        context_list = ['project', 'challenge', 'links', 'previous',
+                        'next', 'user_vote', 'votes', 'excluded',
+                        'webcast_list', 'badge_list', 'parent']
+        for item in context_list:
+            ok_(item in context)
+
+    def test_invalid_url_development_show_get(self):
+        url = reverse('entry_show', args=['proposals',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 404)
 
 
 class SubmissionEditIdeationOpenNotOwnerTest(SubmissionBaseTest):
@@ -147,7 +166,8 @@ class SubmissionEditIdeationOpenNotOwnerTest(SubmissionBaseTest):
         other = create_user('other')
         submission = create_submission(created_by=other,
                                        phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -172,7 +192,8 @@ class SubmissionEditIdeationOpenTest(SubmissionBaseTest):
         self.category = initial_data['category']
         self.submission = create_submission(created_by=self.profile,
                                             phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[self.submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', self.submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -195,9 +216,10 @@ class SubmissionEditIdeationOpenTest(SubmissionBaseTest):
             eq_(item.tags, 'success')
 
     def test_invalid_development_url(self):
-        url = reverse('proposal_edit', args=[self.submission.parent.slug])
+        url = reverse('entry_edit', args=['proposals', self.submission.parent.slug])
         response = self.client.get(url)
         eq_(response.status_code, 404)
+
 
 # Ideation Phase closed
 
@@ -249,9 +271,10 @@ class SubmissionEditIdeationClosedAnonTest(SubmissionBaseTest):
         super(SubmissionEditIdeationClosedAnonTest, self).setUp()
         initial_data = setup_ideation_phase(is_open=False,
                                             **setup_ignite_challenge())
-        submission = create_submission(created_by=self.profile,
-                                       phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[submission.parent.slug])
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=initial_data['ideation_phase'])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', self.submission.parent.slug])
 
     def test_ideation_edit_get(self):
         response = self.client.get(self.edit_url)
@@ -260,6 +283,24 @@ class SubmissionEditIdeationClosedAnonTest(SubmissionBaseTest):
     def test_ideation_edit_post(self):
         response = self.client.post(self.edit_url, {})
         self.assertRedirectsLogin(response)
+
+    def test_ideation_show_get(self):
+        url = reverse('entry_show', args=['ideas', self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        context = response.context
+        eq_(context['entry'], self.submission)
+        context_list = ['project', 'challenge', 'links', 'previous',
+                        'next', 'user_vote', 'votes', 'excluded',
+                        'webcast_list', 'badge_list', 'parent']
+        for item in context_list:
+            ok_(item in context)
+
+    def test_invalid_url_development_show_get(self):
+        url = reverse('entry_show', args=['proposals',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 404)
 
 
 class SubmissionEditIdeationClosedNotOwnerTest(SubmissionBaseTest):
@@ -273,7 +314,8 @@ class SubmissionEditIdeationClosedNotOwnerTest(SubmissionBaseTest):
         other = create_user('other')
         submission = create_submission(created_by=other,
                                        phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -300,7 +342,8 @@ class SubmissionEditIdeationClosedTest(SubmissionBaseTest):
         self.valid_data = self._get_valid_data(category=category.id)
         self.submission = create_submission(created_by=self.profile,
                                             phase=initial_data['ideation_phase'])
-        self.edit_url = reverse('entry_edit', args=[self.submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['ideas', self.submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -318,7 +361,8 @@ class SubmissionEditIdeationClosedTest(SubmissionBaseTest):
         eq_(response.status_code, 404)
 
     def test_invalid_development_url(self):
-        url = reverse('proposal_edit', args=[self.submission.parent.slug])
+        url = reverse('entry_edit',
+                      args=['proposals', self.submission.parent.slug])
         response = self.client.get(url)
         eq_(response.status_code, 404)
 
@@ -370,7 +414,7 @@ class SubmissionDevelopmentOpenTest(SubmissionBaseTest):
         data possible"""
         self.valid_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.development_url, self.valid_data)
-        self.assertRedirects(response, reverse('entries_all'))
+        self.assertRedirects(response, reverse('entries_all', args=['proposals']))
         submission = Submission.objects.get()
         eq_(submission.phase, self.initial_data['dev_phase'])
         eq_(submission.phase_round, self.initial_data['round_a'])
@@ -379,7 +423,7 @@ class SubmissionDevelopmentOpenTest(SubmissionBaseTest):
     def test_development_phase_valid_submission_inline_links(self):
         self.valid_data.update(EXTERNALS)
         response = self.client.post(self.development_url, self.valid_data)
-        self.assertRedirects(response, reverse('entries_all'))
+        self.assertRedirects(response, reverse('entries_all', args=['proposals']))
         submission = Submission.objects.get()
         link = ExternalLink.objects.get()
         eq_(link.name, 'Mozilla')
@@ -401,10 +445,11 @@ class SubmissionEditDevelopmentOpenAnonTest(SubmissionBaseTest):
     def setUp(self):
         super(SubmissionEditDevelopmentOpenAnonTest, self).setUp()
         initial_data = setup_development_rounds_phase(**setup_ignite_challenge())
-        submission = create_submission(created_by=self.profile,
-                                       phase=initial_data['dev_phase'],
-                                       phase_round=initial_data['round_b'])
-        self.edit_url = reverse('proposal_edit', args=[submission.parent.slug])
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=initial_data['dev_phase'],
+                                            phase_round=initial_data['round_b'])
+        self.edit_url = reverse('entry_edit',
+                                args=['proposals', self.submission.parent.slug])
 
     def test_development_edit_get(self):
         response = self.client.get(self.edit_url)
@@ -413,6 +458,25 @@ class SubmissionEditDevelopmentOpenAnonTest(SubmissionBaseTest):
     def test_development_edit_post(self):
         response = self.client.post(self.edit_url, {})
         self.assertRedirectsLogin(response)
+
+    def test_development_show_get(self):
+        url = reverse('entry_show', args=['proposals',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        context = response.context
+        eq_(context['entry'], self.submission)
+        context_list = ['project', 'challenge', 'links', 'previous',
+                        'next', 'user_vote', 'votes', 'excluded',
+                        'webcast_list', 'badge_list', 'parent']
+        for item in context_list:
+            ok_(item in context)
+
+    def test_invalid_url_ideation_show_get(self):
+        url = reverse('entry_show', args=['ideas',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 404)
 
 
 class SubmissionEditDevelopmentOpenNotOwnerTest(SubmissionBaseTest):
@@ -426,7 +490,8 @@ class SubmissionEditDevelopmentOpenNotOwnerTest(SubmissionBaseTest):
         submission = create_submission(created_by=other,
                                        phase=initial_data['dev_phase'],
                                        phase_round=initial_data['round_b'])
-        self.edit_url = reverse('proposal_edit', args=[submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['proposals', submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -462,7 +527,7 @@ class SubmissionEditDevelopmentOpenTest(SubmissionBaseTest):
         self.client.login(username='bob', password='bob')
 
     def _get_edit_url(self, slug):
-        return reverse('proposal_edit', args=[slug])
+        return reverse('entry_edit', args=['proposals', slug])
 
     def tearDown(self):
         super(SubmissionEditDevelopmentOpenTest, self).tearDown()
@@ -517,7 +582,7 @@ class SubmissionEditDevelopmentOpenTest(SubmissionBaseTest):
         eq_(parent.submission.phase_round, self.initial_data['round_b'])
 
     def test_invalid_ideation_url(self):
-        url = reverse('entry_edit', args=[self.submission.parent.slug])
+        url = reverse('entry_edit', args=['ideas', self.submission.parent.slug])
         response = self.client.get(url)
         eq_(response.status_code, 404)
 
@@ -572,10 +637,11 @@ class SubmissionEditDevelopmentClosedRoundAnonTests(SubmissionBaseTest):
         super(SubmissionEditDevelopmentClosedRoundAnonTests, self).setUp()
         initial_data = setup_development_phase(is_round_open=False,
                                                **setup_ignite_challenge())
-        submission = create_submission(created_by=self.profile,
-                                       phase=initial_data['dev_phase'],
-                                       phase_round=initial_data['round_a'])
-        self.edit_url = reverse('proposal_edit', args=[submission.parent.slug])
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=initial_data['dev_phase'],
+                                            phase_round=initial_data['round_a'])
+        self.edit_url = reverse('entry_edit',
+                                args=['proposals', self.submission.parent.slug])
 
     def test_development_edit_get(self):
         response = self.client.get(self.edit_url)
@@ -584,6 +650,26 @@ class SubmissionEditDevelopmentClosedRoundAnonTests(SubmissionBaseTest):
     def test_development_edit_post(self):
         response = self.client.post(self.edit_url, {})
         self.assertRedirectsLogin(response)
+
+    def test_development_show_get(self):
+        url = reverse('entry_show', args=['proposals',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 200)
+        context = response.context
+        eq_(context['entry'], self.submission)
+        context_list = ['project', 'challenge', 'links', 'previous',
+                        'next', 'user_vote', 'votes', 'excluded',
+                        'webcast_list', 'badge_list', 'parent']
+        for item in context_list:
+            ok_(item in context)
+
+    def test_invalid_url_ideation_show_get(self):
+        url = reverse('entry_show', args=['ideas',
+                                          self.submission.parent.slug])
+        response = self.client.get(url)
+        eq_(response.status_code, 404)
+
 
 
 class SubmissionEditDevelopmentClosedRoundNotOnwerTests(SubmissionBaseTest):
@@ -598,7 +684,8 @@ class SubmissionEditDevelopmentClosedRoundNotOnwerTests(SubmissionBaseTest):
         submission = create_submission(created_by=other,
                                        phase=initial_data['dev_phase'],
                                        phase_round=initial_data['round_a'])
-        self.edit_url = reverse('proposal_edit', args=[submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['proposals', submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -626,8 +713,8 @@ class SubmissionEditDevelopmentClosedRoundTests(SubmissionBaseTest):
         self.submission = create_submission(created_by=self.profile,
                                             phase=initial_data['dev_phase'],
                                             phase_round=initial_data['round_a'])
-        self.edit_url = reverse('proposal_edit',
-                                args=[self.submission.parent.slug])
+        self.edit_url = reverse('entry_edit',
+                                args=['proposals', self.submission.parent.slug])
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -645,6 +732,6 @@ class SubmissionEditDevelopmentClosedRoundTests(SubmissionBaseTest):
         eq_(response.status_code, 404)
 
     def test_invalid_ideation_url(self):
-        url = reverse('entry_edit', args=[self.submission.parent.slug])
+        url = reverse('entry_edit', args=['ideas', self.submission.parent.slug])
         response = self.client.get(url)
         eq_(response.status_code, 404)

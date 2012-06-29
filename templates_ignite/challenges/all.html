@@ -13,7 +13,7 @@
 <h1 class="shout">{% block title_listing  %}Ideas{% endblock  %}</h1>
 <div class="meta">
     <p class="intro">You have <em>{{ days_remaining }}</em> days to submit ideas</p>
-    <a class="cta" href="{{ url('create_entry') }}">{{ _('Create submission') }}</a>
+    <a class="cta" href="{{ url('create_entry', phase='ideas') }}">{{ _('Create submission') }}</a>
 </div>
 </header>
 {% endblock %}
@@ -22,10 +22,10 @@
 <div class="content_columns columns with_nav">
 <nav class="tags col box nav">
     <ul>
-        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all') }}">All ideas</a></li>
+        <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='ideas') }}">All ideas</a></li>
         {% if categories %}
         {% for cat in categories %}
-            <li><a{% if category.slug==cat.slug %} class="current wimper"{% endif %} href="{{ url('entries_for_category', category=cat.slug) }}">{{ cat.name }}</a></li>
+            <li><a{% if category.slug==cat.slug %} class="current wimper"{% endif %} href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}">{{ cat.name }}</a></li>
         {% endfor %}
         {% endif %}
     </ul>
@@ -89,9 +89,9 @@
     {% endif %}
     {% else %}
         {% if category.name %}
-        <p class="point">We currently don't have any ideas for {{ category.name }} - be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        <p class="point">We currently don't have any ideas for {{ category.name }} - be the first to <a class="cta" href="{{ url('create_entry', phase='ideas') }}">create an idea</a></p>
         {% else %}
-        <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry') }}">create an idea</a></p>
+        <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase='ideas') }}">create an idea</a></p>
         {% endif %}
     {% endif %}
     </div>

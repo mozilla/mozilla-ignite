@@ -136,8 +136,12 @@ class Phase(BaseModel):
 
     def natural_key(self):
         return self.challenge.natural_key() + (self.name,)
-
     natural_key.dependencies = ['challenges.challenge']
+
+    @models.permalink
+    def get_absolute_url(self):
+        slug = 'ideas' if self.is_ideation else 'proposals'
+        return ('entries_all', [slug])
 
     @cached_property
     def days_remaining(self):
@@ -183,6 +187,14 @@ class Phase(BaseModel):
                 return True
             return False
         return self.start_date < now and now < self.end_date
+
+    @cached_property
+    def is_ideation(self):
+        return self.name == settings.IGNITE_IDEATION_NAME
+
+    @cached_property
+    def is_development(self):
+        return self.phase.name == settings.IGNITE_DEVELOPMENT_NAME
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -339,9 +351,24 @@ class Submission(BaseModel):
             return version_list[0].parent.slug
         return None
 
+    @cached_property
+    def is_idea(self):
+        return self.phase.name == settings.IGNITE_IDEATION_NAME
+
+    @cached_property
+    def is_proposal(self):
+        return self.phase.name == settings.IGNITE_DEVELOPMENT_NAME
+
+    @cached_property
+    def phase_slug(self):
+        if self.is_idea:
+            return 'ideas'
+        return 'proposals'
+
     def get_absolute_url(self):
         """Return this submission's URL."""
-        return self._lookup_url('entry_show', {'entry_id': self.parent_slug})
+        return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
+                                               'phase': self.phase_slug})
 
     def get_version_url(self):
         """Return this submission's URL."""
@@ -349,11 +376,13 @@ class Submission(BaseModel):
 
     def get_edit_url(self):
         """Return the URL to edit this submission."""
-        return self._lookup_url('entry_edit', {'pk': self.id})
+        return self._lookup_url('entry_edit', {'pk': self.id,
+                                               'phase': self.phase_slug})
 
     def get_delete_url(self):
         """Return the URL to delete this submission."""
-        return self._lookup_url('entry_delete', {'pk': self.id})
+        return self._lookup_url('entry_delete', {'pk': self.id,
+                                                 'phase': self.phase_slug})
 
     def get_judging_url(self):
         """Return the URL to judge this submission."""
