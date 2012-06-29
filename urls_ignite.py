@@ -23,9 +23,8 @@ vote_dict = {
     'allow_xmlhttprequest': True,
 }
 
-urlpatterns = patterns('',
-    (r'^admin/', include(admin.site.urls)),
-    (r'^browserid/', include('django_browserid.urls')),
+urlpatterns = patterns(
+    '',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
     url(r'^accounts/login/$', 'jingo.render', kwargs={'template': 'registration/login.html'}, name='login'),
     url(r'^$', 'ignite.views.splash', kwargs=_ignite_kwargs, name='challenge_show'),
@@ -79,6 +78,8 @@ urlpatterns += patterns(
     (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
     (r'^webcast/', include('webcast.urls', namespace='webcast'),),
     (r'^search/', include('search.urls', namespace='search'),),
+    (r'^admin/', include(admin.site.urls)),
+    (r'^browserid/', include('django_browserid.urls')),
     (r'', include('users.urls')),
     )
 

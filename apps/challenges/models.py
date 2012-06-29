@@ -189,12 +189,20 @@ class Phase(BaseModel):
         return self.start_date < now and now < self.end_date
 
     @cached_property
+    def has_started(self):
+        return datetime.utcnow() > self.start_date
+
+    @cached_property
     def is_ideation(self):
         return self.name == settings.IGNITE_IDEATION_NAME
 
     @cached_property
     def is_development(self):
-        return self.phase.name == settings.IGNITE_DEVELOPMENT_NAME
+        return self.name == settings.IGNITE_DEVELOPMENT_NAME
+
+    @cached_property
+    def slug_url(self):
+        return 'proposals' if self.is_development else 'ideas'
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -278,11 +286,6 @@ class Submission(BaseModel):
                                     blank=True, null=True,
                                     on_delete=models.SET_NULL)
     collaborators = models.TextField(blank=True)
-    # Add Development Phase fields.
-    # Make sure they are not required at the Database level.
-    # We will make them required at the ``DevelopmentEntryForm`` Level.
-    repository_url = models.URLField(max_length=500, verify_exists=False,
-                                     blank=True)
     life_improvements = models.TextField(default="",
                                             verbose_name=_(u'How does this improve the lives of people?'))
     take_advantage = models.TextField(blank=True, null=True,
@@ -291,6 +294,13 @@ class Submission(BaseModel):
                                         verbose_name=_(u'Are you interested in making this app?'))
     team_members = models.TextField(blank=True, null=True,
                                     verbose_name=_(u'Tell us about your team making this app'))
+    # Add Development Phase fields.
+    # Make sure they are not required at the Database level.
+    # We will make them required at the ``DevelopmentEntryForm`` Level.
+    repository_url = models.URLField(max_length=500, verify_exists=False,
+                                     blank=True)
+    blog_url = models.URLField(max_length=500, verify_exists=False,
+                               blank=True)
 
 
     # managers

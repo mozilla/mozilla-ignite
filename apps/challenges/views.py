@@ -11,12 +11,11 @@ from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
 from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
-from django.views.decorators.http import require_POST
 from django.views.generic.base import TemplateResponseMixin
 from django.views.generic.list import ListView
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import (ProcessFormView, UpdateView,
-                                       DeleteView, ModelFormMixin)
+from django.views.generic.edit import ProcessFormView, DeleteView, ModelFormMixin
+
 import jingo
 from tower import ugettext as _
 from awards.forms import AwardForm
@@ -83,8 +82,9 @@ def show(request, project, slug, phase, template_name='challenges/show.html',
         raise Http404
     project = challenge.project
     """Pagination options """
+    # TODO
     entry_set = Submission.objects.visible(request.user)
-    entry_set = entry_set.filter(phase__challenge=challenge)
+    entry_set = entry_set.filter(phase__challenge=challenge, phase=phase)
     if category:
         entry_set = entry_set.filter(category__name=category)
     page_number = get_page(request.GET)
@@ -292,6 +292,7 @@ def add_submission(request, phase, form_class=NewEntryForm,
         'form': form,
         'link_form': link_form,
         'error_count': error_count,
+        'phase': phase,
         }
     if extra_context:
         context.update(extra_context)

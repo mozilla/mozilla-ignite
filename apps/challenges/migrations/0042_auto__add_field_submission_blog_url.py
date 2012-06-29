@@ -8,14 +8,14 @@ class Migration(SchemaMigration):
 
     def forwards(self, orm):
         
-        # Adding field 'Submission.repository_url'
-        db.add_column('challenges_submission', 'repository_url', self.gf('django.db.models.fields.URLField')(default='', max_length=500, blank=True), keep_default=False)
+        # Adding field 'Submission.blog_url'
+        db.add_column('challenges_submission', 'blog_url', self.gf('django.db.models.fields.URLField')(default='', max_length=500, blank=True), keep_default=False)
 
 
     def backwards(self, orm):
         
-        # Deleting field 'Submission.repository_url'
-        db.delete_column('challenges_submission', 'repository_url')
+        # Deleting field 'Submission.blog_url'
+        db.delete_column('challenges_submission', 'blog_url')
 
 
     models = {
@@ -112,7 +112,7 @@ class Migration(SchemaMigration):
         'challenges.phase': {
             'Meta': {'ordering': "('order',)", 'unique_together': "(('challenge', 'name'),)", 'object_name': 'Phase'},
             'challenge': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'phases'", 'to': "orm['challenges.Challenge']"}),
-            'end_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 9, 26, 17, 17, 59, 247097)'}),
+            'end_date': ('django.db.models.fields.DateTimeField', [], {'default': 'datetime.datetime(2012, 12, 29, 18, 8, 19, 769423)'}),
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '100'}),
             'order': ('django.db.models.fields.IntegerField', [], {}),
@@ -136,6 +136,7 @@ class Migration(SchemaMigration):
         },
         'challenges.submission': {
             'Meta': {'ordering': "['-id']", 'object_name': 'Submission'},
+            'blog_url': ('django.db.models.fields.URLField', [], {'max_length': '500', 'blank': 'True'}),
             'brief_description': ('django.db.models.fields.CharField', [], {'max_length': '200'}),
             'category': ('django.db.models.fields.related.ForeignKey', [], {'to': "orm['challenges.Category']"}),
             'collaborators': ('django.db.models.fields.TextField', [], {'blank': 'True'}),
@@ -238,6 +239,7 @@ class Migration(SchemaMigration):
             'featured': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'featured_image': ('django.db.models.fields.files.ImageField', [], {'max_length': '100', 'null': 'True', 'blank': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '255', 'blank': 'True'}),
+            'title': ('django.db.models.fields.CharField', [], {'max_length': '255', 'null': 'True', 'blank': 'True'}),
             'user': ('django.db.models.fields.related.OneToOneField', [], {'to': "orm['auth.User']", 'unique': 'True', 'primary_key': 'True'}),
             'website': ('django.db.models.fields.URLField', [], {'max_length': '255', 'blank': 'True'})
         }

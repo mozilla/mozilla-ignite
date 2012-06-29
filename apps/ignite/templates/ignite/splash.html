@@ -18,7 +18,12 @@
     <div class="busta">
         <p class="box intro"><strong>Design and build apps for the faster, smarter internet of the future</strong>. Mozilla and the National Science Foundation invite you to take part in an open innovation challenge. The goal: show how next-generation networks can revolutionize healthcare, education, public safety, energy and more.</p>
        <div class="gather wimper">
-            <a href="{{ url('create_entry', phase='ideas') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
+         {% if ideation.is_open %}
+         <a href="{{ url('create_entry', phase='ideas') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
+         {% endif %}
+         {% if development.is_open %}
+         <a href="{{ url('create_entry', phase='proposals') }}" class="cta">create a proposal</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
+         {% endif %}
        </div>
     </div>
 </div>
@@ -60,15 +65,23 @@
     {% endfor %}
     </ul>
 </section>
+{% if ideation.is_open %}
 <h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
+{% endif %}
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
         <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
     </div>
     <div class="bonus col box">
         <div class="highlight">
+          {% if ideation.is_open %}
             <h2 class="point box-title">What's your big idea?</h2>
             <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Get started</a>
+          {% endif %}
+          {% if development.is_open %}
+            <h2 class="point box-title">What's your proposal?</h2>
+            <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Send your proposal!</a>
+          {% endif %}
         </div>
     </div>
 </div>

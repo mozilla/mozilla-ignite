@@ -93,6 +93,7 @@ class DevelopmentEntryForm(EntryForm):
     # e.g. to make the stkety_note required:
     # sketh_note = forms.ImageField()
     repository_url = forms.URLField()
+    blog_url = forms.URLField()
 
     class Meta:
         model = Submission

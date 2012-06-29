@@ -86,7 +86,14 @@
         {% endfor %}
     </ul>
 {% endif %}
-<a href="{{ url('create_entry', phase='ideas') }}" class="cta">{{ _('Create an idea') }}</a>
+    {% if ideation.is_open %}
+    <a href="{{ url('create_entry', phase='ideas') }}" class="cta">{{ _('Create an idea') }}</a>
+    {% endif %}
+    {% if development.is_open %}
+    <a href="{{ url('create_entry', phase='proposals') }}" class="cta">{{ _('Create a proposal') }}</a>
+    {% endif %}
+
+
 </div>
 </div>
 {% endblock %}

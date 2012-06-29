@@ -20,7 +20,13 @@
 
 {% block content %}
 {% block greeting %}
+{% if phase.is_ideation %}
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
+{% endif %}
+
+{% if phase.is_development %}
+<h1 class="shout">{{ _('Submit a proposal') }}</h1>
+{% endif %}
 <p class="page-intro">{{ _("Congratulations! You've taken the first step towards making the world, and the internet, a better place. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
 {% endblock %}
 <p><span class="error-hint">*</span> means a required field</p>
@@ -118,6 +124,28 @@
        </div>
      </div>
      {% endif %}
+
+{% if form.blog_url  %}
+     <div class="highlight {% if form.blog_url.errors %}fail{% endif %}">
+       <label for="{{ form.blog_url.auto_id }}" class="announce">{% if form.blog_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL for your blog') }}</label>
+       <div class="ed">
+         {% for error in form.blog_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.blog_url }}
+       </div>
+       <div class="">
+         <p>Please address the following questions on your blog:</p>
+         <ul>
+           <li>How is it going? How is your app progressing?</li>
+           <li>What's been done?</li>
+           <li>What are some of the challenges you are experiencing/have experienced?</li>
+           <li>What are you planning on tackling next?</li>
+         </ul>
+       </div>
+     </div>
+     {% endif %}
+
      <fieldset class="external_links highlight {% if link_form.non_form_errors() %}fail{% endif %}">
        <legend><span class="announce">{% if link_form.non_form_errors() %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
         <p class="hint">If you've got additional information about your idea elsewhere on the internet (like YouTube pitches, wireframes or blog posts), please include them here. The more information you provide, the better!</p>

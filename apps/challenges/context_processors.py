@@ -31,3 +31,22 @@ def assigned_submissions_processor(request):
                 .exclude(judgement__judge=profile))
     return {'assignment_count': assigned.count()}
 
+
+class ClosedPhase(object):
+    """Object that mimicks a closed ``Phase``"""
+
+    @property
+    def is_open(self):
+        return False
+
+    @property
+    def is_closed(self):
+        return True
+
+
+def phases_context_processor(request):
+    """Makes the ``Phases`` available in the templates"""
+    return {
+        'ideation': request.ideation if request.ideation else ClosedPhase(),
+        'development': request.development if request.development else ClosedPhase(),
+        }

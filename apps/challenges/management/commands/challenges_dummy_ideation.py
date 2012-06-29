@@ -55,7 +55,7 @@ def create_user(handle):
     return profile
 
 class Command(BaseCommand):
-    help = """Bootstraps Mozilla Ignite data in the ideation phase, without the
+    help = """Bootstraps Mozilla Ignite data in the Ideation phase, without the
     development phase changes. Used to simulate the current content on the site.
     This is only suitable to be run on a Development environment.
     """
@@ -69,9 +69,9 @@ class Command(BaseCommand):
             raise CommandError("IMPORTANT: Make sure you only run this on a "
                                "Development environment ")
         print("Make sure, the project code base has NOT the development phase "
-              "changes, before running this")
+              "changes merged, before running this command")
         answer = raw_input("Does the project codebase ONLY contain the "
-                           "Ideation codebase (yes/no)? ")
+                           "Ideation codebase. (yes/no)? ")
         if answer != 'yes':
             raise CommandError("Make sure your codebase .")
         answer = raw_input("This will IRREVERSIBLY add TEST DATA to your "

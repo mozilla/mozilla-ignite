@@ -8,7 +8,7 @@ from blogs.models import BlogEntry
 from events.models import Event
 
 
-def splash(request, project, slug, template_name='challenges/show.html'):
+def splash(request, project, slug, template_name='ignite/splash.html'):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
@@ -19,7 +19,7 @@ def splash(request, project, slug, template_name='challenges/show.html'):
                                  .filter(phase__challenge=challenge)
                                  .order_by("?"))
     event_list = Event.objects.get_featured()[:5]
-    return jingo.render(request, 'ignite/splash.html', {
+    return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
         'phases': list(enumerate(challenge.phases.all(), start=1)),
