@@ -122,6 +122,10 @@ class Phase(BaseModel):
                                       default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'),
                                     default=in_six_months)
+    judging_start_date = models.DateTimeField(
+        verbose_name=_(u'Judging start date'), blank=True, null=True)
+    judging_end_date = models.DateTimeField(
+        verbose_name=_(u'Judging end date'), blank=True, null=True)
     order = models.IntegerField()
 
     # managers
@@ -602,6 +606,10 @@ class PhaseRound(models.Model):
     phase = models.ForeignKey('challenges.Phase')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    judging_start_date = models.DateTimeField(
+        verbose_name=_(u'Judging start date'), blank=True, null=True)
+    judging_end_date = models.DateTimeField(
+        verbose_name=_(u'Judging end date'), blank=True, null=True)
 
     def __unicode__(self):
         return u'%s: %s' % (self.phase, self.name)
@@ -610,6 +618,10 @@ class PhaseRound(models.Model):
     def is_active(self):
         now = datetime.utcnow()
         return all([now > self.start_date, now < self.end_date])
+
+    @cached_property
+    def is_open(self):
+        return self.is_active
 
     @cached_property
     def days_remaining(self):

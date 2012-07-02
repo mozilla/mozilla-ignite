@@ -45,8 +45,10 @@ class ClosedPhase(object):
 
 
 def phases_context_processor(request):
-    """Makes the ``Phases`` available in the templates"""
-    return {
-        'ideation': request.ideation if request.ideation else ClosedPhase(),
-        'development': request.development if request.development else ClosedPhase(),
-        }
+    """Makes the ``Phases`` available in context when templates are rendered"""
+    context = {}
+    for slug in ['ideation', 'development']:
+        if hasattr(request, slug):
+            phase = getattr(request, slug)
+            context[slug] = phase if phase else ClosedPhase()
+    return context

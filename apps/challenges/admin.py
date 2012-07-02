@@ -1,9 +1,17 @@
+from datetime import datetime
+
+from django.conf.urls.defaults import patterns, url
 from django.contrib import admin
 from django.contrib.auth.models import User, Permission
 from django.contrib.auth.admin import UserAdmin
+from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
 
-from challenges.forms import PhaseRoundAdminForm
+from challenges.forms import PhaseRoundAdminForm, JudgingAssignmentAdminForm
+from challenges.judging import (get_judge_profiles, get_submissions,
+                                get_assignments)
 from challenges.models import (Challenge, Phase, Submission, ExternalLink,
                                Category, ExclusionFlag, JudgingCriterion,
                                JudgingAnswer, Judgement, JudgeAssignment,
@@ -59,6 +67,45 @@ class PhaseRoundInline(admin.TabularInline):
 
 class PhaseAdmin(admin.ModelAdmin):
     inlines = (PhaseCriterionInline, PhaseRoundInline)
+
+    def get_urls(self):
+        urls = super(PhaseAdmin, self).get_urls()
+        custom_urls = patterns(
+            '',
+            url(r'^assign-judges/$',
+                self.admin_site.admin_view(self.assign_judges),
+                name='assign_judges')
+            )
+        return custom_urls + urls
+
+    def assign_judges(self, request):
+        """Assign judges for the selected finished ``Phase`` or ``PhaseRound``"""
+        now = datetime.utcnow()
+        judge_profiles = get_judge_profiles()
+        if request.method == 'POST':
+            form = JudgingAssignmentAdminForm(request.POST,
+                                              judge_profiles=judge_profiles)
+            if form.is_valid():
+                cleaned_data = form.cleaned_data
+                submissions = get_submissions(cleaned_data['phase'],
+                                              cleaned_data['phase_round'])
+                judges_submission = cleaned_data['judges_per_submission']
+                assignments = get_assignments(submissions, judge_profiles,
+                                              commit=True,
+                                              judges_per_submission=judges_submission)
+                self.message_user(request, "Successfully assigned %s submissions "
+                                  "to %s judges with %s judges per submission" %
+                                  (len(submissions), len(judge_profiles),
+                                   judges_submission))
+                return HttpResponseRedirect(reverse('admin:challenges_phase_changelist'))
+        else:
+            form = JudgingAssignmentAdminForm(judge_profiles=judge_profiles)
+        context = {
+            'now': now,
+            'judge_profiles': judge_profiles,
+            'form': form,
+            }
+        return render(request, 'admin/phases/assign_judges.html', context)
 
 
 class SubmissionBadgeInline(admin.TabularInline):

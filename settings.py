@@ -216,7 +216,7 @@ INSTALLED_APPS = (
 
     # Third-party apps
     'commonware.response.cookies',
-    'djcelery',
+    #'djcelery',
     'django_nose',
     'django_extensions',
 

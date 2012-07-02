@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django import forms
 from django.db.models import Q
 from django.forms import widgets
@@ -7,7 +9,7 @@ from django.forms.util import ErrorDict
 
 from challenges.models import (Submission, ExternalLink, Category,
                                Judgement, JudgingCriterion, JudgingAnswer,
-                               PhaseRound, SubmissionHelp)
+                               PhaseRound, SubmissionHelp, Phase)
 from challenges.widgets import CustomRadioSelect
 
 
@@ -324,3 +326,59 @@ class SubmissionHelpForm(forms.ModelForm):
         model = SubmissionHelp
         fields = ('notes', 'status',)
 
+
+def get_judging_phase_choices():
+    """Generates a touple of choices for the available for judging phases"""
+    choices = [('','- Select Phase or Round -')]
+    for phase in Phase.objects.all():
+        if not phase.phase_rounds:
+            choices.append(('phase-%s' % phase.id, 'Phase: %s' % phase.name))
+        else:
+            for phase_round in phase.phase_rounds:
+                choices.append(('round-%s' % phase_round.id,
+                                'Phase: %s. %s'% (phase.name, phase_round.name)))
+    return choices
+
+
+class JudgingAssignmentAdminForm(forms.Form):
+    judging_phase = forms.ChoiceField(choices=get_judging_phase_choices())
+    judges_per_submission = forms.IntegerField(required=False,
+                                               help_text='Leave empty to '
+                                               'assign all submissions to '
+                                               'all judges')
+
+    def __init__(self, *args, **kwargs):
+        self.judge_profiles = kwargs.pop('judge_profiles')
+        super(JudgingAssignmentAdminForm, self).__init__(*args, **kwargs)
+
+    def _validate_phase(self, phase):
+        """Makes sure the ``Phase`` is closed"""
+        if phase.is_open or phase.end_date > datetime.utcnow():
+            raise forms.ValidationError('The Phase/Round must be finished to '
+                                        'assign the judges to the Submissions')
+
+    def clean_judges_per_submission(self):
+        judges_submission = self.cleaned_data.get('judges_per_submission')
+        if judges_submission and len(self.judge_profiles) < judges_submission:
+            raise forms.ValidationError("You don't have enough judges "
+                                        "assigned: you only have %d" %
+                                        len(judges_submission))
+        if not judges_submission:
+            judges_submission = len(self.judge_profiles)
+        return judges_submission
+
+    def clean(self):
+        if 'judging_phase' in self.cleaned_data:
+            model_slug, pki = self.cleaned_data['judging_phase'].split('-')
+            # Fail as loud as possible if the id is not correct
+            if model_slug == 'phase':
+                phase = Phase.objects.get(id=pki)
+                phase_round = None
+                self._validate_phase(phase)
+            else:
+                phase_round = PhaseRound.objects.get(id=pki)
+                phase = phase_round.phase
+                self._validate_phase(phase_round)
+            self.cleaned_data['phase'] = phase
+            self.cleaned_data['phase_round'] = phase_round
+        return self.cleaned_data
