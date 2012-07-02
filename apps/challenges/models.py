@@ -167,6 +167,15 @@ class Phase(BaseModel):
         return None
 
     @cached_property
+    def current_judging_round(self):
+        """Determines what is the current ``PhaseRound`` being judged"""
+        now = datetime.utcnow()
+        for item in self.phase_rounds:
+            if item.judging_start_date < now and item.judging_end_date > now:
+                return item
+        return None
+
+    @cached_property
     def judging_phase_round(self):
         """Returns the ``PhaseRound`` that is being judged at the moment
         - The round should have finished

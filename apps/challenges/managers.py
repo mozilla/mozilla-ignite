@@ -50,22 +50,33 @@ class SubmissionManager(BaseModelManager):
         from challenges.models import SubmissionParent
         return self.filter(submissionparent__status=SubmissionParent.ACTIVE)
 
+    def assigned_to_user(self, profile):
+        """Returns all the submissions assigned to the user
+        ``Phase`` or ``PhaseRound`` should be in judging mode
+        """
+        now = datetime.utcnow()
+        return self.filter(
+            (Q(phase__judging_start_date__lte=now,
+               phase__judging_end_date__gte=now) |
+             Q(phase__phaseround__judging_start_date__lte=now,
+               phase__phaseround__judging_end_date__gte=now)),
+            judgeassignment__judge=profile).exclude(judgement__judge=profile)
+
 
 class PhaseManager(BaseModelManager):
 
     def get_from_natural_key(self, challenge_slug, phase_name):
         return self.get(challenge__slug=challenge_slug, name=phase_name)
 
-    def get_judging_phase(self, slug):
+    def get_judging_phases(self, slug):
         """Determines the judging ``Phase`` if the end_date is in the past
         or a ``PhaseRound`` has past"""
         now = datetime.utcnow()
-        try:
-            return self.filter((Q(end_date__lte=now) |
-                                Q(phaseround__end_date__lte=now)),
-                                challenge__slug=slug).order_by('-end_date')[0]
-        except IndexError:
-            return None
+        return self.filter((Q(judging_start_date__lte=now,
+                             judging_end_date__gte=now) |
+                            Q(phaseround__judging_start_date__lte=now,
+                              phaseround__judging_end_date__gte=now)),
+                            challenge__slug=slug)
 
     def get_ideation_phase(self):
         """Returns the ``Ideation`` phase"""

@@ -67,7 +67,7 @@ urlpatterns += patterns(
         kwargs=_ignite_kwargs, name='entry_help'),
     url(r'^ideas/help-wanted/$', 'entry_help_list',
         kwargs=_ignite_kwargs, name='entry_help_list'),
-    url(r'^ideas/assigned/$', 'entries_assigned',
+    url(r'^submissions/assigned/$', 'entries_assigned',
         kwargs=_ignite_kwargs, name='entries_assigned'),
     )
 

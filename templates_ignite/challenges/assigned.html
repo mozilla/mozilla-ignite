@@ -8,47 +8,49 @@
 {% block section_class %}entries{% endblock %}
 
 {% block header %}
-<h1 class="shout">Ideas assigned to you</h1>
+<h1 class="shout">Submissions assigned to you</h1>
 {% endblock %}
 
 {# No need to display the judge call on this page #}
 {% block judgecall %}{% endblock %}
 
 {% block content %}
-{% if request.phase['is_open']%}
-Evaluating Ideas is not allowed while the {% if request.phase['phase_round'] %}{{ request.phase['phase_round'] }} of the {% endif %} {{ request.phase['name'] }} phase is open
-{% endif %}
-{% for group in entries|groupby('has_judged') %}
-    {% if group.grouper %}
-    <h2>{% trans %}Judged by you{% endtrans %}</h2>
+{% for group_phase in entries|groupby('phase') %}
+<h2>{{ group_phase.grouper.name }} phase{% if group_phase.grouper.current_judging_round %}: {{ group_phase.grouper.current_judging_round.name }}{% endif %}</h2>
+  {% for group_judging in group_phase.list|groupby('has_judged') %}
+    {% if group_judging.grouper %}
+    <h3>{% trans %}Judged by you{% endtrans %}</h3>
     <p>
-        {% trans count=group.list|length %}
-        You have successfully evaluated {{ count }} submission.
-        {% pluralize %}
-        You have successfully evaluated {{ count }} submissions.
-        {% endtrans %}
+      {% trans count=group_judging.list|length %}
+      You have successfully evaluated {{ count }} submission.
+      {% pluralize %}
+      You have successfully evaluated {{ count }} submissions.
+      {% endtrans %}
     </p>
     {% else %}
-    <h2>{% trans %}To be Judged{% endtrans %}</h2>
+    <h3>{% trans %}To be Judged{% endtrans %}</h3>
     <p>
-        {% trans count=group.list|length %}
-        You have {{ count }} submission awaiting evaluation.
-        {% pluralize %}
-        You have {{ count }} submissions awaiting evaluation.
-        {% endtrans %}
+      {% trans count=group_judging.list|length %}
+      You have {{ count }} submission awaiting evaluation.
+      {% pluralize %}
+      You have {{ count }} submissions awaiting evaluation.
+      {% endtrans %}
     </p>
     {% endif %}
     <ul class="submissions">
-        {% for entry in group.list %}
-        <li>
-            <a href="{{ entry.get_absolute_url() }}">
-                {{ entry.title }}
-            </a>
-        </li>
-        {% endfor %}
+      {% for entry in group_judging.list %}
+      <li>
+        <a href="{{ entry.get_absolute_url() }}">
+          {{ entry.title }}
+        </a>
+      </li>
+      {% endfor %}
     </ul>
+  {% endfor %}
 {% endfor %}
 
+
+TODO: ALLOWANCE
 {% if allowance %}
     <section>
       <h2>Green-lit entries for {{ allowance.award.phase.name }} phase {% if allowance.award.phase_round %}. Round {{ allowance.phase_round }}{% endif %}</h2>

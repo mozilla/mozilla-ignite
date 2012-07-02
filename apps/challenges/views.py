@@ -196,7 +196,8 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         if self.phase.judging_phase_round:
             qs.update({'phase_round': self.phase.judging_phase_round})
         submissions = (Submission.objects.filter(**qs)
-                       .select_related('judgement__judge__user', 'judgement'))
+                       .select_related('judgement__judge__user', 'judgement')
+                       .order_by('phase', 'phase_round'))
         # Add a custom attribute for whether user has judged this submission
         for submission in submissions:
             submission.has_judged = any(j.judge.user == self.request.user
@@ -204,7 +205,25 @@ class AssignedEntriesView(ListView, JingoTemplateMixin):
         return sorted(submissions, key=lambda s: s.has_judged, reverse=True)
 
 
-entries_assigned = judge_required(AssignedEntriesView.as_view())
+# entries_assigned = judge_required(AssignedEntriesView.as_view())
+
+@login_required
+@judge_required
+@project_challenge_required
+def entries_assigned(request, project, challenge):
+    profile = request.user.get_profile()
+    submissions = (Submission.objects
+                   .assigned_to_user(profile))
+    for submission in submissions:
+        submission.has_judged = any(j.judge.user == request.user
+                                    for j in submission.judgement_set.all())
+    context = {
+        'project': project,
+        'challenge': challenge,
+        'entries': submissions,
+        'allowance': JudgeAllowance.objects.get_for_judge(profile)
+        }
+    return jingo.render(request, 'challenges/assigned.html', context)
 
 
 class JudgedEntriesView(ListView, JingoTemplateMixin):
