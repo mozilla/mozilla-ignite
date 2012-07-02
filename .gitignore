@@ -27,3 +27,4 @@ requirements/src/*
 .#*
 .vagrant
 vagrantconfig_local.yaml
+media/ignite/dummy/
