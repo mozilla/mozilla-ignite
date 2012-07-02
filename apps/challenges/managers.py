@@ -7,7 +7,7 @@ from django.contrib.auth.models import AnonymousUser
 from innovate.models import BaseModelManager
 
 
-class SubmissionManager(BaseModelManager):
+class SubmissionManager(models.Manager):
 
     def eligible(self, phase, phase_round=None):
         """Return all eligible submissions
@@ -60,7 +60,23 @@ class SubmissionManager(BaseModelManager):
                phase__judging_end_date__gte=now) |
              Q(phase__phaseround__judging_start_date__lte=now,
                phase__phaseround__judging_end_date__gte=now)),
-            judgeassignment__judge=profile).exclude(judgement__judge=profile)
+            judgeassignment__judge=profile)
+
+    def previous_submission(self, entry):
+        try:
+            return (self.visible().filter(Q(created_on__lt=entry.created_on) |
+                                          Q(pk__lt=entry.pk))
+                                          .order_by('-created_on')[0])
+        except IndexError:
+            return None
+
+    def next_submission(self, entry):
+        try:
+            return (self.visible().filter(Q(created_on__gt=entry.created_on) |
+                                          Q(pk__gt=entry.pk))
+                                          .order_by('created_on')[0])
+        except IndexError:
+            return None
 
 
 class PhaseManager(BaseModelManager):

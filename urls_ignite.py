@@ -28,10 +28,6 @@ urlpatterns = patterns(
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
     url(r'^accounts/login/$', 'jingo.render', kwargs={'template': 'registration/login.html'}, name='login'),
     url(r'^$', 'ignite.views.splash', kwargs=_ignite_kwargs, name='challenge_show'),
-    # The /ideas/ URL will become available in the application phase
-    url(r'^ideas/winning/$', 'challenges.views.entries_winning', kwargs=_ignite_kwargs, name='entries_winning'),
-    url(r'^ideas/judged/$', 'challenges.views.entries_judged', kwargs=_ignite_kwargs, name='entries_judged'),
-    url(r'^ideas/(?P<pk>\d+)/judgement/$', 'challenges.views.entry_judge', kwargs=_ignite_kwargs, name='entry_judge'),
     url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
         vote_on_object, vote_dict, name='entry_vote'),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
@@ -67,9 +63,17 @@ urlpatterns += patterns(
         kwargs=_ignite_kwargs, name='entry_help'),
     url(r'^ideas/help-wanted/$', 'entry_help_list',
         kwargs=_ignite_kwargs, name='entry_help_list'),
+    # Judging views
+    url(r'^submission/(?P<pk>\d+)/judgement/$', 'entry_judge',
+        kwargs=_ignite_kwargs, name='entry_judge'),
     url(r'^submissions/assigned/$', 'entries_assigned',
         kwargs=_ignite_kwargs, name='entries_assigned'),
+    url(r'^submissions/judged/$', 'entries_judged',
+        kwargs=_ignite_kwargs, name='entries_judged'),
+    url(r'^submissions/green-lit/$', 'entries_winning',
+        kwargs=_ignite_kwargs, name='entries_winning'),
     )
+
 
 urlpatterns += patterns(
     '',

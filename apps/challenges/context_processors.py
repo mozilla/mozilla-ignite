@@ -1,6 +1,6 @@
 from django.conf import settings
 
-from challenges.models import Submission, Phase, has_phase_finished
+from challenges.models import Submission
 
 
 def assigned_submissions_processor(request):
@@ -14,7 +14,9 @@ def assigned_submissions_processor(request):
     # Judges should have a profile, fail as loud as possible
     # if the judge doesn't have one.
     profile = request.user.get_profile()
-    submissions = Submission.objects.assigned_to_user(profile)
+    # Submissions assigned to the user that haven't been Scored
+    submissions = (Submission.objects.assigned_to_user(profile)
+                   .exclude(judgement__judge=profile))
     return {'assignment_count': len(submissions)}
 
 

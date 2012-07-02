@@ -17,6 +17,7 @@
 {% block content %}
 {% for group_phase in entries|groupby('phase') %}
 <h2>{{ group_phase.grouper.name }} phase{% if group_phase.grouper.current_judging_round %}: {{ group_phase.grouper.current_judging_round.name }}{% endif %}</h2>
+
   {% for group_judging in group_phase.list|groupby('has_judged') %}
     {% if group_judging.grouper %}
     <h3>{% trans %}Judged by you{% endtrans %}</h3>
@@ -49,8 +50,6 @@
   {% endfor %}
 {% endfor %}
 
-
-TODO: ALLOWANCE
 {% if allowance %}
     <section>
       <h2>Green-lit entries for {{ allowance.award.phase.name }} phase {% if allowance.award.phase_round %}. Round {{ allowance.phase_round }}{% endif %}</h2>

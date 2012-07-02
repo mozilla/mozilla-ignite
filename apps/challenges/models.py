@@ -176,18 +176,17 @@ class Phase(BaseModel):
         return None
 
     @cached_property
-    def judging_phase_round(self):
-        """Returns the ``PhaseRound`` that is being judged at the moment
-        - The round should have finished
-        """
+    def is_judgable(self):
+        """Determines if it is possible to judge this submission"""
         now = datetime.utcnow()
-        # wed don't know if the phase_rounds are ordered by end date
-        sorted_rounds = sorted(self.phase_rounds, key=lambda x: x.end_date)
-        sorted_rounds.reverse()
-        for phase_round in sorted_rounds:
-            if phase_round.end_date <= now:
-                return phase_round
-        return None
+        # Phase is during Judging period
+        if self.judging_start_date and self.judging_end_date \
+            and self.judging_start_date < now and self.judging_end_date > now:
+            return True
+        # Round is during judging period
+        if self.current_judging_round:
+            return True
+        return False
 
     @cached_property
     def is_open(self):
@@ -602,7 +601,6 @@ class JudgeAssignment(models.Model):
 
 
 @receiver(signals.post_save, sender=JudgeAssignment)
-@receiver(signals.post_save, sender=Judgement)
 def judgement_flush_cache(instance, **kwargs):
     """Flush the cache for any submissions related to this instance."""
     Submission.objects.invalidate(instance.submission)
