@@ -36,7 +36,6 @@ def phases_context_processor(request):
     """Makes the ``Phases`` available in context when templates are rendered"""
     context = {}
     for slug in ['ideation', 'development']:
-        if hasattr(request, slug):
-            phase = getattr(request, slug)
-            context[slug] = phase if phase else ClosedPhase()
+        phase = getattr(request, slug) if hasattr(request, slug) else None
+        context[slug] = phase if phase else ClosedPhase()
     return context

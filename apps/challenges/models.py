@@ -92,10 +92,6 @@ class Challenge(BaseModel):
         """Return this challenge's URL."""
         return self._lookup_url('challenge_show')
 
-    def get_entries_url(self):
-        """Return the URL for this challenge's entry list."""
-        return self._lookup_url('entries_all')
-
 
 def in_six_months():
     return datetime.utcnow() + relativedelta(months=6)
@@ -149,7 +145,10 @@ class Phase(BaseModel):
 
     @cached_property
     def days_remaining(self):
-        time_remaining = self.end_date - datetime.utcnow()
+        now = datetime.utcnow()
+        if not self.is_open:
+            return -1
+        time_remaining = self.end_date - now
         return time_remaining.days if time_remaining.days >= 0 else -1
 
     @cached_property
@@ -171,7 +170,9 @@ class Phase(BaseModel):
         """Determines what is the current ``PhaseRound`` being judged"""
         now = datetime.utcnow()
         for item in self.phase_rounds:
-            if item.judging_start_date < now and item.judging_end_date > now:
+            if item.judging_start_date and item.judging_end_date \
+                and item.judging_start_date < now \
+                and item.judging_end_date > now:
                 return item
         return None
 
@@ -199,6 +200,10 @@ class Phase(BaseModel):
                 return True
             return False
         return self.start_date < now and now < self.end_date
+
+    @property
+    def is_closed(self):
+        return not self.is_open
 
     @cached_property
     def has_started(self):
@@ -600,12 +605,6 @@ class JudgeAssignment(models.Model):
         unique_together = (('submission', 'judge'),)
 
 
-@receiver(signals.post_save, sender=JudgeAssignment)
-def judgement_flush_cache(instance, **kwargs):
-    """Flush the cache for any submissions related to this instance."""
-    Submission.objects.invalidate(instance.submission)
-
-
 class PhaseRound(models.Model):
     """Rounds for a given ``Phase``"""
     name = models.CharField(max_length=255)
@@ -671,7 +670,11 @@ class SubmissionParent(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('entry_show', [self.slug])
+        kwargs = {
+            'entry_id': self.slug,
+            'phase': self.submission.phase_slug,
+            }
+        return ('entry_show', [], kwargs)
 
     def update_version(self, new_submission):
         """Updates the current ``SubmissionParent`` version"""

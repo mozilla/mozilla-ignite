@@ -104,6 +104,9 @@ def create_submission(with_parent=True, **kwargs):
         'phase': kwargs['phase'] if 'phase' in kwargs else create_phase(),
         'category': kwargs['category'] if 'category' in kwargs else create_category(),
         'title': 'My Awesome submission',
+        'brief_description': 'This is a quick description',
+        'description': 'Lorem Ipsum long description',
+        'life_improvements': 'This will benefit mandkind',
         }
     if kwargs:
         defaults.update(kwargs)

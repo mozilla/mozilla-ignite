@@ -37,7 +37,7 @@ def challenge_setup():
     
     ph = Phase()
     ph.challenge = c
-    ph.name = 'Phase 1'
+    ph.name = 'Ideation'
     ph.order = 1
     ph.save()
 

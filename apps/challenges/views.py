@@ -174,7 +174,7 @@ def entries_assigned(request, project, challenge):
 def entries_judged(request, project, challenge):
     submissions = (Submission.objects
                    .select_related('judgement__judginganswer__criterion')
-                   .filter(judgement__isnull=False))
+                   .filter(judgement__isnull=False).distinct())
     for submission in submissions:
         judgements = [j for j in submission.judgement_set.all() if j.complete]
         total = sum(j.get_score() for j in judgements)
@@ -484,6 +484,7 @@ def submission_edit(request, submission, phase, form_class=EntryForm,
                 # it is duplicated and archived
                 submission = archive_submission(submission, form, link_form,
                                                 phase)
+            messages.success(request, "Your submission has been updated.")
             return HttpResponseRedirect(submission.get_absolute_url())
         else:
             error_count = get_list_count(form.errors,
@@ -506,10 +507,10 @@ def submission_edit(request, submission, phase, form_class=EntryForm,
 def entry_edit(request, project, challenge, pk, phase):
     """Edit ``Submission`` ideas mechanics"""
     phase = get_phase_or_404(phase)
-    form_class = EntryForm if phase.is_ideation else DevelopmentEntryForm
     # Ideation phase must be open
     if not phase or not phase.is_open:
         raise Http404
+    form_class = EntryForm if phase.is_ideation else DevelopmentEntryForm
     extra_context = {
         'project': project,
         'challenge': challenge,
@@ -522,8 +523,7 @@ def entry_edit(request, project, challenge, pk, phase):
     # Ideas ``Submissions`` can't be turned into Proposals
     if not submission.phase == phase:
         raise Http404
-    return submission_edit(request, submission, phase,
-                           form_class=form_class,
+    return submission_edit(request, submission, phase, form_class=form_class,
                            extra_context=extra_context)
 
 
@@ -535,7 +535,7 @@ def entry_delete(request, project, challenge, pk, phase):
     profile = request.user.get_profile()
     try:
         parent = (SubmissionParent.objects.select_related('submission')
-                  .get(slug=pk, submission__phase__challenge=challenge,
+                  .get(submission__pk=pk, submission__phase__challenge=challenge,
                        submission__phase=phase,
                        submission__created_by=profile))
     except SubmissionParent.DoesNotExist:
@@ -544,6 +544,9 @@ def entry_delete(request, project, challenge, pk, phase):
         # Remove all the versioned content from the Parent, since
         # the User don't want to keep any versions of this ``Submission``
         for old_submission in parent.submissionversion_set.all():
+            # remove submissoin
+            old_submission.submission.delete()
+            # remove version
             old_submission.delete()
         # Remove the current ``Submission``
         parent.submission.delete()
@@ -568,11 +571,9 @@ def entry_help(request, project, challenge, entry_id):
     # and it only shows the current revision
     try:
         parent = (SubmissionParent.objects.select_related('submission')
-                  .get(slug=entry_id, submission__phase__challenge=challenge))
+                  .get(slug=entry_id, submission__phase__challenge=challenge,
+                       submission__created_by=request.user.get_profile()))
     except SubmissionParent.DoesNotExist:
-        raise Http404
-    # Make sure the user can edit the submission
-    if not parent.submission.editable_by(request.user):
         raise Http404
     try:
         help_instance = parent.submissionhelp

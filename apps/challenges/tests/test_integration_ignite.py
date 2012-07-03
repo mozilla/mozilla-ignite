@@ -395,7 +395,8 @@ class SubmissionDevelopmentOpenTest(SubmissionBaseTest):
         self.initial_data = setup_development_phase(**setup_ignite_challenge())
         category = self.initial_data['category']
         self.valid_data = self._get_valid_data(category=category.id,
-                                               repository_url='http://mozilla.com')
+                                               repository_url='http://mozilla.com',
+                                               blog_url='http://blog.mozilla.com')
         self.client.login(username='bob', password='bob')
 
     def tearDown(self):
@@ -516,7 +517,8 @@ class SubmissionEditDevelopmentOpenTest(SubmissionBaseTest):
         self.initial_data = setup_development_rounds_phase(**setup_ignite_challenge())
         category = self.initial_data['category']
         self.valid_data = self._get_valid_data(category=category.id,
-                                               repository_url='http://mozilla.com')
+                                               repository_url='http://mozilla.com',
+                                               blog_url='http://blog.mozilla.com')
         del self.valid_data['terms_and_conditions']
         # Create a proposal ``Submission`` on the open ``PhaseRound``
         self.submission = create_submission(

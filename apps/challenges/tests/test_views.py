@@ -1,11 +1,9 @@
 # Note: not using cStringIO here because then we can't set the "filename"
 from StringIO import StringIO
-
 from copy import copy
 from datetime import datetime, timedelta
 
-from django.conf import settings
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, AnonymousUser
 from django.contrib.messages import SUCCESS
 from django.core.urlresolvers import reverse
 from django.db.models import Max
@@ -25,6 +23,12 @@ from challenges.models import (Challenge, Submission, Phase, Category,
 from challenges.tests.fixtures import (challenge_setup, challenge_teardown,
                                        create_users, create_submissions,
                                        BLANK_EXTERNALS)
+from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
+                                                       teardown_ignite_challenge,
+                                                       setup_ideation_phase,
+                                                       create_submission,
+                                                       create_user)
+
 from ignite.tests.decorators import ignite_skip, ignite_only
 from projects.models import Project
 
@@ -35,6 +39,8 @@ suppress_locale_middleware = patch.object(LocaleURLMiddleware,
                                           'process_request',
                                           lambda *args: None)
 
+development_mock = MagicMock
+development_mock.has_started = False
 
 def _build_request(path=None):
     request = Mock()
@@ -57,8 +63,8 @@ class MessageTestCase(TestCase):
     
     def assertSuccessMessage(self, response):
         """Assert that there is a success message in the given response."""
-        self.assertEqual(len(response.context['messages']), 1)
-        self.assertEqual(list(response.context['messages'])[0].level, SUCCESS)
+        eq_(len(response.context['messages']), 1)
+        eq_(list(response.context['messages'])[0].level, SUCCESS)
 
 
 class ChallengeEntryTest(TestCase):
@@ -99,7 +105,8 @@ class ChallengeEntryTest(TestCase):
         
         """
         submission_titles = create_submissions(4)
-        response = self.client.get(Challenge.objects.get().get_entries_url())
+        phase = Phase.objects.get()
+        response = self.client.get(phase.get_absolute_url())
         assert_equal(response.status_code, 200)
         # Make sure the entries are present and in reverse creation order
         assert_equal([s.title for s in response.context['entries'].object_list],
@@ -113,8 +120,8 @@ class ChallengeEntryTest(TestCase):
         hidden_submission = submissions[0]
         hidden_submission.is_draft = True
         hidden_submission.save()
-        
-        response = self.client.get(Challenge.objects.get().get_entries_url())
+        phase = Phase.objects.get()
+        response = self.client.get(phase.get_absolute_url())
         # Check the draft submission is hidden
         assert_equal(set(response.context['entries'].object_list),
                      set(submissions[1:]))
@@ -129,7 +136,7 @@ class ChallengeEntryTest(TestCase):
             entry.save()
         
         response = self.client.get(reverse('entries_winning'))
-        self.assertEqual(set(e.title for e in response.context['entries']),
+        eq_(set(e.title for e in response.context['entries']),
                          set(e.title for e in winners))
 
 
@@ -288,24 +295,25 @@ class ShowEntryTest(TestCase):
     """Test functionality of the single entry view."""
 
     def setUp(self):
-        challenge_setup()
-        create_users()
-        self.alex_profile = User.objects.get(username='alex').get_profile()
-        s = self.create_submission()
-        self.submission = s
-        # Entries require a SubmissionParent which acts as a proxy for versions
-        self.parent = SubmissionParent.objects.create(submission=s)
-        self.submission_path = s.get_absolute_url()
+        self.initial_data = setup_ideation_phase(**setup_ignite_challenge())
+        self.profile = create_user('bob')
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=self.initial_data['ideation_phase'])
+        self.parent = self.submission.parent
+        self.submission_path = self.submission.get_absolute_url()
+
+    def tearDown(self):
+        teardown_ignite_challenge()
 
     def create_submission(self, **kwargs):
         """Helper to create a ``Submission``"""
         defaults = {
-            'phase': Phase.objects.get(),
+            'phase': self.initial_data['ideation_phase'],
             'title': 'A submission',
             'brief_description': 'My submission',
             'description': 'My wonderful submission',
-            'created_by': self.alex_profile,
-            'category': Category.objects.get()
+            'created_by': self.profile,
+            'category': self.initial_data['category'],
             }
         if kwargs:
             defaults.update(kwargs)
@@ -313,7 +321,8 @@ class ShowEntryTest(TestCase):
 
     @suppress_locale_middleware
     def test_show_entry(self):
-        url = reverse('entry_show', args=[self.submission.id])
+        url = reverse('entry_show', kwargs={'entry_id': self.submission.id,
+                                            'phase': 'ideas',})
         response = self.client.get(url)
         assert_equal(response.status_code, 200)
 
@@ -331,7 +340,7 @@ class ShowEntryTest(TestCase):
         self.parent.update_version(new_submission)
         response = self.client.get(self.submission_path)
         assert_equal(response.status_code, 200)
-        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+        eq_(response.context['entry'].title, 'Updated Submission!')
 
     @suppress_locale_middleware
     def test_new_versioned_entry(self):
@@ -339,14 +348,15 @@ class ShowEntryTest(TestCase):
         self.parent.update_version(new_submission)
         response = self.client.get(new_submission.get_absolute_url())
         assert_equal(response.status_code, 200)
-        self.assertEqual(response.context['entry'].title, 'Updated Submission!')
+        eq_(response.context['entry'].title, 'Updated Submission!')
 
     @suppress_locale_middleware
     def test_failed_versioned_entry(self):
         """New versioned entries shouldn't change the url"""
         new_submission = self.create_submission(title='Updated Submission!')
         self.parent.update_version(new_submission)
-        url = reverse('entry_show', args=[new_submission.id])
+        url = reverse('entry_show', kwargs={'entry_id': new_submission.id,
+                                            'phase': 'ideas'})
         response = self.client.get(url)
         assert_equal(response.status_code, 404)
 
@@ -356,6 +366,9 @@ class EditEntryTest(MessageTestCase):
 
     def setUp(self):
         challenge_setup()
+        phase = Phase.objects.get()
+        phase.name = 'Ideation'
+        phase.save()
         create_users()
         admin = User.objects.create_user('admin', 'admin@example.com',
                                          password='admin')
@@ -370,6 +383,9 @@ class EditEntryTest(MessageTestCase):
         entry = Submission.objects.get()
         self.view_path = entry.get_absolute_url()
         self.edit_path = entry.get_edit_url()
+
+    def tearDown(self):
+        teardown_ignite_challenge()
 
 
     def open_phase(self):
@@ -417,7 +433,7 @@ class EditEntryTest(MessageTestCase):
         data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data, follow=True)
-        self.assertEqual(response.status_code, 403)
+        eq_(response.status_code, 404)
 
     @suppress_locale_middleware
     def test_anonymous_access(self):
@@ -471,25 +487,25 @@ class EditEntryTest(MessageTestCase):
 
 
 class EditLinkTest(TestCase):
-    
+
     def setUp(self):
-        challenge_setup()
-        create_users()
-        
-        alex_profile = User.objects.get(username='alex').get_profile()
-        create_submissions(1, creator=alex_profile)
-        
-        submission = Submission.objects.get()
-        self.view_path = submission.get_absolute_url()
-        self.edit_path = submission.get_edit_url()
-        
-        ExternalLink.objects.create(submission=submission, name='Foo',
+        self.initial_data = setup_ideation_phase(**setup_ignite_challenge())
+        self.profile = create_user('bob')
+        self.submission = create_submission(created_by=self.profile,
+                                            phase=self.initial_data['ideation_phase'])
+        self.view_path = self.submission.get_absolute_url()
+        self.edit_path = self.submission.get_edit_url()
+        ExternalLink.objects.create(submission=self.submission, name='Foo',
                                     url='http://example.com/')
-        ExternalLink.objects.create(submission=submission, name='Foo',
+        ExternalLink.objects.create(submission=self.submission, name='Foo',
                                     url='http://example.net/')
-        
-        self.client.login(username='alex', password='alex')
-    
+        self.client.login(username='bob', password='bob')
+
+    def tearDown(self):
+        teardown_ignite_challenge()
+        ExternalLink.objects.all().delete()
+        self.client.logout()
+
     def _base_form(self):
         submission = Submission.objects.get()
         return {'title': submission.title,
@@ -497,53 +513,44 @@ class EditLinkTest(TestCase):
                 'description': submission.description,
                 'life_improvements': 'This will benefit mankind',
                 'category': submission.category.id}
-    
+
     @suppress_locale_middleware
     def test_preserve_links(self):
         """Test submission when the links are not changed."""
         form_data = self._base_form()
         links = ExternalLink.objects.all()
         form_data.update(_build_links(2, *map(_form_from_link, links)))
-        
         response = self.client.post(self.edit_path, form_data)
-        
         self.assertRedirects(response, self.view_path)
-        self.assertEqual(ExternalLink.objects.count(), 2)
-    
+        eq_(ExternalLink.objects.count(), 2)
+
     @suppress_locale_middleware
     def test_remove_links(self):
         """Test submission with blank link boxes.
-        
-        All the links should be deleted, as the forms are blank.
-        
-        """
+
+        All the links should be deleted, as the forms are blank."""
         form_data = self._base_form()
         links = ExternalLink.objects.all()
         link_forms = [{'id': link.id} for link in links]
         form_data.update(_build_links(2, *link_forms))
-        
         response = self.client.post(self.edit_path, form_data)
         self.assertRedirects(response, self.view_path)
-        self.assertEqual(ExternalLink.objects.count(), 0)
-    
+        eq_(ExternalLink.objects.count(), 0)
+
     @suppress_locale_middleware
     def test_add_links(self):
         """Test adding links to a submission without any."""
         ExternalLink.objects.all().delete()
-        
         form_data = self._base_form()
         link_forms = [{'name': 'Cheese', 'url': 'http://cheese.com/'},
                       {'name': 'Pie', 'url': 'http://en.wikipedia.org/wiki/Pie'}]
         form_data.update(_build_links(0, *link_forms))
-        
         response = self.client.post(self.edit_path, form_data)
-        
         self.assertRedirects(response, self.view_path)
-        self.assertEqual(ExternalLink.objects.count(), 2)
-        
+        eq_(ExternalLink.objects.count(), 2)
         cheese_link = ExternalLink.objects.get(name='Cheese')
-        self.assertEqual(cheese_link.url, 'http://cheese.com/')
-        self.assertEqual(cheese_link.submission, Submission.objects.get())
+        eq_(cheese_link.url, 'http://cheese.com/')
+        eq_(cheese_link.submission, Submission.objects.get())
 
 
 class DeleteEntryTest(MessageTestCase):
@@ -551,6 +558,9 @@ class DeleteEntryTest(MessageTestCase):
     def setUp(self):
         challenge_setup()
         create_users()
+        phase = Phase.objects.get()
+        phase.name = 'Ideation'
+        phase.save()
         self.alex_profile = User.objects.get(username='alex').get_profile()
         submission = self.create_submission()
         self.parent = SubmissionParent.objects.create(submission=submission)
@@ -591,14 +601,14 @@ class DeleteEntryTest(MessageTestCase):
         """Check that non-owners cannot see the delete form."""
         self.client.login(username='bob', password='bob')
         response = self.client.get(self.delete_path)
-        assert_equal(response.status_code, 403)
+        assert_equal(response.status_code, 404)
 
     @suppress_locale_middleware
     def test_non_owner_delete(self):
         """Check that users cannot delete each other's submissions."""
         self.client.login(username='bob', password='bob')
         response = self.client.post(self.delete_path, {})
-        assert_equal(response.status_code, 403)
+        assert_equal(response.status_code, 404)
         assert Submission.objects.exists()
 
     @suppress_locale_middleware
@@ -650,7 +660,7 @@ class DeleteEntryTest(MessageTestCase):
         submission_b = self.create_submission(title='b')
         self.parent.update_version(submission_b)
         self.client.login(username='alex', password='alex')
-        self.client.post(submission_b.get_delete_url(), {})
+        result = self.client.post(submission_b.get_delete_url(), {})
         assert_equal((Submission.objects.filter(created_by=self.alex_profile)
                       .count()), 0)
         assert_equal((SubmissionParent.objects
@@ -659,80 +669,6 @@ class DeleteEntryTest(MessageTestCase):
         assert_equal((SubmissionVersion.objects
                       .filter(submission__created_by=self.alex_profile)
                       .count()), 0)
-
-
-class EditEntryPhaseTest(MessageTestCase):
-    """Test functionality of the edit entry view for new versions."""
-
-    def setUp(self):
-        challenge_setup()
-        create_users()
-        admin = User.objects.create_user('admin', 'admin@example.com',
-                                         password='admin')
-        admin.is_superuser = True
-        admin.save()
-        # Fill in the profile name to stop nag redirects
-        admin_profile = admin.get_profile()
-        admin_profile.name = 'Admin Adminson'
-        admin_profile.save()
-        alex_profile = User.objects.get(username='alex').get_profile()
-        create_submissions(1, creator=alex_profile)
-        self.close_phase()
-        entry = Submission.objects.get()
-        self.view_path = entry.get_absolute_url()
-        self.edit_path = entry.get_edit_url()
-        # create new active phase
-        challenge = Challenge.objects.get()
-        start_date = datetime.utcnow() - timedelta(hours=1)
-        end_date = datetime.utcnow() + timedelta(hours=1)
-        self.phase = Phase.objects.create(challenge=challenge,
-                                          name='New Phase',
-                                          start_date=start_date,
-                                          end_date=end_date, order=2)
-
-    def open_phase(self):
-        phase = Phase.objects.get()
-        phase.start_date = datetime.utcnow() - timedelta(hours=1)
-        phase.end_date = datetime.utcnow() + timedelta(hours=1)
-        phase.save()
-
-    def close_phase(self):
-        phase = Phase.objects.get()
-        phase.start_date = datetime.utcnow() - timedelta(hours=1)
-        phase.end_date = datetime.utcnow() - timedelta(hours=1)
-        phase.save()
-
-    def _edit_data(self, submission=None):
-        if submission is None:
-            submission = Submission.objects.get()
-        return dict(title=submission.title,
-                    brief_description='Versioned Submission',
-                    description='A really, seriously good submission',
-                    category=submission.category.id,
-                    life_improvements='A lot of improvement')
-
-    @suppress_locale_middleware
-    def test_edit_form(self):
-        self.client.login(username='alex', password='alex')
-        response = self.client.get(self.edit_path)
-        assert_equal(response.status_code, 200)
-
-    @suppress_locale_middleware
-    def test_edit(self):
-        """Test an edit when there is a new Phase"""
-        self.client.login(username='alex', password='alex')
-        data = self._edit_data()
-        data.update(BLANK_EXTERNALS)
-        response = self.client.post(self.edit_path, data, follow=True)
-        self.assertRedirects(response, self.view_path)
-        # Check for a success message
-        self.assertSuccessMessage(response)
-        parent = SubmissionParent.objects.get()
-        self.assertEqual(parent.name, data['title'])
-        # Make sure it was cloned
-        assert_equal(parent.submission.brief_description, data['brief_description'])
-        assert_equal(parent.submission.phase, self.phase)
-        assert_equal(Submission.objects.count(), 2)
 
 
 class SubmissionHelpViewTest(TestCase):
@@ -766,43 +702,40 @@ class SubmissionHelpViewTest(TestCase):
 
     def test_submission_help_anon(self):
         response = self.client.get(self.help_url)
-        self.assertEqual(response.status_code, 302)
+        eq_(response.status_code, 302)
         self.assertTrue(reverse('login') in response['Location'])
         response = self.client.post(self.help_url, self.valid_data)
-        self.assertEqual(response.status_code, 302)
+        eq_(response.status_code, 302)
         self.assertTrue(reverse('login') in response['Location'])
 
     def test_submission_help_not_owner(self):
         self.client.login(username='bob', password='bob')
         response = self.client.get(self.help_url)
-        self.assertEqual(response.status_code, 404)
+        eq_(response.status_code, 404)
         response = self.client.post(self.help_url, self.valid_data)
-        self.assertEqual(response.status_code, 404)
+        eq_(response.status_code, 404)
 
     def test_submission_published_help(self):
         self.client.login(username='alex', password='alex')
         response = self.client.get(self.help_url)
-        self.assertEqual(response.status_code, 200)
-        response = self.client.post(self.help_url, self.valid_data,
-                                    follow=True)
-        self.assertRedirects(response, self.submission_a.get_absolute_url())
-        for item in list(response.context['messages']):
-            self.assertEqual(item.tags, 'success')
-        self.assertEqual(SubmissionHelp.objects.get_active().count(), 1)
+        eq_(response.status_code, 200)
+        response = self.client.post(self.help_url, self.valid_data)
+        ok_(self.submission_a.get_absolute_url() in response['Location'])
+        eq_(SubmissionHelp.objects.get_active().count(), 1)
 
     def test_submission_help_listing(self):
         self.create_submission_help()
         response = self.client.get(reverse('entry_help_list'))
-        self.assertEqual(response.status_code, 200)
+        eq_(response.status_code, 200)
         page = response.context['page']
-        self.assertEqual(page.paginator.count, 1)
+        eq_(page.paginator.count, 1)
 
     def test_submission_help_list_hidden(self):
         self.create_submission_help(status=SubmissionHelp.DRAFT)
         response = self.client.get(reverse('entry_help_list'))
-        self.assertEqual(response.status_code, 200)
+        eq_(response.status_code, 200)
         page = response.context['page']
-        self.assertEqual(page.paginator.count, 0)
+        eq_(page.paginator.count, 0)
 
 
 def store_rendered_templates(store, signal, sender, template, context, **kwargs):
@@ -834,10 +767,14 @@ class TestAddSubmissionView(TestCase):
 
     def test_add_submission_get(self):
         request = self.factory.get('/')
+        request.user = AnonymousUser()
+        request.development = development_mock
         response = views.add_submission(request, self.ideation)
         eq_(response.status_code, 200)
 
     def test_invalid_form(self):
-        request = self.factory.post('/', {})
+        request = self.factory.post('/', BLANK_EXTERNALS)
+        request.user = AnonymousUser()
+        request.development = development_mock
         response = views.add_submission(request, self.ideation)
         eq_(response.status_code, 200)

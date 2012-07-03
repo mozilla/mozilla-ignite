@@ -16,7 +16,7 @@ class SearchTest(TestCase):
 
     def setUp(self):
         self.profile = create_user('bob')
-        self.url = reverse('create_entry')
+        self.url = reverse('create_entry', args=['ideas'])
         self.initial_data = setup_development_phase(**setup_ignite_challenge())
         self.ideation = self.initial_data['ideation_phase']
         self.development = self.initial_data['dev_phase']

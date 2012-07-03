@@ -18,7 +18,7 @@ class TimeSlotBaseTest(TestCase):
 
     def setUp(self):
         self.profile = create_user('bob')
-        self.url = reverse('create_entry')
+        self.url = reverse('create_entry', args=['ideas'])
 
     def tearDown(self):
         teardown_ignite_challenge()

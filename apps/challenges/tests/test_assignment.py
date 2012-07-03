@@ -8,12 +8,12 @@ from django.core.cache import cache
 from django.conf import settings
 
 from challenges.tests.test_judging import judging_setup
-from challenges.management.commands.assign import (get_judge_profiles,
-                                                   get_submissions,
-                                                   get_assignments)
+from challenges.judging import (get_judge_profiles, get_submissions,
+                                get_assignments)
 from challenges.models import (Submission, Judgement, JudgeAssignment,
                                ExclusionFlag, Phase)
 from ignite.tests.decorators import ignite_only
+from nose.tools import eq_, ok_
 
 
 def assignment_setup():
@@ -25,24 +25,24 @@ def assignment_setup():
 
 
 class AssignmentTest(TestCase):
-    
+
+    def setUp(self):
+        assignment_setup()
+        self.phase = Phase.objects.get()
+        self.judging_permission = Permission.objects.get(
+                                      codename='judge_submission')
+
     def assertEvenAssignment(self, assignments):
         counts = defaultdict(lambda: 0)
         for assignment in assignments:
             counts[assignment.judge] += 1
         # No judge has more than one submission more than any other
         self.assertTrue(max(counts.values()) - min(counts.values()) <= 1)
-    
-    def setUp(self):
-        assignment_setup()
-        self.phase = Phase.objects.get()
-        self.judging_permission = Permission.objects.get(
-                                      codename='judge_submission')
-    
+
     def test_get_judges(self):
         self.assertEqual(set([j.user.username for j in get_judge_profiles()]),
                          set(['alex', 'charlie']))
-    
+
     def test_get_judges_superuser(self):
         """Test superusers aren't automatically returned as judges."""
         User.objects.filter(username='bob').update(is_superuser=True)
@@ -103,7 +103,7 @@ class AssignmentTest(TestCase):
     def test_assignments(self):
         assignments = get_assignments(submissions=get_submissions(self.phase),
                                       judge_profiles=get_judge_profiles(),
-                                      commit=False)
+                                      commit=False, judges_per_submission=2)
         self.assertEvenAssignment(assignments)
         # Check nothing has been saved
         self.assertEqual(JudgeAssignment.objects.count(), 0)
@@ -111,7 +111,7 @@ class AssignmentTest(TestCase):
     def test_assignment_commit(self):
         assignments = get_assignments(submissions=get_submissions(self.phase),
                                       judge_profiles=get_judge_profiles(),
-                                      commit=True)
+                                      commit=True, judges_per_submission=2)
         self.assertEvenAssignment(assignments)
         expected_submissions = (settings.JUDGES_PER_SUBMISSION *
                                 Submission.objects.count())
@@ -128,6 +128,8 @@ class AssignmentContextTest(TestCase):
         date = datetime.utcnow() - timedelta(hours=1)
         self.phase.start_date = date
         self.phase.end_date = date
+        self.phase.judging_start_date = date
+        self.phase.judging_end_date = date + timedelta(days=1)
         self.phase.save()
         self.judge_profile = User.objects.get(username='alex').get_profile()
 
@@ -135,6 +137,8 @@ class AssignmentContextTest(TestCase):
         date = datetime.utcnow() + timedelta(hours=1)
         self.phase.start_date = datetime.utcnow() - timedelta(hours=1)
         self.phase.end_date = date
+        self.phase.judging_start_date = date + timedelta(days=1)
+        self.phase.judging_end_date = date + timedelta(days=2)
         self.phase.save()
     
     @ignite_only
@@ -165,7 +169,7 @@ class AssignmentContextTest(TestCase):
                                            judge=self.judge_profile)
         assert self.client.login(username='alex', password='alex')
         response = self.client.get('/')
-        assert response.context.get('assignment_count') is None
+        eq_(response.context.get('assignment_count'), 0)
 
     @ignite_only
     def test_assigned_and_judged(self):
