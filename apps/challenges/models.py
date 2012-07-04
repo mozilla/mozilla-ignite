@@ -631,7 +631,11 @@ class PhaseRound(models.Model):
 
     @cached_property
     def days_remaining(self):
-        return self.end_date - datetime.utcnow()
+        now = datetime.utcnow()
+        if not self.is_open:
+            return -1
+        time_remaining = self.end_date - now
+        return time_remaining.days if time_remaining.days >= 0 else -1
 
 
 class SubmissionParent(models.Model):
