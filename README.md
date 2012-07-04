@@ -13,7 +13,7 @@ Contributing
 Patches are welcome! Feel free to fork and contribute to this project on
 [github][gh-betafarm].
 
-[gh-betafarm]: https://github.com/rossbruniges/mozilla-ignite
+[gh-betafarm]: https://github.com/mozilla/mozilla-ignite
 
 
 Installation
@@ -27,7 +27,7 @@ Getting the source code
 
 Clone the repository and its dependencies:
 
-    git clone --recursive git@github.com:rossbruniges/mozilla-ignite.git
+    git clone --recursive git@github.com:mozilla/mozilla-ignite.git
 
 This will take a few minutes.
 
