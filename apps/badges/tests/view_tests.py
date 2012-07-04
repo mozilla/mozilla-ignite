@@ -22,7 +22,8 @@ class BadgesSubmissionTest(BadgesBaseTest):
             }
         entry = SubmissionBadge.objects.create(**data)
         self.assertTrue(entry.is_published)
-        url = reverse('entry_show', args=[self.submission.id])
+        url = reverse('entry_show', kwargs={'entry_id': self.submission.id,
+                                            'phase': 'ideas'})
         response = self.client.get(url)
         self.assertEqual(len(response.context['badge_list']), 1)
 
@@ -34,6 +35,7 @@ class BadgesSubmissionTest(BadgesBaseTest):
             'is_published': False,
             }
         SubmissionBadge.objects.create(**data)
-        url = reverse('entry_show', args=[self.submission.id])
+        url = reverse('entry_show', kwargs={'entry_id': self.submission.id,
+                                            'phase': 'ideas'})
         response = self.client.get(url)
         self.assertEqual(len(response.context['badge_list']), 0)

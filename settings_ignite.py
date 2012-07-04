@@ -28,12 +28,10 @@ MIDDLEWARE_CLASSES += (
 TEMPLATE_CONTEXT_PROCESSORS += (
     'ignite.context_processors.browserid_target_processor',
     'challenges.context_processors.assigned_submissions_processor',
+    'challenges.context_processors.phases_context_processor',
     )
 
-# ``DEVELOPMENT_PHASE`` only enables templating overriding
-# any other functionality has been implemented using
-# Phases/Rounds start and end dates.
-if DEVELOPMENT_PHASE:
-    TEMPLATE_DIRS = (
-        path('templates_ignite', 'development'),
-        ) + TEMPLATE_DIRS
+
+ABSOLUTE_URL_OVERRIDES = {
+    'auth.user': lambda u: "/profile/%s/" % u.username,
+}

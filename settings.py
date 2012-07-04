@@ -1,6 +1,7 @@
 # Django settings file for a project based on the playdoh template.
 
 import os
+import logging
 
 from django.utils.functional import lazy
 
@@ -21,6 +22,21 @@ DATABASES = {}  # See settings_local.
 
 # Site ID is used by Django's Sites framework.
 SITE_ID = 1
+
+## Logging
+LOG_LEVEL = logging.DEBUG
+HAS_SYSLOG = False
+SYSLOG_TAG = "http_app_playdoh" # Change this after you fork.
+LOGGING_CONFIG = None
+LOGGING = {
+    }
+
+# CEF Logging
+CEF_PRODUCT = 'Playdoh'
+CEF_VENDOR = 'Mozilla'
+CEF_VERSION = '0'
+CEF_DEVICE_VERSION = '0'
+
 
 #Bleach settings
 TAGS = ('h1', 'h2', 'a', 'b', 'em', 'i', 'strong',
@@ -102,7 +118,7 @@ MEDIA_URL = '/media/ignite/'
 ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '1iz#v0m55@h26^m6hxk3a7at*h$qj_2a$juu1#nv50548j(x1v'
+SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -116,7 +132,7 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.debug',
     'django.core.context_processors.media',
     'django.core.context_processors.request',
-    'django.core.context_processors.csrf',
+    'session_csrf.context_processor',
     'django.contrib.messages.context_processors.messages',
 
     'commons.context_processors.i18n',
@@ -178,14 +194,11 @@ MIDDLEWARE_CLASSES = (
     'commons.middleware.LocaleURLMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-
-    'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-
+    'session_csrf.CsrfMiddleware',
     'commonware.middleware.FrameOptionsHeader',
     'ignite.middleware.ProfileMiddleware',
-
     'waffle.middleware.WaffleMiddleware',
 )
 
@@ -196,13 +209,14 @@ INSTALLED_APPS = (
     'commons',  # Content common to most playdoh-based apps.
     'jingo_minify',
     'tower',  # for ./manage.py extract (L10n)
+    'cronjobs',  # for ./manage.py cron * cmd line tasks
 
     # We need this so the jsi18n view will pick up our locale directory.
     ROOT_PACKAGE,
 
     # Third-party apps
     'commonware.response.cookies',
-    'djcelery',
+    #'djcelery',
     'django_nose',
     'django_extensions',
 
@@ -308,7 +322,7 @@ USER_AVATAR_PATH = 'img/uploads/avatars/'
 TOPIC_IMAGE_PATH = 'img/uploads/topics/'
 PROJECT_IMAGE_PATH = 'img/uploads/projects/'
 EVENT_IMAGE_PATH = 'img/uploads/events/'
-CHALLENGE_IMAGE_PATH = 'img/uploads/challenges'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.
@@ -347,14 +361,21 @@ PUSH_DEFAULT_HUB_PASSWORD = ''
 PUSH_CREDENTIALS = 'projects.utils.push_hub_credentials'
 
 SOUTH_TESTS_MIGRATE = False
-CACHE_BACKEND = 'caching.backends.locmem://'
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 # Don't cache count queries at all, because there's no way to invalidate them
 CACHE_COUNT_TIMEOUT = None
 
 GRAVATAR_URL = 'https://secure.gravatar.com/avatar/'
 
 SITE_FEED_URLS = {
-    'splash': 'https://mozillaignite.org/blog/feed',
+    'splash': 'https://blog.mozillaignite.org/feed/',
 }
 
 JUDGES_PER_SUBMISSION = 2
@@ -391,4 +412,9 @@ HAYSTACK_CONNECTIONS = {
 # High number since we don't want pagination
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
 HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
+SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_HTTPONLY = True
+
+ANON_ALWAYS = True
 

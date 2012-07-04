@@ -1,5 +1,6 @@
 from awards.forms import AwardForm
 from awards.models import JudgeAllowance
+from awards.models import Award
 from challenges.decorators import judge_required
 from challenges.models import Submission
 from django.contrib import messages
@@ -23,7 +24,7 @@ def award(request, submission_id, project=None, slug=None):
     judge_data = {
         'judge': request.user.get_profile(),
         'award__phase': submission.phase,
-        'award__is_released': True,
+        'award__status': Award.RELEASED,
         }
     if submission.phase_round:
         judge_data.update({'award__phase_round': submission.phase_round})

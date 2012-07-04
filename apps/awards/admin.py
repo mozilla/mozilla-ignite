@@ -1,6 +1,6 @@
 from awards.models import JudgeAllowance, SubmissionAward, Award
 from awards.forms import AwardAdminForm
-from challenges.management.commands.assign import get_judge_profiles
+from challenges.judging import get_judge_profiles
 from django.contrib import admin
 from django.conf.urls.defaults import patterns, url
 from django.core.urlresolvers import reverse
@@ -19,13 +19,13 @@ class AwardAdmin(admin.ModelAdmin):
 
     def get_urls(self):
         urls = super(AwardAdmin, self).get_urls()
-        my_urls = patterns(
+        custom_urls = patterns(
             '',
             url(r'^(?P<award_id>\d+)/distribute/$',
                 self.admin_site.admin_view(self.distribute),
                 name='awards_distribute')
             )
-        return my_urls + urls
+        return custom_urls + urls
 
     def distribute(self, request, award_id):
         """Distribute the money evenly between all the Judges"""

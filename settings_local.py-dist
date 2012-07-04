@@ -1,21 +1,24 @@
 # This is an example settings_local.py file.
 # Copy it and add your local settings here.
 import os
-# This might be better implemented as a module name, as with Django's
-# DJANGO_SETTINGS_MODULE environment variable, but Python doesn't like
-# importing '*' from a module determined at runtime
-if os.environ.get('DJANGO_SITE') == 'ignite':
-    from settings_ignite import *
-else:
-    from settings import *
+import logging
 
+from settings_ignite import *
 
+# Create the these directories off media and set to 755 so the app can access them
+USER_AVATAR_PATH = 'img/uploads/avatars/'
+TOPIC_IMAGE_PATH = 'img/uploads/topics/'
+PROJECT_IMAGE_PATH = 'img/uploads/projects/'
+EVENT_IMAGE_PATH = 'img/uploads/events/'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
+
+# Create a local database and include their details in here
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'NAME': 'mozilla-ignite',
+        'USER': 'mozilla-ignite',
+        'PASSWORD': 'mozilla-ignite',
         'HOST': '',
         'PORT': '',
         'OPTIONS': {
@@ -28,17 +31,57 @@ DATABASES = {
     },
 }
 
+# Fill this out with people who should get alerts of server errors
 ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
 MANAGERS = ADMINS
 
+# Make this unique, and don't share it with anybody.
+SECRET_KEY = 'cheese'
 
+# Should be False on a production box
 DEBUG = TEMPLATE_DEBUG = True
 
+# Install memcache and remove this to make djangobrowser id
+# https://github.com/mozilla/django-session-csrf#differences-from-django
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
 
-# Change this
+# Browser ID performs the assertion with this url e.g. http://localhost:8000
+SITE_URL = 'https://local.mozillaignite.org'
+
+SESSION_COOKIE_SECURE = False
+SESSION_COOKIE_HTTPONLY = False
+# Install memcache and remove this to make djangobrowser id
+# https://github.com/mozilla/django-session-csrf#differences-from-django
+CACHE_BACKEND = 'caching.backends.locmem://'
+
+# Auth - create a HMAC_KEY
 HMAC_KEYS = {
-    '2011-01-01': 'cheesecake',
+    #'2011-01-01': 'cheesecake',
+}
+
+debug = dict(level=logging.DEBUG)
+
+LOGGING = {
+    'loggers': {
+        'django_browserid': debug,
+    },
+}
+
+# This should match the admin files location
+ADMIN_MEDIA_PREFIX = '/static/admin/'
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
 }

@@ -20,36 +20,37 @@ from django_extensions.db.fields import (AutoSlugField,
                                          CreationDateTimeField,
                                          ModificationDateTimeField)
 from innovate.models import BaseModel, BaseModelManager
+from innovate.utils import ImageStorage
 from projects.models import Project
 from tower import ugettext_lazy as _
 from users.models import Profile
 
 
 class ChallengeManager(BaseModelManager):
-    
+
     def get_by_natural_key(self, slug):
         return self.get(slug=slug)
 
 
 class Challenge(BaseModel):
     """A user participation challenge on a specific project."""
-    
+
     objects = ChallengeManager()
-    
+
     title = models.CharField(verbose_name=_(u'Title'), max_length=60, unique=True)
     slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
     summary = models.TextField(verbose_name=_(u'Summary'),
                                validators=[MaxLengthValidator(200)])
     description = models.TextField(verbose_name=_(u'Description'))
-    
+
     def natural_key(self):
         return (self.slug,)
-    
+
     @property
     def description_html(self):
         """Challenge description with bleached HTML."""
         return cached_bleach(self.description)
-    
+
     image = models.ImageField(verbose_name=_(u'Project image'),
                               null=True, blank=True,
                              upload_to=settings.CHALLENGE_IMAGE_PATH)
@@ -70,14 +71,14 @@ class Challenge(BaseModel):
 
     def __unicode__(self):
         return self.title
-    
+
     def _lookup_url(self, view_name, kwargs=None):
         """Look up a URL related to this challenge.
-        
+
         Note that this needs to account both for an Ignite-style URL structure,
         where there is a single challenge for the entire site, and sites where
         there are multiple challenges.
-        
+
         """
         if kwargs is None:
             kwargs = {}
@@ -86,14 +87,10 @@ class Challenge(BaseModel):
         except NoReverseMatch:
             kwargs.update({'project': self.project.slug, 'slug': self.slug})
             return reverse(view_name, kwargs=kwargs)
-    
+
     def get_absolute_url(self):
         """Return this challenge's URL."""
         return self._lookup_url('challenge_show')
-    
-    def get_entries_url(self):
-        """Return the URL for this challenge's entry list."""
-        return self._lookup_url('entries_all')
 
 
 def in_six_months():
@@ -121,6 +118,10 @@ class Phase(BaseModel):
                                       default=datetime.utcnow)
     end_date = models.DateTimeField(verbose_name=_(u'End date'),
                                     default=in_six_months)
+    judging_start_date = models.DateTimeField(
+        verbose_name=_(u'Judging start date'), blank=True, null=True)
+    judging_end_date = models.DateTimeField(
+        verbose_name=_(u'Judging end date'), blank=True, null=True)
     order = models.IntegerField()
 
     # managers
@@ -137,9 +138,18 @@ class Phase(BaseModel):
         return self.challenge.natural_key() + (self.name,)
     natural_key.dependencies = ['challenges.challenge']
 
+    @models.permalink
+    def get_absolute_url(self):
+        slug = 'ideas' if self.is_ideation else 'proposals'
+        return ('entries_all', [slug])
+
     @cached_property
     def days_remaining(self):
-        return self.end_date - datetime.utcnow()
+        now = datetime.utcnow()
+        if not self.is_open:
+            return -1
+        time_remaining = self.end_date - now
+        return time_remaining.days if time_remaining.days >= 0 else -1
 
     @cached_property
     def phase_rounds(self):
@@ -147,26 +157,69 @@ class Phase(BaseModel):
 
     @cached_property
     def current_round(self):
-        """Determines the current round for this ``Phase``"""
+        """Determines the current open ``PhaseRound`` for this ``Phase``"""
         now = datetime.utcnow()
+        # we have a phase ``Round`` open
         for item in self.phase_rounds:
-            if item.start_date <= now and item.end_date >= now:
+            if item.start_date < now and item.end_date > now:
                 return item
         return None
 
     @cached_property
-    def judging_phase_round(self):
-        """Returns the ``PhaseRound`` that is being judged at the moment
-        - The round should have finished
-        """
+    def current_judging_round(self):
+        """Determines what is the current ``PhaseRound`` being judged"""
         now = datetime.utcnow()
-        # wed don't know if the phase_rounds are ordered by end date
-        sorted_rounds = sorted(self.phase_rounds, key=lambda x: x.end_date)
-        sorted_rounds.reverse()
-        for phase_round in sorted_rounds:
-            if phase_round.end_date <= now:
-                return phase_round
+        for item in self.phase_rounds:
+            if item.judging_start_date and item.judging_end_date \
+                and item.judging_start_date < now \
+                and item.judging_end_date > now:
+                return item
         return None
+
+    @cached_property
+    def is_judgable(self):
+        """Determines if it is possible to judge this submission"""
+        now = datetime.utcnow()
+        # Phase is during Judging period
+        if self.judging_start_date and self.judging_end_date \
+            and self.judging_start_date < now and self.judging_end_date > now:
+            return True
+        # Round is during judging period
+        if self.current_judging_round:
+            return True
+        return False
+
+    @cached_property
+    def is_open(self):
+        """Determines if this ``Phase`` is opened for ``Submissions``"""
+        now = datetime.utcnow()
+        # If the ``Phase`` has any ``phase_rounds`` its status
+        # is determined by the ``current_round``
+        if self.phase_rounds:
+            if self.current_round:
+                return True
+            return False
+        return self.start_date < now and now < self.end_date
+
+    @property
+    def is_closed(self):
+        return not self.is_open
+
+    @cached_property
+    def has_started(self):
+        return datetime.utcnow() > self.start_date
+
+    @cached_property
+    def is_ideation(self):
+        return self.name == settings.IGNITE_IDEATION_NAME
+
+    @cached_property
+    def is_development(self):
+        return self.name == settings.IGNITE_DEVELOPMENT_NAME
+
+    @cached_property
+    def slug_url(self):
+        return 'proposals' if self.is_development else 'ideas'
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -187,10 +240,11 @@ class ExternalLink(BaseModel):
     def __unicode__(self):
         return u"%s -> %s" % (self.name, self.url)
 
+
 class CategoryManager(BaseModelManager):
-    
+
     def get_active_categories(self):
-        
+
         filtered_cats = []
         for cat in Category.objects.all():
             cat_submissions = cat.submission_set.all()
@@ -204,17 +258,17 @@ class CategoryManager(BaseModelManager):
 
 
 class Category(BaseModel):
-    
+
     objects = CategoryManager()
-    
+
     name = models.CharField(verbose_name=_(u'Name'), max_length=60, unique=True)
     slug = models.SlugField(verbose_name=_(u'Slug'), max_length=60, unique=True)
 
     def __unicode__(self):
         return self.name
-    
+
     class Meta:
-        
+
         verbose_name_plural = 'Categories'
 
 
@@ -230,9 +284,9 @@ class Submission(BaseModel):
         verbose_name=_(u'Featured image'), blank=True, null=True,
         help_text=_(u"This will be used in our summary and list views. You "
                     u"can add more images in your description or link out to "
-                    u"sets or images out on the web by adding in an external"
-                    u" link"),
-        upload_to=settings.CHALLENGE_IMAGE_PATH)
+                    u"sets or images out on the web by adding in an external link"),
+        upload_to=settings.CHALLENGE_IMAGE_PATH,
+        storage=ImageStorage())
     category = models.ForeignKey(Category)
     created_by = models.ForeignKey(Profile)
     created_on = models.DateTimeField(default=datetime.utcnow)
@@ -249,11 +303,22 @@ class Submission(BaseModel):
                                     blank=True, null=True,
                                     on_delete=models.SET_NULL)
     collaborators = models.TextField(blank=True)
+    life_improvements = models.TextField(default="",
+                                            verbose_name=_(u'How does this improve the lives of people?'))
+    take_advantage = models.TextField(blank=True, null=True,
+                                        verbose_name=_(u'How does this make the most of the GENI network?'))
+    interest_making = models.TextField(blank=True, null=True,
+                                        verbose_name=_(u'Are you interested in making this app?'))
+    team_members = models.TextField(blank=True, null=True,
+                                    verbose_name=_(u'Tell us about your team making this app'))
     # Add Development Phase fields.
     # Make sure they are not required at the Database level.
     # We will make them required at the ``DevelopmentEntryForm`` Level.
     repository_url = models.URLField(max_length=500, verify_exists=False,
                                      blank=True)
+    blog_url = models.URLField(max_length=500, verify_exists=False,
+                               blank=True)
+
 
     # managers
     objects = SubmissionManager()
@@ -272,19 +337,19 @@ class Submission(BaseModel):
     @property
     def challenge(self):
         return self.phase.challenge
-    
+
     def get_image_src(self):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
-        return path(self.sketh_note) or path('img/project-default.gif')
+        return path(self.sketh_note) or path('img/project-default.png')
     
     def _lookup_url(self, view_name, kwargs=None):
         """Look up a URL related to this submission.
-        
+
         Note that this needs to account both for an Ignite-style URL structure,
         where there is a single challenge for the entire site, and sites where
         there are multiple challenges.
-        
+
         """
         if kwargs is None:
             kwargs = {}
@@ -313,9 +378,24 @@ class Submission(BaseModel):
             return version_list[0].parent.slug
         return None
 
+    @cached_property
+    def is_idea(self):
+        return self.phase.name == settings.IGNITE_IDEATION_NAME
+
+    @cached_property
+    def is_proposal(self):
+        return self.phase.name == settings.IGNITE_DEVELOPMENT_NAME
+
+    @cached_property
+    def phase_slug(self):
+        if self.is_idea:
+            return 'ideas'
+        return 'proposals'
+
     def get_absolute_url(self):
         """Return this submission's URL."""
-        return self._lookup_url('entry_show', {'entry_id': self.parent_slug})
+        return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
+                                               'phase': self.phase_slug})
 
     def get_version_url(self):
         """Return this submission's URL."""
@@ -323,45 +403,46 @@ class Submission(BaseModel):
 
     def get_edit_url(self):
         """Return the URL to edit this submission."""
-        return self._lookup_url('entry_edit', {'pk': self.id})
-    
+        return self._lookup_url('entry_edit', {'pk': self.id,
+                                               'phase': self.phase_slug})
+
     def get_delete_url(self):
         """Return the URL to delete this submission."""
-        return self._lookup_url('entry_delete', {'pk': self.id})
-    
+        return self._lookup_url('entry_delete', {'pk': self.id,
+                                                 'phase': self.phase_slug})
+
     def get_judging_url(self):
         """Return the URL to judge this submission."""
         return self._lookup_url('entry_judge', {'pk': self.id})
-    
+
     # Permission shortcuts, for use in templates
-    
     def _permission_check(self, user, permission_name):
         """Check whether a user has a given permission on this object.
-        
+
         This has to check both the general object and specific object cases,
         because Django doesn't do the intelligent thing here and fall back on
         the general case when a backend doesn't support per-object permissions.
-        
+
         """
         return any(user.has_perm(permission_name, obj=obj)
                    for obj in [None, self])
-    
+
     def visible_to(self, user):
         """Return True if the user provided can see this entry."""
         return self._permission_check(user, 'challenges.view_submission')
-    
+
     def editable_by(self, user):
         """Return True if the user provided can edit this entry."""
         return self._permission_check(user, 'challenges.edit_submission')
-    
+
     def deletable_by(self, user):
         """Return True if the user provided can delete this entry."""
         return self._permission_check(user, 'challenges.delete_submission')
-    
+
     def judgeable_by(self, user):
         """Return True if the user provided is allowed to judge this entry."""
         return self._permission_check(user, 'challenges.judge_submission')
-    
+
     def owned_by(self, user):
         """Return True if user provided owns this entry."""
         return user == self.created_by.user
@@ -384,97 +465,95 @@ class Submission(BaseModel):
 
 class ExclusionFlag(models.Model):
     """Flags to exclude a submission from judging."""
-    
+
     submission = models.ForeignKey(Submission)
-    
+
     notes = models.TextField(blank=True)
-    
+
     def __unicode__(self):
         return unicode(self.submission)
 
 
 class JudgingCriterion(models.Model):
     """A numeric rating criterion for judging submissions."""
-    
+
     question = models.CharField(max_length=250, unique=True)
     min_value = 0
     max_value = models.IntegerField(default=10)
-    
+
     phases = models.ManyToManyField(Phase, blank=True,
                                     related_name='judgement_criteria',
                                     through='PhaseCriterion')
-    
+
     def __unicode__(self):
         return self.question
-    
+
     def clean(self):
         if self.min_value >= self.max_value:
             raise ValidationError('Invalid value range %d..%d' %
                                   (self.min_value, self.max_value))
-    
+
     @property
     def range(self):
         """Return the valid range of values for this criterion."""
         return xrange(self.min_value, self.max_value + 1)
-    
+
     class Meta:
-        
+
         verbose_name_plural = 'Judging criteria'
         ordering = ('id',)
 
 
 class PhaseCriterion(models.Model):
-    """Assignment of judging criteria to individual phases.
-    
+    """
+    Assignment of judging criteria to individual phases.
     These include a total weight assigned to each criterion. The score from
     each criterion is multiplied up to have this weight as a maximum value.
-    
     """
-    
+
     phase = models.ForeignKey(Phase)
     criterion = models.ForeignKey(JudgingCriterion)
-    
+
     # The total weight afforded to this criterion
     weight = models.DecimalField(max_digits=4, decimal_places=2, default=10)
-    
+
     class Meta:
-        
+
         unique_together = (('phase', 'criterion'),)
         verbose_name_plural = 'phase criteria'
-    
+
     def __unicode__(self):
         return ' - '.join(map(unicode, [self.phase, self.criterion]))
 
 
 class Judgement(models.Model):
     """A judge's rating of a submission."""
-    
+
     class Incomplete(RuntimeError):
         """Error class when calculating scores on incomplete judgements."""
-        
         def __init__(self, judgement):
             super_init = super(Judgement.Incomplete, self).__init__
             super_init('Judgement is incomplete', judgement)
-    
+
     submission = models.ForeignKey(Submission)
     judge = models.ForeignKey(Profile)
-    
+
     # answers comes through in a foreign key from JudgingAnswer
     notes = models.TextField(blank=True)
-    
+
     def __unicode__(self):
         return ' - '.join([unicode(self.submission), unicode(self.judge)])
-    
+
     def get_absolute_url(self):
         return self.submission.get_absolute_url()
-    
+
     @property
     def complete(self):
         """Whether all the criteria in the submission's phase are rated."""
         criteria = JudgingCriterion.objects.filter(judginganswer__judgement=self)
         return all(c in criteria for c in
                    self.submission.phase.judgement_criteria.all())
-    
+
     def get_score(self):
         total_score = Decimal('0')
         phase_criteria = self.submission.phase.phasecriterion_set.all()
@@ -486,24 +565,23 @@ class Judgement(models.Model):
         except JudgingAnswer.DoesNotExist:
             raise Judgement.Incomplete(self)
         return total_score
-    
+
     class Meta:
         unique_together = (('submission', 'judge'),)
 
 
 class JudgingAnswer(models.Model):
     """A judge's answer to an individual judging criterion."""
-    
     judgement = models.ForeignKey(Judgement, related_name='answers')
     criterion = models.ForeignKey(JudgingCriterion)
     rating = models.IntegerField()
-    
+
     def __unicode__(self):
         return ' - '.join([unicode(self.judgement), unicode(self.criterion)])
-    
+
     class Meta:
         unique_together = (('judgement', 'criterion'),)
-    
+
     def clean(self):
         criterion = self.criterion
         if self.rating not in self.criterion.range:
@@ -514,24 +592,17 @@ class JudgingAnswer(models.Model):
 
 class JudgeAssignment(models.Model):
     """An assignment of a specific judge to a submission."""
-    
+
     submission = models.ForeignKey(Submission)
     judge = models.ForeignKey(Profile)
-    
+
     created_on = models.DateTimeField(default=datetime.utcnow)
-    
+
     def __unicode__(self):
         return unicode(self.submission)
-    
+
     class Meta:
         unique_together = (('submission', 'judge'),)
-
-
-@receiver(signals.post_save, sender=JudgeAssignment)
-@receiver(signals.post_save, sender=Judgement)
-def judgement_flush_cache(instance, **kwargs):
-    """Flush the cache for any submissions related to this instance."""
-    Submission.objects.invalidate(instance.submission)
 
 
 class PhaseRound(models.Model):
@@ -541,6 +612,10 @@ class PhaseRound(models.Model):
     phase = models.ForeignKey('challenges.Phase')
     start_date = models.DateTimeField()
     end_date = models.DateTimeField()
+    judging_start_date = models.DateTimeField(
+        verbose_name=_(u'Judging start date'), blank=True, null=True)
+    judging_end_date = models.DateTimeField(
+        verbose_name=_(u'Judging end date'), blank=True, null=True)
 
     def __unicode__(self):
         return u'%s: %s' % (self.phase, self.name)
@@ -551,8 +626,16 @@ class PhaseRound(models.Model):
         return all([now > self.start_date, now < self.end_date])
 
     @cached_property
+    def is_open(self):
+        return self.is_active
+
+    @cached_property
     def days_remaining(self):
-        return self.end_date - datetime.utcnow()
+        now = datetime.utcnow()
+        if not self.is_open:
+            return -1
+        time_remaining = self.end_date - now
+        return time_remaining.days if time_remaining.days >= 0 else -1
 
 
 class SubmissionParent(models.Model):
@@ -591,7 +674,11 @@ class SubmissionParent(models.Model):
 
     @models.permalink
     def get_absolute_url(self):
-        return ('entry_show', [self.slug])
+        kwargs = {
+            'entry_id': self.slug,
+            'phase': self.submission.phase_slug,
+            }
+        return ('entry_show', [], kwargs)
 
     def update_version(self, new_submission):
         """Updates the current ``SubmissionParent`` version"""

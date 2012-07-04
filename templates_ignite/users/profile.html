@@ -1,4 +1,4 @@
-{% extends "second_base.html" %}
+{% extends "base.html" %}
 {% from "timeslot/includes/booking_list.html" import booking_listing  with context %}
 
 {% block page_title %}{{ profile.display_name }} | Users | {% endblock %}
@@ -67,7 +67,7 @@
             <a class="title" href="{{ idea.get_absolute_url() }}">
                 <h3 class="title wimper">
                     <div class="frame box">
-                        <img src="http://src.sencha.io/200/{{ app_url }}{{ idea.get_image_src() }}" alt="" />
+                        <img src="{{ idea.get_image_src() }}" alt="" />
                     </div>
                     {{ idea.title }}
                 </h3>
@@ -86,7 +86,14 @@
         {% endfor %}
     </ul>
 {% endif %}
-<a href="{{ url('create_entry') }}" class="cta">{{ _('Create an idea') }}</a>
+    {% if ideation.is_open %}
+    <a href="{{ url('create_entry', phase='ideas') }}" class="cta">{{ _('Create an idea') }}</a>
+    {% endif %}
+    {% if development.is_open %}
+    <a href="{{ url('create_entry', phase='proposals') }}" class="cta">{{ _('Create a proposal') }}</a>
+    {% endif %}
+
+
 </div>
 </div>
 {% endblock %}

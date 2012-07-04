@@ -1,9 +1,6 @@
 import os
 
-if os.environ.get('DJANGO_SITE') == 'ignite':
-    from settings_ignite import *
-else:
-    from settings import *
+from settings_ignite import *
 
 DEBUG = TEMPLATE_DEBUG = True
 
@@ -28,29 +25,19 @@ HMAC_KEYS = {
 }
 
 
-app_list = []
+EXCLUDED_APPS = ('django_mailer', 'south', 'admin_tools',
+                 'debug_toolbar')
+INSTALLED_APPS = filter(lambda a: a not in EXCLUDED_APPS, INSTALLED_APPS)
 
-for app in INSTALLED_APPS:
-    conditions = [not app == 'south',
-                  not 'admin_tools' in app,
-                  not 'debug_toolbar' in app,
-                  not 'sentry' in app,
-                  ]
-    if all(conditions):
-        app_list.append(app)
-
-INSTALLED_APPS = app_list
-
-# TEST_RUNNER = 'test_utils.runner.RadicalTestSuiteRunner'
 
 NOSE_ARGS = [
     '-s',
-    '--failed',
-    '--stop',
+    # '--failed',
+    # '--stop',
     '--nocapture',
     '--failure-detail',
     '--with-progressive',
-    # '--with-coverage',
+    '--logging-filter=-south',
     ]
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

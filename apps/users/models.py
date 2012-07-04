@@ -17,9 +17,8 @@ def determine_upload_path(instance, filename):
     chunk_size = 1000  # max files per directory
     path = getattr(settings, 'USER_AVATAR_PATH', 'images/profiles/')
     path = path.lstrip('/').rstrip('/')
-    return "%(path)s/%(partition)d/%(filename)s" % {
+    return "%(path)s/%(filename)s" % {
         'path': path,
-        'partition': get_partition_id(instance.pk, chunk_size),
         'filename': safe_filename(filename)
     }
 
@@ -45,6 +44,8 @@ class Profile(BaseModel):
                                 verbose_name=_(u'User'))
     name = models.CharField(max_length=255, blank=True,
                             verbose_name=_(u'Display name'))
+    title = models.CharField(max_length=255, blank=True, null=True,
+                            verbose_name=(u'Job title'))
     avatar = models.ImageField(upload_to=determine_upload_path, null=True,
                                blank=True, verbose_name=_(u'Avatar'),
                                max_length=settings.MAX_FILEPATH_LENGTH,
@@ -56,6 +57,10 @@ class Profile(BaseModel):
     featured_image = models.ImageField(verbose_name=_(u'Featured Image'),
                                        blank=True, null=True,
                                        upload_to=settings.USER_AVATAR_PATH)
+
+    @models.permalink
+    def get_absolute_url(self):
+        return ('users_profile', [self.user.username])
 
     def get_gravatar_url(self, size=140):
         base_url = getattr(settings, 'GRAVATAR_URL', None)

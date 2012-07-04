@@ -1,6 +1,6 @@
 <!DOCTYPE html{% block schema_org %}{% endblock %}>
 <!--[if (lt IE 9)]><html class="no-js bad-ie" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
-<!--[if (gt IE 8)|!(IE)]><html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
+<!--[if (gt IE 8)|!(IE)]><!--><html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}"><!--<![endif]-->
 <head>
     <title>{% block page_title %}{% endblock %}{{ app_name }}</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
@@ -8,12 +8,12 @@
     {% block site_css %}
         {{ css('ignite_devices') }}
     {% endblock %}
-    <link rel="stylesheet" media="all and (min-width:30em)" href="{{ MEDIA_URL }}ignite/css/desktop.css" />
+    {{ css('ignite_desktop', 'all and (min-width:30em)') }}
     <!--[if lt IE 9]>
-        <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-        <link rel="stylesheet" media="screen" href="{{ MEDIA_URL }}ignite/css/desktop.css" />
+        <script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+        {{ css('ignite_desktop') }}
     <![endif]-->
-    <link rel="icon" href="{{ MEDIA_URL }}ignite/img/favicon.ico" />
+    <link rel="icon" href="{{ MEDIA_URL }}img/favicon.ico" />
     {% block social_meta %}{% endblock %}
 </head>
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
@@ -21,20 +21,25 @@
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
         var ignite = window.ignite || {};
         ignite.data = {
-            MEDIA_URL : {{ MEDIA_URL }},
+            MEDIA_URL : '{{ MEDIA_URL }}',
             JS_BUILD_ID: 'foo'
         };
     </script>
     <header class="masthead">
         <div class="busta clearfix">
-            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}ignite/img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
+            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
             <a href="http://www.mozilla.org" class="tab">mozilla.org</a>
             <nav>
                 <ul>
                     <li><a href="{{ url('about_ignite') }}">{{ _('About the challenge') }}</a></li>
-                    <li><a href="{{ url('entries_all') }}">{{ _('Ideas') }}</a></li>
+                    <li><a href="{{ url('entries_all', phase='ideas') }}">{{ _('Ideas') }}</a></li>
+                    {% if development.has_started %}<li><a href="{{ url('entries_all', phase='proposals') }}">{{ _('Proposals') }}</a></li>{% endif %}
+                    {% if waffle.switch('show_judges') %}
                     <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
-                    <li><a href="/blog/">{{ _('Blog') }}</a></li>
+                    {% endif %}
+                    {% if waffle.switch('show_blog') %}
+                    <li><a href="https://blog.mozillaignite.org/">{{ _('Blog') }}</a></li>
+                    {% endif %}
                     {% block login %}
                     {% if not user.is_authenticated() %}
                         <li>{% include "registration/_login_form.html" %}</li>
@@ -49,35 +54,31 @@
     </header>
     <div role="main">
     <section>
-    <div class="promo">
-        <div class="busta">
-            {% block header %}{% endblock %}
-        </div>
-        <div class="busta styleme" style="background-color: #ffff00;">
-        {% if perms.challenges.judge_submission and assignment_count %}
-        {% block judgecall %}
-        {% trans count=assignment_count, url=url('entries_assigned') %}
-        <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
-        {% pluralize %}
-        <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
-        {% endtrans %}
-        {% endblock %}
-        {% endif %}
-        </div>
-    </div>
-    {% block alerts %}
-    {% if messages %}
-    <section class="alerts">
-        <ul class="busta">
-            {% for message in messages %}
-                <li>{{ message|safe }}</li>
-            {% endfor %}
-        </ul>
-    </section>
-    {% endif %}
-    {% endblock %}
+    {% block header %}{% endblock %}
     <div class="entre">
         <div class="busta">
+            {% if perms.challenges.judge_submission and assignment_count %}
+            <div class="busta styleme" style="background-color: #ffff00;">
+                {% block judgecall %}   
+                    {% trans count=assignment_count, url=url('entries_assigned') %}
+                    <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
+                    {% pluralize %}
+                    <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
+                    {% endtrans %}
+                {% endblock %}
+            </div>
+            {% endif %}
+            {% block alerts %}
+                {% if messages %}
+                <section class="alerts">
+                    <ul class="busta">
+                    {% for message in messages %}
+                        <li>{{ message|safe }}</li>
+                    {% endfor %}
+                    </ul>
+                </section>
+                {% endif %}
+            {% endblock %}
             {% block content %}{% endblock %}
         </div>
     </div>
@@ -87,40 +88,58 @@
     <aside>
         <section class="partners">
             <div class="busta">
-            <h2>Our partners</h2>
+            <h2 class="point">Our partners</h2>
             <ul>
-                <li><a href="http://www.nsf.gov"><img src="{{ MEDIA_URL }}ignite/img/partners/nsf.png" width="90" height="75" alt="National Science Foundation" /></a></li>
-                <li><a href="http://www.geni.net"><img src="{{ MEDIA_URL }}ignite/img/partners/geni.png" width="90" height="75" alt="geni - exploring networks of the future" /></a></li>
-                <li><a href="http://www.zerodivide.org"><img width="90" height="75" alt="Zero Divide" src="{{ MEDIA_URL }}ignite/img/partners/zd.png"></a></li>
-                <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}ignite/img/partners/webfwd.png"></a></li>
-                <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}ignite/img/partners/mdn.png"></a></li>
-                <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}ignite/img/partners/ignite.png"></a></li>
+                <li><a href="http://www.nsf.gov"><img src="{{ MEDIA_URL }}img/partners/nsf.png" width="90" height="75" alt="National Science Foundation" /></a></li>
+                <li><a href="http://www.geni.net"><img src="{{ MEDIA_URL }}img/partners/geni.png" width="90" height="75" alt="geni - exploring networks of the future" /></a></li>
+                <li><a href="http://www.zerodivide.org"><img width="90" height="75" alt="Zero Divide" src="{{ MEDIA_URL }}img/partners/zd.png"></a></li>
+                <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}img/partners/webfwd.png"></a></li>
+                <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}img/partners/mdn.png"></a></li>
+                <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}img/partners/ignite.png"></a></li>
             </ul>
             </div>
         </section>
         <section class="external">
             <div class="busta">
-            <div class="col box tweet">
-                <h2>Follow and tweet</h2>
-                <p>What becomes possible at 1GBps? What's the future of the web and smart networks? Tweet your thoughts with <a href="https://twitter.com/#!/search?q=%23usignite">#usignite</a>.</p>
-                <a href="https://twitter.com/mozilla" class="twitter-follow-button" data-show-count="false">Follow @mozilla</a>
-                <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
+            <div class="col box post">
+                <h2 class="point">Get email updates about Ignite and Mozilla</h2>
+                <form action="https://donate.mozilla.org/page/s/mozilla-ignite-updates" method="post" name="signup">
+                    <label for="email" class="indent">Email</label>
+                    <input type="text" name="email" id="email" value="" required placeholder="Email address" />
+                    <div class="inline_field">
+                        <label>
+                            <input type="checkbox" id="custom-978" name="custom-978" value="1" required />
+                            I'm okay with you handling this info as you explain in your <a href="http://www.mozilla.org/about/policies/privacy-policy.html">privacy policy:</a>.
+                        </label>
+                    </div>
+                    <div class="inline_field">
+                        <label>
+                            <input type="checkbox" id="email_opt_in" name="email_opt_in" value="1" >
+                            I want to receive email updates about Ignite and Mozilla's other projects and campaigns.
+                        </label>
+                    </div>
+                    <div class="inline_field">
+                    </div>
+                    <input type="submit" name="submit-btn" value="Keep me updated" class="cta" />
+                </form>
             </div>
             <div class="col box learn">
-                <h2>Learn more</h2>
+                <h2 class="point">Learn more</h2>
                 <ul>
                     <li><a href="mailto:ignite@mozillafoundation.org">Contact us</a></li>
                     <li><a href="http://www.geni.net">Visit <abbr title="Global Environment for Network Innovations">GENI</abbr> website</a></li>
-                    <li><a href="http://www.nsf.gov/cise/usignite/">Visit <abbr title="United States">US</abbr> Ignite website</a></li>
+                    <li><a href="http://us-ignite.org">Visit <abbr title="United States">US</abbr> Ignite website</a></li>
                 </ul>
             </div>
             <div class="col box mozilla">
-                <h2>Connect with Mozilla</h2>
+                <h2 class="point">Connect with Mozilla</h2>
                 <ul>
                     <li><a href="http://www.mozilla.org/about/mission.html">Learn about Mozilla's mission</a></li>
                     <li><a href="https://donate.mozilla.org/join/">Join Mozilla</a></li>
-                    <li><a href="http://www.facebook.com/mozilladrumbeat/">Like us on Facebook</a></li>
+                    <li><a href="http://www.facebook.com/mozilla/">Like us on Facebook</a></li>
+                    <li><a href="https://twitter.com/mozillaignite" class="twitter-follow-button" data-show-count="false">Follow @mozillaignite</a></li>
                 </ul>
+                <script src="//platform.twitter.com/widgets.js" type="text/javascript"></script>
             </div>
             </div>
         </section>
@@ -130,15 +149,12 @@
         {{ js('ignite_core') }}
     {% endblock %}
     {% block page_js %}{% endblock %}
-    {% if not waffle.switch('in_dev') %}
-        <script type="text/javascript">
-            var uvOptions = {};
-            (function() {
-                var uv = document.createElement('script'); uv.type = 'text/javascript'; uv.async = true;
-                uv.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'widget.uservoice.com/s399jcs76KmYlVNnbr8hKQ.js';
-                var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(uv, s);
-            })();
-        </script>
+    {% if waffle.switch('track_hits') %}
+    <!-- START OF SmartSource Data Collector TAG v10.2.0 -->
+    <!-- Copyright (c) 2012 Webtrends Inc. All rights reserved. -->
+    <script src="{{ MEDIA_URL }}js/include/ext/webtrends/webtrends.load.js"></script>
+    <noscript><img alt="dcsimg" id="dcsimg" width="1" height="1" src="//statse.webtrendslive.com/dcs7ggi1tvz5bdbvfb86i75xm_9b9v/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=10.2.10&amp;dcssip=www.mozillaignite.org"/></noscript>
+    <!-- END OF SmartSource Data Collector TAG v10.2.0 -->
     {% endif %}
 </body>
 </html>

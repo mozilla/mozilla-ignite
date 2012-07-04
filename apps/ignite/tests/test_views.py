@@ -27,7 +27,7 @@ class SplashViewTest(test_utils.TestCase):
         create_submissions(30)
         response = self.client.get(reverse('challenge_show'))
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(len(response.context['entries']), 10)
+        self.assertEqual(len(response.context['entries']), 5)
     
     @ignite_only
     def test_splash_draft_entries(self):

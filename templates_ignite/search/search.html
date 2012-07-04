@@ -1,6 +1,13 @@
 {% extends "challenges/all.html" %}
 
-{% block title_listing %}Search Ideas{% endblock title_listing %}
+
+{% block header %}
+<header class="busta">
+<h1 class="shout">
+Search submissions
+</h1>
+</header>
+{% endblock %}
 
 {% block content %}
 <div class="content_columns columns with_nav">
@@ -25,7 +32,7 @@
           <a class="title" href="{{ result.object.get_absolute_url() }}">
             <h3 class="title wimper">
               <div class="frame box">
-                <img src="http://src.sencha.io/200/{{ app_url }}{{ result.object.submission.get_image_src() }}" alt="">
+                <img src="{{ result.object.submission.get_image_src() }}" alt="">
               </div>
               {{ result.object.submission.title }}
             </h3>

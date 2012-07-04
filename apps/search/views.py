@@ -44,8 +44,3 @@ class CustomSearchView(FacetedSearchView):
             context['suggestion'] = self.form.get_suggestion()
         context.update(self.extra_context())
         return jingo.render(self.request, self.template, context)
-
-    def extra_context(self):
-        extra = super(CustomSearchView, self).extra_context()
-        extra['days_remaining'] = self.request.phase['days_remaining']
-        return extra

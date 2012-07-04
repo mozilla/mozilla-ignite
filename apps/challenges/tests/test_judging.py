@@ -220,11 +220,16 @@ class JudgingViewTest(MessageTestCase):
         date = datetime.utcnow() - timedelta(hours=1)
         self.phase.start_date = date
         self.phase.end_date = date
+        self.phase.judging_start_date = date
+        self.phase.judging_end_date = date + timedelta(hours=3)
         self.phase.save()
 
     def open_phase(self):
-        date = datetime.utcnow() + timedelta(hours=1)
-        self.phase.end_date = date
+        """Open the phase and close the judging period"""
+        now = datetime.utcnow() + timedelta(hours=1)
+        self.phase.end_date = now
+        self.phase.judging_start_date = now + timedelta(days=1)
+        self.phase.judging_end_date = now + timedelta(days=1)
         self.phase.save()
 
     @ignite_only
@@ -297,7 +302,7 @@ class JudgingViewTest(MessageTestCase):
             self.assertEqual(answer.rating, 5)
 
     @ignite_only
-    def test_submit_judge_form_with_closed_phase(self):
+    def test_submit_judge_form_with_closed_judging_phase(self):
         """Test judging when the Phase has been closed"""
         self.open_phase()
         submission = Submission.objects.get()
@@ -306,7 +311,7 @@ class JudgingViewTest(MessageTestCase):
         post_data = {'notes': 'This submission is acceptable to me.'}
         response = self.client.post(submission.get_judging_url(),
                                     data=post_data, follow=True)
-        self.assertEqual(response.status_code, 403)
+        self.assertEqual(response.status_code, 404)
 
     @ignite_only
     def test_judge_not_assigned(self):

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django import forms
 from django.db.models import Q
 from django.forms import widgets
@@ -7,7 +9,7 @@ from django.forms.util import ErrorDict
 
 from challenges.models import (Submission, ExternalLink, Category,
                                Judgement, JudgingCriterion, JudgingAnswer,
-                               PhaseRound, SubmissionHelp)
+                               PhaseRound, SubmissionHelp, Phase)
 from challenges.widgets import CustomRadioSelect
 
 
@@ -17,7 +19,19 @@ entry_widgets = {
     'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
     'description': forms.Textarea(attrs={'aria-describedby':'info_description',
                                          'id':'wmd-input',}),
-    'is_draft': forms.CheckboxInput(attrs={'aria-describedby':'info_is_draft'}),
+    'life_improvements': forms.Textarea(attrs={
+        'aria-describedby': 'info_life_improvements',
+    }),
+    'take_advantage': forms.Textarea(attrs={
+        'aria-describedby': 'info_take_advantage',
+    }),
+    'interest_making': forms.Textarea(attrs={
+        'aria-describedby': 'info_intertest_making',
+    }),
+    'team_members': forms.Textarea(attrs={
+        'aria-describedby': 'info_team_members'
+    }),
+    'is_draft': forms.CheckboxInput(attrs={'aria-describedby': 'info_is_draft'}),
     }
 
 entry_fields = (
@@ -28,6 +42,13 @@ entry_fields = (
     'is_draft',
     'sketh_note',
     'category',
+    'is_draft',
+    'sketh_note',
+    'category',
+    'life_improvements',
+    'take_advantage',
+    'interest_making',
+    'team_members',
     )
 
 # List new fields for the Submission
@@ -74,6 +95,7 @@ class DevelopmentEntryForm(EntryForm):
     # e.g. to make the stkety_note required:
     # sketh_note = forms.ImageField()
     repository_url = forms.URLField()
+    blog_url = forms.URLField()
 
     class Meta:
         model = Submission
@@ -93,7 +115,6 @@ class NewDevelopmentEntryForm(DevelopmentEntryForm):
 
 class AutoDeleteForm(forms.ModelForm):
     """Form class which deletes its instance if all fields are empty."""
-    
     def is_blank(self):
         # Using base_fields here to ignore any foreign key or ID fields added
         for name, field in self.base_fields.iteritems():
@@ -101,24 +122,22 @@ class AutoDeleteForm(forms.ModelForm):
                               self.files, self.add_prefix(name))
             if field_value:
                 return False
-        
         return True
-    
+
     def full_clean(self):
         if self.is_blank():
             # Blank forms are always valid
             self._errors = ErrorDict()
             self.cleaned_data = {}
             return
-        
         super(AutoDeleteForm, self).full_clean()
-    
+
     def save(self, commit=True):
         """Save the contents of this form.
-        
+
         Note that this form will fail if the commit argument is set to False
         and all fields are empty.
-        
+
         """
         if self.is_blank() and self.instance.pk:
             if not commit:
@@ -126,11 +145,11 @@ class AutoDeleteForm(forms.ModelForm):
                                    'uncommitted saves.')
             self.instance.delete()
             return None
-        
+
         if self.is_blank() and not self.instance.pk:
             # Nothing to do
             return None
-        
+
         return super(AutoDeleteForm, self).save()
 
 
@@ -167,13 +186,13 @@ InlineLinkFormSet = inlineformset_factory(Submission, ExternalLink,
 
 class JudgingForm(forms.ModelForm):
     """A form for judges to rate submissions.
-    
+
     The form is generated dynamically using a list of JudgingCriterion objects,
     each of which is a question about some aspect of the submission. Each of
     these criteria has a numeric range (0 to 10 by default).
-    
+
     """
-    
+
     def __init__(self, *args, **kwargs):
         criteria = kwargs.pop('criteria')
         initial = kwargs.pop('initial', {})
@@ -192,17 +211,16 @@ class JudgingForm(forms.ModelForm):
                 except JudgingAnswer.DoesNotExist:
                     # No answer for this question yet
                     pass
-        
+
         super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
-        
+
         self.fields.update(new_fields)
-    
+
     def _field_from_criterion(self, criterion):
         return MinMaxIntegerField(label=criterion.question,
                                   min_value=criterion.min_value,
-                                  max_value=criterion.max_value,
-                                  widget=RangeInput())
-    
+                                  max_value=criterion.max_value)
+
     @property
     def answer_data(self):
         """The cleaned data from this form related to criteria answers."""
@@ -211,10 +229,10 @@ class JudgingForm(forms.ModelForm):
         extract_key = lambda k: k.split('_', 1)[1]
         return dict((extract_key(k), v) for k, v in self.cleaned_data.items()
                     if k.startswith('criterion_'))
-    
+
     def save(self):
         judgement = super(JudgingForm, self).save()
-        
+
         for key, value in self.answer_data.items():
             # If this fails, we want to fall over fairly horribly
             criterion = JudgingCriterion.objects.get(pk=key)
@@ -223,34 +241,38 @@ class JudgingForm(forms.ModelForm):
                 answer = JudgingAnswer.objects.get(**kwargs)
             except JudgingAnswer.DoesNotExist:
                 answer = JudgingAnswer(**kwargs)
-            
+
             answer.rating = value
             answer.save()
-        
+
         return judgement
-    
+
     class Meta:
         model = Judgement
         exclude = ('submission', 'judge')
 
 
 class NumberInput(widgets.Input):
-    
+
     input_type = 'number'
 
 
 class RangeInput(widgets.Input):
-    
+
     input_type = 'range'
 
 
-class MinMaxIntegerField(forms.IntegerField):
+class MinMaxIntegerField(forms.ChoiceField):
     """An integer field that supports passing min/max values to its widget."""
-    
-    widget = NumberInput
-    
-    def widget_attrs(self, widget):
-        return {'min': self.min_value, 'max': self.max_value}
+
+    widget = widgets.RadioSelect
+
+    def __init__(self, *args, **kwargs):
+        min_value = kwargs.pop('min_value')
+        max_value = kwargs.pop('max_value')
+        choices = [(x, x) for x in range(min_value, max_value)]
+        kwargs.update({'choices': choices})
+        super(MinMaxIntegerField, self).__init__(*args, **kwargs)
 
 
 class PhaseRoundAdminForm(forms.ModelForm):
@@ -303,3 +325,60 @@ class SubmissionHelpForm(forms.ModelForm):
     class Meta:
         model = SubmissionHelp
         fields = ('notes', 'status',)
+
+
+def get_judging_phase_choices():
+    """Generates a touple of choices for the available for judging phases"""
+    choices = [('','- Select Phase or Round -')]
+    for phase in Phase.objects.all():
+        if not phase.phase_rounds:
+            choices.append(('phase-%s' % phase.id, 'Phase: %s' % phase.name))
+        else:
+            for phase_round in phase.phase_rounds:
+                choices.append(('round-%s' % phase_round.id,
+                                'Phase: %s. %s'% (phase.name, phase_round.name)))
+    return choices
+
+
+class JudgingAssignmentAdminForm(forms.Form):
+    judging_phase = forms.ChoiceField(choices=get_judging_phase_choices())
+    judges_per_submission = forms.IntegerField(required=False,
+                                               help_text='Leave empty to '
+                                               'assign all submissions to '
+                                               'all judges')
+
+    def __init__(self, *args, **kwargs):
+        self.judge_profiles = kwargs.pop('judge_profiles')
+        super(JudgingAssignmentAdminForm, self).__init__(*args, **kwargs)
+
+    def _validate_phase(self, phase):
+        """Makes sure the ``Phase`` is closed"""
+        if phase.is_open or phase.end_date > datetime.utcnow():
+            raise forms.ValidationError('The Phase/Round must be finished to '
+                                        'assign the judges to the Submissions')
+
+    def clean_judges_per_submission(self):
+        judges_submission = self.cleaned_data.get('judges_per_submission')
+        if judges_submission and len(self.judge_profiles) < judges_submission:
+            raise forms.ValidationError("You don't have enough judges "
+                                        "assigned: you only have %d" %
+                                        len(judges_submission))
+        if not judges_submission:
+            judges_submission = len(self.judge_profiles)
+        return judges_submission
+
+    def clean(self):
+        if 'judging_phase' in self.cleaned_data:
+            model_slug, pki = self.cleaned_data['judging_phase'].split('-')
+            # Fail as loud as possible if the id is not correct
+            if model_slug == 'phase':
+                phase = Phase.objects.get(id=pki)
+                phase_round = None
+                self._validate_phase(phase)
+            else:
+                phase_round = PhaseRound.objects.get(id=pki)
+                phase = phase_round.phase
+                self._validate_phase(phase_round)
+            self.cleaned_data['phase'] = phase
+            self.cleaned_data['phase_round'] = phase_round
+        return self.cleaned_data

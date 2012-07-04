@@ -223,6 +223,15 @@ class AwardDevelopmentOpenPhaseTests(AwardAmountBaseTest):
         response = self.client.post(self.award_url, data)
         self.assertEqual(response.status_code, 404)
 
+    def test_judge_request_award_not_released(self):
+        self.client.login(username='bob', password='bob')
+        self.create_allowance()
+        self.phase_award.status = Award.PENDING
+        self.phase_award.save()
+        data = {'amount': 100}
+        response = self.client.post(self.award_url, data)
+        self.assertEqual(response.status_code, 404)
+
     def test_judge_allocation_non_qualifying_submission(self):
         self.client.login(username='bob', password='bob')
         self.create_allowance()

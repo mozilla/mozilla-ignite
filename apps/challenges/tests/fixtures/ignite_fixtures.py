@@ -104,6 +104,9 @@ def create_submission(with_parent=True, **kwargs):
         'phase': kwargs['phase'] if 'phase' in kwargs else create_phase(),
         'category': kwargs['category'] if 'category' in kwargs else create_category(),
         'title': 'My Awesome submission',
+        'brief_description': 'This is a quick description',
+        'description': 'Lorem Ipsum long description',
+        'life_improvements': 'This will benefit mandkind',
         }
     if kwargs:
         defaults.update(kwargs)
@@ -180,8 +183,11 @@ def setup_development_phase(is_round_open=True, **kwargs):
 
 
 def setup_development_rounds_phase(is_round_open=True, **kwargs):
-    """Ideation phase is in the past and the Development phase and a Round are
-    open"""
+    """Fixtures for seting up a development phase scenario
+    - Ideation phase is in the past
+    - Development phase is open
+    - ``round_b`` is open by default
+    """
     now = datetime.utcnow()
     delta = relativedelta(days=10)
     ideation_phase = kwargs['ideation_phase']

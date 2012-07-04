@@ -2,6 +2,7 @@ import functools
 
 from challenges.models import Challenge
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import User, Permission
 from django.db.models import Q
@@ -12,24 +13,28 @@ judge_required = permission_required('challenges.judge_submission')
 
 
 def phase_required(func=None, methods_allowed=None, is_open=True):
-    """Forbids access to the wrapped view when the phase is not open, by default
-    blocks all methods
+    """Forbids access to the wrapped view when the phase is NOT open.
+    By default blocks all methods
     Usage:
     - Allow only get
-    @phase_open_required(methods_allowed=['GET'])
+    @phase_required(methods_allowed=['GET'])
     - Deny all methods
-    @phase_open_required
+    @phase_required
     """
 
     def decorator(func):
         @functools.wraps(func)
         def wrapper(request, *args, **kwargs):
+            if not 'phase' in kwargs or not hasattr(request, kwargs['phase']):
+                raise ImproperlyConfigured('``phase`` must be an argument of '
+                                           'the decorated view')
+            phase = getattr(request, kwargs['phase'])
             allowed = [] if not methods_allowed else methods_allowed
             # Determine which phase state is blacklisted open or closed
             if is_open:
-                condition = not request.phase['is_open']
+                condition = not phase.is_open
             else:
-                condition = request.phase['is_open']
+                condition = phase.is_open
             if condition and not request.method in allowed:
                 return HttpResponseForbidden()
             return func(request, *args, **kwargs)

@@ -20,6 +20,7 @@ from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
                                                        create_submission,
                                                        create_user)
 from ignite.tests.decorators import ignite_skip
+from nose.tools import ok_, eq_
 
 
 def _create_project_and_challenge():
@@ -181,28 +182,41 @@ class Phases(TestCase):
     def setUp(self):
         self.project, self.challenge = _create_project_and_challenge()
 
-        self.p1 = Phase.objects.create(
-            name=u'Phase 1',
-            order=1,
-            challenge=self.challenge,
-            start_date = datetime.utcnow(),
-            end_date = datetime.utcnow() + relativedelta( months = +1 )
-        )
-        self.p2 = Phase.objects.create(
-            name=u'Phase 2',
-            order=2,
-            challenge=self.challenge,
-            start_date = datetime.utcnow() + relativedelta( months = +2 ),
-            end_date = datetime.utcnow() + relativedelta( months = +3 )
-        )
-
-    def test_get_current_open(self):
-       current = Phase.objects.get_current_phase(self.challenge.slug)
-       self.assertEqual(current.name, 'Phase 1')
-
     def tearDown(self):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()
+
+    def create_open_phase(self):
+        now = datetime.utcnow()
+        data = {
+            'challenge': self.challenge,
+            'name': 'Ideation',
+            'start_date': now - relativedelta(days=2),
+            'end_date': now + relativedelta(days=30),
+            'order': 1,
+            }
+        phase = Phase.objects.create(**data)
+        eq_(phase.days_remaining, 29)
+        eq_(len(phase.phase_rounds), 0)
+        eq_(phase.current_round, None)
+        eq_(phase.judiging_phase_round, None)
+        ok_(phase.is_open)
+
+    def create_closed_phase(self):
+        now = datetime.utcnow()
+        data = {
+            'challenge': self.challenge,
+            'name': 'Ideation',
+            'start_date': now - relativedelta(days=30),
+            'end_date': now - relativedelta(days=32),
+            'order': 1,
+            }
+        phase = Phase.objects.create(**data)
+        eq_(phase.days_remaining, 0)
+        eq_(len(phase.phase_rounds), 0)
+        eq_(phase.current_round, None)
+        eq_(phase.judiging_phase_round, None)
+        eq_(phase.is_open, False)
 
 
 class Criteria(TestCase):
@@ -396,23 +410,57 @@ class PhaseRoundTest(TestCase):
 
     def setUp(self):
         challenge_setup()
-        self.phase = Phase.objects.all()[0]
 
     def tearDown(self):
         for model in [Challenge, Project, Phase, User, Category, Submission,
                       PhaseRound]:
             model.objects.all().delete()
 
+    def _create_phase_round(self, phase, **kwargs):
+        delta = relativedelta(hours=1)
+        now = datetime.utcnow()
+        defaults = {
+            'name': 'Round A',
+            'phase': phase,
+            'start_date': now - delta,
+            'end_date': now + delta,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return PhaseRound.objects.create(**defaults)
+
     def test_create_phase(self):
         data = {
             'name': 'Round A',
-            'phase': self.phase,
+            'phase': Phase.objects.all()[0],
             'start_date': datetime.utcnow(),
             'end_date': datetime.utcnow() + relativedelta(hours=1),
             }
         phase = PhaseRound.objects.create(**data)
         assert phase.slug, 'Slug missing on: %s' % phase
         self.assertTrue(phase.is_active)
+
+    def test_open_phase_round(self):
+        phase = Phase.objects.all()[0]
+        phase_round = self._create_phase_round(phase)
+        # reload
+        phase = Phase.objects.all()[0]
+        eq_(phase.current_round, phase_round)
+        ok_(phase.is_open)
+
+    def test_close_phase_round(self):
+        phase = Phase.objects.all()[0]
+        now = datetime.utcnow()
+        delta = relativedelta(hours=1)
+        close_data = {
+            'start_date': now + delta,
+            'end_date': now + delta + delta,
+            }
+        phase_round = self._create_phase_round(phase, **close_data)
+        # reload
+        phase = Phase.objects.all()[0]
+        eq_(phase.current_round, None)
+        eq_(phase.is_open, False)
 
 
 class SubmissionParentTest(TestCase):
