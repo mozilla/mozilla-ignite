@@ -341,7 +341,7 @@ class Submission(BaseModel):
     def get_image_src(self):
         media_url = getattr(settings, 'MEDIA_URL', '')
         path = lambda f: f and '%s%s' % (media_url, f)
-        return path(self.sketh_note) or path('img/project-default.gif')
+        return path(self.sketh_note) or path('img/project-default.png')
     
     def _lookup_url(self, view_name, kwargs=None):
         """Look up a URL related to this submission.
