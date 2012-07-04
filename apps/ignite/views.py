@@ -14,7 +14,7 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
     challenge = get_object_or_404(project.challenge_set, slug=slug)
     blogs = BlogEntry.objects.filter(
         page='splash'
-    ).order_by("-updated",)
+    ).order_by("-updated",)[:3]
     entries = (Submission.objects.visible()
                                  .filter(phase__challenge=challenge)
                                  .order_by("?"))
