@@ -31,6 +31,10 @@ class ClosedPhase(object):
     def is_closed(self):
         return True
 
+    @property
+    def has_started(self):
+        return False
+
 
 def phases_context_processor(request):
     """Makes the ``Phases`` available in context when templates are rendered"""
