@@ -77,3 +77,11 @@ LOGGING = {
 
 # This should match the admin files location
 ADMIN_MEDIA_PREFIX = '/static/admin/'
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
