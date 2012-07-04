@@ -83,7 +83,6 @@ def show(request, project, slug, phase, template_name='challenges/show.html',
         raise Http404
     project = challenge.project
     """Pagination options """
-    # TODO
     entry_set = Submission.objects.visible(request.user)
     entry_set = entry_set.filter(phase__challenge=challenge, phase=phase)
     if category:
@@ -94,8 +93,6 @@ def show(request, project, slug, phase, template_name='challenges/show.html',
         category = Category.objects.get(slug=category)
     except ObjectDoesNotExist:
         category = False
-    # 'days_remaining': request.phase['days_remaining']
-    days_remaning = request.ideation.days_remaining
     return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
@@ -103,7 +100,7 @@ def show(request, project, slug, phase, template_name='challenges/show.html',
         'entries': entries,
         'categories': Category.objects.get_active_categories(),
         'category': category,
-        'days_remaining': days_remaning,
+        'days_remaining': phase.days_remaining,
         'phase': phase,
     })
 
