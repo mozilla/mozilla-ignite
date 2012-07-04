@@ -49,6 +49,10 @@ class dev {
     password => $password,
     require => Class[nginx];
   }
+  class { "elasticsearch":
+    project_path => $project_path,
+    require => Class[playdoh];
+  }
   class { "custom":
     project_path => $project_path,
     project_name => $project_name;

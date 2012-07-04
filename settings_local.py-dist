@@ -44,8 +44,6 @@ SECRET_KEY = 'cheese'
 # Should be False on a production box
 DEBUG = TEMPLATE_DEBUG = True
 
-SECRET_KEY = ''
-
 # Install memcache and remove this to make djangobrowser id
 # https://github.com/mozilla/django-session-csrf#differences-from-django
 CACHES = {
@@ -77,3 +75,5 @@ LOGGING = {
     },
 }
 
+# This should match the admin files location
+ADMIN_MEDIA_PREFIX = '/static/admin/'

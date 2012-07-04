@@ -26,4 +26,9 @@ class sun_java_6 {
     require => [ File["partner.list"], Exec["apt-get-update"] ],
   }
 
+  package { "openjdk-6-jre-headless":
+    ensure => latest,
+    require => [ File["partner.list"], Exec["apt-get-update"] ],
+  }
+
 }
