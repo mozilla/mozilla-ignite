@@ -6,7 +6,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
-from challenges.models import Submission, Category, Phase, Challenge, Project
+from challenges.models import (Submission, Category, Phase, Challenge, Project,
+                               JudgingCriterion)
 from challenges.management.commands.dummy_utils import (create_submissions,
                                                         get_random_winners,
                                                         _random_words,
@@ -128,6 +129,11 @@ class Command(BaseCommand):
             for i in range(10):
                 judge = create_user(_random_words(1))
                 judging_group.user_set.add(judge.user)
+            criteria = JudgingCriterion.objects.all()
+            if not criteria:
+                questions = ['Awesomeness', 'Inovation', 'Feasibility']
+                criteria_list = [JudgingCriterion.objects.create(question=q) \
+                                 for q in questions]
 
         ideation = Phase.objects.get_ideation_phase()
         if not ideation:
@@ -161,6 +167,9 @@ class Command(BaseCommand):
                                        end_date=end_date,
                                        judging_start_date=judging_start_date,
                                        judging_end_date=judging_end_date)
+        if options['judging']:
+            for criterion in criteria_list:
+                ideation.phasecriterion_set.create(criterion=criterion)
         if options['submissions']:
             print "Adding submissions for the Ideation Phase"
             create_submissions(ideation, category, with_parents=True)
