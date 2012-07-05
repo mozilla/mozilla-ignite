@@ -1346,6 +1346,18 @@ section footer .cta {
 .pagination li a {
     margin: 0 5px;
 }
+/* Judges dashboard */
+.dashboard_table thead th {
+    border-bottom: 1px solid #2E2E2D;
+    text-align: left;
+    padding: 1em 10px;
+    font-weight: normal;
+}
+.dashboard_table tbody th,
+.dashboard_table tbody td {
+    padding: 0.5em 10px;
+    text-align: left;
+}
 /* Single submission */
 .widgets {
     background: #fff;

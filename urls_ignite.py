@@ -66,7 +66,7 @@ urlpatterns += patterns(
     # Judging views
     url(r'^submission/(?P<pk>\d+)/judgement/$', 'entry_judge',
         kwargs=_ignite_kwargs, name='entry_judge'),
-    url(r'^submissions/assigned/$', 'entries_assigned',
+    url(r'^dashboard/$', 'entries_assigned',
         kwargs=_ignite_kwargs, name='entries_assigned'),
     url(r'^submissions/judged/$', 'entries_judged',
         kwargs=_ignite_kwargs, name='entries_judged'),
