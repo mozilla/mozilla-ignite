@@ -223,7 +223,7 @@ class Criteria(TestCase):
     
     def test_value_range(self):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
-        self.assertEqual(list(c.range), [0, 1, 2, 3, 4, 5])
+        self.assertEqual(list(c.range), [1, 2, 3, 4, 5])
     
     def test_good_range(self):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
