@@ -66,6 +66,7 @@ class PhaseRoundInline(admin.TabularInline):
     extra = 1
 
 class PhaseAdmin(admin.ModelAdmin):
+    change_list_template = 'admin/phases/phases_change_list.html'
     inlines = (PhaseCriterionInline, PhaseRoundInline)
 
     def get_urls(self):
