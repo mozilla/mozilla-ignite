@@ -148,16 +148,12 @@
                     {% trans %}This entry has been eliminated from the contest.{% endtrans %}
                 </p>
                 {% endif %}
-                <h2 class="wimper">Rate this submission</h2>
-                {% if judge_assigned %}
-                <p>This submission has been assigned to you</p>
-                {% else %}
-                <p>This submission has not been assigned to you</p>
-                {% endif %}
-                <form method="POST" action="{{ entry.get_judging_url() }}">
+                
+                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form highlight">
+                    <h2 class="point box-title">Rate this submission</h2>
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
-                    <input type="submit" class="cta" value="Submit thy judgement" />
+                    <input type="submit" class="cta" value="Judge submission" />
                 </form>
             </section>
             {% endif %}

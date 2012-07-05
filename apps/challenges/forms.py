@@ -215,6 +215,8 @@ class JudgingForm(forms.ModelForm):
         super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
 
         self.fields.update(new_fields)
+        self.fields.keyOrder = filter(lambda a: a not in 'notes', self.fields.keyOrder)
+        self.fields.keyOrder.append('notes')
 
     def _field_from_criterion(self, criterion):
         return MinMaxIntegerField(label=criterion.question,

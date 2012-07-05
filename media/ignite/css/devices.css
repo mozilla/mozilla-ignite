@@ -330,6 +330,32 @@ form span.error-hint:before {
 .image_form .hint {
     display: inline-block;
 }
+/* Judging form styles */
+.rating_form ul {
+    overflow: hidden;
+    clear: left;
+    padding-left: 0;
+    list-style-type: none;
+}
+.rating_form li {
+    float: left;
+    width: 10%;
+    text-align: center;
+}
+.rating_form li label {
+    margin-bottom: 0;
+    padding-top: 0.2em;
+}
+.rating_form li input {
+    display: block;
+    width: 20px;
+    margin: 0 auto;
+}
+.rating_form .errorlist li {
+    width: auto;
+    color: #DA1C21;
+    font-weight: bold;
+}
 .cta {
     font-family: "LeagueGothic";
     text-transform: uppercase;
