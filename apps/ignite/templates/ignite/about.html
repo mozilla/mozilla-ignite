@@ -19,13 +19,13 @@
 			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
 			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
 			<p class="intro"><strong>The best ideas will win funding and support</strong>, and help shape the internet’s future.</p>
-			<p><a href="{{ url('entries_all') }}">Check out</a> what's been submitted so far.</p>
+			<p><a href="{{ url('entries_all', phase='ideas') }}">Check out</a> what's been submitted so far.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
 				<h3 class="point box-title">Now to August 23rd: Brainstorm, connect and collaborate</h3>
-				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
-				<a class="cta" href="{{ url('create_entry') }}">Submit your idea now</a>
+				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all', phase='ideas') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
+				<a class="cta" href="{{ url('create_entry', phase='ideas') }}">Submit your idea now</a>
 			</div>
 		</div>
 	</div>
@@ -91,8 +91,8 @@
 			<div class="highlight">
 				<h3 class="point box-title">Get Involved</h3>
 				<ul>
-					<li><strong><a href="{{ url('create_entry') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
-					<li><strong><a href="{{ url('entries_all') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
+					<li><strong><a href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
 					<li><strong>Stay in touch.</strong> Follow <a href="https://twitter.com/#!/mozillaignite">Mozilla Ignite</a> on Twitter or join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>.</li>
 					<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
@@ -156,7 +156,7 @@
 			</div>
 			<div class="box col">
 				<h3 class="wimper">What do I need to submit?</h3>
-				<p><a href="{{ url('create_entry') }}">Use the submission form</a> to clearly explain how your idea will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
+				<p><a href="{{ url('create_entry', phase='ideas') }}">Use the submission form</a> to clearly explain how your idea will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
 				<ul>
 					<li>healthcare technologies</li>
 					<li>education and workforce technologies</li>
@@ -263,7 +263,7 @@
 		</div>
 	</div>
 	<footer>
-		<a href="{{ url('create_entry') }}" class="cta">Submit your idea now</a>
+		<a href="{{ url('create_entry', phase='ideas') }}" class="cta">Submit your idea now</a>
 	</footer>
 	</div>
 </section>
