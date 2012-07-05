@@ -1,5 +1,5 @@
 Hello,
 
-You have successfully booked a timeslot
+You have successfully booked a timeslot from {{ timeslot.start_date }} to {{ timeslot.end_date }} for your {{ entry }} submission.
 
 The Mozilla Ignite Team

@@ -6,9 +6,13 @@ from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 
-from challenges.models import Submission, Category, Phase, Challenge, Project
+from challenges.models import (Submission, Category, Phase, Challenge, Project,
+                               JudgingCriterion)
 from challenges.management.commands.dummy_utils import (create_submissions,
-                                                        get_random_winners)
+                                                        get_random_winners,
+                                                        _random_words,
+                                                        create_user)
+from timeslot.models import TimeSlot, Release
 
 
 # Expected constants in the DB
@@ -41,7 +45,7 @@ class Command(BaseCommand):
 
    Open the development Phase adding new submissions and winners
 
-   python manage.py challenges_dummy_content --development --withsubmissions --withwinners
+   python manage.py challenges_dummy_content --development --submissions --winners
 
     """
 
@@ -60,16 +64,26 @@ class Command(BaseCommand):
                     default=False,
                     dest='closed_rounds',
                     help='Set the Development Phase Rounds Closed'),
-        make_option('--withsubmissions',
+        make_option('--submissions',
                     action='store_true',
                     default=False,
-                    dest='with_submissions',
+                    dest='submissions',
                     help='Adds submissions for the all the open Phase/Round'),
-        make_option('--withwinners',
+        make_option('--winners',
                     action='store_true',
                         default=False,
-                    dest='with_winners',
+                    dest='winners',
                     help='Adds random winning submissions for the closed Phases'),
+        make_option('--judging',
+                    action='store_true',
+                    default=False,
+                    dest='judging',
+                    help='Opens the judging stage in closed Phases'),
+        make_option('--webcast',
+                    action='store_true',
+                    default=False,
+                    dest='webcast',
+                    help='Creates and releases tickets for the webcast'),
         )
 
     def _update_object(self, phase, **kwargs):
@@ -79,7 +93,7 @@ class Command(BaseCommand):
         phase.save()
         return phase
 
-    def _update_rounds(self, development, with_open_rounds=True):
+    def _update_rounds(self, development, with_open_rounds=True, judging=False):
         """Creates or manages ``PhaseRounds`` for the given ``Phase``
         if ``with_open_rounds`` is disabled all the rounds will be closed
         """
@@ -106,16 +120,35 @@ class Command(BaseCommand):
         return rounds
 
     def handle(self, *args, **options):
-        # answer = raw_input('This will IRREVERSIBLY add TEST DATA to your '
-        #                    'database. Proceed (yes/no)? ')
-        # if answer != 'yes':
-        #     raise CommandError('Phew. Import canceled.')
+        answer = raw_input('This will IRREVERSIBLY add TEST DATA to your '
+                           'database. Proceed (yes/no)? ')
+        if answer != 'yes':
+            raise CommandError('Phew. Import canceled.')
+
+        # Any super user is a judge
+        judging_group = Group.objects.get(name='Judges')
+        for user in User.objects.filter(is_superuser=True):
+            judging_group.user_set.add(user)
+
+        if options['judging']:
+            print "Creating Judges"
+            for i in range(10):
+                judge = create_user(_random_words(1))
+                judging_group.user_set.add(judge.user)
+            criteria = JudgingCriterion.objects.all()
+            if not criteria:
+                print "Creating judging criteria"
+                questions = ['Awesomeness', 'Inovation', 'Feasibility']
+                criteria_list = [JudgingCriterion.objects.create(question=q) \
+                                 for q in questions]
+
         ideation = Phase.objects.get_ideation_phase()
         if not ideation:
             raise CommandError('You need an Ideation Phase')
         development = Phase.objects.get_development_phase()
         if not development:
             # We need a development phase
+            print "Creating a Development phase"
             challenge = Challenge.objects.get(slug=IGNITE_CHALLENGE_SLUG)
             development = Phase.objects.create(name=IGNITE_DEVELOPMENT_NAME,
                                                challenge=challenge, order=2)
@@ -127,16 +160,30 @@ class Command(BaseCommand):
             print "Opening Ideation Phase"
             start_date = now - delta
             end_date = now + delta
+            judging_start_date = end_date
+            judging_end_date = end_date
         else:
             print "Closing Ideation Phase"
             start_date = now - delta - delta
             end_date = now - delta
+            judging_start_date = end_date
+            if options['judging']:
+                print "Opening judging on Ideation"
+                judging_end_date = end_date + delta + delta
+            else:
+                judging_end_date = end_date
         ideation = self._update_object(ideation, start_date=start_date,
-                                       end_date=end_date)
-        if options['with_submissions']:
+                                       end_date=end_date,
+                                       judging_start_date=judging_start_date,
+                                       judging_end_date=judging_end_date)
+        if options['judging']:
+            print "Adding judging criteria to Ideation"
+            for criterion in criteria_list:
+                ideation.phasecriterion_set.create(criterion=criterion)
+        if options['submissions']:
             print "Adding submissions for the Ideation Phase"
             create_submissions(ideation, category, with_parents=True)
-        if options['with_winners']:
+        if options['winners']:
             print "Setting up winners for the Ideation Phase"
             get_random_winners(ideation)
         # Development ``Phase``
@@ -154,15 +201,26 @@ class Command(BaseCommand):
         # create ``PhaseRounds`` for the development phase
         with_open_rounds = not options['closed_rounds']
         rounds = self._update_rounds(development, with_open_rounds)
-        if options['with_submissions']:
+        if options['submissions']:
             print "Adding submissions for the Development Phase"
             create_submissions(development, category, phase_round=rounds[0],
                                with_parents=True)
-        if options['with_winners']:
+        if options['winners']:
             print "Setting up winners for the Development Phase"
             get_random_winners(development, phase_round=rounds[0])
-        # Any super user is a judge
-        judging_group = Group.objects.get(name='Judges')
-        for user in User.objects.filter(is_superuser=True):
-            judging_group.user_set.add(user)
+
+        if options['webcast']:
+            try:
+                release = Release.objects.get(phase=ideation)
+            except Release.DoesNotExist:
+                print "Creating a Release for the timeslots"
+                release = Release.objects.create(name='Release Ideation',
+                                                 phase=ideation,
+                                                 is_current=True)
+            timeslot_date = now + relativedelta(days=15)
+            print "Creating Timeslots for the release"
+            for i in range(10):
+                TimeSlot.objects.create(start_date=timeslot_date,
+                                        end_date=timeslot_date,
+                                        release=release)
         print "Done!"
