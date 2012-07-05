@@ -14,6 +14,7 @@ from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
                                                        create_submission,
                                                        create_user, create_judge)
 from challenges.views import get_award_context
+from nose.tools import eq_, ok_
 
 
 class AwardAmountBaseTest(TestCase):
@@ -259,6 +260,16 @@ class AwardDevelopmentOpenPhaseTests(AwardAmountBaseTest):
         for item in list(response.context['messages']):
             self.assertEqual(item.tags, 'success')
         self.assertRedirects(response, self.submission.get_absolute_url())
+
+    def test_judge_remove_allocation(self):
+        self.test_judge_valid_allocation()
+        data = {'amount': 0}
+        response = self.client.post(self.award_url, data, follow=True)
+        for item in list(response.context['messages']):
+            self.assertEqual(item.tags, 'success')
+        self.assertRedirects(response, self.submission.get_absolute_url())
+        eq_(SubmissionAward.objects.all().count(), 0)
+        ok_(Submission.objects.get())
 
     def test_judge_overfound(self):
         self.client.login(username='bob', password='bob')
