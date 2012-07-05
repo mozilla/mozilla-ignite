@@ -12,6 +12,7 @@ from challenges.management.commands.dummy_utils import (create_submissions,
                                                         get_random_winners,
                                                         _random_words,
                                                         create_user)
+from timeslot.models import TimeSlot, Release
 
 
 # Expected constants in the DB
@@ -78,6 +79,11 @@ class Command(BaseCommand):
                     default=False,
                     dest='judging',
                     help='Opens the judging stage in closed Phases'),
+        make_option('--webcast',
+                    action='store_true',
+                    default=False,
+                    dest='webcast',
+                    help='Creates and releases tickets for the webcast'),
         )
 
     def _update_object(self, phase, **kwargs):
@@ -131,6 +137,7 @@ class Command(BaseCommand):
                 judging_group.user_set.add(judge.user)
             criteria = JudgingCriterion.objects.all()
             if not criteria:
+                print "Creating judging criteria"
                 questions = ['Awesomeness', 'Inovation', 'Feasibility']
                 criteria_list = [JudgingCriterion.objects.create(question=q) \
                                  for q in questions]
@@ -141,6 +148,7 @@ class Command(BaseCommand):
         development = Phase.objects.get_development_phase()
         if not development:
             # We need a development phase
+            print "Creating a Development phase"
             challenge = Challenge.objects.get(slug=IGNITE_CHALLENGE_SLUG)
             development = Phase.objects.create(name=IGNITE_DEVELOPMENT_NAME,
                                                challenge=challenge, order=2)
@@ -160,6 +168,7 @@ class Command(BaseCommand):
             end_date = now - delta
             judging_start_date = end_date
             if options['judging']:
+                print "Opening judging on Ideation"
                 judging_end_date = end_date + delta + delta
             else:
                 judging_end_date = end_date
@@ -168,6 +177,7 @@ class Command(BaseCommand):
                                        judging_start_date=judging_start_date,
                                        judging_end_date=judging_end_date)
         if options['judging']:
+            print "Adding judging criteria to Ideation"
             for criterion in criteria_list:
                 ideation.phasecriterion_set.create(criterion=criterion)
         if options['submissions']:
@@ -176,8 +186,6 @@ class Command(BaseCommand):
         if options['winners']:
             print "Setting up winners for the Ideation Phase"
             get_random_winners(ideation)
-        if options['judging']:
-            pass
         # Development ``Phase``
         if options['development']:
             print "Opening Development Phase"
@@ -200,4 +208,19 @@ class Command(BaseCommand):
         if options['winners']:
             print "Setting up winners for the Development Phase"
             get_random_winners(development, phase_round=rounds[0])
+
+        if options['webcast']:
+            try:
+                release = Release.objects.get(phase=ideation)
+            except Release.DoesNotExist:
+                print "Creating a Release for the timeslots"
+                release = Release.objects.create(name='Release Ideation',
+                                                 phase=ideation,
+                                                 is_current=True)
+            timeslot_date = now + relativedelta(days=15)
+            print "Creating Timeslots for the release"
+            for i in range(10):
+                TimeSlot.objects.create(start_date=timeslot_date,
+                                        end_date=timeslot_date,
+                                        release=release)
         print "Done!"
