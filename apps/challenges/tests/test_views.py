@@ -134,11 +134,10 @@ class ChallengeEntryTest(TestCase):
         for entry in winners:
             entry.is_winner = True
             entry.save()
-        
         response = self.client.get(reverse('entries_winning'))
-        eq_(set(e.title for e in response.context['entries']),
-                         set(e.title for e in winners))
-
+        eq_(set(e.title for e in response.context['ideation_winners']),
+            set(e.title for e in winners))
+        assert_equal(len(response.context['development_winners']), 0)
 
 def _build_links(initial_count, *forms):
     prefix = 'externals'

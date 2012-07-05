@@ -397,10 +397,6 @@ class Submission(BaseModel):
         return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
                                                'phase': self.phase_slug})
 
-    def get_version_url(self):
-        """Return this submission's URL."""
-        return self._lookup_url('entry_version', {'entry_id': self.id})
-
     def get_edit_url(self):
         """Return the URL to edit this submission."""
         return self._lookup_url('entry_edit', {'pk': self.id,

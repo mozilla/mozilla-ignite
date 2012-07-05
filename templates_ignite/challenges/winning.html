@@ -9,15 +9,25 @@
 
 {% block content %}
 <h1 class="shout">Green-lit submissions</h1>
-{% for group_phase in entries|groupby('phase') %}
-<h2>{{ group_phase.grouper.name }} phase</h2>
-{% for group_round in group_phase.list|groupby('phase_round') %}
-{% if group_round.grouper %}<h3>{{ group_round.grouper.name }}</h3>{% endif %}
+{% if ideation_winners %}
+<h2>Ideation</h2>
 <ol class="submissions columns">
-  {% for entry in group_round.list %}
+  {% for entry in ideation_winners %}
   {% include "challenges/includes/winning_entry.html"%}
   {% endfor %}
 </ol>
+{% endif %}
+
+
+{% if development_winners %}
+<h2>Development</h2>
+{% for group in development_winners|groupby('phase_round') %}
+{% if group.grouper %}<h3>{{ group.grouper.name }}</h3>{% endif %}
+<ol class="submissions columns">
+  {% for entry in group.list %}
+  {% include "challenges/includes/winning_entry.html"%}
+  {% endfor%}
+</ol>
 {% endfor %}
-{% endfor %}
+{% endif %}
 {% endblock %}

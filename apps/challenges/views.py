@@ -114,12 +114,16 @@ def entries_all(request, project, slug, phase):
 @project_challenge_required
 def entries_winning(request, project, challenge):
     """Show entries that have been marked as winners and awarded."""
-    submissions = (Submission.objects.visible(request.user)
-                   .filter(phase__challenge=challenge)
-                   .filter(is_winner=True)
-                   .order_by('phase', 'phase_round'))
+    ideation_winners = (Submission.objects.visible(request.user)
+                        .filter(phase=request.ideation)
+                        .filter(is_winner=True))
+    development_winners = (Submission.objects.visible(request.user)
+                           .filter(phase=request.development)
+                           .filter(is_winner=True)
+                           .order_by('phase_round__start_date'))
     context = {
-        'entries': submissions,
+        'ideation_winners': ideation_winners,
+        'development_winners': development_winners,
         'project': project,
         'challenge': challenge,
         }
