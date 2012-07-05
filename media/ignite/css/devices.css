@@ -439,7 +439,9 @@ form span.error-hint:before {
     color: #085526;
     font-weight: bold;
     margin-bottom: 2em;
-    border-radius: 4px;
+}
+#splash .alerts {
+    margin-bottom: 0;
 }
 .alerts h2 {
     margin-bottom: 0.5em;
