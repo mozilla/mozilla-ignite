@@ -458,6 +458,13 @@ class Submission(BaseModel):
     def is_green_lit(self):
         return self.is_winner
 
+    def get_judge_score(self, profile):
+        try:
+            judgement = self.judgement_set.filter(judge=profile)[0]
+        except IndexError:
+            return None
+        return judgement.get_score()
+
 
 class ExclusionFlag(models.Model):
     """Flags to exclude a submission from judging."""
@@ -725,3 +732,7 @@ class SubmissionHelp(models.Model):
 
     def __unicode__(self):
         return u'Help needed for %s' % self.parent
+
+    @property
+    def is_published(self):
+        return self.status == self.PUBLISHED

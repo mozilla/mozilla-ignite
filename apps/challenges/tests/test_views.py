@@ -432,7 +432,7 @@ class EditEntryTest(MessageTestCase):
         data = self._edit_data()
         data.update(BLANK_EXTERNALS)
         response = self.client.post(self.edit_path, data, follow=True)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     @suppress_locale_middleware
     def test_anonymous_access(self):

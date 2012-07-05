@@ -23,13 +23,13 @@
 {% endblock %}
 
 {% block content %} 
-    <a href="{{ url('entries_all', phase='ideas') }}" class="back wimper">See all submissions</a>
+    <a href="{{ url('entries_all', phase=entry.phase_slug) }}" class="back wimper">See all {{ entry.phase_slug}}</a>
     <article>
       <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
-        {% if entry.owned_by(user) %}
+        {% if development.has_started and entry.owned_by(user) %}
             <li><a href="{{ url('entry_help', entry_id=entry.parent.slug) }}" class="cta do">Ask for help</a></li>
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
@@ -85,6 +85,12 @@
             <li><a class="wimper" href="{{ link.url }}">{{ link.name }}</a></li>
             {% endfor %}
             </ul> 
+            </div>
+            {% endif %}
+            {% if help_required %}
+            <div class="description">
+              <h2>Would you be interested in helping with this proposal?</h2>
+              <p>{{ help_required.notes }}</p>
             </div>
             {% endif %}
             <address class="vcard">

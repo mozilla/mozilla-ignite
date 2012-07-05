@@ -218,7 +218,7 @@ class SubmissionEditIdeationOpenTest(SubmissionBaseTest):
     def test_invalid_development_url(self):
         url = reverse('entry_edit', args=['proposals', self.submission.parent.slug])
         response = self.client.get(url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 # Ideation Phase closed
@@ -256,12 +256,12 @@ class SubmissionIdeationClosedTest(SubmissionBaseTest):
 
     def test_submission_page_get(self):
         response = self.client.get(self.ideation_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_submission_page_post(self):
         self.valid_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.ideation_url, self.valid_data)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 class SubmissionEditIdeationClosedAnonTest(SubmissionBaseTest):
@@ -324,11 +324,11 @@ class SubmissionEditIdeationClosedNotOwnerTest(SubmissionBaseTest):
 
     def test_ideation_edit_get(self):
         response = self.client.get(self.edit_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_ideation_edit_post(self):
         response = self.client.post(self.edit_url, {})
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 class SubmissionEditIdeationClosedTest(SubmissionBaseTest):
@@ -352,19 +352,19 @@ class SubmissionEditIdeationClosedTest(SubmissionBaseTest):
 
     def test_ideation_edit_form(self):
         response = self.client.get(self.edit_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_ideation_save_edit_failed(self):
         self.valid_data.update(BLANK_EXTERNALS)
         del self.valid_data['terms_and_conditions']
         response = self.client.post(self.edit_url, self.valid_data, follow=True)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_invalid_development_url(self):
         url = reverse('entry_edit',
                       args=['proposals', self.submission.parent.slug])
         response = self.client.get(url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 # Development phase tests
@@ -586,7 +586,7 @@ class SubmissionEditDevelopmentOpenTest(SubmissionBaseTest):
     def test_invalid_ideation_url(self):
         url = reverse('entry_edit', args=['ideas', self.submission.parent.slug])
         response = self.client.get(url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 # Development Phase closed Rounds
@@ -623,12 +623,12 @@ class SubmissionDevelopmentClosedRoundTests(SubmissionBaseTest):
 
     def test_development_phase_submission_page(self):
         response = self.client.get(self.development_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_development_phase_submission_post(self):
         self.valid_data.update(BLANK_EXTERNALS)
         response = self.client.post(self.development_url, self.valid_data)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 class SubmissionEditDevelopmentClosedRoundAnonTests(SubmissionBaseTest):
@@ -696,11 +696,11 @@ class SubmissionEditDevelopmentClosedRoundNotOnwerTests(SubmissionBaseTest):
 
     def test_development_edit_get(self):
         response = self.client.get(self.edit_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_development_edit_post(self):
         response = self.client.post(self.edit_url, {})
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
 
 class SubmissionEditDevelopmentClosedRoundTests(SubmissionBaseTest):
@@ -725,15 +725,15 @@ class SubmissionEditDevelopmentClosedRoundTests(SubmissionBaseTest):
 
     def test_development_edit_form(self):
         response = self.client.get(self.edit_url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_development_save_edit_failure(self):
         self.valid_data.update(BLANK_EXTERNALS)
         del self.valid_data['terms_and_conditions']
         response = self.client.post(self.edit_url, self.valid_data)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)
 
     def test_invalid_ideation_url(self):
         url = reverse('entry_edit', args=['ideas', self.submission.parent.slug])
         response = self.client.get(url)
-        eq_(response.status_code, 404)
+        eq_(response.status_code, 403)

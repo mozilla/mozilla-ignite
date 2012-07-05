@@ -56,3 +56,9 @@ def fail(request, template_name='404.html'):
 def app_fail(request, template_name='500.html'):
     return jingo.render(request, template_name, {}, status=500)
 
+
+def action_unavailable_response(request, message=None,
+                                template_name="action_unavailable.html"):
+    """Generic page for unavailable actions"""
+    context = {'message': message}
+    return jingo.render(request, template_name, context, status=403)

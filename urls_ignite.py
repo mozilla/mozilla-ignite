@@ -61,7 +61,7 @@ urlpatterns += patterns(
     #     kwargs=_ignite_kwargs, name='entry_version'),
     url(r'^submissions/(?P<entry_id>\d+)/help/$', 'entry_help',
         kwargs=_ignite_kwargs, name='entry_help'),
-    url(r'^ideas/help-wanted/$', 'entry_help_list',
+    url(r'^submissions/help-wanted/$', 'entry_help_list',
         kwargs=_ignite_kwargs, name='entry_help_list'),
     # Judging views
     url(r'^submission/(?P<pk>\d+)/judgement/$', 'entry_judge',
