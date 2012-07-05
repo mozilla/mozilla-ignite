@@ -126,13 +126,10 @@
           </section>
           {% endif %}
             {% if award_form %}
-            <section>
-              <h2>Award this submission</h2>
-              <ul>
-                <li>Total Funds: ${{ allowance.amount }}</li>
-                <li>Allocated Funds: ${{ allowance.amount_used }}</li>
-                <li>Free Funds: ${{ allowance.amount_free }}</li>
-              </ul>
+            <section class="highlight box">
+              <h2 class="point box-title">Award this submission</h2>
+              <p><b>You scored this submission {{ entry.get_judge_score(user.get_profile()) }}%</b></p>
+              <p>You can award up to ${{ allowance.amount_free }}</p>
               <form method="post" id="form-awardform-id" action="{{ url('awards:award', submission_id=entry.id) }}">
                 {{ award_form.as_p() }}
                 {{ csrf()|safe }}
@@ -149,7 +146,7 @@
                 </p>
                 {% endif %}
                 
-                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form highlight">
+                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form highlight box">
                     <h2 class="point box-title">Rate this submission</h2>
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
