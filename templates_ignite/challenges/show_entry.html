@@ -49,6 +49,11 @@
         {% endif %}
         {% endif %}
         <div class="columns">
+            {% if excluded %}
+                <p class="busta alerts errors">
+                    {% trans %}This entry has been eliminated from judging.{% endtrans %}
+                </p>
+                {% endif %}
         <div class="col box">
             <div class="widgets">
                 <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
@@ -138,15 +143,8 @@
             </section>
             {% endif %}
             {% if judging_form %}
-            <section class="widgets">
-                {% if excluded %}
-                {# For the love of all that is holy, style me #}
-                <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
-                    {% trans %}This entry has been eliminated from the contest.{% endtrans %}
-                </p>
-                {% endif %}
-                
-                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form highlight box">
+            <section class="highlight box">
+                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form">
                     <h2 class="point box-title">Rate this submission</h2>
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
