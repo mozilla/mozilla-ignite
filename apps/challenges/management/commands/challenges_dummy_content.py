@@ -4,8 +4,18 @@ from optparse import make_option
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+from django.contrib.auth.models import User, Group
 
 from challenges.models import Submission, Category, Phase, Challenge, Project
+from challenges.management.commands.dummy_utils import (create_submissions,
+                                                        get_random_winners)
+
+
+# Expected constants in the DB
+IGNITE_PROJECT_SLUG = 'us-ignite'
+IGNITE_CHALLENGE_SLUG = 'ignite-challenge'
+IGNITE_IDEATION_NAME = 'Ideation'
+IGNITE_DEVELOPMENT_NAME = 'Development'
 
 
 class Command(BaseCommand):
@@ -29,6 +39,10 @@ class Command(BaseCommand):
 
         python manage.py challenges_dummy_content --development --closedrounds
 
+   Open the development Phase adding new submissions and winners
+
+   python manage.py challenges_dummy_content --development --withsubmissions --withwinners
+
     """
 
     option_list = BaseCommand.option_list + (
@@ -46,9 +60,17 @@ class Command(BaseCommand):
                     default=False,
                     dest='closed_rounds',
                     help='Set the Development Phase Rounds Closed'),
+        make_option('--withsubmissions',
+                    action='store_true',
+                    default=False,
+                    dest='with_submissions',
+                    help='Adds submissions for the all the open Phase/Round'),
+        make_option('--withwinners',
+                    action='store_true',
+                        default=False,
+                    dest='with_winners',
+                    help='Adds random winning submissions for the closed Phases'),
         )
-
-    now = datetime.utcnow()
 
     def _update_object(self, phase, **kwargs):
         """Update the ``Phase`` with the provides_values"""
@@ -63,7 +85,7 @@ class Command(BaseCommand):
         """
         rounds = development.phaseround_set.all()
         if not rounds:
-            # Create 3 dummy phaess if there is none available
+            # Create 3 dummy phases if there is none available
             print "Creating dummy Development Rounds"
             create_round = lambda i: (development.phaseround_set
                                       .create(name='Round %s' % i,
@@ -89,35 +111,58 @@ class Command(BaseCommand):
         # if answer != 'yes':
         #     raise CommandError('Phew. Import canceled.')
         ideation = Phase.objects.get_ideation_phase()
+        if not ideation:
+            raise CommandError('You need an Ideation Phase')
         development = Phase.objects.get_development_phase()
+        if not development:
+            # We need a development phase
+            challenge = Challenge.objects.get(slug=IGNITE_CHALLENGE_SLUG)
+            development = Phase.objects.create(name=IGNITE_DEVELOPMENT_NAME,
+                                               challenge=challenge, order=2)
+        category = Category.objects.all()[0]
         now = datetime.utcnow()
         delta = relativedelta(days=15)
         # Ideation ``Phase``
-        if ideation:
-            if options['ideation']:
-                print "Opening Ideation Phase"
-                start_date = now - delta
-                end_date = now + delta
-            else:
-                print "Closing Ideation Phase"
-                start_date = now - delta - delta
-                end_date = now - delta
-            ideation = self._update_object(ideation, start_date=start_date,
-                                           end_date=end_date)
+        if options['ideation']:
+            print "Opening Ideation Phase"
+            start_date = now - delta
+            end_date = now + delta
+        else:
+            print "Closing Ideation Phase"
+            start_date = now - delta - delta
+            end_date = now - delta
+        ideation = self._update_object(ideation, start_date=start_date,
+                                       end_date=end_date)
+        if options['with_submissions']:
+            print "Adding submissions for the Ideation Phase"
+            create_submissions(ideation, category, with_parents=True)
+        if options['with_winners']:
+            print "Setting up winners for the Ideation Phase"
+            get_random_winners(ideation)
         # Development ``Phase``
-        if development:
-            if options['development']:
-                print "Opening Development Phase"
-                start_date = now - relativedelta(days=3)
-                end_date = now + delta + delta
-            else:
-                print "Closing Development Phase"
-                start_date = now - delta - relativedelta(days=3)
-                end_date = now - relativedelta(days=3)
-            development = self._update_object(development,
-                                              start_date=start_date,
-                                              end_date=end_date)
+        if options['development']:
+            print "Opening Development Phase"
+            start_date = now - relativedelta(days=3)
+            end_date = now + delta + delta
+        else:
+            print "Closing Development Phase"
+            start_date = now - delta - relativedelta(days=3)
+            end_date = now - relativedelta(days=3)
+        development = self._update_object(development,
+                                          start_date=start_date,
+                                          end_date=end_date)
         # create ``PhaseRounds`` for the development phase
         with_open_rounds = not options['closed_rounds']
         rounds = self._update_rounds(development, with_open_rounds)
+        if options['with_submissions']:
+            print "Adding submissions for the Development Phase"
+            create_submissions(development, category, phase_round=rounds[0],
+                               with_parents=True)
+        if options['with_winners']:
+            print "Setting up winners for the Development Phase"
+            get_random_winners(development, phase_round=rounds[0])
+        # Any super user is a judge
+        judging_group = Group.objects.get(name='Judges')
+        for user in User.objects.filter(is_superuser=True):
+            judging_group.user_set.add(user)
         print "Done!"

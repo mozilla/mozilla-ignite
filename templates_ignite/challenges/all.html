@@ -127,7 +127,7 @@
         {% else %}
 
         {% if phase.is_ideation %}
-<p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_urg) }}">create an idea</a></p>
+<p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an idea</a></p>
         {% endif %}
         {% if phase.is_development %}
 <p class="point">We currently don't have any proposal submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an proposal</a></p>

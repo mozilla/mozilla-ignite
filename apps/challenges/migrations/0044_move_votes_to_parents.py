@@ -5,6 +5,7 @@ from south.v2 import DataMigration
 from django.db import models
 
 from voting.models import Vote
+from django.contrib.contenttypes.models import ContentType
 
 class Migration(DataMigration):
 
@@ -12,7 +13,6 @@ class Migration(DataMigration):
         "Write your forwards methods here."
         # get votes for the Submissions
         submission_model = orm['contenttypes.ContentType'].objects.get(app_label='challenges', model='submission')
-        parent_model = orm['contenttypes.ContentType'].objects.get(app_label='challenges', model='submissionparent')
         votes = Vote.objects.filter(content_type=submission_model)
         # Iterate over the existing votes
         for vote in votes:
