@@ -90,6 +90,7 @@ class SubmissionManager(models.Manager):
                 .select_related('created_by', 'create_by__user')
                 .filter(~Q(id__in=booked_ids)))
 
+
 class PhaseManager(BaseModelManager):
 
     def get_from_natural_key(self, challenge_slug, phase_name):

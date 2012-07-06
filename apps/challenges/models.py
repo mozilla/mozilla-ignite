@@ -449,10 +449,7 @@ class Submission(BaseModel):
         - Entry has been gren lit
         - User hasn't booked a timeslot
         """
-        return all([
-            self.is_winner,
-            not self.timeslot_set.all(),
-            ])
+        return all([self.is_winner, not self.timeslot_set.all()])
 
     @property
     def is_green_lit(self):
@@ -465,6 +462,17 @@ class Submission(BaseModel):
             return None
         return judgement.get_score()
 
+    @property
+    def score(self):
+        """Returns the current score for the Submission"""
+        judgements = [j for j in self.judgement_set.all() if j.complete]
+        total = sum(j.get_score() for j in judgements)
+        if judgements:
+            self.average_score = total / len(judgements)
+        else:
+            self.average_score = 0
+        self.judgement_count = len(judgements)
+        return self.average_score
 
 class ExclusionFlag(models.Model):
     """Flags to exclude a submission from judging."""
