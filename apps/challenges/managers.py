@@ -78,6 +78,17 @@ class SubmissionManager(models.Manager):
         except IndexError:
             return None
 
+    def non_booked_submissions(self, release):
+        """Returns the non-booked submissions for the given release"""
+        booked_qs = release.timeslot_set.select_related('submission').\
+            filter(is_booked=True)
+        booked_ids = [i.submission.id for i in booked_qs if i.submission]
+        args = [release.phase]
+        if release.phase_round:
+            args.append(release.phase_round)
+        return (self.green_lit(*args)
+                .select_related('created_by', 'create_by__user')
+                .filter(~Q(id__in=booked_ids)))
 
 class PhaseManager(BaseModelManager):
 
