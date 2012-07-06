@@ -1347,6 +1347,9 @@ section footer .cta {
     margin: 0 5px;
 }
 /* Judges dashboard */
+.dashboard_table {
+    width: 100%;
+}
 .dashboard_table thead th {
     border-bottom: 1px solid #2E2E2D;
     text-align: left;

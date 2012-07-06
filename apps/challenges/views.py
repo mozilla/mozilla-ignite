@@ -114,6 +114,7 @@ def entries_assigned(request, project, challenge):
     In order to award green-lited submissions
     - Judge has allowance
     - The Award money has been released
+    - Any webcasts that they need to attend
     """
     profile = request.user.get_profile()
     # Submissions assigned to the user
@@ -125,12 +126,26 @@ def entries_assigned(request, project, challenge):
     for submission in submissions:
         submission.has_judged = any(j.judge.user == request.user
                                     for j in submission.judgement_set.all())
+
+    # User has assigned judging tasks
+    webcast_list = []
+    if request.user.is_authenticated() and request.user.is_judge:
+        # Determining if a user is a judge is quite expensive query-wise,
+        # so we use the JudgeAssignment model to list the judge
+        # booked webcasts, past and present.
+        ids = (JudgeAssignment.objects.filter(judge=request.user.get_profile()).
+               values_list('submission__id', flat=True))
+        webcast_list = (TimeSlot.objects.
+                        select_related('submission').
+                        filter(is_booked=True, submission__in=ids))
     context = {
         'project': project,
         'challenge': challenge,
         'entries': sorted(submissions, key=lambda s: s.has_judged,
                           reverse=True),
+        'webcast_list': webcast_list
         }
+        
     # Award context
     allowance = JudgeAllowance.objects.get_for_judge(profile)
     if allowance:

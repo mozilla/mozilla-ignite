@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
+{% from "timeslot/includes/booking_list.html" import booking_listing with context %}
 
 {% block page_title %}{{ _('Dashboard') }} |{% endblock %}
 
@@ -12,9 +13,16 @@
 
 {% block content %}
 <h1 class="shout">Your Dashboard</h1>
-<div class="content_columns">
+<div class="content_columns equal">
   <p class="announce">The place to come for all your judging needs.</p>
-  <div class="col box main">
+  {% if webcast_list  %}
+  <div class="highlight box">
+  <h2 class="box-title exclaim">Webcasts to attend</h2>
+  <p>You've got some webcasts to attend. Please be ready to hear the teams talk about their ideas and have some questions ready for them.</p>
+  {{ booking_listing(webcast_list) }}
+  {% endif %}
+</div>
+  <div class="col box">
     <h2 class="exclaim">Your judging</h2>
 {% for group_phase in entries|groupby('phase') %}
 <h3 class="announce">{{ group_phase.grouper.name }} phase{% if group_phase.grouper.current_judging_round %}: {{ group_phase.grouper.current_judging_round.name }}{% endif %}</h3>
@@ -64,10 +72,10 @@
   {% endfor %}
 {% endfor %}
 </div>
-<div class="col box bonus">
+<div class="col box">
 {% if allowance %}
-    <section class="highlight box">
-      <h2 class="exclaim box-title">Awards</h2>
+    <section>
+      <h2 class="exclaim">Awards</h2>
       <p>Awards have been released that you can assign to the submissions you think most worthy from the recently closed {{ allowance.award.phase.name }} phase.</p>
       <p>Feel free to distribute the and realocate your funding; entries won't be notified until the admins have authorized the payments.</p>
       <p>You have ${{ allowance.amount_free }} (out of ${{ allowance.amount }}) left to allocate</p>

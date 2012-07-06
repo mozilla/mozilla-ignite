@@ -33,12 +33,6 @@
 <p>{{ profile.bio }}</p>
 {% endif %}
 
-{# Judge assigned webcasts #}
-{% if webcast_list  %}
-<h2>Webcasts of assigned Ideas</h2>
-{{ booking_listing(webcast_list) }}
-{% endif %}
-
 {% if need_booking_list or booked_list %}
 <div class="highlight box">
 <h2 class="box-title point">Webcasts</h2>
