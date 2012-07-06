@@ -114,14 +114,6 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
-          {% if webcast_list %}
-          <section>
-            <h2>Upcoming webcast</h2>
-            {% for webcast in webcast_list %}
-            <p>Webcast on {{ webcast.start_date }}.</p>
-            {% endfor%}
-          </section>
-          {% endif %}
           {% if badge_list %}
           <section>
             <h2>Badges awarded</h2>
@@ -152,6 +144,17 @@
                 </form>
             </section>
             {% endif %}
+            {% if webcast_list %}
+          <section class="highlight box">
+            <h2 class="point box-title">Upcoming webcast</h2>
+            <p>Like the sounds of this idea? Why not watch their upcoming webcast(s) on:</p>
+            <ul>
+            {% for webcast in webcast_list %}
+            <li>{{ webcast.start_date.strftime('%B %d, %Y at %H:%M') }} at <a href="{{ webcast.webcast_url }}">{{ webcast.webcast_url }}</a></li>
+            {% endfor%}
+        </ul>
+          </section>
+          {% endif %}
             <section class="widgets">
                 <h2 class="wimper">Share</h2>
                 <ul class="share">

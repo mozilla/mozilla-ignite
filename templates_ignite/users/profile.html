@@ -39,23 +39,30 @@
 {{ booking_listing(webcast_list) }}
 {% endif %}
 
+{% if need_booking_list or booked_list %}
+<div class="highlight box">
+<h2 class="box-title point">Webcasts</h2>
 {% if profile.user == user %}
-
-{# User webcasts waiting to be booked #}
 {% if need_booking_list %}
-<h2>Green-lit ideas ready for webcast booking</h2>
+<h3 class="box-title wimper">Book your webcast slot</h3>
+<p>As you have green lit submissions (congrations by the way) you need to book up a time slot for a webcast. Please select a timeslot for each application you have below.</p>
 <ul>
   {% for object in need_booking_list %}
   <li><a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object.title }}</a></li>
   {% endfor%}
 </ul>
 {% endif %}
-
-{# User booked webcasts #}
+{% endif %}
 {% if booked_list %}
-<h2>Your Upcoming webcasts</h2>
+<h3 class="box-title wimper">Upcoming webcasts</h3>
+{% if profile.user == user %}
+<p>Don't forget that you've got upcoming webcast timeslots booked up. Make sure you're ready to go for:</p>
+{% else %}
+<p>You can view upcoming webcasts of their current idea and developments on their following submissions:</p>
+{% endif %}
 {{ booking_listing(booked_list) }}
 {% endif %}
+</div>
 {% endif %}
 
 {% if submissions %}
