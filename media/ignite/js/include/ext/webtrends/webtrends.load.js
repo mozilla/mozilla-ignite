@@ -11,7 +11,6 @@ window.webtrendsAsyncInit=function(){
         download:true,
         downloadtypes:"xls,doc,pdf,txt,csv,zip,docx,xlsx,rar,gzip",
         onsitedoms:"mozillaignite.org",
-        fpcdom:".mozillaignite.org",
         plugins:{
             //hm:{src:"//s.webtrends.com/js/webtrends.hm.js"}
         }

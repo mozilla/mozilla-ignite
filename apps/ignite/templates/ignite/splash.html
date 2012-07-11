@@ -121,13 +121,26 @@
         <div class="events" id="upcoming_events">
             <h2 class="wimper">Upcoming Events</h2>
             <ol>
+              {% if event_list.count() %}
               {% for event in event_list %}
               <li>
                 <h3 class="wimper">{{ event.name }}</h3>
-                <p class="date">{{ event.start.strftime('%b') }} <span>{{ event.start.day }}</span></p>
+                <p class="date">
+                    <span class="date-part">{{ event.start.strftime('%b') }}<br /> <span class="day">{{ event.start.day }}</span></span>
+                    {% if not event.start.day == event.end.day %}
+                     to 
+                     {% if not event.start.strftime('%b') == event.end.strftime('%b') %}
+                     <span  class="date-part">{{ event.end.strftime('%b') }}<br /> 
+                    {% endif %}
+                     <span class="day">{{ event.end.day }}</span></span>
+                     {% endif %}
+                </p>
                 <p>{{ event.venue.name }} - <a href="{{ event.url }}">register</a></p>
               </li>
               {% endfor%}
+              {% else %}
+              <li>No upcoming events - please keep an eye on this site or our blog for the latest announcements.</li>
+              {% endif %}
             </ol>
         </div>
     </div>
