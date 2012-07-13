@@ -605,13 +605,14 @@ form span.error-hint:before {
 /* Masthead */
 .masthead {
     background: rgba(0, 0, 0, 0.8);
-    border-top: 2px solid #686868;
+    border-top: 2px solid #fff;
     color: #fff;
 }
 .masthead .brand {
     margin: 20px 0;
     padding: 0;
     color: #fff;
+    float: left;
 }
 .masthead .brand  img {
     display: block;
@@ -626,6 +627,9 @@ form span.error-hint:before {
     width: 118px;
     height: 48px;
     overflow: hidden;
+}
+.masthead nav {
+    clear: left;
 }
 .masthead ul {
     overflow: hidden;
