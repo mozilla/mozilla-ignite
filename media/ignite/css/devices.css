@@ -915,9 +915,18 @@ fieldset .focus_areas ul {
 }
 .events li {
     position: relative;
-    padding: 15px 15px 15px 80px;
+    padding: 15px 15px 15px 125px;
     border-top: 1px solid #c7ddeb;
     overflow: hidden;
+}
+.events li:after {
+    content: "";
+    width: 1px;
+    height: 300px;
+    position: absolute;
+    top: 0;
+    left: 110px;
+    background: #C7DDEB
 }
 .events ul li:first-child {
     border-top: none;
@@ -933,12 +942,17 @@ fieldset .focus_areas ul {
     padding: 15px;
     top: 0;
     left: 0;
-    border-right: 1px solid #c7ddeb;
     line-height: 1;
-    width: 32px;
+    width: 110px;
+    -webkit-box-sizing: border-box;
+    -moz-box-sizing: border-box;
+    box-sizing: border-box;
 }
-.events .date span {
-    display: block;
+.events .date .date-part {
+    display: inline-block;
+}
+.events .date .day {
+    display: inline-block;
     font-weight: bold;
     font-size: 25px;
     margin-top: 0.2em;
