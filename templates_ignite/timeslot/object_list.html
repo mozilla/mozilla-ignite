@@ -1,25 +1,41 @@
 {% extends "base.html" %}
 {% from "layout/pagination.html" import footer_pagination with context %}
+
+{% block page_title %}Book a timeslot | {{ entry.title }} | {% endblock %}
+
 {% block content %}
-<h1>Book a timeslot for {{ entry.title }}</h1>
-<p>Select one of these timeslots available</p>
-<ul>
+<h1>Book a timeslot</h1>
+<p>Book a timeslot from the list below so that you can meet our judges and tell them about the progress on your project, {{ entry.title }}.</p>
+<p><b>Please note that once you've booked a slot you can't cancel it so make sure you can make the time</b></p>
+<table class="dashboard_table">
+  <thead>
+    <tr>
+      <th scope="col">Date</th>
+      <th scope="col">Timeslot duration</th>
+      <th scope="col">Options</th>
+    </tr>
+  </thead>
+  <tbody>
   {% for object in page.object_list %}
-  <li>
+  <tr>
+    <th scope="row">{{ object.start_date.strftime('%B %d, %Y') }}</th>
+    <td>{{ object.start_date.strftime('%H:%M') }} to {{ object.end_date.strftime('%H:%M') }}</td>
+    <td>
     {% if object.is_booked %}
-    {{ object.start_date }} - {{ object.end_date }}
+    <b>Timeslot booked</b>
     {% else %}
     <form method="post" action="{{ url('timeslot:object_detail', entry_id=entry.id, object_id=object.short_id) }}">
-      <h2>{{ object.start_date.strftime('%B %d, %Y') }}</h2>
-      <p>
-        From {{ object.start_date.strftime('%H:%M') }} hrs to {{ object.end_date.strftime('%H:%M') }} hrs
-        {{ csrf() }}<button type="submit" name="_book">Book</button>
-      </p>
+        {{ csrf() }}
+        <button type="submit" class="cta" name="_book">Book</button>
     </form>
+  </td>
     {% endif %}
-  </li>
+  </tr>
   {% endfor%}
-</ul>
+  <tbody>
+</table>
+
+<p>If you can't make any of the availiable timeslots, or if you really do want to cancel a booking that you have made please <a href="mailto:ignite@mozillafoundation.org">email us</a>, we're happy to help.</p>
 
 {{ footer_pagination(page) }}
 

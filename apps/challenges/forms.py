@@ -215,6 +215,8 @@ class JudgingForm(forms.ModelForm):
         super(JudgingForm, self).__init__(*args, initial=initial, **kwargs)
 
         self.fields.update(new_fields)
+        self.fields.keyOrder = filter(lambda a: a not in 'notes', self.fields.keyOrder)
+        self.fields.keyOrder.append('notes')
 
     def _field_from_criterion(self, criterion):
         return MinMaxIntegerField(label=criterion.question,
@@ -270,7 +272,8 @@ class MinMaxIntegerField(forms.ChoiceField):
     def __init__(self, *args, **kwargs):
         min_value = kwargs.pop('min_value')
         max_value = kwargs.pop('max_value')
-        choices = [(x, x) for x in range(min_value, max_value)]
+        # ammended +1 to max_value - so labels go from 1 to 10 (opposed to 1 to 9)
+        choices = [(x, x) for x in range(min_value, max_value + 1)]
         kwargs.update({'choices': choices})
         super(MinMaxIntegerField, self).__init__(*args, **kwargs)
 

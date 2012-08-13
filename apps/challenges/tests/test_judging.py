@@ -156,61 +156,6 @@ class JudgingFormTest(TestCase):
                      [3, 5, 7])
 
 
-class JudgedEntriesTest(TestCase):
-    """Test the view for the judged entries view."""
-    
-    def setUp(self):
-        judging_setup(submission_count=3)
-        self.client.login(username='alex', password='alex')
-    
-    def create_judgement(self, submission, ratings, judge):
-        if isinstance(judge, User):
-            judge = judge.get_profile()
-        if isinstance(judge, basestring):
-            judge = User.objects.get(username=judge).get_profile()
-        
-        judgement = Judgement.objects.create(submission=submission,
-                                             judge=judge,
-                                             notes='Something something notes.')
-        phase_criteria = submission.phase.judgement_criteria.all()
-        for criterion, rating in zip(phase_criteria, ratings):
-            JudgingAnswer.objects.create(criterion=criterion,
-                                         judgement=judgement,
-                                         rating=rating)
-        return judgement
-    
-    @ignite_only
-    def test_no_judged_entries(self):
-        """Test display when no-one has judged anything."""
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(response.context['entries'], [])
-    
-    @ignite_only
-    def test_judged_entry(self):
-        submission = Submission.objects.all()[0]
-        self.create_judgement(submission, [3, 5, 7], judge='alex')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 1)
-    
-    @ignite_only
-    def test_multiple_judgements(self):
-        submission = Submission.objects.all()[0]
-        self.create_judgement(submission, [3, 5, 7], judge='alex')
-        self.create_judgement(submission, [3, 4, 5], judge='bob')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 1)
-        self.assertEqual(response.context['entries'][0].average_score,
-                         Decimal('13.5'))
-        self.assertEqual(response.context['entries'][0].judgement_count, 2)
-    
-    @ignite_only
-    def test_multiple_entries(self):
-        for submission in Submission.objects.all():
-            self.create_judgement(submission, [3, 5, 7], judge='alex')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 3)
-
-
 class JudgingViewTest(MessageTestCase):
     
     def setUp(self):

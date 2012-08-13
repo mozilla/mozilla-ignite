@@ -3,19 +3,11 @@ import logging
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
-from django.core.exceptions import PermissionDenied, ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.db.models import Q
 from django.forms.formsets import formset_factory
 from django.http import HttpResponseRedirect, Http404, HttpResponseForbidden
-from django.views.decorators.http import require_POST
-from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
-from django.views.generic.base import TemplateResponseMixin
-from django.views.generic.list import ListView
-from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import ProcessFormView, DeleteView, ModelFormMixin
 
 import jingo
 from tower import ugettext as _
@@ -24,8 +16,7 @@ from awards.models import JudgeAllowance
 from voting.models import Vote
 from badges.models import SubmissionBadge
 from commons.helpers import get_page, get_paginator
-from challenges.decorators import (phase_open_required, phase_closed_required,
-                                   project_challenge_required, judge_required)
+from challenges.decorators import project_challenge_required, judge_required
 from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
                               JudgingForm, NewEntryForm, SubmissionHelpForm,
                               SubmissionHelp, DevelopmentEntryForm,
@@ -33,7 +24,7 @@ from challenges.forms import (EntryForm, EntryLinkForm, InlineLinkFormSet,
 from challenges.models import (Challenge, Phase, Submission, Category,
                                ExternalLink, Judgement, SubmissionParent,
                                JudgeAssignment, SubmissionVersion)
-from projects.models import Project
+from ignite.views import action_unavailable_response
 from timeslot.models import TimeSlot
 
 
@@ -51,21 +42,6 @@ def get_phase_or_404(slug):
     if phase:
         return phase
     raise Http404
-
-
-class JingoTemplateMixin(TemplateResponseMixin):
-    """View mixin to render through Jingo rather than Django's renderer."""
-
-    def render_to_response(self, context, **response_kwargs):
-        """Render using Jingo and return the response."""
-        template_names = self.get_template_names()
-        if len(template_names) > 1:
-            LOGGER.info('Jingo only works with a single template name; '
-                        'discarding ' + ', '.join(template_names[1:]))
-        template_name = template_names[0]
-
-        return jingo.render(self.request, template_name, context,
-                            **response_kwargs)
 
 
 def get_list_count(*args):
@@ -114,12 +90,16 @@ def entries_all(request, project, slug, phase):
 @project_challenge_required
 def entries_winning(request, project, challenge):
     """Show entries that have been marked as winners and awarded."""
-    submissions = (Submission.objects.visible(request.user)
-                   .filter(phase__challenge=challenge)
-                   .filter(is_winner=True)
-                   .order_by('phase', 'phase_round'))
+    ideation_winners = (Submission.objects.visible(request.user)
+                        .filter(phase=request.ideation)
+                        .filter(is_winner=True))
+    development_winners = (Submission.objects.visible(request.user)
+                           .filter(phase=request.development)
+                           .filter(is_winner=True)
+                           .order_by('phase_round__start_date'))
     context = {
-        'entries': submissions,
+        'ideation_winners': ideation_winners,
+        'development_winners': development_winners,
         'project': project,
         'challenge': challenge,
         }
@@ -134,6 +114,7 @@ def entries_assigned(request, project, challenge):
     In order to award green-lited submissions
     - Judge has allowance
     - The Award money has been released
+    - Any webcasts that they need to attend
     """
     profile = request.user.get_profile()
     # Submissions assigned to the user
@@ -145,12 +126,26 @@ def entries_assigned(request, project, challenge):
     for submission in submissions:
         submission.has_judged = any(j.judge.user == request.user
                                     for j in submission.judgement_set.all())
+
+    # User has assigned judging tasks
+    webcast_list = []
+    if request.user.is_authenticated() and request.user.is_judge:
+        # Determining if a user is a judge is quite expensive query-wise,
+        # so we use the JudgeAssignment model to list the judge
+        # booked webcasts, past and present.
+        ids = (JudgeAssignment.objects.filter(judge=request.user.get_profile()).
+               values_list('submission__id', flat=True))
+        webcast_list = (TimeSlot.objects.
+                        select_related('submission').
+                        filter(is_booked=True, submission__in=ids))
     context = {
         'project': project,
         'challenge': challenge,
         'entries': sorted(submissions, key=lambda s: s.has_judged,
                           reverse=True),
+        'webcast_list': webcast_list
         }
+        
     # Award context
     allowance = JudgeAllowance.objects.get_for_judge(profile)
     if allowance:
@@ -257,13 +252,13 @@ def add_submission(request, phase, form_class=NewEntryForm,
 @project_challenge_required
 def create_entry(request, project, challenge, phase):
     """Creates a Ideation ``Submission`` with the details provided.
-    Once the phase is closed we 404.
+    Once the phase is closed we show an unavailable page
     """
     phase = get_phase_or_404(phase)
     form_class = NewEntryForm if phase.is_ideation else NewDevelopmentEntryForm
     # Phase must be open
     if not phase or not phase.is_open:
-        raise Http404
+        return action_unavailable_response(request)
     extra_context = {
         'project': project,
         'challenge': challenge,
@@ -369,6 +364,12 @@ def entry_show(request, project, challenge, entry_id, phase, judging_form=None):
     # Cache webcast list
     webcast_list = TimeSlot.objects.filter(is_booked=True,
                                            submission__in=submission_ids)
+    # help required
+    try:
+        help_required = parent.submissionhelp
+        help_required = help_required if help_required.is_published else None
+    except ObjectDoesNotExist:
+        help_required = None
     context = {
         'project': project,
         'challenge': challenge,
@@ -382,6 +383,7 @@ def entry_show(request, project, challenge, entry_id, phase, judging_form=None):
         'webcast_list': webcast_list,
         'badge_list': badge_list,
         'parent': parent,
+        'help_required': help_required,
     }
     # Add extra context to the View. It is on regular django templates it is
     # usually done on template tags. In this case we do it here
@@ -506,7 +508,7 @@ def entry_edit(request, project, challenge, pk, phase):
     phase = get_phase_or_404(phase)
     # Ideation phase must be open
     if not phase or not phase.is_open:
-        raise Http404
+        return action_unavailable_response(request)
     form_class = EntryForm if phase.is_ideation else DevelopmentEntryForm
     extra_context = {
         'project': project,
@@ -582,8 +584,7 @@ def entry_help(request, project, challenge, entry_id):
         instance.parent = parent
         instance.save()
         if instance.status == SubmissionHelp.PUBLISHED:
-            msg = _('Your message has been posted successfully and is now '
-                    'available on your Idea page')
+            msg = _('Your message has been posted successfully.')
             messages.success(request, msg)
         return HttpResponseRedirect(parent.submission.get_absolute_url())
     else:

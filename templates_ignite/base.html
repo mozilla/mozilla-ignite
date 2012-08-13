@@ -54,31 +54,33 @@
     </header>
     <div role="main">
     <section>
+    {% if perms.challenges.judge_submission and assignment_count %}
+    {% block judgecall %}
+    <div class="entre alerts">
+        <div class="busta">
+            {% trans count=assignment_count, url=url('entries_assigned') %}
+            <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
+            {% pluralize %}
+            <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
+            {% endtrans %}
+        </div>
+    </div>
+    {% endblock %}
+    {% endif %}
+    {% block alerts %}
+        {% if messages %}
+        <section class="alerts">
+            <ul class="busta">
+            {% for message in messages %}
+                <li>{{ message|safe }}</li>
+            {% endfor %}
+            </ul>
+        </section>
+        {% endif %}
+    {% endblock %}
     {% block header %}{% endblock %}
     <div class="entre">
         <div class="busta">
-            {% if perms.challenges.judge_submission and assignment_count %}
-            <div class="busta styleme" style="background-color: #ffff00;">
-                {% block judgecall %}   
-                    {% trans count=assignment_count, url=url('entries_assigned') %}
-                    <p>Hi there: you have <a href="{{ url }}">{{ count }} submission</a> awaiting your judgement.</p>
-                    {% pluralize %}
-                    <p>Hi there: you have <a href="{{ url }}">{{ count }} submissions</a> awaiting your judgement.</p>
-                    {% endtrans %}
-                {% endblock %}
-            </div>
-            {% endif %}
-            {% block alerts %}
-                {% if messages %}
-                <section class="alerts">
-                    <ul class="busta">
-                    {% for message in messages %}
-                        <li>{{ message|safe }}</li>
-                    {% endfor %}
-                    </ul>
-                </section>
-                {% endif %}
-            {% endblock %}
             {% block content %}{% endblock %}
         </div>
     </div>

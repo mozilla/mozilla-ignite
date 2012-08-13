@@ -397,10 +397,6 @@ class Submission(BaseModel):
         return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
                                                'phase': self.phase_slug})
 
-    def get_version_url(self):
-        """Return this submission's URL."""
-        return self._lookup_url('entry_version', {'entry_id': self.id})
-
     def get_edit_url(self):
         """Return the URL to edit this submission."""
         return self._lookup_url('entry_edit', {'pk': self.id,
@@ -453,15 +449,30 @@ class Submission(BaseModel):
         - Entry has been gren lit
         - User hasn't booked a timeslot
         """
-        return all([
-            self.is_winner,
-            not self.timeslot_set.all(),
-            ])
+        return all([self.is_winner, not self.timeslot_set.all()])
 
     @property
     def is_green_lit(self):
         return self.is_winner
 
+    def get_judge_score(self, profile):
+        try:
+            judgement = self.judgement_set.filter(judge=profile)[0]
+        except IndexError:
+            return None
+        return judgement.get_score()
+
+    @property
+    def score(self):
+        """Returns the current score for the Submission"""
+        judgements = [j for j in self.judgement_set.all() if j.complete]
+        total = sum(j.get_score() for j in judgements)
+        if judgements:
+            self.average_score = total / len(judgements)
+        else:
+            self.average_score = 0
+        self.judgement_count = len(judgements)
+        return self.average_score
 
 class ExclusionFlag(models.Model):
     """Flags to exclude a submission from judging."""
@@ -478,7 +489,8 @@ class JudgingCriterion(models.Model):
     """A numeric rating criterion for judging submissions."""
 
     question = models.CharField(max_length=250, unique=True)
-    min_value = 0
+    # changed from 0 to 1 so the values display as 1 to 10 opposed to 0 to 9
+    min_value = 1
     max_value = models.IntegerField(default=10)
 
     phases = models.ManyToManyField(Phase, blank=True,
@@ -729,3 +741,7 @@ class SubmissionHelp(models.Model):
 
     def __unicode__(self):
         return u'Help needed for %s' % self.parent
+
+    @property
+    def is_published(self):
+        return self.status == self.PUBLISHED

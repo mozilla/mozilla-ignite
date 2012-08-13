@@ -3,9 +3,15 @@
 <ul>
   {% for object in object_list %}
   <li>
-    <a href="{{ object.submission.get_absolute_url() }}">{{ object.submission.title }} on {{ object.start_date.strftime('%B %d, %Y at  %H:%M') }} hrs</a>
+    {{ object.submission.title }} on {{ object.start_date.strftime('%B %d, %Y at  %H:%M') }} - 
+    {% if object.webcast_url %}
+    <a href="{{ object.webcast_url }}">Watch now</a>
+    {% else %}
+    <b>Webcast URL coming soon</b>
+    {% endif %}
   </li>
   {% endfor%}
 </ul>
+<p><b>Note</b> - webcasts won't start until a few minutes before their start time.</p>
 {% endif %}
 {%- endmacro %}

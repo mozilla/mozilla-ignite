@@ -1,13 +1,15 @@
 {% extends "challenges/all.html" %}
 
 
-{% block header %}
-<header class="busta">
-<h1 class="shout">
-Search submissions
-</h1>
-</header>
+{% block page_title %}
+{% if query %}
+Submissions containing '{{ query }}' | 
+{% else %}
+Search submissions |
+{% endif %}
 {% endblock %}
+
+{% block header %}{% endblock %}
 
 {% block content %}
 <div class="content_columns columns with_nav">
@@ -22,9 +24,10 @@ Search submissions
     </ul>
   </form>
 </nav>
-
-    {% if page.object_list %}
+  {% if query %}
   <div class="highlight col box main">
+    {% if page.object_list %}
+  <h2 class="all">Results for {{ query }}</h2>
     <ol class="submissions columns">
       {% for result in page.object_list %}
       <li class="box col">
@@ -49,7 +52,9 @@ Search submissions
     {% endif %}
   </div>
   {% else %}
-  <p>No results found</p>
+  <p class="all announce">No results found for {{ query }}</p>
+  {% endif %}
+</div>
   {% endif %}
 </div>
 </div>

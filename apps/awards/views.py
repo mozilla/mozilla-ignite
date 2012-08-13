@@ -36,6 +36,15 @@ def award(request, submission_id, project=None, slug=None):
     if form.is_valid():
         is_allocated = judge_allowance.allocate(form.cleaned_data['amount'],
                                                 submission)
+        if form.cleaned_data['amount'] == 0:
+            submission_award = (judge_allowance.submissionaward_set
+                                .filter(submission=submission))
+            if submission_award:
+                submission_award.delete()
+                message = _("You have successfuly removed the award from this"
+                            " submission")
+                messages.success(request, message)
+                return HttpResponseRedirect(submission.get_absolute_url())
         if is_allocated:
             message = _("You have successfuly awarded this Entry")
             messages.success(request, message)

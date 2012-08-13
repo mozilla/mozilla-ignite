@@ -1,35 +1,36 @@
 {% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
+{% from "timeslot/includes/booking_list.html" import booking_listing with context %}
 
-{% block page_title %}{{ _('All submissions assigned to you') }} |{% endblock %}
+{% block page_title %}{{ _('Dashboard') }} |{% endblock %}
 
 {% block page_id %}assigned_submissions{% endblock %}
 
 {% block section_class %}entries{% endblock %}
 
-{% block header %}
-<h1 class="shout">Submissions assigned to you</h1>
-{% endblock %}
-
 {# No need to display the judge call on this page #}
 {% block judgecall %}{% endblock %}
 
 {% block content %}
+<h1 class="shout">Your Dashboard</h1>
+<div class="content_columns equal">
+  <p class="announce">The place to come for all your judging needs.</p>
+  {% if webcast_list  %}
+  <div class="highlight box">
+  <h2 class="box-title exclaim">Webcasts to attend</h2>
+  <p>You've got some webcasts to attend. Please be ready to hear the teams talk about their ideas and have some questions ready for them.</p>
+  {{ booking_listing(webcast_list) }}
+  {% endif %}
+</div>
+  <div class="col box">
+    <h2 class="exclaim">Your judging</h2>
 {% for group_phase in entries|groupby('phase') %}
-<h2>{{ group_phase.grouper.name }} phase{% if group_phase.grouper.current_judging_round %}: {{ group_phase.grouper.current_judging_round.name }}{% endif %}</h2>
-
+<h3 class="announce">{{ group_phase.grouper.name }} phase{% if group_phase.grouper.current_judging_round %}: {{ group_phase.grouper.current_judging_round.name }}{% endif %}</h3>
   {% for group_judging in group_phase.list|groupby('has_judged') %}
     {% if group_judging.grouper %}
-    <h3>{% trans %}Judged by you{% endtrans %}</h3>
-    <p>
-      {% trans count=group_judging.list|length %}
-      You have successfully evaluated {{ count }} submission.
-      {% pluralize %}
-      You have successfully evaluated {{ count }} submissions.
-      {% endtrans %}
-    </p>
+    <h4>{% trans %}Judged by you{% endtrans %}</h4>
     {% else %}
-    <h3>{% trans %}To be Judged{% endtrans %}</h3>
+    <h4>{% trans %}To be Judged{% endtrans %}</h4>
     <p>
       {% trans count=group_judging.list|length %}
       You have {{ count }} submission awaiting evaluation.
@@ -37,38 +38,74 @@
       You have {{ count }} submissions awaiting evaluation.
       {% endtrans %}
     </p>
-    {% endif %}
-    <ul class="submissions">
-      {% for entry in group_judging.list %}
+    {% endif %}      
+      {% if group_judging.grouper %}
+      <table class="dashboard_table">
+        <thead>
+          <tr>
+            <th scope="col">Submission title</th>
+            <th scope="col">You scored it</th>
+            <th scole="col">Options</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for entry in group_judging.list %}
+          <tr>
+        <th scope="row">{{ entry.title }}</th> 
+        <td>{{ entry.get_judge_score(user.get_profile()) }}%</td>
+        <td><a href="{{ entry.get_absolute_url() }}">edit your judgement</a></td>
+      </tr>
+          {% endfor %}
+    </tbody>
+  </table>
+      {% else %}
+      <ul class="submissions">
+        {% for entry in group_judging.list %}
       <li>
         <a href="{{ entry.get_absolute_url() }}">
           {{ entry.title }}
         </a>
       </li>
       {% endfor %}
-    </ul>
+      {% endif %}
+      </ul>
   {% endfor %}
 {% endfor %}
-
+</div>
+<div class="col box">
 {% if allowance %}
     <section>
-      <h2>Green-lit entries for {{ allowance.award.phase.name }} phase {% if allowance.award.phase_round %}. Round {{ allowance.phase_round }}{% endif %}</h2>
-      <p>These entries have been green-lit for this phase. Feel free to distribute the and realocate your funding. Entries won't be notified until the admins Freeze the Award.</p>
-      <ul>
-        <li>Total Funds: ${{ allowance.amount }}</li>
-        <li>Allocated Funds: ${{ allowance.amount_used }}</li>
-        <li>Free Funds: ${{ allowance.amount_free }}</li>
-      </ul>
-
+      <h2 class="exclaim">Awards</h2>
+      <p>Awards have been released that you can assign to the submissions you think most worthy from the recently closed {{ allowance.award.phase.name }} phase.</p>
+      <p>Feel free to distribute the and realocate your funding; entries won't be notified until the admins have authorized the payments.</p>
+      <p>You have ${{ allowance.amount_free }} (out of ${{ allowance.amount }}) left to allocate</p>
+      <h3 class="wimper">Submissions you can award</h3>
       <ul>
         {% for object in greenlit_list %}
         <li><a href="{{ object.get_absolute_url() }}">{{ object }}</a></li>
         {% endfor%}
       </ul>
-      <h2>Allocated Funding submisssions</h2>
+      <h3 class="wimper">Awards you have made</h3>
+      <table class="dashboard_table">
+        <thead>
+          <tr>
+            <th scope="col">Submission title</th>
+            <th scope="col">You awarded</th>
+            <th scole="col">Options</th>
+          </tr>
+        </thead>
+        <tbody>
       {% for object in awarded_list %}
-      <li><a href="{{ object.submission.get_absolute_url() }}">{{ object.submission }}</a>, awarded ${{ object.amount }}</li>
+      <tr>
+        <th scope="row">{{ object.submission }}</th>
+        <td>${{ object.amount }}</td>
+        <td><a href="{{ object.submission.get_absolute_url() }}">edit award</a></td>
+      </tr>
         {% endfor%}
+      </tbody>
+        </table>
     </section>
     {% endif %}
 {% endblock %}
+</div>
+</div>

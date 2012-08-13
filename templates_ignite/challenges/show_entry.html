@@ -23,13 +23,13 @@
 {% endblock %}
 
 {% block content %} 
-    <a href="{{ url('entries_all', phase='ideas') }}" class="back wimper">See all submissions</a>
+    <a href="{{ url('entries_all', phase=entry.phase_slug) }}" class="back wimper">See all {{ entry.phase_slug}}</a>
     <article>
       <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
-        {% if entry.owned_by(user) %}
+        {% if development.has_started and entry.owned_by(user) %}
             <li><a href="{{ url('entry_help', entry_id=entry.parent.slug) }}" class="cta do">Ask for help</a></li>
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
@@ -49,6 +49,11 @@
         {% endif %}
         {% endif %}
         <div class="columns">
+            {% if excluded %}
+                <p class="busta alerts errors">
+                    {% trans %}This entry has been eliminated from judging.{% endtrans %}
+                </p>
+                {% endif %}
         <div class="col box">
             <div class="widgets">
                 <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
@@ -87,6 +92,12 @@
             </ul> 
             </div>
             {% endif %}
+            {% if help_required %}
+            <div class="description">
+              <h2>Would you be interested in helping with this proposal?</h2>
+              <p>{{ help_required.notes }}</p>
+            </div>
+            {% endif %}
             <address class="vcard">
                 <p class="wimper"><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
@@ -103,14 +114,6 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
-          {% if webcast_list %}
-          <section>
-            <h2>Upcoming webcast</h2>
-            {% for webcast in webcast_list %}
-            <p>Webcast on {{ webcast.start_date }}.</p>
-            {% endfor%}
-          </section>
-          {% endif %}
           {% if badge_list %}
           <section>
             <h2>Badges awarded</h2>
@@ -120,13 +123,10 @@
           </section>
           {% endif %}
             {% if award_form %}
-            <section>
-              <h2>Award this submission</h2>
-              <ul>
-                <li>Total Funds: ${{ allowance.amount }}</li>
-                <li>Allocated Funds: ${{ allowance.amount_used }}</li>
-                <li>Free Funds: ${{ allowance.amount_free }}</li>
-              </ul>
+            <section class="highlight box">
+              <h2 class="point box-title">Award this submission</h2>
+              <p><b>You scored this submission {{ entry.get_judge_score(user.get_profile()) }}%</b></p>
+              <p>You can award up to ${{ allowance.amount_free }}</p>
               <form method="post" id="form-awardform-id" action="{{ url('awards:award', submission_id=entry.id) }}">
                 {{ award_form.as_p() }}
                 {{ csrf()|safe }}
@@ -135,26 +135,26 @@
             </section>
             {% endif %}
             {% if judging_form %}
-            <section class="widgets">
-                {% if excluded %}
-                {# For the love of all that is holy, style me #}
-                <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
-                    {% trans %}This entry has been eliminated from the contest.{% endtrans %}
-                </p>
-                {% endif %}
-                <h2 class="wimper">Rate this submission</h2>
-                {% if judge_assigned %}
-                <p>This submission has been assigned to you</p>
-                {% else %}
-                <p>This submission has not been assigned to you</p>
-                {% endif %}
-                <form method="POST" action="{{ entry.get_judging_url() }}">
+            <section class="highlight box">
+                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form">
+                    <h2 class="point box-title">Rate this submission</h2>
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
-                    <input type="submit" class="cta" value="Submit thy judgement" />
+                    <input type="submit" class="cta" value="Judge submission" />
                 </form>
             </section>
             {% endif %}
+            {% if webcast_list %}
+          <section class="highlight box">
+            <h2 class="point box-title">Upcoming webcast</h2>
+            <p>Like the sounds of this idea? Why not watch their upcoming webcast(s) on:</p>
+            <ul>
+            {% for webcast in webcast_list %}
+            <li>{{ webcast.start_date.strftime('%B %d, %Y at %H:%M') }} at <a href="{{ webcast.webcast_url }}">{{ webcast.webcast_url }}</a></li>
+            {% endfor%}
+        </ul>
+          </section>
+          {% endif %}
             <section class="widgets">
                 <h2 class="wimper">Share</h2>
                 <ul class="share">

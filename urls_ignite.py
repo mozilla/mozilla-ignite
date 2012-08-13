@@ -57,19 +57,17 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     'challenges.views',
-    url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
-        kwargs=_ignite_kwargs, name='entry_version'),
+    # url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
+    #     kwargs=_ignite_kwargs, name='entry_version'),
     url(r'^submissions/(?P<entry_id>\d+)/help/$', 'entry_help',
         kwargs=_ignite_kwargs, name='entry_help'),
-    url(r'^ideas/help-wanted/$', 'entry_help_list',
+    url(r'^submissions/help-wanted/$', 'entry_help_list',
         kwargs=_ignite_kwargs, name='entry_help_list'),
     # Judging views
     url(r'^submission/(?P<pk>\d+)/judgement/$', 'entry_judge',
         kwargs=_ignite_kwargs, name='entry_judge'),
-    url(r'^submissions/assigned/$', 'entries_assigned',
+    url(r'^dashboard/$', 'entries_assigned',
         kwargs=_ignite_kwargs, name='entries_assigned'),
-    url(r'^submissions/judged/$', 'entries_judged',
-        kwargs=_ignite_kwargs, name='entries_judged'),
     url(r'^submissions/green-lit/$', 'entries_winning',
         kwargs=_ignite_kwargs, name='entries_winning'),
     )

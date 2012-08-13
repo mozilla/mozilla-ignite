@@ -330,6 +330,32 @@ form span.error-hint:before {
 .image_form .hint {
     display: inline-block;
 }
+/* Judging form styles */
+.rating_form ul {
+    overflow: hidden;
+    clear: left;
+    padding-left: 0;
+    list-style-type: none;
+}
+.rating_form li {
+    float: left;
+    width: 10%;
+    text-align: center;
+}
+.rating_form li label {
+    margin-bottom: 0;
+    padding-top: 0.2em;
+}
+.rating_form li input {
+    display: block;
+    width: 20px;
+    margin: 0 auto;
+}
+.rating_form .errorlist li {
+    width: auto;
+    color: #DA1C21;
+    font-weight: bold;
+}
 .cta {
     font-family: "LeagueGothic";
     text-transform: uppercase;
@@ -439,7 +465,9 @@ form span.error-hint:before {
     color: #085526;
     font-weight: bold;
     margin-bottom: 2em;
-    border-radius: 4px;
+}
+#splash .alerts {
+    margin-bottom: 0;
 }
 .alerts h2 {
     margin-bottom: 0.5em;
@@ -1254,6 +1282,7 @@ section footer .cta {
     padding-left: 0;
     border: none;
     min-height: 0;
+    margin: 0;
 }
 .lists .highlight .advanced-manufacturing {
     background-image: url(../img/css/manufacturing.png);
@@ -1317,6 +1346,21 @@ section footer .cta {
 }
 .pagination li a {
     margin: 0 5px;
+}
+/* Judges dashboard */
+.dashboard_table {
+    width: 100%;
+}
+.dashboard_table thead th {
+    border-bottom: 1px solid #2E2E2D;
+    text-align: left;
+    padding: 1em 10px;
+    font-weight: normal;
+}
+.dashboard_table tbody th,
+.dashboard_table tbody td {
+    padding: 0.5em 10px;
+    text-align: left;
 }
 /* Single submission */
 .widgets {
