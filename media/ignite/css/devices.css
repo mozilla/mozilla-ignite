@@ -31,6 +31,9 @@ address {
 aside {
     position: relative;
 }
+iframe {
+    width: 100%;
+}
 h1,
 .shout {
     margin-top: 0;
