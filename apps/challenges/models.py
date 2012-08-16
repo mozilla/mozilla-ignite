@@ -152,6 +152,14 @@ class Phase(BaseModel):
         return time_remaining.days if time_remaining.days >= 0 else -1
 
     @cached_property
+    def days_until(self):
+        now = datetime.utcnow()
+        if not self.is_closed:
+            return -1
+        time_until = self.start_date - now
+        return time_until.days if time_until.days >= 0 else -1
+
+    @cached_property
     def phase_rounds(self):
         return self.phaseround_set.all()
 

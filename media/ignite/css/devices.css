@@ -895,6 +895,9 @@ fieldset.highlight {
     margin-top: 0;
     color: #2E2E2D !important;
 }
+#splash .highlight p {
+    margin-bottom: 0
+}
 .highlight ul {
     padding-left: 0;
 }
