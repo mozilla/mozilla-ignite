@@ -68,8 +68,6 @@ urlpatterns += patterns(
         kwargs=_ignite_kwargs, name='entry_judge'),
     url(r'^dashboard/$', 'entries_assigned',
         kwargs=_ignite_kwargs, name='entries_assigned'),
-    url(r'^submissions/judged/$', 'entries_judged',
-        kwargs=_ignite_kwargs, name='entries_judged'),
     url(r'^submissions/green-lit/$', 'entries_winning',
         kwargs=_ignite_kwargs, name='entries_winning'),
     )

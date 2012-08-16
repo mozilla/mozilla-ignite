@@ -308,21 +308,10 @@ HMAC_KEYS = {
 TEST_RUNNER = 'test_utils.runner.RadicalTestSuiteRunner'
 
 ## Celery
-BROKER_HOST = 'localhost'
-BROKER_PORT = 5672
-BROKER_USER = 'playdoh'
-BROKER_PASSWORD = 'playdoh'
-BROKER_VHOST = 'playdoh'
-BROKER_CONNECTION_TIMEOUT = 0.1
 CELERY_RESULT_BACKEND = 'amqp'
 CELERY_IGNORE_RESULT = True
 
 MAX_FILEPATH_LENGTH = 250
-USER_AVATAR_PATH = 'img/uploads/avatars/'
-TOPIC_IMAGE_PATH = 'img/uploads/topics/'
-PROJECT_IMAGE_PATH = 'img/uploads/projects/'
-EVENT_IMAGE_PATH = 'img/uploads/events/'
-CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.
@@ -406,6 +395,7 @@ HAYSTACK_CONNECTIONS = {
         'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
         'URL': 'http://127.0.0.1:9200/',
         'INDEX_NAME': 'haystack',
+        'TIMEOUT': 60 * 5,
     },
 }
 
