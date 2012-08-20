@@ -42,11 +42,13 @@
                     <li><a href="https://blog.mozillaignite.org/">{{ _('Blog') }}</a></li>
                     {% endif %}
                     {% block login %}
+                    <li id="login_form">
                     {% if not user.is_authenticated() %}
-                        <li>{% include "registration/_login_form.html" %}</li>
+                        {% include "registration/_login_form.html" %}
                     {% else %} 
-                        <li><a class="logout" href="{{ url('logout') }}">{{ _('Log out') }}</a></li>
+                        <a class="logout" href="{{ url('logout') }}">{{ _('Log out') }}</a>
                     {% endif %}
+                    </li>
                     {% endblock %}
                 </ul>
             </nav>

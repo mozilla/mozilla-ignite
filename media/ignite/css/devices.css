@@ -680,6 +680,10 @@ form span.error-hint:before {
     color: #EF4619 !important;
     padding: 0 10px !important ;
 }
+/* don't show this until it can be used - after persona code is loaded */
+.masthead #login_form {
+    display: none;
+}
 /* Promo box */
 .promo .shout {
     width: 60%;
