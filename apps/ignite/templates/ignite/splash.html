@@ -21,6 +21,9 @@
          {% if ideation.is_open %}
          <a href="{{ url('create_entry', phase='ideas') }}" class="cta">get started</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
          {% endif %}
+         {% if request.ideation.is_closed and not request.development.days_until == -1  %}
+            Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days
+        {% endif %}
          {% if development.is_open %}
          <a href="{{ url('create_entry', phase='proposals') }}" class="cta">create a proposal</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
          {% endif %}
@@ -33,7 +36,11 @@
             <li class="col brainstorm box">
                 <h3 class="exclaim">Brainstorm</h3>
                 <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
+                {% if request.ideation.is_open %}
                 <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
+                {% else %}
+                <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
+                {% endif %}
             </li>
             <li class="col hack box">
                 <h3 class="exclaim">Hack</h3>
@@ -47,7 +54,11 @@
             <li class="col compete box">
                 <h3 class="exclaim">Compete</h3>
                 <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
-                <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a></p>
+                {% if request.development.is_open %}
+                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
+                {% else %}
+                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
+                {% endif %}
             </li>
         </ul>
     </div>
@@ -72,16 +83,20 @@
     <div class="dynamic main col box">
         <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
     </div>
+
     <div class="bonus col box">
         <div class="highlight">
-          {% if ideation.is_open %}
-            <h2 class="point box-title">What's your big idea?</h2>
+            {% if request.ideation.is_open %}
+                    <h2 class="point box-title">What's your big idea?</h2>
             <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Get started</a>
-          {% endif %}
-          {% if development.is_open %}
-            <h2 class="point box-title">What's your proposal?</h2>
-            <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Send your proposal!</a>
-          {% endif %}
+                {% endif %}
+                {% if request.ideation.is_closed and not request.development.days_until == -1  %}
+                    <p class="intro">Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days</p>
+                {% endif %}
+                {% if request.development.is_open %}
+                    <h2 class="point box-title">What's your proposal?</h2>
+                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Send your proposal!</a>
+                {% endif %}
         </div>
     </div>
 </div>

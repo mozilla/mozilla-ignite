@@ -212,10 +212,18 @@
                 </ul>
                 </nav>
             </section> 
+            {% if request.ideation.is_open %}
             <div class="highlight">
                 <h2 class="point box-title">How would you push the web further?</h2>
                 <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Create an idea</a>
             </div>
+            {% endif %}
+            {% if request.development.is_open %}
+            <div class="highlight">
+                <h2 class="point box-title">How would you push the web further?</h2>
+                <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit a proposal</a>
+            </div>
+            {% endif %}
         </aside>
         </div>
     </article>

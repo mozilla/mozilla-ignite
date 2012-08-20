@@ -31,6 +31,9 @@ address {
 aside {
     position: relative;
 }
+iframe {
+    width: 100%;
+}
 h1,
 .shout {
     margin-top: 0;
@@ -605,13 +608,14 @@ form span.error-hint:before {
 /* Masthead */
 .masthead {
     background: rgba(0, 0, 0, 0.8);
-    border-top: 2px solid #686868;
+    border-top: 2px solid #fff;
     color: #fff;
 }
 .masthead .brand {
     margin: 20px 0;
     padding: 0;
     color: #fff;
+    float: left;
 }
 .masthead .brand  img {
     display: block;
@@ -626,6 +630,9 @@ form span.error-hint:before {
     width: 118px;
     height: 48px;
     overflow: hidden;
+}
+.masthead nav {
+    clear: left;
 }
 .masthead ul {
     overflow: hidden;
@@ -672,6 +679,10 @@ form span.error-hint:before {
 .masthead .toolbar a {
     color: #EF4619 !important;
     padding: 0 10px !important ;
+}
+/* don't show this until it can be used - after persona code is loaded */
+.masthead #login_form {
+    display: none;
 }
 /* Promo box */
 .promo .shout {
@@ -887,6 +898,9 @@ fieldset.highlight {
 .highlight .box-title {
     margin-top: 0;
     color: #2E2E2D !important;
+}
+#splash .highlight p {
+    margin-bottom: 0
 }
 .highlight ul {
     padding-left: 0;
