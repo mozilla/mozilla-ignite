@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Help wanted</h1>
+<form method="post" id="form-submissionhelp-id" action="">
+  <div class="highlight {% if form.errors %}fail{% endif %}">
+    <label for="wmd-input" class="announce">{{ _('Describe what do you need help with') }}</label>
+    <p class="hint" id="info_description">{{ _('Describe who would be a good fit for helping you with your Idea') }}</p>
+    <div class="ed">
+      {% for error in form.notes.errors %}<strong>*{{ error }}</strong>{% endfor%}
+      {{ form.notes }}
+      {{ form.status }}
+    </div>
+  </div>
+  {{ csrf()|safe }}
+  <input type="submit" value="Update" class="cta">
+</form>
+{% endblock content %}

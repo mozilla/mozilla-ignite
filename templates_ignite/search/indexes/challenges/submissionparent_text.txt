@@ -1,0 +1,5 @@
+{{ object.submission.title|safe }}
+{{ object.submission.brief_description|safe }}
+{{ object.submission.description|safe }}
+{{ object.submission.category.name|safe }}
+{{ object.submission.created_by.name|safe }}

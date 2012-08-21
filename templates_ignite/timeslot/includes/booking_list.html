@@ -1,0 +1,17 @@
+{% macro booking_listing(object_list) -%}
+{% if object_list %}
+<ul>
+  {% for object in object_list %}
+  <li>
+    {{ object.submission.title }} on {{ object.start_date.strftime('%B %d, %Y at  %H:%M') }} - 
+    {% if object.webcast_url %}
+    <a href="{{ object.webcast_url }}">Watch now</a>
+    {% else %}
+    <b>Webcast URL coming soon</b>
+    {% endif %}
+  </li>
+  {% endfor%}
+</ul>
+<p><b>Note</b> - webcasts won't start until a few minutes before their start time.</p>
+{% endif %}
+{%- endmacro %}

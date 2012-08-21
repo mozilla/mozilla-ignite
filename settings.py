@@ -118,7 +118,7 @@ MEDIA_URL = '/media/ignite/'
 ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '1iz#v0m55@h26^m6hxk3a7at*h$qj_2a$juu1#nv50548j(x1v'
+SECRET_KEY = ''
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -216,8 +216,9 @@ INSTALLED_APPS = (
 
     # Third-party apps
     'commonware.response.cookies',
-    'djcelery',
+    #'djcelery',
     'django_nose',
+    'django_extensions',
 
     # Django contrib apps
     'django.contrib.admin',
@@ -244,9 +245,12 @@ INSTALLED_APPS = (
     # Feed subscription
     'django_push.subscriber',
     'feeds',
+    # email queue
+    #'django_mailer',
 
     # Feature flipping
     'waffle',
+    'haystack',   # search
 
     # Ignite specific
     'innovate',
@@ -258,7 +262,13 @@ INSTALLED_APPS = (
     'challenges',
     'ignite',
     'voting',
+    'timeslot',
+    'webcast',
+    'resources',
+    'badges',
+    'awards',
     'blogs',
+    'search',
 )
 
 # Tells the extract script what files to look for L10n in and what function
@@ -298,21 +308,10 @@ HMAC_KEYS = {
 TEST_RUNNER = 'test_utils.runner.RadicalTestSuiteRunner'
 
 ## Celery
-BROKER_HOST = 'localhost'
-BROKER_PORT = 5672
-BROKER_USER = 'playdoh'
-BROKER_PASSWORD = 'playdoh'
-BROKER_VHOST = 'playdoh'
-BROKER_CONNECTION_TIMEOUT = 0.1
 CELERY_RESULT_BACKEND = 'amqp'
 CELERY_IGNORE_RESULT = True
 
 MAX_FILEPATH_LENGTH = 250
-USER_AVATAR_PATH = 'img/uploads/avatars/'
-TOPIC_IMAGE_PATH = 'img/uploads/topics/'
-PROJECT_IMAGE_PATH = 'img/uploads/projects/'
-EVENT_IMAGE_PATH = 'img/uploads/events/'
-CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 
 # a list of passwords that meet policy requirements, but are considered
 # too common and therefore easily guessed.
@@ -328,8 +327,10 @@ PASSWORD_BLACKLIST = (
 AUTH_PROFILE_MODULE = 'users.Profile'
 
 # Email goes to the console by default.  s/console/smtp/ for regular delivery
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_BACKEND = 'django_mailer.smtp_queue.EmailBackend'
 DEFAULT_FROM_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
+SERVER_EMAIL = 'Innovate Mozilla <innovate@mozilla.org>'
 
 AUTHENTICATION_BACKENDS = (
     'django_browserid.auth.BrowserIDBackend',
@@ -368,7 +369,42 @@ SITE_FEED_URLS = {
 
 JUDGES_PER_SUBMISSION = 2
 
+# Switch for the development phase
+DEVELOPMENT_PHASE = False
+
+
+# TimeSlot Booking
+# Time to expire the booking if not confirmed
+BOOKING_EXPIRATION = 5 * 60   # 5 minutes
+# Determines if the user throttling will be enabled
+BOOKING_THROTTLING = False
+# Email preferences
+BOOKING_SEND_EMAILS = True
+
+# Paginator
+PAGINATOR_SIZE = 25
+
+MIDDLEWARE_URL_EXCEPTIONS = [
+    '/__debug__/',
+    '/admin/',
+    MEDIA_URL,
+    ]
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+        'TIMEOUT': 60 * 5,
+    },
+}
+
+# High number since we don't want pagination
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 6
+HAYSTACK_DEFAULT_OPERATOR = 'AND'
+
 SESSION_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 
 ANON_ALWAYS = True
+

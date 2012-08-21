@@ -44,12 +44,9 @@ figure img {
     right: 0;
 }
 /* Masthead */
-.masthead .brand {
-    float: left;
-}
 .masthead nav {
     float: right;
-    margin-right: 130px;
+    clear: none;
 }
 .user_tools {
     float: right;

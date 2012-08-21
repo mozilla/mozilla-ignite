@@ -10,7 +10,7 @@ from activity.models import broadcast
 
 class Entry(BaseModel):
     title = models.CharField(max_length=100)
-    published = models.DateTimeField(default=datetime.datetime.now())
+    published = models.DateTimeField(default=datetime.datetime.utcnow())
     url = models.URLField()
     body = models.TextField()
     link = models.ForeignKey('projects.Link')

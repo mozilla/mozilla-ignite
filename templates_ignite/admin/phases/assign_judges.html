@@ -1,0 +1,31 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Assign Judges to Phases{% endblock title %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Assign Judges</h1>
+  <p>Assign the judges for the given phases</p>
+  <h2>Available Judges</h2>
+  <ol>
+    {% for judge in judge_profiles %}
+    <li>
+      <a href="{{ judge.get_absolute_url }}">{{ judge.display_name }}</a>
+    </li>
+    {% endfor%}
+  </ol>
+  <form action="" method="post" id="assign_judges_form">
+    <div>
+      {% csrf_token %}
+      <fieldset class="module aligned">
+        <h2>Assign Judges</h2>
+        <div class="description">Select the phase and the judges to distribute these submitions</div>
+        <ul>
+          {{ form.as_ul }}
+          <li><button type="submit">Assign</button></li>
+        </ul>
+      </fieldset>
+    </div>
+  </form>
+</div>
+{% endblock %}

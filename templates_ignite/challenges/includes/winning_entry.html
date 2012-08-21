@@ -1,0 +1,15 @@
+{% from "challenges/helpers.html" import created_by with context %}
+<li class="box col">
+  <article>
+    <a href="{{ entry.get_absolute_url() }}">
+      <h4>
+        <div class="frame box">
+          <img src="{{ entry.get_image_src() }}" alt="">
+        </div>
+        {{ entry.title }}
+      </h4>
+    </a>
+    <p>{{ entry.brief_description }}</p>
+    <address>{{ created_by(entry, footer=False) }}</address>
+  </article>
+</li>

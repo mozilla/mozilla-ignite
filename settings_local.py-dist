@@ -16,9 +16,9 @@ CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
+        'NAME': 'mozilla-ignite',
+        'USER': 'mozilla-ignite',
+        'PASSWORD': 'mozilla-ignite',
         'HOST': '',
         'PORT': '',
         'OPTIONS': {
@@ -44,10 +44,18 @@ SECRET_KEY = 'cheese'
 # Should be False on a production box
 DEBUG = TEMPLATE_DEBUG = True
 
-# BrowserID stuff #
-## Change this to the URL that you're running the app under - for browserID to auth
-SITE_URL = ''
-# If you're running dev as http only this should be True.
+# Install memcache and remove this to make djangobrowser id
+# https://github.com/mozilla/django-session-csrf#differences-from-django
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
+# Browser ID performs the assertion with this url e.g. http://localhost:8000
+SITE_URL = 'https://local.mozillaignite.org'
+
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = False
 # Install memcache and remove this to make djangobrowser id
@@ -66,3 +74,16 @@ LOGGING = {
         'django_browserid': debug,
     },
 }
+
+# This should match the admin files location
+ADMIN_MEDIA_PREFIX = '/static/admin/'
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://127.0.0.1:9200/',
+        'INDEX_NAME': 'haystack',
+    },
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'

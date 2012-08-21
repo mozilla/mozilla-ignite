@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block page_title %}{{ _('Page not found | ') }}{% endblock %}
+
+{% block page_id %}not_found%{% endblock %}
+
+{% block section_class %}error{% endblock %}
+
+{% block content %}
+<h1>Whoops</h1>
+<div class="highlight">
+<h2 class="box-title point">Action unavailable</h2>
+<p class="intro">The action that you are trying to do is unavailable.</p>
+<h3 class="wimper">You can also:</h3>
+<ul>
+    <li><a href="{{ url('entries_all', phase='ideas') }}">view all our existing ideas</a></li>
+    <li><a href="{{ url('about_ignite') }}">learn more about the Mozilla Ignite challenge</a></li>
+    <li><a href="{{ url('create_entry', phase='ideas') }}">submit your own idea</a></li>
+</ul>
+</div>
+{% endblock %}

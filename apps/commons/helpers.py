@@ -4,7 +4,9 @@ import urllib
 import urlparse
 
 from django.conf import settings
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.template import defaultfilters
+from django.utils.encoding import smart_str
 from django.utils.html import strip_tags
 
 from jingo import register
@@ -12,12 +14,10 @@ import jinja2
 
 from .urlresolvers import reverse
 
-
 # Yanking filters from Django.
 register.filter(strip_tags)
 register.filter(defaultfilters.timesince)
 register.filter(defaultfilters.truncatewords)
-
 
 
 @register.function
@@ -66,3 +66,22 @@ def _urlencode(items):
 def urlencode(txt):
     """Url encode a path."""
     return urllib.quote_plus(txt)
+
+
+def get_page(data):
+    """Determines the page number"""
+    try:
+        page = int(data.get('page', '1'))
+    except (ValueError, TypeError):
+        page = 1
+    return page
+
+
+def get_paginator(queryset, page_number, items=settings.PAGINATOR_SIZE):
+    """"Generates a paginator object with the size and page provided"""
+    paginator = Paginator(queryset, items)
+    try:
+        paginated_query = paginator.page(page_number)
+    except (EmptyPage, InvalidPage):
+        paginated_query = paginator.page(paginator.num_pages)
+    return paginated_query

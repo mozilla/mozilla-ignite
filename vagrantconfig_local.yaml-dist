@@ -1,0 +1,11 @@
+# Configuration for Vagrant
+
+# Change to true if you can use nfs; using nfs significantly
+# improves performance.
+nfs: false
+gui: false
+server_name: local.mozillaignite.org
+# Used for the root mysql password
+password: root
+# Turns on Vagrant debug flags, useful if you have issues with puppet
+debug: false

@@ -2,50 +2,89 @@ from django.conf import settings
 from django.conf.urls.defaults import patterns, include, url
 from django.contrib import admin
 from django.http import HttpResponseRedirect
-from django.views.generic.simple import redirect_to
-from jingo.views import direct_to_template
+
+from challenges.models import SubmissionParent
 from voting.views import vote_on_object
 
-from challenges.models import Submission
 
 from funfactory.monkeypatches import patch
 patch()
 
 admin.autodiscover()
 
-_ignite_kwargs = {'project': settings.IGNITE_PROJECT_SLUG,
-                  'slug': settings.IGNITE_CHALLENGE_SLUG}
+_ignite_kwargs = {
+    'project': settings.IGNITE_PROJECT_SLUG,
+    'slug': settings.IGNITE_CHALLENGE_SLUG
+    }
 
 vote_dict = {
-    'model': Submission,
+    'model': SubmissionParent,
     'template_object_name': 'submission',
     'allow_xmlhttprequest': True,
 }
 
-urlpatterns = patterns('',
-    (r'^admin/', include(admin.site.urls)),
-    (r'^browserid/', include('django_browserid.urls')),
+urlpatterns = patterns(
+    '',
     url(r'^accounts/logout/$', 'django.contrib.auth.views.logout', kwargs={'next_page': '/'}, name='logout'),
     url(r'^accounts/login/$', 'jingo.render', kwargs={'template': 'registration/login.html'}, name='login'),
     url(r'^$', 'ignite.views.splash', kwargs=_ignite_kwargs, name='challenge_show'),
-    (r'', include('users.urls')),
-    # The /ideas/ URL will become available in the application phase
-    url(r'^ideas/assigned/$', 'challenges.views.entries_assigned', kwargs=_ignite_kwargs, name='entries_assigned'),
-    url(r'^ideas/winning/$', 'challenges.views.entries_winning', kwargs=_ignite_kwargs, name='entries_winning'),
-    url(r'^ideas/judged/$', 'challenges.views.entries_judged', kwargs=_ignite_kwargs, name='entries_judged'),
-    url(r'^ideas/list/(?P<category>[\w-]+)/$', 'challenges.views.entries_category', kwargs=_ignite_kwargs, name='entries_for_category'),
-    url(r'^ideas/list/$', 'challenges.views.entries_all', kwargs=_ignite_kwargs, name='entries_all'),
-    url(r'^ideas/(?P<entry_id>\d+)/$', 'challenges.views.entry_show', kwargs=_ignite_kwargs, name='entry_show'),
-    url(r'^ideas/(?P<pk>\d+)/judgement/$', 'challenges.views.entry_judge', kwargs=_ignite_kwargs, name='entry_judge'),
-    url(r'^ideas/(?P<pk>\d+)/edit/$', 'challenges.views.entry_edit', kwargs=_ignite_kwargs, name='entry_edit'),
-    url(r'^ideas/(?P<pk>\d+)/delete/$', 'challenges.views.entry_delete', kwargs=_ignite_kwargs, name='entry_delete'),
     url(r'^ideas/vote/(?P<object_id>\d+)/(?P<direction>up|clear)/?$',
         vote_on_object, vote_dict, name='entry_vote'),
-    url(r'^ideas/add/$', 'challenges.views.create_entry', kwargs=_ignite_kwargs, name='create_entry'),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
     url(r'^terms/$', 'ignite.views.terms', kwargs=_ignite_kwargs,  name='terms_conditions')
 )
+
+
+pattern = '(?P<phase>(ideas|proposals))'
+
+urlpatterns += patterns(
+    'challenges.views',
+    url(r'^%s/add/$' % pattern, 'create_entry', kwargs=_ignite_kwargs,
+        name='create_entry'),
+    url(r'^%s/(?P<entry_id>\d+)/$' % pattern, 'entry_show',
+        kwargs=_ignite_kwargs, name='entry_show'),
+    url(r'^%s/list/$' % pattern, 'entries_all', kwargs=_ignite_kwargs,
+        name='entries_all'),
+    url(r'^%s/list/(?P<category>[\w-]+)/$' % pattern, 'entries_category',
+        kwargs=_ignite_kwargs, name='entries_for_category'),
+    url(r'^%s/(?P<pk>\d+)/edit/$' % pattern, 'entry_edit',
+        kwargs=_ignite_kwargs, name='entry_edit'),
+    url(r'^%s/(?P<pk>\d+)/delete/$' % pattern, 'entry_delete',
+        kwargs=_ignite_kwargs, name='entry_delete'),
+)
+
+
+urlpatterns += patterns(
+    'challenges.views',
+    # url(r'^ideas/v/(?P<entry_id>\d+)/$', 'entry_version',
+    #     kwargs=_ignite_kwargs, name='entry_version'),
+    url(r'^submissions/(?P<entry_id>\d+)/help/$', 'entry_help',
+        kwargs=_ignite_kwargs, name='entry_help'),
+    url(r'^submissions/help-wanted/$', 'entry_help_list',
+        kwargs=_ignite_kwargs, name='entry_help_list'),
+    # Judging views
+    url(r'^submission/(?P<pk>\d+)/judgement/$', 'entry_judge',
+        kwargs=_ignite_kwargs, name='entry_judge'),
+    url(r'^dashboard/$', 'entries_assigned',
+        kwargs=_ignite_kwargs, name='entries_assigned'),
+    url(r'^submissions/green-lit/$', 'entries_winning',
+        kwargs=_ignite_kwargs, name='entries_winning'),
+    )
+
+
+urlpatterns += patterns(
+    '',
+    (r'^resources/', include('resources.urls', namespace='resources')),
+    (r'^award/', include('awards.urls', namespace='awards'), _ignite_kwargs),
+    (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
+    (r'^webcast/', include('webcast.urls', namespace='webcast'),),
+    (r'^search/', include('search.urls', namespace='search'),),
+    (r'^admin/', include(admin.site.urls)),
+    (r'^browserid/', include('django_browserid.urls')),
+    (r'', include('users.urls')),
+    )
+
 
 # Handle 404 and 500 errors
 handler404 = 'ignite.views.fail'
@@ -59,3 +98,8 @@ if settings.DEBUG:
         (r'^%s/(?P<path>.*)$' % media_url, 'django.views.static.serve',
          {'document_root': settings.MEDIA_ROOT}),
     )
+if settings.DEBUG and 'debug_toolbar_user_panel' in settings.INSTALLED_APPS:
+    urlpatterns += patterns(
+        '',
+        url(r'', include('debug_toolbar_user_panel.urls')),
+        )

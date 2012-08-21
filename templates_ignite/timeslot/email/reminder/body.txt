@@ -1,0 +1,7 @@
+Hello,
+
+Just a reminder that the timeslot for your {{ submission.title }} submission is ready to be booked.
+
+Please login and go to http://{{ site.domain }}{% url timeslot:pending %} to book your timeslot
+
+The Mozilla Ignite Team

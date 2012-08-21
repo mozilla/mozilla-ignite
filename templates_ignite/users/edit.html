@@ -1,4 +1,4 @@
-{% extends "second_base.html" %}
+{% extends "base.html" %}
 
 {% block page_title %}{{ _('Edit profile') }} | {% endblock %}
 
@@ -19,7 +19,7 @@
     <div class="image_form highlight">
         <p class="announce">Avatar</p>
         <img src="{{ user.get_profile().avatar_url(60) }}" />
-        <p class="hint">{{ _('Profile pictures are powered by ') }} <a href="http://gravatar.com">Gravatar.com</a></p>
+        <p class="hint">{{ _('Profile pictures are powered by ') }} <a href="http://gravatar.com" target="_blank">Gravatar.com</a></p>
     </div>
     <div class="highlight">
         <label class="announce" for="id_website">{{ _('Website') }}</label>
