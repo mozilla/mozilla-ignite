@@ -14,6 +14,12 @@ IDEATION_SLUG = 'Ideation'
 
 class Migration(DataMigration):
 
+    
+    depends_on = (
+        ('challenges', '0032_auto__add_field_submission_updated_on__add_field_submission_phase_roun'),
+        )
+
+
     def forwards(self, orm):
         "Write your forwards methods here."
         try:

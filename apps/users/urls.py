@@ -1,10 +1,8 @@
+from django.conf import settings
 from django.conf.urls.defaults import patterns, url
 
 
 urlpatterns = patterns('',
-    url(r'^dashboard/$', 'users.views.dashboard', name='users_dashboard'),
-    url(r'^dashboard/(?P<page>\d+)/', 'users.views.dashboard',
-        name='users_dashboard'),
     url(r'^signout/$', 'users.views.signout', name='users_signout'),
     url(r'^profile/edit/$', 'users.views.edit', name='users_edit'),
     url(r'^profile/edit/links/$', 'users.views.links',
@@ -21,3 +19,12 @@ urlpatterns = patterns('',
     url(r'^people/active/$', 'users.views.active', name='users_active'),
     url(r'^people/recent/$', 'users.views.recent', name='users_recent'),
 )
+
+
+# the dashboard is only required for the non-ignite site
+if not hasattr(settings, 'IGNITE_SITE'):
+    urlpatterns += (
+        'users.views',
+        url(r'^dashboard/$', 'dashboard', name='users_dashboard'),
+        url(r'^dashboard/(?P<page>\d+)/', 'dashboard', name='users_dashboard'),
+        )

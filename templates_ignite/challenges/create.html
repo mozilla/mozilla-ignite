@@ -1,4 +1,4 @@
-{% extends 'second_base.html' %}
+{% extends 'base.html' %}
 
 {% block page_title %}{% if errors %}{{ _('Errors in your idea') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
 
@@ -7,9 +7,9 @@
 {% block section_class %}entries{% endblock %}
 
 {% block alerts %}
-{% if errors %}
+{% if error_count %}
 <section class="alerts errors">
-    {% trans count=errors|length %}
+    {% trans count=error_count %}
     <p>You have {{ count }} error in your submission. Please correct this before you can submit an idea.</p>
     {% pluralize %}
     <p>You have {{ count }} errors in your submission. Please correct this before you can submit an idea.</p>
@@ -18,75 +18,81 @@
 {% endif %}
 {% endblock %}
 
-{% block content %}   
+{% block content %}
 {% block greeting %}
+{% if phase.is_ideation %}
 <h1 class="shout">{{ _('Submit an idea') }}</h1>
+{% endif %}
+
+{% if phase.is_development %}
+<h1 class="shout">{{ _('Submit a proposal') }}</h1>
+{% endif %}
 <p class="page-intro">{{ _("Congratulations! You've taken the first step towards making the world, and the internet, a better place. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
 {% endblock %}
 <p><span class="error-hint">*</span> means a required field</p>
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
-    <div class="highlight  {% if errors['Name']%}fail{% endif %}">
-        <label for="id_title" class="announce">{% if errors['Name'] %}<em>Error in</em> {% endif %}{{ _('Title of Submission') }} <span class="error-hint"><span>(required)</span></span></label>
+    <div class="highlight {% if form.title.errors %}fail{% endif %}">
+        <label for="id_title" class="announce">{% if form.title.errors %}<em>Error in</em> {% endif %}{{ _('Title of Submission') }} <span class="error-hint"><span>(required)</span></span></label>
         <div class="ed">
-        <strong>{{ errors['Name'] }}</strong>
+          {% for error in form.title.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.title }}
         </div>
     </div>
-    <div class="highlight {% if errors['The problem']%}fail{% endif %}">
-        <label for="id_brief_description" class="announce">{% if errors['The problem'] %}<em>Error in</em> {% endif %}{{ _('The pitch') }} <span class="error-hint"><span>(required)</span></span></label>
+    <div class="highlight {% if form.brief_description.errors %}fail{% endif %}">
+        <label for="id_brief_description" class="announce">{% if form.brief_description.errors %}<em>Error in</em> {% endif %}{{ _('The pitch') }} <span class="error-hint"><span>(required)</span></span></label>
         <p class="hint" id="info_brief_description">{{ _('Summarize the problem or opportunity you\'re looking to address in 140 characters or less') }}</p>
         <div class="ed">
-        <strong>{{ errors['The problem'] }}</strong>
+          {% for error in form.brief_description.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.brief_description }}
         </div>
     </div>
-    <div class="highlight {% if errors['The solution']%}fail{% endif %}">
-        <label for="wmd-input" class="announce">{% if errors['Full description'] %}<em>Error in</em> {% endif %}{{ _('The solution') }} <span class="error-hint"><span>(required)</span></span></label>
+    <div class="highlight {% if form.description.errors  %}fail{% endif %}">
+        <label for="wmd-input" class="announce">{% if form.description.errors %}<em>Error in</em> {% endif %}{{ _('The solution') }} <span class="error-hint"><span>(required)</span></span></label></label>
         <p class="hint" id="info_description">{{ _('Describe your proposed solution. How does it address the problem or opportunity you\'ve identified? (Aim for 400 words or less — brevity is the soul of wit.)') }}</p>
         <div class="ed">
-        <strong>{{ errors['The solution'] }}</strong>
+          {% for error in form.description.errors %}<strong>{{ error }}</strong>{% endfor %}
         <div class="wmd-region">
         {{ form.description }}
         </div>
         </div>
      </div>
-    <fieldset class="stacked_field highlight {% if errors['Focus area']%}fail{% endif %}">
-        <legend><span class="announce">{% if errors['Focus area'] %}<em>Error in</em> {% endif %}{{ _('Which focus area does it address, primarily?') }} <span class="error-hint"><span>(required)</span></span></span></legend>
+    <fieldset class="stacked_field highlight {% if form.category.errors%}fail{% endif %}">
+        <legend><span class="announce">{% if form.category.errors %}<em>Error in</em> {% endif %}{{ _('Which focus area does it address, primarily?') }} <span class="error-hint"><span>(required)</span></span></span></legend>
         <div class="focus_areas columns ed">
-            <strong>{{ errors['Focus area'] }}</strong>
+          {% for error in form.category.errors %}<strong>{{ error }}</strong>{% endfor %}
             {{ form.category }}
         </div>
     </fieldset>
-    <div class="highlight {% if errors['Life benefit']%}fail{% endif %}">
-        <label for="id_life_improvements" class="announce">{% if errors['Life benefit'] %}<em>Error in</em> {% endif %}{{ _('How will your idea make people\'s lives better?') }} <span class="error-hint"><span>(required)</span></span></label>
+    <div class="highlight {% if form.life_improvements.errors%}fail{% endif %}">
+        <label for="id_life_improvements" class="announce">{% if form.life_improvements.errors %}<em>Error in</em> {% endif %}{{ _('How will your idea make people\'s lives better?') }} <span class="error-hint"><span>(required)</span></span></label>
         <p class="hint" id="info_life_improvements">{{ _('Specifically, who will benefit and at what scale?') }}</p>
         <div class="ed">
-        <strong>{{ errors['Life benefit'] }}</strong>
+          {% for error in form.life_improvements.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.life_improvements }}
         </div>
     </div>
-    <div class="highlight {% if errors['GENI Network']%}fail{% endif %}">
-        <label for="id_take_advantage" class="announce">{% if errors['GENI Network'] %}<em>Error in</em> {% endif %}{{ _('How does your idea take advantage of next-generation networks?') }}</label>
+    <div class="highlight {% if form.take_advantage.errors%}fail{% endif %}">
+        <label for="id_take_advantage" class="announce">{% if form.take_advantage.errors %}<em>Error in</em> {% endif %}{{ _('How does your idea take advantage of next-generation networks?') }}</label>
         <p class="hint" id="info_take_advantage">{{ _('Does some version of this already exist? If so, how does your idea improve on it? What current technological limitations are making your idea hard to execute on today\'s networks? What challenges would you anticipate if you were to actually build out the idea?') }}</p>
         <div class="ed">
-        <strong>{{ errors['GENI Network'] }}</strong>
+          {% for error in form.take_advantage.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.take_advantage }}
         </div>
     </div>
-     <div class="highlight {% if errors['Team members']%}fail{% endif %}">
-        <label for="id_team_members" class="announce">{% if errors['Team members'] %}<em>Error in</em> {% endif %}{{ _('Team members') }}</label>
+     <div class="highlight {% if form.team_members.errors%}fail{% endif %}">
+        <label for="id_team_members" class="announce">{% if form.team_members.errors %}<em>Error in</em> {% endif %}{{ _('Team members') }}</label>
         <p class="hint" id="info_team_members">{{ _('If you\'re submitting this idea as part of a team, tell us who you\'re working with.') }}</p>
         <div class="ed">
-        <strong>{{ errors['Team members'] }}</strong>
+          {% for error in form.team_members.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.team_members }}
         </div>
     </div>
-     <div class="highlight {% if errors['Interested to make']%}fail{% endif %}">
-        <label for="id_interest_making" class="announce">{% if errors['Interested to make'] %}<em>Error in</em> {% endif %}{{ _('Are you interested in making your idea a reality?') }}</label>
-        <p class="hint" id="info_intertest_making">{{ _('Do you want to try and build this app? If so, do you need help? What kind of help -- guidance, mentorship, learning materials, more team members? (This won’t have an impact on how your idea is judged -- we’re just curious.)') }}</p>
+     <div class="highlight {% if form.interest_making.errors %}fail{% endif %}">
+        <label for="id_interest_making" class="announce">{% if form.interest_making.errors %}<em>Error in</em> {% endif %}{{ _('Are you interested in making your idea a reality?') }}</label>
+        <p class="hint" id="info_intertest_making">{{ _('Do you want to try and build it? If so, do you need help? For example, guidance, mentorship, learning materials, more team members? (This won’t have an impact on how your idea is judged -- we’re just curious.)') }}</p>
         <div class="ed">
-        <strong>{{ errors['Interested to make'] }}</strong>
+          {% for error in form.interest_making.errors %}<strong>{{ error }}</strong>{% endfor %}
         {{ form.interest_making }}
         </div>
     </div>
@@ -107,18 +113,53 @@
             {{ form.sketh_note }}
         {% endif %}
      </div>
-     <fieldset class="external_links highlight {% if errors['External links']%}fail{% endif %}">
-        <legend><span class="announce">{% if errors['External links'] %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
+{% if form.repository_url  %}
+     <div class="highlight {% if form.repository_url.errors %}fail{% endif %}">
+       <label for="{{ form.repository_url.auto_id }}" class="announce">{% if form.repository_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL where your work is visible') }}</label>
+       <div class="ed">
+         {% for error in form.repository_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.repository_url }}
+       </div>
+     </div>
+     {% endif %}
+
+{% if form.blog_url  %}
+     <div class="highlight {% if form.blog_url.errors %}fail{% endif %}">
+       <label for="{{ form.blog_url.auto_id }}" class="announce">{% if form.blog_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL for your blog') }}</label>
+       <div class="ed">
+         {% for error in form.blog_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.blog_url }}
+       </div>
+       <div class="">
+         <p>Please address the following questions on your blog:</p>
+         <ul>
+           <li>How is it going? How is your app progressing?</li>
+           <li>What's been done?</li>
+           <li>What are some of the challenges you are experiencing/have experienced?</li>
+           <li>What are you planning on tackling next?</li>
+         </ul>
+       </div>
+     </div>
+     {% endif %}
+
+     <fieldset class="external_links highlight {% if link_form.non_form_errors() %}fail{% endif %}">
+       <legend><span class="announce">{% if link_form.non_form_errors() %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
         <p class="hint">If you've got additional information about your idea elsewhere on the internet (like YouTube pitches, wireframes or blog posts), please include them here. The more information you provide, the better!</p>
         {{ link_form.management_form }}
         <div class="ed">
-        <strong>{{ errors['External links'] }}</strong>
+          {# We are only showing a single error message #}
+          {% for error in link_form.non_form_errors() %}
+          <strong>* {{ error }}</strong>
+          {% endfor %}
         {% for link in link_form.forms %}
             <div class="inline_field">
                 {% for field in link.hidden_fields() %}
                 {{ field }}
                 {% endfor %}
-                
                 {% for field in link.visible_fields() %}
                     {{ field.label_tag() }}
                     {{ field }}
@@ -129,10 +170,10 @@
      </fieldset>
 
      {% if form.terms_and_conditions %}
-     <div class="highlight inline_field {% if errors['Terms and conditions']%}fail{% endif %}">
-        <div class="ed">
-            <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if errors['Terms and conditions'] %}<em>Error in</em> {% endif %}I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a> <span class="error-hint"><span>(required)</span></span></label>
-            <p><strong>{{ errors['Terms and conditions'] }}</strong></p>
+     <div class="highlight inline_field {% if form.terms_and_conditions.errors %}fail{% endif %}">
+       <div class="ed">
+         <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if form.terms_and_conditions.errors %}<em>Error in</em> {% endif %} I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a> <span class="error-hint"><span>(required)</span></span></label>
+         {% for error in form.terms_and_conditions.errors %}<p><strong>* {{ error }}</strong></p>{% endfor%}
        </div>
      </div>
      {% endif %}

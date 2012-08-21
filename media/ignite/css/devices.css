@@ -31,6 +31,9 @@ address {
 aside {
     position: relative;
 }
+iframe {
+    width: 100%;
+}
 h1,
 .shout {
     margin-top: 0;
@@ -330,6 +333,32 @@ form span.error-hint:before {
 .image_form .hint {
     display: inline-block;
 }
+/* Judging form styles */
+.rating_form ul {
+    overflow: hidden;
+    clear: left;
+    padding-left: 0;
+    list-style-type: none;
+}
+.rating_form li {
+    float: left;
+    width: 10%;
+    text-align: center;
+}
+.rating_form li label {
+    margin-bottom: 0;
+    padding-top: 0.2em;
+}
+.rating_form li input {
+    display: block;
+    width: 20px;
+    margin: 0 auto;
+}
+.rating_form .errorlist li {
+    width: auto;
+    color: #DA1C21;
+    font-weight: bold;
+}
 .cta {
     font-family: "LeagueGothic";
     text-transform: uppercase;
@@ -399,10 +428,24 @@ form span.error-hint:before {
     background-image: url(../img/css/thumbs_up.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
     background-position: 12px 50%, 0 0;
     padding-left: 40px;
+    color: #454545 !important;
+    border: 1px solid #E2E2E2;
+}
+.thumb:hover {
+    background: #f0f0f1 url(../img/css/thumbs_up.png) no-repeat 10px 50%;
+    background-position: 12px 50%, 0 0;
+    padding-left: 40px;
 }
 .cancel {
     background: transparent url(../img/css/cancel.png) no-repeat 10px 50%;
     background-image: url(../img/css/cancel.png ), -moz-linear-gradient(bottom, rgb(240,240,241) 45%, rgb(255,255,255) 73%);
+    background-position: 16px 50%, 0 0;
+    padding-left: 40px;
+    border: 1px solid #E2E2E2;
+    color: #454545 !important;
+}
+.cancel:hover {
+    background: #f0f0f1 url(../img/css/cancel.png) no-repeat 10px 50%;
     background-position: 16px 50%, 0 0;
     padding-left: 40px;
 }
@@ -425,7 +468,9 @@ form span.error-hint:before {
     color: #085526;
     font-weight: bold;
     margin-bottom: 2em;
-    border-radius: 4px;
+}
+#splash .alerts {
+    margin-bottom: 0;
 }
 .alerts h2 {
     margin-bottom: 0.5em;
@@ -563,13 +608,14 @@ form span.error-hint:before {
 /* Masthead */
 .masthead {
     background: rgba(0, 0, 0, 0.8);
-    border-top: 2px solid #686868;
+    border-top: 2px solid #fff;
     color: #fff;
 }
 .masthead .brand {
     margin: 20px 0;
     padding: 0;
     color: #fff;
+    float: left;
 }
 .masthead .brand  img {
     display: block;
@@ -584,6 +630,9 @@ form span.error-hint:before {
     width: 118px;
     height: 48px;
     overflow: hidden;
+}
+.masthead nav {
+    clear: left;
 }
 .masthead ul {
     overflow: hidden;
@@ -630,6 +679,10 @@ form span.error-hint:before {
 .masthead .toolbar a {
     color: #EF4619 !important;
     padding: 0 10px !important ;
+}
+/* don't show this until it can be used - after persona code is loaded */
+.masthead #login_form {
+    display: none;
 }
 /* Promo box */
 .promo .shout {
@@ -845,6 +898,9 @@ fieldset.highlight {
 .highlight .box-title {
     margin-top: 0;
     color: #2E2E2D !important;
+}
+#splash .highlight p {
+    margin-bottom: 0
 }
 .highlight ul {
     padding-left: 0;
@@ -1254,6 +1310,7 @@ section footer .cta {
     padding-left: 0;
     border: none;
     min-height: 0;
+    margin: 0;
 }
 .lists .highlight .advanced-manufacturing {
     background-image: url(../img/css/manufacturing.png);
@@ -1317,6 +1374,21 @@ section footer .cta {
 }
 .pagination li a {
     margin: 0 5px;
+}
+/* Judges dashboard */
+.dashboard_table {
+    width: 100%;
+}
+.dashboard_table thead th {
+    border-bottom: 1px solid #2E2E2D;
+    text-align: left;
+    padding: 1em 10px;
+    font-weight: normal;
+}
+.dashboard_table tbody th,
+.dashboard_table tbody td {
+    padding: 0.5em 10px;
+    text-align: left;
 }
 /* Single submission */
 .widgets {

@@ -1,4 +1,4 @@
-{% extends "second_base.html" %}
+{% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}About | {% endblock %}
@@ -16,16 +16,25 @@
 	<h2 class="announce trigger">What is the Mozilla Ignite Challenge?</h2>
 	<div class="panel columns content_columns">
 		<div class="main col box">
+            <iframe src="//player.vimeo.com/video/46589415" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/46589415">Mozilla Ignite Challenge 2012</a> from <a href="http://vimeo.com/youraface">Graham Wheeler</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
 			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
 			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
 			<p class="intro"><strong>The best ideas will win funding and support</strong>, and help shape the internet’s future.</p>
-			<p><a href="{{ url('entries_all') }}">Check out</a> what's been submitted so far.</p>
+			<p><a href="{{ url('entries_all', phase='ideas') }}">Check out</a> what has been submitted so far.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
 				<h3 class="point box-title">Now to August 23rd: Brainstorm, connect and collaborate</h3>
-				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
-				<a class="cta" href="{{ url('create_entry') }}">Submit your idea now</a>
+				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all', phase='ideas') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
+                {% if request.ideation.is_open %}
+				    <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Submit your idea now</a>
+                {% endif %}
+                {% if request.ideation.is_closed and not request.development.days_until == -1  %}
+                    <p>Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days.</p>
+                {% endif %}
+                {% if request.development.is_open %}
+                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit your idea now</a>
+                {% endif %}
 			</div>
 		</div>
 	</div>
@@ -91,8 +100,13 @@
 			<div class="highlight">
 				<h3 class="point box-title">Get Involved</h3>
 				<ul>
-					<li><strong><a href="{{ url('create_entry') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
-					<li><strong><a href="{{ url('entries_all') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
+                    {% if request.ideation.is_open %}
+					   <li><strong><a href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+                    {% endif %}
+                    {% if request.development.is_open %}
+                       <li><strong><a href="{{ url('create_entry', phase='proposals') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+                    {% endif %}
+					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
 					<li><strong>Stay in touch.</strong> Follow <a href="https://twitter.com/#!/mozillaignite">Mozilla Ignite</a> on Twitter or join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>.</li>
 					<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
@@ -156,7 +170,11 @@
 			</div>
 			<div class="box col">
 				<h3 class="wimper">What do I need to submit?</h3>
-				<p><a href="{{ url('create_entry') }}">Use the submission form</a> to clearly explain how your idea will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
+                {% if request.ideation.is_open %}
+				    <p><a href="{{ url('create_entry', phase='ideas') }}">Use the submission form</a> to clearly explain how your idea will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
+                {% else %}
+                    <p>Ideas will make use of gigabit-per-second networks to create broad public benefit in one of these areas:</p>
+                {% endif %}
 				<ul>
 					<li>healthcare technologies</li>
 					<li>education and workforce technologies</li>
@@ -185,7 +203,11 @@
 			</div>
 			<div class="box col">
 				<h3 class="wimper">How to apply</h3>
-				<p><strong>Development applications open September 1</strong>. To enter, assemble your team and fill out the online application form.</p>
+                {% if request.development.is_open %}
+                    <p>To enter, assemble your team and fill out the <a href="{{ url('create_entry', phase='proposals') }}">online application form</a>.</p>
+                {% else %}
+                    <p><strong>Development applications open September 1</strong>. To enter, assemble your team and fill out the online application form.</p>
+                {% endif %}
 				<p>Successful applicants will be greenlit and given access to <a href="http://geni.net">GENI</a>, an ultra-fast next-generation network for you to develop and test your apps.</p>
 			</div>
 		</div>
@@ -262,9 +284,16 @@
 			</div>
 		</div>
 	</div>
+    {% if request.ideation.is_open or request.development.is_open %}
 	<footer>
-		<a href="{{ url('create_entry') }}" class="cta">Submit your idea now</a>
+        {% if request.ideation.is_open %}
+            <a href="{{ url('create_entry', phase='ideas') }}" class="cta">Submit your idea now</a>
+        {% endif %}
+        {% if request.development.is_open %}
+            <a href="{{ url('create_entry', phase='proposals') }}" class="cta">Submit your idea now</a>
+        {% endif %}
 	</footer>
+    {% endif %}
 	</div>
 </section>
 <section class="examples">

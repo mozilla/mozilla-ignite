@@ -1,0 +1,25 @@
+{% macro footer_pagination(page, query=None) -%}
+{% if page.paginator.num_pages > 1 %}
+<footer class="pagination">
+  <nav>
+    {% if page.has_previous() %}
+    <a href="?page={{ page.previous_page_number() }}{% if query %}&q={{ query }}{% endif %}" class="btn">prev</a>
+    {% endif %}
+    <ol>
+      {% for i in range(page.paginator.num_pages) %}
+      <li>
+        {% if i + 1 == page.number %}
+        <span>{{ i + 1 }}</span>
+        {% else %}
+        <a href="?page={{ i + 1 }}{% if query %}&q={{ query }}{% endif %}">{{ i + 1 }}</a>
+        {% endif %}
+      </li>
+      {% endfor %}
+    </ol>
+    {% if page.has_next() %}
+    <a href="?page={{ page.next_page_number() }}{% if query %}&q={{ query }}{% endif %}" class="btn">next</a>
+    {% endif %}
+  </nav>
+</footer>
+{% endif %}
+{%- endmacro %}

@@ -1,4 +1,5 @@
 settings_local.py
+settings_local.py-bg
 *.py[co]
 *.sw[po]
 *.komodoproject
@@ -18,8 +19,13 @@ tmp/*
 *~
 locale/*
 media/img/uploads/*
+notes.rst
 media/ignite/img/uploads*
+whoosh_index/
 requirements/src/*
 /src/
 #*
 .#*
+.vagrant
+vagrantconfig_local.yaml
+media/ignite/dummy/

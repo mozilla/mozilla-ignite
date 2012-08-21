@@ -1,4 +1,4 @@
-{% extends "second_base.html" %}
+{% extends "base.html" %}
 {% from "challenges/helpers.html" import created_by with context %}
 
 {% block page_title %}{{ _('Winning submissions') }} | {% endblock %}
@@ -8,24 +8,26 @@
 {% block section_class %}entries{% endblock %}
 
 {% block content %}
-<h1 class="shout">Winners</h1>
+<h1 class="shout">Green-lit submissions</h1>
+{% if ideation_winners %}
+<h2>Ideation</h2>
 <ol class="submissions columns">
-{% for entry in entries %}
-    <li class="box col">
-        <article>
-            <a href="{{ entry.get_absolute_url() }}">
-                <h4>
-                    <div class="frame box">
-                    <img src="{{ entry.get_image_src() }}" alt="">
-                    </div>
-                    {{ entry.title }}
-                </h4>
-            </a>
-            <p>{{ entry.brief_description }}</p>
-            <address>{{ created_by(entry, footer=False) }}</address>
-        </article>
-    </li>
-    {% endfor %}
-    </ol>
-</section>       
+  {% for entry in ideation_winners %}
+  {% include "challenges/includes/winning_entry.html"%}
+  {% endfor %}
+</ol>
+{% endif %}
+
+
+{% if development_winners %}
+<h2>Development</h2>
+{% for group in development_winners|groupby('phase_round') %}
+{% if group.grouper %}<h3>{{ group.grouper.name }}</h3>{% endif %}
+<ol class="submissions columns">
+  {% for entry in group.list %}
+  {% include "challenges/includes/winning_entry.html"%}
+  {% endfor%}
+</ol>
+{% endfor %}
+{% endif %}
 {% endblock %}

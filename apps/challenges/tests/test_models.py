@@ -2,27 +2,32 @@ from datetime import datetime, timedelta
 from dateutil.relativedelta import relativedelta
 from decimal import Decimal
 
-from django.conf import settings
 from django.contrib.auth.models import User
 from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.test import TestCase
-from mock import Mock, patch
 
 from projects.models import Project
 from challenges.models import (Challenge, Submission, Phase, Category,
                               ExclusionFlag, Judgement, JudgingCriterion,
-                              PhaseCriterion)
+                              PhaseCriterion, PhaseRound, SubmissionParent,
+                              SubmissionVersion, SubmissionHelp)
 from challenges.tests.fixtures import (challenge_setup, create_submissions,
-                                       create_users)
+                                       create_users, challenge_teardown)
+from challenges.tests.fixtures.ignite_fixtures import (setup_ignite_challenge,
+                                                       teardown_ignite_challenge,
+                                                       setup_development_rounds_phase,
+                                                       create_submission,
+                                                       create_user)
 from ignite.tests.decorators import ignite_skip
+from nose.tools import ok_, eq_
 
 
 def _create_project_and_challenge():
     """Create and return a sample project with a sample challenge."""
     project = Project.objects.create(name='Project', slug='project',
                                           allow_participation=True)
-    end_date = datetime.now() + timedelta(days=365)
+    end_date = datetime.utcnow() + timedelta(days=365)
     challenge = Challenge.objects.create(title='Challenge',
                                               slug='challenge',
                                               end_date=end_date,
@@ -176,38 +181,49 @@ class Phases(TestCase):
 
     def setUp(self):
         self.project, self.challenge = _create_project_and_challenge()
-        
-        self.p1 = Phase.objects.create(
-            name=u'Phase 1',
-            order=1,
-            challenge=self.challenge,
-            start_date = datetime.utcnow(),
-            end_date = datetime.utcnow() + relativedelta( months = +1 )
-        )
-        self.p2 = Phase.objects.create(
-            name=u'Phase 2',
-            order=2,
-            challenge=self.challenge,
-            start_date = datetime.utcnow() + relativedelta( months = +2 ),
-            end_date = datetime.utcnow() + relativedelta( months = +3 )
-        )
- 
-    
-    def test_get_current_open(self):
-       current = Phase.objects.get_current_phase(self.challenge.slug)
-       self.assertEqual(len(current), 1)
-       self.assertEqual(current[0].name, 'Phase 1')
-    
+
     def tearDown(self):
         for model in [Challenge, Project, Phase]:
             model.objects.all().delete()
+
+    def create_open_phase(self):
+        now = datetime.utcnow()
+        data = {
+            'challenge': self.challenge,
+            'name': 'Ideation',
+            'start_date': now - relativedelta(days=2),
+            'end_date': now + relativedelta(days=30),
+            'order': 1,
+            }
+        phase = Phase.objects.create(**data)
+        eq_(phase.days_remaining, 29)
+        eq_(len(phase.phase_rounds), 0)
+        eq_(phase.current_round, None)
+        eq_(phase.judiging_phase_round, None)
+        ok_(phase.is_open)
+
+    def create_closed_phase(self):
+        now = datetime.utcnow()
+        data = {
+            'challenge': self.challenge,
+            'name': 'Ideation',
+            'start_date': now - relativedelta(days=30),
+            'end_date': now - relativedelta(days=32),
+            'order': 1,
+            }
+        phase = Phase.objects.create(**data)
+        eq_(phase.days_remaining, 0)
+        eq_(len(phase.phase_rounds), 0)
+        eq_(phase.current_round, None)
+        eq_(phase.judiging_phase_round, None)
+        eq_(phase.is_open, False)
 
 
 class Criteria(TestCase):
     
     def test_value_range(self):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
-        self.assertEqual(list(c.range), [0, 1, 2, 3, 4, 5])
+        self.assertEqual(list(c.range), [1, 2, 3, 4, 5])
     
     def test_good_range(self):
         c = JudgingCriterion(question='How awesome is this idea?', max_value=5)
@@ -293,20 +309,64 @@ class JudgementScoring(TestCase):
 
 
 class TestSubmissions(TestCase):
-    
+
     def setUp(self):
         challenge_setup()
         create_submissions(3)
+        self.phase = Phase.objects.get()
         cache.clear()
-    
+
     def test_no_exclusions(self):
-        self.assertEqual(Submission.objects.eligible().count(), 3)
-    
+        self.assertEqual(Submission.objects.eligible(self.phase).count(), 3)
+
     def test_exclusion(self):
         excluded = Submission.objects.all()[0]
         ExclusionFlag.objects.create(submission=excluded, notes='Blah blah')
-        self.assertEqual(Submission.objects.eligible().count(), 2)
-    
+        self.assertEqual(Submission.objects.eligible(self.phase).count(), 2)
+
+
+class TestSubmissionsMultiplePhases(TestCase):
+
+    def setUp(self):
+        self.initial_data = setup_development_rounds_phase(**setup_ignite_challenge())
+        self.ideation = self.initial_data['ideation_phase']
+        self.development = self.initial_data['dev_phase']
+        self.user = create_user('bob')
+        self.round_a = self.initial_data['round_a']
+        self.round_b = self.initial_data['round_b']
+
+    def tearDown(self):
+        teardown_ignite_challenge()
+
+    def test_exclude_submission_phases(self):
+        create_submission(created_by=self.user, phase=self.ideation)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 1)
+        self.assertEqual(Submission.objects.eligible(self.development).count(), 0)
+        self.assertEqual(Submission.objects.count(), 1)
+
+    def test_exclude_submission_rounds(self):
+        create_submission(created_by=self.user, phase=self.development,
+                          phase_round=self.round_a)
+        self.assertEqual(Submission.objects.eligible(self.development,
+                                                     self.round_a).count(), 1)
+        self.assertEqual((Submission.objects.eligible(self.development,
+                                                      self.round_b).count()), 0)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
+
+    def test_exclude_submission_version(self):
+        submission_ideation = create_submission(created_by=self.user,
+                                                phase=self.ideation)
+        new_sub = create_submission(title='Replacement', created_by=self.user,
+                                    phase=self.development, with_parent=False)
+        submission_ideation.parent.update_version(new_sub)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
+        self.assertEqual(Submission.objects.eligible(self.development).count(), 1)
+
+    def test_exclude_drafts(self):
+        create_submission(created_by=self.user, phase=self.ideation, is_draft=True)
+        self.assertEqual(Submission.objects.eligible(self.ideation).count(), 0)
+
+
 class DraftSubmissionTest(TestCase):
     
     def setUp(self):
@@ -344,3 +404,186 @@ class DraftSubmissionTest(TestCase):
         assert self.draft_submission in Submission.objects.visible(user=alex)
         assert alex.has_perm('challenges.view_submission',
                              obj=self.draft_submission)
+
+
+class PhaseRoundTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submission,
+                      PhaseRound]:
+            model.objects.all().delete()
+
+    def _create_phase_round(self, phase, **kwargs):
+        delta = relativedelta(hours=1)
+        now = datetime.utcnow()
+        defaults = {
+            'name': 'Round A',
+            'phase': phase,
+            'start_date': now - delta,
+            'end_date': now + delta,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return PhaseRound.objects.create(**defaults)
+
+    def test_create_phase(self):
+        data = {
+            'name': 'Round A',
+            'phase': Phase.objects.all()[0],
+            'start_date': datetime.utcnow(),
+            'end_date': datetime.utcnow() + relativedelta(hours=1),
+            }
+        phase = PhaseRound.objects.create(**data)
+        assert phase.slug, 'Slug missing on: %s' % phase
+        self.assertTrue(phase.is_active)
+
+    def test_open_phase_round(self):
+        phase = Phase.objects.all()[0]
+        phase_round = self._create_phase_round(phase)
+        # reload
+        phase = Phase.objects.all()[0]
+        eq_(phase.current_round, phase_round)
+        ok_(phase.is_open)
+
+    def test_close_phase_round(self):
+        phase = Phase.objects.all()[0]
+        now = datetime.utcnow()
+        delta = relativedelta(hours=1)
+        close_data = {
+            'start_date': now + delta,
+            'end_date': now + delta + delta,
+            }
+        phase_round = self._create_phase_round(phase, **close_data)
+        # reload
+        phase = Phase.objects.all()[0]
+        eq_(phase.current_round, None)
+        eq_(phase.is_open, False)
+
+
+class SubmissionParentTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+
+    def create_submission(self, **kwargs):
+        defaults = {
+            'title': 'Title',
+            'brief_description': 'A submission',
+            'description': 'A really good submission',
+            'phase': self.phase,
+            'created_by': self.created_by,
+            'category': self.category,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+    def tearDown(self):
+        for model in [Challenge, Project, Phase, User, Category, Submission,
+                      SubmissionParent]:
+            model.objects.all().delete()
+
+    def test_parent_creation(self):
+        """Create a ``SubmissionParent`` with the less possible data"""
+        submission = self.create_submission(title='a')
+        parent = SubmissionParent.objects.create(submission=submission)
+        assert parent.id, "SubmissionParent creation failure"
+        self.assertEqual(parent.status, SubmissionParent.ACTIVE)
+        self.assertEqual(parent.slug, submission.id)
+        self.assertEqual(parent.name, submission.title)
+
+    def test_parent_visibility(self):
+        submission = self.create_submission(title='a')
+        parent = SubmissionParent.objects.create(submission=submission)
+        self.assertEqual(Submission.objects.visible().count(), 1)
+        parent.status = SubmissionParent.INACTIVE
+        parent.save()
+        self.assertEqual(Submission.objects.visible().count(), 0)
+
+    def test_submission_without_parent(self):
+        submission = self.create_submission(title='a')
+        self.assertEqual(Submission.objects.visible().count(), 0)
+
+
+class SubmissionParentVersioningTest(TestCase):
+
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+        self.submission_a = self.create_submission(title='a')
+        self.submission_b = self.create_submission(title='b')
+        self.parent = SubmissionParent.objects.create(submission=self.submission_a)
+
+    def create_submission(self, **kwargs):
+        defaults = {
+            'title': 'Title',
+            'brief_description': 'A submission',
+            'description': 'A really good submission',
+            'phase': self.phase,
+            'created_by': self.created_by,
+            'category': self.category,
+            }
+        if kwargs:
+            defaults.update(kwargs)
+        return Submission.objects.create(**defaults)
+
+    def test_update_parent_history(self):
+        self.parent.update_version(self.submission_b)
+        submission_versions = SubmissionVersion.objects.all()
+        self.assertEqual(len(submission_versions), 1)
+        submission_version = submission_versions[0]
+        self.assertEqual(submission_version.submission, self.submission_a)
+        self.assertEqual(self.parent.submission, self.submission_b)
+
+    def test_update_parent_values(self):
+        self.parent.update_version(self.submission_b)
+        self.assertEqual(self.parent.submission, self.submission_b)
+        self.assertEqual(self.parent.slug, self.submission_a.id)
+        self.assertEqual(self.parent.name, self.submission_b.title)
+
+    def test_visible_submission(self):
+        """Test a versioned Submission is not visible on all listing"""
+        self.parent.update_version(self.submission_b)
+        assert self.submission_a not in Submission.objects.visible()
+        assert self.submission_a in Submission.objects.all()
+
+
+class SubmissionHelpTest(TestCase):
+    def setUp(self):
+        challenge_setup()
+        profile_list = create_users()
+        self.phase = Phase.objects.all()[0]
+        self.created_by = profile_list[0]
+        self.category = Category.objects.all()[0]
+        create_submissions(1, self.phase, self.created_by)
+        self.submission_a = Submission.objects.get()
+        self.parent = self.submission_a.parent
+
+    def tearDown(self):
+        challenge_teardown()
+        for model in [SubmissionHelp]:
+            model.objects.all().delete()
+
+    def create_submission_help(self):
+        submission_help = SubmissionHelp.objects.create(parent=self.parent,
+                                                        notes='Help Wanted')
+        assert submission_help.created, "SubmissionHelp failed"
+        self.assertEqual(submission_help.status, SubmissionHelp.DRAFT)
+
+    def submission_help_manager(self):
+        submission_help = SubmissionHelp.objects.create(parent=self.parent,
+                                                        notes='Help Wanted')
+        self.assertEqual(SubmissionHelp.objects.get_active().count(), 0)
+        submission_help.status = SubmissionHelp.PUBLISHED
+        submission_help.save()
+        self.assertEqual(SubmissionHelp.objects.get_active().count(), 1)

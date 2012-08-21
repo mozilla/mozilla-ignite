@@ -1,0 +1,13 @@
+{% extends "admin/change_list.html" %}
+{% load adminmedia admin_list i18n %}
+
+{% block object-tools-items %}
+<li>
+  <a href="assign-judges/">Assign Judges to Phases</a>
+</li>
+<li>
+  <a href="add/{% if is_popup %}?_popup=1{% endif %}" class="addlink">
+    {% blocktrans with cl.opts.verbose_name as name %}Add {{ name }}{% endblocktrans %}
+  </a>
+</li>
+{% endblock %}

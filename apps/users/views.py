@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.paginator import Paginator
 from django.core.urlresolvers import reverse
+from django.db.models import Q
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.shortcuts import get_object_or_404
 from django.utils.translation import ugettext
@@ -13,7 +14,8 @@ from django.utils.translation import ugettext
 from activity.models import Activity
 from users.models import Profile, Link
 from users.forms import ProfileForm, ProfileLinksForm
-from challenges.models import Submission
+from challenges.models import Submission, JudgeAssignment
+from timeslot.models import TimeSlot, Release
 from settings import INSTALLED_APPS
 
 import jingo
@@ -21,6 +23,7 @@ import jingo
 ACTIVITY_PAGE_SIZE = 20
 
 
+@login_required
 def dashboard(request, page=0):
     """Display first page of activities for a users dashboard."""
     start = int(page) * ACTIVITY_PAGE_SIZE
@@ -55,16 +58,50 @@ def signout(request):
 
 
 def profile(request, username):
-    """Display profile page for user specified by ``username``."""
+    """Display profile page for user specified by ``username``.
+    This page also acts as a hub for all the user notifications
+    """
     user = get_object_or_404(auth.models.User, username=username)
     profile = get_object_or_404(Profile, user=user)
     if 'challenges' in INSTALLED_APPS:
-        submissions = Submission.objects.filter(created_by=profile)
+        if profile.user == user:
+            submissions = Submission.objects.current().filter(created_by=profile)
+        else:
+            submissions = Submission.objects.visible().filter(created_by=profile)
+    # Show the all the submission related data when the user is the owner
+    need_booking_list = []
+    booked_list = []
+    if profile.user == user:
+        release = Release.objects.get_current()
+        booked_list = (TimeSlot.objects.select_related('submission')
+                       .filter(submission__created_by=profile,
+                               is_booked=True, release=release))
+        booked_ids = [i.submission.id for i in booked_list]
+        if release:
+            need_booking_list = (Submission.objects
+                                 .green_lit(release.phase, release.phase_round)
+                                 .select_related('created_by')
+                                 .filter(~Q(id__in=booked_ids),
+                                         created_by=profile))
+    # User has assigned judging tasks
+    webcast_list = []
+    if request.user.is_authenticated() and request.user.is_judge:
+        # Determining if a user is a judge is quite expensive query-wise,
+        # so we use the JudgeAssignment model to list the judge
+        # booked webcasts, past and present.
+        ids = (JudgeAssignment.objects.filter(judge=request.user.get_profile()).
+               values_list('submission__id', flat=True))
+        webcast_list = (TimeSlot.objects.
+                        select_related('submission').
+                        filter(is_booked=True, submission__in=ids))
     return jingo.render(request, 'users/profile.html', {
         'profile': profile,
         'social_links': profile.link_set.all() or False,
         'projects': profile.project_set.all() or False,
-        'submissions': submissions or False
+        'submissions': submissions or False,
+        'booked_list': booked_list,
+        'need_booking_list': need_booking_list,
+        'webcast_list': webcast_list,
     })
 
 

@@ -22,8 +22,10 @@ class ProfileMiddleware(object):
 
     def process_request(self, request):
         # django debug_toolbar
-        if '__debug__' in request.path:
-            return
+        SAFE_PREFIX = ['__debug__', '/admin/', ]
+        for prefix in SAFE_PREFIX:
+            if prefix in request.path:
+                return
         if self.is_safe(request.path):
             return
         path = u'/%s' % ('/'.join(request.path.split('/')[2:]),)

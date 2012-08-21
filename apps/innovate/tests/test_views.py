@@ -1,7 +1,9 @@
 from django.core.urlresolvers import reverse
+from django.contrib.auth.models import AnonymousUser
 from django.test import Client
 from django.test.client import RequestFactory
 
+from mock import MagicMock
 from projects.models import Project
 from ignite.tests.decorators import ignite_skip
 from innovate import urls
@@ -34,13 +36,21 @@ def test_featured():
     assert response.status_code == 200
     assert project.name in response.content
 
+development = MagicMock
+development.has_started = False
 
 def test_404_handler():
     """Test that the 404 error handler renders and gives the correct code."""
-    response = handle404(RequestFactory().get('/not/a/real/path/'))
+    request = RequestFactory().get('/not/a/real/path/')
+    request.user = AnonymousUser()
+    request.development = development
+    response = handle404(request)
     assert response.status_code == 404
 
 def test_500_handler():
     """Test that the 500 error handler renders and gives the correct code."""
-    response = handle500(RequestFactory().get('/not/a/real/path/'))
+    request = RequestFactory().get('/not/a/real/path/')
+    request.user = AnonymousUser()
+    request.development = development
+    response = handle500(request)
     assert response.status_code == 500

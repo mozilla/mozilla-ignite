@@ -1,0 +1,28 @@
+{% extends "admin/base_site.html" %}
+
+{% block title %}Remind missing bookings{% endblock title %}
+
+{% block content %}
+<div id="content-main">
+  <h1>Send reminder to missing submissions</h1>
+  <p>This will email a reminder the green-lit submissions that haven't book a timeslot for <strong>{{ release }}</strong></p>
+<ul>
+  {% for object in submission_list %}
+  <li>
+    <a href="{{ object.get_absolute_url }}" target="_blank">{{ object }} by {{ object.created_by.display_name }} ({{ object.created_by.user.email }})</a>
+  </li>
+  {% endfor%}
+</ul>
+<form action="" method="post" id="remind_submissions_form">
+    <div>
+      {% csrf_token %}
+      <fieldset class="module aligned">
+        <h2>Remind Submissions</h2>
+        <ul>
+          <li><button type="submit">Remind</button></li>
+        </ul>
+      </fieldset>
+    </div>
+  </form>
+</div>
+{% endblock %}

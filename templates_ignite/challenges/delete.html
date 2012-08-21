@@ -1,4 +1,4 @@
-{% extends 'second_base.html' %}
+{% extends 'base.html' %}
 
 {% block page_title %}{{ _('Delete') }} | {{ object.title }} | {% endblock %}
 
@@ -23,11 +23,15 @@
 <h1 class="shout">{% block page_heading %}{{ _('Delete your submission') }}{% endblock %}</h1>  
 <form action="" method="post" enctype="multipart/form-data">
     {{ csrf()|safe }}
+    <div class="highlight box">
     <p class="announce">{{ _('Are you <em>certain</em> you want to remove your submission?') }}</p>
+    <p class="intro">Submission to delete: {{ object.title }}</p>
+    <p><strong>If you choose to delete your entry, you hereby remove this submission from consideration in the challenge.</strong></p>
     <p>{{ _("If you're not happy with your submission at the moment, you can also revert it to \"draft\" status and keep polishing.") }}</p>
     {% block submit %}
     <a href={{ object.get_absolute_url() }} class="back">{{ _('OK, take me back') }}</a> or
     <input class="cta" type="submit" value="{{ _('Delete this submission permanently') }}" />
+    </div>
     {% endblock %}
 </form>
 {% endblock %}

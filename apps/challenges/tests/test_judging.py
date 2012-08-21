@@ -1,3 +1,5 @@
+from datetime import datetime, timedelta
+
 from decimal import Decimal
 from django.contrib.auth.models import User, Permission
 from django.contrib.contenttypes.models import ContentType
@@ -154,92 +156,62 @@ class JudgingFormTest(TestCase):
                      [3, 5, 7])
 
 
-class JudgedEntriesTest(TestCase):
-    """Test the view for the judged entries view."""
-    
-    def setUp(self):
-        judging_setup(submission_count=3)
-        self.client.login(username='alex', password='alex')
-    
-    def create_judgement(self, submission, ratings, judge):
-        if isinstance(judge, User):
-            judge = judge.get_profile()
-        if isinstance(judge, basestring):
-            judge = User.objects.get(username=judge).get_profile()
-        
-        judgement = Judgement.objects.create(submission=submission,
-                                             judge=judge,
-                                             notes='Something something notes.')
-        phase_criteria = submission.phase.judgement_criteria.all()
-        for criterion, rating in zip(phase_criteria, ratings):
-            JudgingAnswer.objects.create(criterion=criterion,
-                                         judgement=judgement,
-                                         rating=rating)
-        return judgement
-    
-    @ignite_only
-    def test_no_judged_entries(self):
-        """Test display when no-one has judged anything."""
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(response.context['entries'], [])
-    
-    @ignite_only
-    def test_judged_entry(self):
-        submission = Submission.objects.all()[0]
-        self.create_judgement(submission, [3, 5, 7], judge='alex')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 1)
-    
-    @ignite_only
-    def test_multiple_judgements(self):
-        submission = Submission.objects.all()[0]
-        self.create_judgement(submission, [3, 5, 7], judge='alex')
-        self.create_judgement(submission, [3, 4, 5], judge='bob')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 1)
-        self.assertEqual(response.context['entries'][0].average_score,
-                         Decimal('13.5'))
-        self.assertEqual(response.context['entries'][0].judgement_count, 2)
-    
-    @ignite_only
-    def test_multiple_entries(self):
-        for submission in Submission.objects.all():
-            self.create_judgement(submission, [3, 5, 7], judge='alex')
-        response = self.client.get(reverse('entries_judged'))
-        self.assertEqual(len(response.context['entries']), 3)
-
-
 class JudgingViewTest(MessageTestCase):
     
     def setUp(self):
         judging_setup()
-    
+        # Make sure dates are in the past
+        self.phase = Phase.objects.get()
+        date = datetime.utcnow() - timedelta(hours=1)
+        self.phase.start_date = date
+        self.phase.end_date = date
+        self.phase.judging_start_date = date
+        self.phase.judging_end_date = date + timedelta(hours=3)
+        self.phase.save()
+
+    def open_phase(self):
+        """Open the phase and close the judging period"""
+        now = datetime.utcnow() + timedelta(hours=1)
+        self.phase.end_date = now
+        self.phase.judging_start_date = now + timedelta(days=1)
+        self.phase.judging_end_date = now + timedelta(days=1)
+        self.phase.save()
+
     @ignite_only
     def test_no_judge_form(self):
         """Test the form doesn't show if the user doesn't have permission."""
         submission = Submission.objects.get()
-        response = self.client.get(submission.get_absolute_url())
-        assert response.context['judging_form'] is None
+        response = self.client.get(submission.get_absolute_url(), follow=True)
+        assert response.context.get('judging_form') is None
     
     @ignite_only
     def test_judge_form(self):
         """Test displaying the judge form."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         assert 'notes' in judging_form.fields
         criteria = submission.phase.judgement_criteria.all()
         expected_keys = set(['criterion_%s' % c.pk for c in criteria])
         expected_keys.add('notes')
         self.assertEqual(set(judging_form.fields.keys()), expected_keys)
-    
+
+    @ignite_only
+    def test_judge_closed_phase(self):
+        """Test the judging form is not valid when the phase is closed"""
+        self.open_phase()
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url(), follow=True)
+        assert response.context.get('judging_form') is None
+
     @ignite_only
     def test_non_eliminated_entry(self):
         """Test that non-eliminated entries are not marked as eliminated."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         self.assertEqual(response.context['excluded'], False)
     
     @ignite_only
@@ -248,7 +220,7 @@ class JudgingViewTest(MessageTestCase):
         submission = Submission.objects.get()
         submission.exclusionflag_set.create(notes='This entry sucks')
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         self.assertEqual(response.context['excluded'], True)
     
     @ignite_only
@@ -256,7 +228,7 @@ class JudgingViewTest(MessageTestCase):
         """Test judging an unjudged submission."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         post_data = {'notes': 'This submission is acceptable to me.'}
         for key in judging_form.fields:
@@ -273,13 +245,25 @@ class JudgingViewTest(MessageTestCase):
         self.assertEqual(judgement.submission, submission)
         for answer in judgement.answers.all():
             self.assertEqual(answer.rating, 5)
-    
+
+    @ignite_only
+    def test_submit_judge_form_with_closed_judging_phase(self):
+        """Test judging when the Phase has been closed"""
+        self.open_phase()
+        submission = Submission.objects.get()
+        assert self.client.login(username='alex', password='alex')
+        response = self.client.get(submission.get_absolute_url(), follow=True)
+        post_data = {'notes': 'This submission is acceptable to me.'}
+        response = self.client.post(submission.get_judging_url(),
+                                    data=post_data, follow=True)
+        self.assertEqual(response.status_code, 404)
+
     @ignite_only
     def test_judge_not_assigned(self):
         """Test behaviour when the current user is not assigned this entry."""
         submission = Submission.objects.get()
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is False
     
     @ignite_only
@@ -290,7 +274,7 @@ class JudgingViewTest(MessageTestCase):
         JudgeAssignment.objects.create(submission=submission,
                                        judge=user_profile)
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is True
     
     @ignite_only
@@ -301,7 +285,7 @@ class JudgingViewTest(MessageTestCase):
         JudgeAssignment.objects.create(submission=submission,
                                        judge=user_profile)
         assert self.client.login(username='alex', password='alex')
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         assert response.context['judge_assigned'] is False
     
     @ignite_only
@@ -316,8 +300,7 @@ class JudgingViewTest(MessageTestCase):
         for criterion in submission.phase.judgement_criteria.all():
             JudgingAnswer.objects.create(judgement=judgement,
                                          criterion=criterion, rating=1)
-        
-        response = self.client.get(submission.get_absolute_url())
+        response = self.client.get(submission.get_absolute_url(), follow=True)
         judging_form = response.context['judging_form']
         post_data = {'notes': 'I actually quite like this submission.'}
         ratings = [6, 7, 8]
