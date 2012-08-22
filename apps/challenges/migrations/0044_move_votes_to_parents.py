@@ -16,6 +16,11 @@ class Migration(DataMigration):
         votes = Vote.objects.filter(content_type=submission_model)
         # Iterate over the existing votes
         for vote in votes:
+            # Ignore votes that don't have a submission object
+            # Not having a object means that the submission has been
+            # removed.
+            if not vote.object:
+                continue
             # change the vote to be in the parent
             parent = vote.object.parent
             vote.object = parent
