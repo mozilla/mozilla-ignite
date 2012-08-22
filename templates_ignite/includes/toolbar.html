@@ -1,0 +1,18 @@
+{% if user.is_authenticated() %}
+<div class="toolbar">
+  <p>Signed in as {{ user.get_profile().display_name }}</p>
+  <ul>
+    <li>
+      <a href="{{ url('users_profile', username=user.username) }}">View profile</a>
+    </li>
+    <li>
+      <a href="{{ url('users_edit') }}">Edit profile</a>
+    </li>
+    {% if request.user.is_judge %}
+    <li>
+      <a  href="{{ url('entries_assigned') }}">Dashboard</a>
+    </li>
+    {% endif %}
+  </ul>
+</div>
+{% endif %}

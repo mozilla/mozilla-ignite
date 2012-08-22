@@ -13,3 +13,9 @@
 [submodule "vendor-local/src/django-waffle"]
 	path = vendor-local/src/django-waffle
 	url = git://github.com/jsocol/django-waffle.git
+[submodule "vendor-local/src/pyelasticsearch"]
+	path = vendor-local/src/pyelasticsearch
+	url = git://github.com/toastdriven/pyelasticsearch.git
+[submodule "vendor-local/src/django-haystack"]
+	path = vendor-local/src/django-haystack
+	url = git://github.com/toastdriven/django-haystack.git

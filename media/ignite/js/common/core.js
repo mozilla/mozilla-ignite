@@ -12,10 +12,12 @@ ignite.media_url = function(loc) {
 ignite.areas = {
     common : [
         {
-            elm : 'form.browserid_form',
-            requires : 'https://browserid.org/include.js',
+            elm : '#login_form',
+            requires : 'https://login.persona.org/include.js',
             onload : function() {
-                var form = $('form.browserid_form');
+                var form = $('form.browserid_form'),
+                    tab = $('#login_form');
+                tab.css('display', 'inline-block');
                 form.find('a.login').bind('click', function(e) {
                     e.preventDefault();
                     navigator.id.getVerifiedEmail(function(assertion) {

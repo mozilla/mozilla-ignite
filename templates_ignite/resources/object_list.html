@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Resources</h1>
+{% for object in object_list %}
+<section>
+  <h1>{{ object.title }}</h1>
+  <p>{{ object.body }}</p>
+  {% if object.email %}
+  <a href="mailto:{{ object.email }}">Contact Mozilla Ignite</a> to get access
+  {% endif %}
+  {% if object.url %}
+  <a href="{{ object.url }}">Read more</a>
+  {% endif %}
+</section>
+{% endfor%}
+
+{% endblock content%}

@@ -6,6 +6,10 @@ from django.db import models
 
 class Migration(SchemaMigration):
 
+    depends_on = (
+        ('challenges', '0030_remove_min_criterion_value'),
+        )
+
     def forwards(self, orm):
         
         # Adding field 'Submission.life_improvements'

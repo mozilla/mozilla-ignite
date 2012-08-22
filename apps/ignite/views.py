@@ -8,7 +8,7 @@ from blogs.models import BlogEntry
 from events.models import Event
 
 
-def splash(request, project, slug, template_name='challenges/show.html'):
+def splash(request, project, slug, template_name='ignite/splash.html'):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
@@ -19,7 +19,7 @@ def splash(request, project, slug, template_name='challenges/show.html'):
                                  .filter(phase__challenge=challenge)
                                  .order_by("?"))
     event_list = Event.objects.get_featured()[:5]
-    return jingo.render(request, 'ignite/splash.html', {
+    return jingo.render(request, template_name, {
         'challenge': challenge,
         'project': project,
         'phases': list(enumerate(challenge.phases.all(), start=1)),
@@ -45,13 +45,20 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
     })
 
 
+def terms(request, project, slug, template_name='static/terms_conditions.html'):
+    return jingo.render(request, template_name, {})
+
+
 def fail(request, template_name='404.html'):
     return jingo.render(request, template_name, {}, status=404)
 
-
+ 
 def app_fail(request, template_name='500.html'):
     return jingo.render(request, template_name, {}, status=500)
 
 
-def terms(request, project, slug, template_name='static/terms_conditions.html'):
-    return jingo.render(request, template_name, {})
+def action_unavailable_response(request, message=None,
+                                template_name="action_unavailable.html"):
+    """Generic page for unavailable actions"""
+    context = {'message': message}
+    return jingo.render(request, template_name, context, status=403)

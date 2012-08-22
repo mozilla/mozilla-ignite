@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Your Submissions pending of booking</h1>
+<ul>
+  {% for object in object_list %}
+  <li>
+    <a href="{{ url('timeslot:object_list', entry_id=object.id) }}">{{ object }}</a>
+  </li>
+  {% endfor%}
+</ul>
+{% endblock content%}

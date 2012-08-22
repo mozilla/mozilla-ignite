@@ -1,0 +1,63 @@
+{% extends "challenges/all.html" %}
+
+
+{% block page_title %}
+{% if query %}
+Submissions containing '{{ query }}' | 
+{% else %}
+Search submissions |
+{% endif %}
+{% endblock %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+<div class="content_columns columns with_nav">
+
+<nav class="tags col box nav">
+  <form method="get" id="form-search-id" action="{{ url('search:search') }}">
+    <ul>
+      {{ form.as_ul() }}
+      <li>
+        <input class="cta" type="submit" value="Search">
+      </li>
+    </ul>
+  </form>
+</nav>
+  {% if query %}
+  <div class="highlight col box main">
+    {% if page.object_list %}
+  <h2 class="all">Results for {{ query }}</h2>
+    <ol class="submissions columns">
+      {% for result in page.object_list %}
+      <li class="box col">
+        <article>
+          <a class="title" href="{{ result.object.get_absolute_url() }}">
+            <h3 class="title wimper">
+              <div class="frame box">
+                <img src="{{ result.object.submission.get_image_src() }}" alt="">
+              </div>
+              {{ result.object.submission.title }}
+            </h3>
+          </a>
+          <p>{{ result.object.submission.brief_description }}</p>
+          <address>{{ created_by(result.object.submission, footer=False) }}</address>
+        </article>
+      </li>
+      {% endfor %}
+    </ol>
+
+    {% if query %}
+    {{ footer_pagination(page, query) }}
+    {% endif %}
+  </div>
+  {% else %}
+  <p class="all announce">No results found for {{ query }}</p>
+  {% endif %}
+</div>
+  {% endif %}
+</div>
+</div>
+</div>
+</section>
+{% endblock %}

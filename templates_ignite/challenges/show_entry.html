@@ -1,4 +1,4 @@
-{% extends "second_base.html" %}
+{% extends "base.html" %}
 
 {% block schema_org %} itemscope itemtype="http://schema.org/Product"{% endblock %}
 
@@ -23,15 +23,19 @@
 {% endblock %}
 
 {% block content %} 
-    <a href="{{ url('entries_all') }}" class="back wimper">See all submissions</a>
+    <a href="{{ url('entries_all', phase=entry.phase_slug) }}" class="back wimper">See all {{ entry.phase_slug}}</a>
     <article>
-        <h1 class="shout">{{ entry.title }}</h1> 
+      <h1 class="shout">{{ entry.title }}</h1>
         {# This will need changing if edit and delete permissions separate #}
         {% if entry.editable_by(user) %}
         <ul class="user_tools">
-        {% if entry.owned_by(user) %}
+        {% if development.has_started and entry.owned_by(user) %}
+            <li><a href="{{ url('entry_help', entry_id=entry.parent.slug) }}" class="cta do">Ask for help</a></li>
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
+            {% if entry.needs_booking %}
+            <li><a href="{{ url('timeslot:object_list', entry_id=entry.id) }}" class="cta do">Book a timeslot</a></li>
+            {% endif %}
         {% else %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>
@@ -45,6 +49,11 @@
         {% endif %}
         {% endif %}
         <div class="columns">
+            {% if excluded %}
+                <p class="busta alerts errors">
+                    {% trans %}This entry has been eliminated from judging.{% endtrans %}
+                </p>
+                {% endif %}
         <div class="col box">
             <div class="widgets">
                 <p>Submitted on {{ entry.created_on.strftime('%B %d, %Y') }}</p>
@@ -69,7 +78,10 @@
                 <h2 class="wimper">How does your idea take advantage of next-generation networks?</h2>
                 <p>{{ entry.take_advantage }}</p>
                 {% endif %}
-            </div>
+    </div>
+            {% if entry.repository_url %}
+            <p><a href="{{ entry.repository_url }}">Project Repository</a></p>
+            {% endif %}
             {% if links %}
             <div class="links">
             <h2 class="wimper">See also</h2>
@@ -78,6 +90,12 @@
             <li><a class="wimper" href="{{ link.url }}">{{ link.name }}</a></li>
             {% endfor %}
             </ul> 
+            </div>
+            {% endif %}
+            {% if help_required %}
+            <div class="description">
+              <h2>Would you be interested in helping with this proposal?</h2>
+              <p>{{ help_required.notes }}</p>
             </div>
             {% endif %}
             <address class="vcard">
@@ -96,27 +114,47 @@
             <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
         </div>
         <aside class="col box">
+          {% if badge_list %}
+          <section>
+            <h2>Badges awarded</h2>
+            {% for object in badge_list %}
+            <p>{{ object.badge.badge_type }} {{ object.text }}</p>
+            {% endfor%}
+          </section>
+          {% endif %}
+            {% if award_form %}
+            <section class="highlight box">
+              <h2 class="point box-title">Award this submission</h2>
+              <p><b>You scored this submission {{ entry.get_judge_score(user.get_profile()) }}%</b></p>
+              <p>You can award up to ${{ allowance.amount_free }}</p>
+              <form method="post" id="form-awardform-id" action="{{ url('awards:award', submission_id=entry.id) }}">
+                {{ award_form.as_p() }}
+                {{ csrf()|safe }}
+                <p><input type="submit" value="Award Idea" class="cta"></p>
+              </form>
+            </section>
+            {% endif %}
             {% if judging_form %}
-            <section class="widgets">
-                {% if excluded %}
-                {# For the love of all that is holy, style me #}
-                <p style="background-color: #f00; color: white; font-weight: bold; padding: 1em; margin-left: -1em; margin-right: -1em">
-                    {% trans %}This entry has been eliminated from the contest.{% endtrans %}
-                </p>
-                {% endif %}
-                <h2 class="wimper">Rate this submission</h2>
-                {% if judge_assigned %}
-                <p>This submission has been assigned to you</p>
-                {% else %}
-                <p>This submission has not been assigned to you</p>
-                {% endif %}
-                <form method="POST" action="{{ entry.get_judging_url() }}">
+            <section class="highlight box">
+                <form method="POST" action="{{ entry.get_judging_url() }}" class="rating_form">
+                    <h2 class="point box-title">Rate this submission</h2>
                     {{ csrf()|safe }}
                     {{ judging_form.as_p() }}
-                    <input type="submit" class="cta" value="Submit thy judgement" />
+                    <input type="submit" class="cta" value="Judge submission" />
                 </form>
             </section>
             {% endif %}
+            {% if webcast_list %}
+          <section class="highlight box">
+            <h2 class="point box-title">Upcoming webcast</h2>
+            <p>Like the sounds of this idea? Why not watch their upcoming webcast(s) on:</p>
+            <ul>
+            {% for webcast in webcast_list %}
+            <li>{{ webcast.start_date.strftime('%B %d, %Y at %H:%M') }} at <a href="{{ webcast.webcast_url }}">{{ webcast.webcast_url }}</a></li>
+            {% endfor%}
+        </ul>
+          </section>
+          {% endif %}
             <section class="widgets">
                 <h2 class="wimper">Share</h2>
                 <ul class="share">
@@ -140,12 +178,12 @@
                     <p>Use the social media sharing buttons above, or just get your friends to head to <em>http://www.mozillaignite.org{{ entry.get_absolute_url() }}</em></p>
                 {% else %}
                 {% if user_vote and user_vote.is_upvote %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='clear') }}" method="POST" id="user_vote">
+                <form action="{{ url('entry_vote', object_id=parent.pk, direction='clear') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="cancel cta do" value="{{ _('Clear my vote') }}" />
                 </form>
                 {% else %}
-                <form action="{{ url('entry_vote', object_id=entry.pk, direction='up') }}" method="POST" id="user_vote">
+                <form action="{{ url('entry_vote', object_id=parent.pk, direction='up') }}" method="POST" id="user_vote">
                     {{ csrf()|safe }}
                     <input type="submit" class="thumb cta do" value="{{ _('Give this a thumbs up') }}" />
                 </form>
@@ -158,7 +196,7 @@
             <section class="widgets">
                 <nav class="tags">
                 <h2 class="wimper">Focus area</h2>
-                <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug ) }}">{{ entry.category }}</a></p>
+                <p><a class="{{ entry.category.slug }}"href="{{ url('entries_for_category', category=entry.category.slug, phase='ideas') }}">{{ entry.category }}</a></p>
                 </nav>
             </section>
             <section class="widgets">
@@ -174,10 +212,18 @@
                 </ul>
                 </nav>
             </section> 
+            {% if request.ideation.is_open %}
             <div class="highlight">
                 <h2 class="point box-title">How would you push the web further?</h2>
-                <a class="cta" href="{{ url('create_entry') }}">Create an idea</a>
+                <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Create an idea</a>
             </div>
+            {% endif %}
+            {% if request.development.is_open %}
+            <div class="highlight">
+                <h2 class="point box-title">How would you push the web further?</h2>
+                <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit a proposal</a>
+            </div>
+            {% endif %}
         </aside>
         </div>
     </article>
