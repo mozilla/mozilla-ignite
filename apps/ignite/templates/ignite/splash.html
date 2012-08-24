@@ -33,13 +33,13 @@
 <div class="methods">
     <div class="busta columns">
         <ul>
-            <li class="col brainstorm box">
-                <h3 class="exclaim">Brainstorm</h3>
-                <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
-                {% if request.ideation.is_open %}
-                <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
+            <li class="col compete box">
+                <h3 class="exclaim">Compete</h3>
+                <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
+                {% if request.development.is_open %}
+                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
                 {% else %}
-                <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
+                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
                 {% endif %}
             </li>
             <li class="col hack box">
@@ -51,13 +51,13 @@
                 <p class="col-foot">Ignite events being announced soon</p>
                 {% endif %}
             </li>
-            <li class="col compete box">
-                <h3 class="exclaim">Compete</h3>
-                <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
-                {% if request.development.is_open %}
-                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
+            <li class="col brainstorm box">
+                <h3 class="exclaim">Brainstorm</h3>
+                <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
+                {% if request.ideation.is_open %}
+                <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
                 {% else %}
-                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
+                <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
                 {% endif %}
             </li>
         </ul>
