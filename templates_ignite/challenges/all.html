@@ -136,6 +136,12 @@
     {% endif %}
     </div>
     </div>
+    {% if phase.is_ideation and request.development.is_open %}
+    <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_all', phase='proposals') }}">all development proposals</a></p>
+  {% endif %}
+  {% if phase.is_development %}
+  <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_all', phase='ideas') }}">all idea submissions</a></p>
+  {% endif %}
     </div>
     </div>
 </section>       
