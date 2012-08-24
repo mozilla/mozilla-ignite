@@ -59,10 +59,38 @@
 </div>
 {% endif %}
 
-{% if submissions %}
+{% if development_submissions %}
+    <h2 class="wimper">{{ _('Proposals') }}</h2>
+    <ul class="columns submissions">
+        {% for proposal in development_submissions %}
+        <li class="col box">
+            <article>
+            <a class="title" href="{{ proposal.get_absolute_url() }}">
+                <h3 class="title wimper">
+                    <div class="frame box">
+                        <img src="{{ proposal.get_image_src() }}" alt="" />
+                    </div>
+                    {{ proposal.title }}
+                </h3>
+            </a>
+            </article>
+            {% if proposal.editable_by(user) %}
+                {% if proposal.is_draft %}
+                    <div class="alerts inline">
+                        <p><strong>Proposal in draft</strong></p>
+                        <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
+                        <a href="{{ proposal.get_edit_url() }}" class="cta do">Edit your proposal</a>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+{% if ideation_submissions %}
     <h2 class="wimper">{{ _('Ideas') }}</h2>
     <ul class="columns submissions">
-        {% for idea in submissions %}
+        {% for idea in ideation_submissions %}
         <li class="col box">
             <article>
             <a class="title" href="{{ idea.get_absolute_url() }}">
