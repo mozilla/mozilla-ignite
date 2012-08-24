@@ -79,9 +79,17 @@
 {% if ideation.is_open %}
 <h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
 {% endif %}
+{% if development.is_open %}
+<h2 class="faux_trigger box">Now through September 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
+{% endif %}
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
-        <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
+        {% if ideation.is_open %}
+            <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
+        {% endif %}
+        {% if development.is_open %}
+            <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Tell us what you would make.</p>
+        {% endif %}
     </div>
 
     <div class="bonus col box">
@@ -119,7 +127,12 @@
     {% endfor %}
 </ul>
 <footer>
+    {% if request.ideation.is_open %}
     <p class="intro">Discover great ideas <a href="{{ url('entries_all', phase='ideas') }}" class="cta do">See all submissions</a></p>
+    {% endif %}
+    {% if development.is_open %}
+    <p class="intro">Discover great ideas <a href="{{ url('entries_all', phase='proposals') }}" class="cta do">See all proposals</a></p>
+    {% endif %}
 </footer>
 {% if waffle.switch('show_blog') and waffle.switch('show_events') %}
 <h2 class="faux_trigger box">Latest news and events</h2>
