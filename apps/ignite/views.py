@@ -15,9 +15,27 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
     blogs = BlogEntry.objects.filter(
         page='splash'
     ).order_by("-updated",)[:3]
-    entries = (Submission.objects.visible()
+    # if the dev challenge is open we want to only show dev entries
+    if request.development.is_open:
+        entries = (Submission.objects.visible()
                                  .filter(phase__challenge=challenge)
+                                 .filter(phase__name="Development")
                                  .order_by("?"))
+        num_entries = len(entries)
+        entries_from = 'proposals'
+        if num_entries < 5:
+            entries = (Submission.objects.visible()
+                                 .filter(phase__challenge=challenge)
+                                 .filter(phase__name="Ideation")
+                                 .order_by("?"))
+            entries_from = 'ideas'
+    else:
+        entries = (Submission.objects.visible()
+                                 .filter(phase__challenge=challenge)
+                                 .filter(phase__name="Ideation")
+                                 .order_by("?"))
+        entries_from = 'ideas'
+
     event_list = Event.objects.get_featured()[:5]
     return jingo.render(request, template_name, {
         'challenge': challenge,
@@ -27,6 +45,7 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
         'categories': Category.objects.all(),
         'blogs': blogs,
         'event_list': event_list,
+        'entries_from': entries_from,
     })
 
 

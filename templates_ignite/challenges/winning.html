@@ -8,26 +8,24 @@
 {% block section_class %}entries{% endblock %}
 
 {% block content %}
-<h1 class="shout">Green-lit submissions</h1>
-{% if ideation_winners %}
-<h2>Ideation</h2>
-<ol class="submissions columns">
-  {% for entry in ideation_winners %}
-  {% include "challenges/includes/winning_entry.html"%}
-  {% endfor %}
-</ol>
-{% endif %}
-
-
-{% if development_winners %}
-<h2>Development</h2>
-{% for group in development_winners|groupby('phase_round') %}
-{% if group.grouper %}<h3>{{ group.grouper.name }}</h3>{% endif %}
-<ol class="submissions columns">
-  {% for entry in group.list %}
-  {% include "challenges/includes/winning_entry.html"%}
-  {% endfor%}
-</ol>
-{% endfor %}
+{% if winners %}
+    <h1 class="shout">Winning ideas</h1>
+    {% if phase.name == 'Ideation' %}
+        <ol class="submissions columns">
+        {% for entry in winners %}
+            {% include "challenges/includes/winning_entry.html"%}
+        {% endfor %}
+        </ol>
+    {% else %}
+        <h1 class="shout">Winning applications</h1>
+        {% for group in development_winners|groupby('phase_round') %}
+            {% if group.grouper %}<h3>{{ group.grouper.name }}</h3>{% endif %}
+            <ol class="submissions columns">
+            {% for entry in group.list %}
+                {% include "challenges/includes/winning_entry.html"%}
+            {% endfor%}
+            </ol>
+        {% endfor %}
+    {% endif %}
 {% endif %}
 {% endblock %}

@@ -33,13 +33,13 @@
 <div class="methods">
     <div class="busta columns">
         <ul>
-            <li class="col brainstorm box">
-                <h3 class="exclaim">Brainstorm</h3>
-                <p class="intro">What would <strong>you</strong> do with 1 Gbps? What apps would you create for deeply programmable networks 250x faster than today?</p>
-                {% if request.ideation.is_open %}
-                <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
+            <li class="col compete box">
+                <h3 class="exclaim">Compete</h3>
+                <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
+                {% if request.development.is_open %}
+                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
                 {% else %}
-                <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
+                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
                 {% endif %}
             </li>
             <li class="col hack box">
@@ -51,13 +51,13 @@
                 <p class="col-foot">Ignite events being announced soon</p>
                 {% endif %}
             </li>
-            <li class="col compete box">
-                <h3 class="exclaim">Compete</h3>
-                <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
-                {% if request.development.is_open %}
-                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
+            <li class="col brainstorm box">
+                <h3 class="exclaim">Brainstorm</h3>
+                <p class="intro">What apps are gonna change the world on gigabit super-networks? Browse through the <a href="{{ url('entries_all', phase='ideas') }}">ideas submitted</a>; winners to be announced on the <a href="https://blog.mozillaignite.org/">ignite blog</a>.</p>
+                {% if request.ideation.is_open %}
+                <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
                 {% else %}
-                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
+                <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
                 {% endif %}
             </li>
         </ul>
@@ -71,7 +71,12 @@
     <ul>
     {% for cat in categories %}
     <li class="box col {{ cat.slug }}">
+      {% if request.development.is_open %}
+      <a href="{{ url('entries_for_category', category=cat.slug, phase='proposals') }}"><strong>{{ cat.name }}</strong></a>
+      {% endif %}
+      {% if request.ideation.is_open %}
       <a href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}"><strong>{{ cat.name }}</strong></a>
+      {% endif %}
     </li>
     {% endfor %}
     </ul>
@@ -79,9 +84,17 @@
 {% if ideation.is_open %}
 <h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
 {% endif %}
+{% if development.is_open %}
+<h2 class="faux_trigger box">Let the hacking begin! Now through Sept. 20th: Propose the app you want to build.</h2>
+{% endif %}
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
-        <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
+        {% if ideation.is_open %}
+            <p class="intro"><strong>What would you do with an Internet without limits?</strong> How can next-generation apps change the world? Share your ideas. You don't need to be a developer or technologist to participate -- at this stage we're just seeking good ideas. All are welcome!</p>
+        {% endif %}
+        {% if development.is_open %}
+            <p class="intro"><strong>What would you BUILD on an internet without limits?</strong> The laws of physics (almost) no longer apply to your piece of the spacetime continuum. It’s time to start building apps on 1 Gbps, deeply programmable networks. The Development Challenge takes place in 3 rounds over 6 months with $500K in prizes & support for teams.</p>
+        {% endif %}
     </div>
 
     <div class="bonus col box">
@@ -94,12 +107,15 @@
                     <p class="intro">Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days</p>
                 {% endif %}
                 {% if request.development.is_open %}
-                    <h2 class="point box-title">What's your proposal?</h2>
-                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Send your proposal!</a>
+                    <h2 class="point box-title">What's your app?</h2>
+                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Get started</a>
                 {% endif %}
         </div>
     </div>
 </div>
+{% if request.development.is_open and entries_from == 'ideas' %}
+<p class="intro">Get inspired! Browse ideas from Brainstorming:</p>
+{% endif %}
 <ul class="submissions columns">
     {% for entry in entries %}
     <li class="box col">
@@ -119,7 +135,12 @@
     {% endfor %}
 </ul>
 <footer>
+    {% if request.ideation.is_open %}
     <p class="intro">Discover great ideas <a href="{{ url('entries_all', phase='ideas') }}" class="cta do">See all submissions</a></p>
+    {% endif %}
+    {% if development.is_open %}
+    <p class="intro">Discover other applications <a href="{{ url('entries_all', phase='proposals') }}" class="cta do">See all proposals</a></p>
+    {% endif %}
 </footer>
 {% if waffle.switch('show_blog') and waffle.switch('show_events') %}
 <h2 class="faux_trigger box">Latest news and events</h2>

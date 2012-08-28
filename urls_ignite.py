@@ -48,6 +48,8 @@ urlpatterns += patterns(
         name='entries_all'),
     url(r'^%s/list/(?P<category>[\w-]+)/$' % pattern, 'entries_category',
         kwargs=_ignite_kwargs, name='entries_for_category'),
+    url(r'^%s/winners/$' % pattern, 'entries_winning',
+        kwargs=_ignite_kwargs, name='entries_winning'),
     url(r'^%s/(?P<pk>\d+)/edit/$' % pattern, 'entry_edit',
         kwargs=_ignite_kwargs, name='entry_edit'),
     url(r'^%s/(?P<pk>\d+)/delete/$' % pattern, 'entry_delete',
