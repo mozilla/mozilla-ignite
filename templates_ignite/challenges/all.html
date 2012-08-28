@@ -120,7 +120,7 @@
 </p>
         {% endif %}
         {% if phase.is_development %}
-        <p class="point">We currently don't have any proposals for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='proposals') }}">create an proposal</a></p>{% endif %}
+        <p class="point">We currently don't have any proposals for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='proposals') }}">create a proposal</a></p>{% endif %}
 
         {% endif %}
 
@@ -130,17 +130,25 @@
 <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an idea</a></p>
         {% endif %}
         {% if phase.is_development %}
-<p class="point">We currently don't have any proposal submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an proposal</a></p>
+<p class="point">We currently don't have any proposal submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create a proposal</a></p>
         {% endif %}
         {% endif %}
     {% endif %}
     </div>
     </div>
     {% if phase.is_ideation and request.development.is_open %}
-    <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_all', phase='proposals') }}">all development proposals</a></p>
+        {% if category %}
+    <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_for_category', category=category.slug, phase='proposals') }}">all development proposals in {{ category.name }}</a></p>
+    {% else %}
+        <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_all', phase='proposals') }}">all development proposals</a></p>
+    {% endif %}
   {% endif %}
   {% if phase.is_development %}
-  <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_all', phase='ideas') }}">all idea submissions</a></p>
+    {% if category %}
+  <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_for_category', category=category.slug, phase='ideas') }}">all idea submissions in {{ category.name }}</a></p>
+  {% else %}
+    <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_all', phase='ideas') }}">all idea submissions</a></p>
+{% endif %}
   {% endif %}
     </div>
     </div>
