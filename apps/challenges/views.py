@@ -88,20 +88,17 @@ def entries_all(request, project, slug, phase):
 
 
 @project_challenge_required
-def entries_winning(request, project, challenge):
+def entries_winning(request, project, challenge, phase):
+    phase = get_phase_or_404(phase)
     """Show entries that have been marked as winners and awarded."""
-    ideation_winners = (Submission.objects.visible(request.user)
-                        .filter(phase=request.ideation)
+    winners = (Submission.objects.visible(request.user)
+                        .filter(phase=phase)
                         .filter(is_winner=True))
-    development_winners = (Submission.objects.visible(request.user)
-                           .filter(phase=request.development)
-                           .filter(is_winner=True)
-                           .order_by('phase_round__start_date'))
     context = {
-        'ideation_winners': ideation_winners,
-        'development_winners': development_winners,
+        'winners': winners,
         'project': project,
         'challenge': challenge,
+        'phase': phase,
         }
     return jingo.render(request, 'challenges/winning.html', context)
 
