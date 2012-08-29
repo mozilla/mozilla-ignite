@@ -22,7 +22,7 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
                                  .filter(phase__name="Development")
                                  .order_by("?"))
         num_entries = len(entries)
-        entries_from = 'proposals'
+        entries_from = 'apps'
         if num_entries < 5:
             entries = (Submission.objects.visible()
                                  .filter(phase__challenge=challenge)
@@ -71,7 +71,7 @@ def terms(request, project, slug, template_name='static/terms_conditions.html'):
 def fail(request, template_name='404.html'):
     return jingo.render(request, template_name, {}, status=404)
 
- 
+
 def app_fail(request, template_name='500.html'):
     return jingo.render(request, template_name, {}, status=500)
 

@@ -25,7 +25,7 @@
             Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days
         {% endif %}
          {% if development.is_open %}
-         <a href="{{ url('create_entry', phase='proposals') }}" class="cta">create a proposal</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
+         <a href="{{ url('create_entry', phase='apps') }}" class="cta">create an application</a><br /> or <a href="{{ url('about_ignite') }}">learn more</a>
          {% endif %}
        </div>
     </div>
@@ -37,7 +37,7 @@
                 <h3 class="exclaim">Compete</h3>
                 <p class="intro">Win funding and support to make your app a reality. <strong>$500,000 in prizes</strong> available over three rounds.</p>
                 {% if request.development.is_open %}
-                    <a class="col-foot" href="{{ url('create_entry', phase='proposals') }}">Submit your proposal</a>
+                    <a class="col-foot" href="{{ url('create_entry', phase='apps') }}">Submit your application</a>
                 {% else %}
                     <a class="col-foot" href="{{ url('about_ignite')}}">Applications open August 1</a>
                 {% endif %}
@@ -71,10 +71,9 @@
     <ul>
     {% for cat in categories %}
     <li class="box col {{ cat.slug }}">
-      {% if request.development.is_open %}
-      <a href="{{ url('entries_for_category', category=cat.slug, phase='proposals') }}"><strong>{{ cat.name }}</strong></a>
-      {% endif %}
-      {% if request.ideation.is_open %}
+      {% if request.development.has_started %}
+      <a href="{{ url('entries_for_category', category=cat.slug, phase='apps') }}"><strong>{{ cat.name }}</strong></a>
+      {% else %}
       <a href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}"><strong>{{ cat.name }}</strong></a>
       {% endif %}
     </li>
@@ -108,7 +107,7 @@
                 {% endif %}
                 {% if request.development.is_open %}
                     <h2 class="point box-title">What's your app?</h2>
-                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Get started</a>
+                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Get started</a>
                 {% endif %}
         </div>
     </div>
@@ -139,7 +138,7 @@
     <p class="intro">Discover great ideas <a href="{{ url('entries_all', phase='ideas') }}" class="cta do">See all submissions</a></p>
     {% endif %}
     {% if development.is_open %}
-    <p class="intro">Discover other applications <a href="{{ url('entries_all', phase='proposals') }}" class="cta do">See all proposals</a></p>
+    <p class="intro">Discover other applications <a href="{{ url('entries_all', phase='apps') }}" class="cta do">See all applications</a></p>
     {% endif %}
 </footer>
 {% if waffle.switch('show_blog') and waffle.switch('show_events') %}

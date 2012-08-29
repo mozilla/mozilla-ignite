@@ -33,11 +33,11 @@ LOGGER = logging.getLogger(__name__)
 
 def get_phase_or_404(slug):
     """Returns the appropriate ``Phase`` to the given slug
-    ``ideas`` or ``proposals`` or raise ``Http404``"""
+    ``ideas`` or ``apps`` or raise ``Http404``"""
     phase = None
     if slug == 'ideas':
         phase = Phase.objects.get_ideation_phase()
-    if slug == 'proposals':
+    if slug == 'apps':
         phase = Phase.objects.get_development_phase()
     if phase:
         return phase
