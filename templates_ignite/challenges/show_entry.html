@@ -94,7 +94,7 @@
             {% endif %}
             {% if help_required %}
             <div class="description">
-              <h2>Would you be interested in helping with this proposal?</h2>
+              <h2>Would you be interested in helping with this application?</h2>
               <p>{{ help_required.notes }}</p>
             </div>
             {% endif %}
@@ -221,7 +221,7 @@
             {% if request.development.is_open %}
             <div class="highlight">
                 <h2 class="point box-title">How would you push the web further?</h2>
-                <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit a proposal</a>
+                <a class="cta" href="{{ url('create_entry', phase='apps') }}">Submit an application</a>
             </div>
             {% endif %}
         </aside>

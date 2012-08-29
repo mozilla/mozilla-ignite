@@ -36,7 +36,7 @@ urlpatterns = patterns(
 )
 
 
-pattern = '(?P<phase>(ideas|proposals))'
+pattern = '(?P<phase>(ideas|apps))'
 
 urlpatterns += patterns(
     'challenges.views',

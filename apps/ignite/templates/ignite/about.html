@@ -33,7 +33,7 @@
                     <p>Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days.</p>
                 {% endif %}
                 {% if request.development.is_open %}
-                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit your idea now</a>
+                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Submit your idea now</a>
                 {% endif %}
 			</div>
 		</div>
@@ -104,7 +104,7 @@
 					   <li><strong><a href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
                     {% if request.development.is_open %}
-                       <li><strong><a href="{{ url('create_entry', phase='proposals') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+                       <li><strong><a href="{{ url('create_entry', phase='apps') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
 					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
@@ -204,7 +204,7 @@
 			<div class="box col">
 				<h3 class="wimper">How to apply</h3>
                 {% if request.development.is_open %}
-                    <p>To enter, assemble your team and fill out the <a href="{{ url('create_entry', phase='proposals') }}">online application form</a>.</p>
+                    <p>To enter, assemble your team and fill out the <a href="{{ url('create_entry', phase='apps') }}">online application form</a>.</p>
                 {% else %}
                     <p><strong>Development applications open August 1</strong>. To enter, assemble your team and fill out the online application form.</p>
                 {% endif %}
@@ -290,7 +290,7 @@
             <a href="{{ url('create_entry', phase='ideas') }}" class="cta">Submit your idea now</a>
         {% endif %}
         {% if request.development.is_open %}
-            <a href="{{ url('create_entry', phase='proposals') }}" class="cta">Submit your idea now</a>
+            <a href="{{ url('create_entry', phase='apps') }}" class="cta">Submit your idea now</a>
         {% endif %}
 	</footer>
     {% endif %}
