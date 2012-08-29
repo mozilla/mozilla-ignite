@@ -71,10 +71,9 @@
     <ul>
     {% for cat in categories %}
     <li class="box col {{ cat.slug }}">
-      {% if request.development.is_open %}
+      {% if request.development.has_started %}
       <a href="{{ url('entries_for_category', category=cat.slug, phase='apps') }}"><strong>{{ cat.name }}</strong></a>
-      {% endif %}
-      {% if request.ideation.is_open %}
+      {% else %}
       <a href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}"><strong>{{ cat.name }}</strong></a>
       {% endif %}
     </li>
