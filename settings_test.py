@@ -19,6 +19,12 @@ DATABASES = {
     }
 }
 
+# Create the these directories off media and set to 755 so the app can access them
+USER_AVATAR_PATH = 'img/uploads/avatars/'
+TOPIC_IMAGE_PATH = 'img/uploads/topics/'
+PROJECT_IMAGE_PATH = 'img/uploads/projects/'
+EVENT_IMAGE_PATH = 'img/uploads/events/'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
 
 HMAC_KEYS = {
     '2011-01-01': 'cheesecake',

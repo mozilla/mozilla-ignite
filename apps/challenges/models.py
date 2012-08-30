@@ -140,7 +140,7 @@ class Phase(BaseModel):
 
     @models.permalink
     def get_absolute_url(self):
-        slug = 'ideas' if self.is_ideation else 'proposals'
+        slug = 'ideas' if self.is_ideation else 'apps'
         return ('entries_all', [slug])
 
     @cached_property
@@ -172,6 +172,16 @@ class Phase(BaseModel):
             if item.start_date < now and item.end_date > now:
                 return item
         return None
+
+    @cached_property
+    def next_round(self):
+        """Determines the next open ``PhaseRound`` for this ``Phase``"""
+        now = datetime.utcnow()
+        upcoming_rounds = self.phase_rounds.filter(start_date__gte=now).order_by('start_date')
+        if upcoming_rounds:
+            return upcoming_rounds[0]
+        else:
+            return None
 
     @cached_property
     def current_judging_round(self):
@@ -227,7 +237,7 @@ class Phase(BaseModel):
 
     @cached_property
     def slug_url(self):
-        return 'proposals' if self.is_development else 'ideas'
+        return 'apps' if self.is_development else 'ideas'
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -398,7 +408,7 @@ class Submission(BaseModel):
     def phase_slug(self):
         if self.is_idea:
             return 'ideas'
-        return 'proposals'
+        return 'apps'
 
     def get_absolute_url(self):
         """Return this submission's URL."""

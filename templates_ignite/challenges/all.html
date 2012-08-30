@@ -10,133 +10,139 @@
 
 {% block header %}
 <header class="busta">
-<h1 class="shout">
-  {% block title_listing  %}
-  {% if phase.is_ideation %}
-  Ideas
-  {% endif %}
-  {% if phase.is_development %}
-  Proposals
-  {% endif %}
-  {% endblock  %}
-</h1>
-  {% if phase.days_remaining > 0 %}
-<div class="meta">
-    <p class="intro">You have <em>{{ phase.days_remaining }}</em> days to submit {{ phase.slug_url }}</p>
+    <h1 class="shout">
+        {% block title_listing  %}
+            {% if phase.is_ideation %}Ideas{% endif %}
+            {% if phase.is_development %}Applications{% endif %}
+        {% endblock  %}
+    </h1>
     {% if phase.is_open %}
-    <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">{{ _('Create submission') }}</a>
+        <div class="meta">
+            {% if phase.is_development %}
+                <p class="intro">You have <em>{{ phase.current_round.days_remaining }}</em> days to submit or iterate on your application</p>
+                <a class="cta" href="{{ url('create_entry', phase='apps') }}">{{ _('Create application') }}</a>
+            {% else %}
+                <p class="intro">You have <em>{{ phase.days_remaining }}</em> days to submit {{ phase.slug_url }}</p>
+                <a class="cta" href="{{ url('create_entry', phase='ideas') }}">{{ _('Create submission') }}</a>
+            {% endif %}
+        </div>
     {% endif %}
-
-</div>
-{% endif %}
 </header>
 {% endblock %}
 
 {% block content %}
 <div class="content_columns columns with_nav">
-<nav class="tags col box nav">
-    <ul>
-      {% if phase.is_ideation %}
-      <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='ideas') }}">All ideas</a></li>
-      {% endif %}
-      {% if phase.is_development %}
-      <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='proposals') }}">All proposals</a></li>
-      {% endif %}
-        {% if categories %}
-        {% for cat in categories %}
-            <li><a{% if category.slug==cat.slug %} class="current wimper"{% endif %} href="{{ url('entries_for_category', category=cat.slug, phase=phase.slug_url) }}">{{ cat.name }}</a></li>
-        {% endfor %}
+    <nav class="tags col box nav">
+        <ul>
+            {% if phase.is_ideation %}
+                <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='ideas') }}">All ideas</a></li>
+            {% endif %}
+            {% if phase.is_development %}
+                <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='apps') }}">All applications</a></li>
+            {% endif %}
+            {% if categories %}
+                {% for cat in categories %}
+                    <li><a{% if category.slug==cat.slug %} class="current wimper"{% endif %} href="{{ url('entries_for_category', category=cat.slug, phase=phase.slug_url) }}">{{ cat.name }}</a></li>
+                {% endfor %}
+            {% endif %}
+        </ul>
+    </nav>
+    <div class="highlight col box main">
+        {% if category %}
+            <h2 class="{{category.slug }}">{{ category.name }}</h2>
+        {% else %}
+            {% if phase.is_ideation %}
+                <h2 class="all">All ideas</h2>
+            {% endif %}
+            {% if phase.is_development %}
+                <h2 class="all">All applications</h2>
+            {% endif %}
         {% endif %}
-    </ul>
-</nav>
-<div class="highlight col box main">
-{% if category %}
-<h2 class="{{category.slug }}">{{ category.name }}</h2>
-{% else %}
-{% if phase.is_ideation %}
-<h2 class="all">All ideas</h2>
+        {% if entries.object_list.count() != 0 %}
+            <ol class="submissions columns">
+                {% for entry in entries.object_list %}
+                    <li class="box col">
+                        <article>
+                            <a class="title" href="{{ entry.get_absolute_url() }}">
+                                <h3 class="title wimper">
+                                    <div class="frame box">
+                                        <img src="{{ entry.get_image_src() }}" alt="">
+                                    </div>
+                                    {{ entry.title }}
+                                </h3>
+                            </a>
+                            {% if entry.editable_by(user) %}
+                                {% if entry.is_draft %}
+                                    <div class="alerts inline">
+                                        <p><strong>Idea in draft</strong></p>
+                                        <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
+                                        <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
+                                    </div>
+                                {% endif %}
+                            {% endif %}
+                            <p>{{ entry.brief_description }}</p>
+                            <address>{{ created_by(entry, footer=False) }}</address>
+                        </article>
+                    </li>
+                {% endfor %}
+            </ol>
+            {% if entries.paginator.num_pages > 1 %}
+                <footer class="pagination">
+                    <nav>
+                        {% if entries.has_previous() %}
+                            <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
+                        {% endif %} 
+                        <ol>
+                            {% for i in range(entries.paginator.num_pages) %}
+                                <li>
+                                    {% if i + 1 == entries.number %}
+                                        <span>{{ i + 1 }}</span>
+                                    {% else %}
+                                        <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+                        </ol>
+                        {% if entries.has_next() %}
+                            <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
+                        {% endif %}
+                    </nav>
+                </footer>
+            {% endif %}
+        {% else %}
+            {% if category.name %}
+                {% if phase.is_ideation %}
+                    <p class="point">
+                        We currently don't have any ideas for {{ category.name }}
+                        {% if phase.is_open %}- be the first to  <a class="cta" href="{{ url('create_entry', phase='ideas') }}">create an idea</a>{% endif %}
+                    </p>
+                {% endif %}
+                {% if phase.is_development %}
+                    <p class="point">We currently don't have any applications for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='apps') }}">create an application</a></p>{% endif %}
+                {% endif %}
+            {% else %}
+                {% if phase.is_ideation %}
+                    <p class="point">We currently don't have any ideas submitted for any of the focus areas{% if phase.is_open %} - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an idea</a>{% endif %}</p>
+                {% endif %}
+                {% if phase.is_development %}
+                    <p class="point">We currently don't have any applications submitted for any of the focus areas{% if phase.is_open %} - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an application</a>{% endif %}</p>
+                {% endif %}
+            {% endif %}
+        {% endif %}
+    </div>
+</div>
+{% if phase.is_ideation and request.development.is_open %}
+    {% if category %}
+        <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_for_category', category=category.slug, phase='apps') }}">all development applications in {{ category.name }}</a></p>
+    {% else %}
+        <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_all', phase='apps') }}">all development applications</a></p>
+    {% endif %}
 {% endif %}
 {% if phase.is_development %}
-<h2 class="all">All proposals</h2>
-{% endif %}
-
-{% endif %}
-{% if entries.object_list.count() != 0 %}
-<ol class="submissions columns">
-{% for entry in entries.object_list %}
-    <li class="box col">
-        <article>
-            <a class="title" href="{{ entry.get_absolute_url() }}">
-                <h3 class="title wimper">
-                    <div class="frame box">
-                    <img src="{{ entry.get_image_src() }}" alt="">
-                    </div>
-                    {{ entry.title }}
-                </h3>
-            </a>
-            {% if entry.editable_by(user) %}
-            {% if entry.is_draft %}
-            <div class="alerts inline">
-                <p><strong>Idea in draft</strong></p>
-                <p>Only you can see this until you uncheck the "Save as draft?" option.</p>
-                <a href="{{ entry.get_edit_url() }}" class="cta do">Edit your idea</a>
-            </div>
-            {% endif %}
-            {% endif %}
-            <p>{{ entry.brief_description }}</p>
-            <address>{{ created_by(entry, footer=False) }}</address>
-        </article>
-    </li>
-    {% endfor %}
-    </ol>
-    {% if entries.paginator.num_pages > 1 %}
-    <footer class="pagination">
-    <nav>
-    {% if entries.has_previous() %}
-        <a href="?page={{ entries.previous_page_number() }}" class="btn">prev</a>
-    {% endif %} 
-    <ol>
-    {% for i in range(entries.paginator.num_pages) %}
-    <li>
-        {% if i + 1 == entries.number %}
-            <span>{{ i + 1 }}</span>
-        {% else %}
-            <a href="?page={{ i + 1 }}">{{ i + 1 }}</a>
-        {% endif %}
-    </li>
-    {% endfor %}
-    </ol>
-    {% if entries.has_next() %}
-        <a href="?page={{ entries.next_page_number() }}" class="btn">next</a>
-    {% endif %}
-    </nav>
-    </footer>
-    {% endif %}
+    {% if category %}
+        <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_for_category', category=category.slug, phase='ideas') }}">all idea submissions in {{ category.name }}</a></p>
     {% else %}
-        {% if category.name %}
-        {% if phase.is_ideation %}
-        <p class="point">We currently don't have any ideas for {{ category.name }}
-          {% if phase.is_open %}- be the first to  <a class="cta" href="{{ url('create_entry', phase='ideas') }}">create an idea</a>{% endif %}
-</p>
-        {% endif %}
-        {% if phase.is_development %}
-        <p class="point">We currently don't have any proposals for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='proposals') }}">create an proposal</a></p>{% endif %}
-
-        {% endif %}
-
-        {% else %}
-
-        {% if phase.is_ideation %}
-<p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an idea</a></p>
-        {% endif %}
-        {% if phase.is_development %}
-<p class="point">We currently don't have any proposal submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an proposal</a></p>
-        {% endif %}
-        {% endif %}
+        <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_all', phase='ideas') }}">all idea submissions</a></p>
     {% endif %}
-    </div>
-    </div>
-    </div>
-    </div>
-</section>       
+{% endif %}
 {% endblock %}

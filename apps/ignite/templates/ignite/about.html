@@ -24,8 +24,12 @@
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
-				<h3 class="point box-title">Now to August 23rd: Brainstorm, connect and collaborate</h3>
-				<p>Between now and August 23rd we’re hosting a big <a href="{{ url('entries_all', phase='ideas') }}">public brainstorm</a> online and at salons and hack days across the U.S. This is a chance to share your idea, connect with other innovators and meet potential collaborators. Ready? Go!</p>
+                {% if request.development.is_open %}
+				    <h3 class="point box-title">Now through {{ request.development.current_round.end_date.strftime('%B %-d') }}: submit your app proposals.</h3>
+                {% else %}
+                    <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.end_date.strftime('%B %-d') }}: submit your app proposals.</h3>
+                {% endif %}
+				<p>Time to start hacking: we're offering $485,000 in prizes & support for teams over three rounds.</p>
                 {% if request.ideation.is_open %}
 				    <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Submit your idea now</a>
                 {% endif %}
@@ -33,7 +37,7 @@
                     <p>Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days.</p>
                 {% endif %}
                 {% if request.development.is_open %}
-                    <a class="cta" href="{{ url('create_entry', phase='proposals') }}">Submit your idea now</a>
+                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Submit your application now</a>
                 {% endif %}
 			</div>
 		</div>
@@ -51,7 +55,7 @@
                         <strong>Brainstorming Round</strong>
                         <span class="ribbon">$15k in awards</span>
                     </div>
-                    <em class="date wimper"><strong>Now through August 23</strong></em>
+                    <em class="date wimper"><strong>Completed August 23rd</strong></em>
                 </div>
             </div>
             </section>
@@ -88,13 +92,11 @@
 	</figure>
 	<div class="columns content_columns">
 		<div class="col main box">
-			<p class="intro"><strong>The Mozilla Ignite Challenge is broken into four rounds</strong></p>
-			<ul class="intro">
-				<li class="intro">an initial <strong>Brainstorming Round</strong>,</li>
-				<li>followed by three <strong>Development Rounds</strong></li>
-			</ul>
-			<p class="intro">Submissions for the Brainstorming Round are open now through August 23. Participation in the Brainstorming Round is optional, but encouraged. Applications for the Development Phase will open {{ development.start_date.strftime('%B %-d') }}, and must be received by September 20 to be approved for the very start of the development challenge.</p>
-			<p class="intro">Funding will be awarded by our <strong><a href="{{ url('our_judges') }}">panel of expert judges</a></strong> at the end of each round. <strong>$500,000 US will be awarded in all.</strong> You can compete in a single development round, or in all three.</p>
+			<p class="intro">The Brainstorm round wrapped on August 23rd. We received over 300 submissions — <a href="{{ url('entries_all', phase='ideas') }}">check out the ideas</a>.</p>
+            <p class="intro">We're now entering the Development rounds, where challenge participants compete for money and support to make their gigabit apps a reality.</p>
+            <p class="intro">We're offering $485k in awards over three rounds. Over the course of each round, participants will sprint on their apps and present progress to our panel of judges. The judges will award the prize money among the teams participating in each round.</p>
+            <p class="intro">You can participate in as many rounds as you like.</p>
+            <p class="intro">The first round begins on October 4th. To participate in this round, we must receive your application by September 28th.</p>
 		</div>
 		<div class="col bonux box">
 			<div class="highlight">
@@ -104,7 +106,7 @@
 					   <li><strong><a href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
                     {% if request.development.is_open %}
-                       <li><strong><a href="{{ url('create_entry', phase='proposals') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
+                       <li><strong><a href="{{ url('create_entry', phase='apps') }}">Submit your applications</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
 					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
@@ -182,7 +184,7 @@
 					<li>advanced manufacturing</li>
 					<li>emergency preparedness and public safety</li>
 				</ul>
-				<p>The deadline for submitting your ideas to the Brainstorming Round is August 23.</p>
+				<p>The Brainstorming round wrapped on August 23rd. Check out <a href="{{ url('entries_all', phase='ideas') }}">the ideas that were shared</a>.</p>
 			</div>
 		</div>
 	</div>
@@ -204,7 +206,7 @@
 			<div class="box col">
 				<h3 class="wimper">How to apply</h3>
                 {% if request.development.is_open %}
-                    <p>To enter, assemble your team and fill out the <a href="{{ url('create_entry', phase='proposals') }}">online application form</a>.</p>
+                    <p>To enter, assemble your team and fill out the <a href="{{ url('create_entry', phase='apps') }}">online application form</a>.</p>
                 {% else %}
                     <p><strong>Development applications open {{ development.start_date.strftime('%B %-d') }}</strong>. To enter, assemble your team and fill out the online application form.</p>
                 {% endif %}
@@ -216,7 +218,7 @@
 <section class="how_start">
 	<h2 class="trigger">How do I get started?</h2>
 	<div class="panel">
-		<p class="intro">The gigabit space is uncharted and presents many avenues of possibility. To help developers get into the groove, Mozilla Ignite is building a community of practice to share resources, code, and learnings. Over summer 2012, we'll be facilitating:</p>
+		<p class="intro">The gigabit space is uncharted and presents many avenues of possibility. To help developers get into the groove, Mozilla Ignite is building a community of practice to share resources, code, and learnings:</p>
 		<ul class="intro">
 			<li>a slate of free online learning labs, where we'll go over the latest open web technologies and how they can be leveraged in gigabit apps—as well as on-ramping materials for networking engineering sandboxes like GENI.</li>
 			<li>a weekly <a href="https://wiki.mozilla.org/Ignite">conference call</a> where developers and institutions can coordinate around specific projects and meet like-minded collaborators.</li>
@@ -290,7 +292,7 @@
             <a href="{{ url('create_entry', phase='ideas') }}" class="cta">Submit your idea now</a>
         {% endif %}
         {% if request.development.is_open %}
-            <a href="{{ url('create_entry', phase='proposals') }}" class="cta">Submit your idea now</a>
+            <a href="{{ url('create_entry', phase='apps') }}" class="cta">Submit your idea now</a>
         {% endif %}
 	</footer>
     {% endif %}
@@ -416,12 +418,12 @@
 		<li>
 			<h3 class="wimper">Do I get to keep my intellectual property?</h3>
 			<p>Absolutely. Our hope is that many of the apps developed in this challenge will become commercially viable, and we want to encourage entrepreneurial innovation at the edges of the network. Whatever you develop in this challenge is yours to go monetize, or not.</p>
-			<p>At the same time, building an open development community around GENI, the open web, and other open technologies is another key objective of the challenge, so all competing apps must publish their code under a suitably open license. Check the complete <a href="{{ url('terms_conditions') }}" target="_blank">official rules</a> for more.</p>
+			<p>At the same time, building an open development community around GENI, the open web, and other open technologies is another key objective of the challenge, so we strongly urge all competing apps to publish some or all of their code under a suitably open license. The judges may weigh an app's contribution to open source in the prize deliberations. Check the complete <a href="{{ url('terms_conditions') }}" target="_blank">official rules</a> for more.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Who should enter?</h3>
 			<p>Web developers, university researchers, network engineers, start-ups, civic innovators, and anyone interested in high-speed networks. Participation is open to all.<p>
-			<p>However, as this is a federally-funded initiative by the U.S. government, each team must designate a fiscal agent who will accept awards on the team's behalf. Only U.S.-incorporated organizations and citizens can accept awards. Practically, this means that teams can have members from all over the world—but must also have at least one team member, or a host, in the United States.</p>
+			<p>However, as this is a federally-funded initiative by the U.S. government, each team must designate a fiscal agent who will accept awards on the team's behalf. Only U.S.-incorporated organizations and citizens or those legally allowed to work or receive compensation in the United States can accept awards. See the <a href="{{ url('terms_conditions') }}" target="_blank">contest rules</a> for more details. Practically, this means that teams can have members from all over the world—but must also have at least one team member, or a host, in the United States.</p>
 		</li>
 		<li>
 			<h3 class="wimper">How much funding am I eligible to receive?</h3>

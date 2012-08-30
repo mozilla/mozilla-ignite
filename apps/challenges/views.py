@@ -33,11 +33,11 @@ LOGGER = logging.getLogger(__name__)
 
 def get_phase_or_404(slug):
     """Returns the appropriate ``Phase`` to the given slug
-    ``ideas`` or ``proposals`` or raise ``Http404``"""
+    ``ideas`` or ``apps`` or raise ``Http404``"""
     phase = None
     if slug == 'ideas':
         phase = Phase.objects.get_ideation_phase()
-    if slug == 'proposals':
+    if slug == 'apps':
         phase = Phase.objects.get_development_phase()
     if phase:
         return phase
@@ -88,20 +88,17 @@ def entries_all(request, project, slug, phase):
 
 
 @project_challenge_required
-def entries_winning(request, project, challenge):
+def entries_winning(request, project, challenge, phase):
+    phase = get_phase_or_404(phase)
     """Show entries that have been marked as winners and awarded."""
-    ideation_winners = (Submission.objects.visible(request.user)
-                        .filter(phase=request.ideation)
+    winners = (Submission.objects.visible(request.user)
+                        .filter(phase=phase)
                         .filter(is_winner=True))
-    development_winners = (Submission.objects.visible(request.user)
-                           .filter(phase=request.development)
-                           .filter(is_winner=True)
-                           .order_by('phase_round__start_date'))
     context = {
-        'ideation_winners': ideation_winners,
-        'development_winners': development_winners,
+        'winners': winners,
         'project': project,
         'challenge': challenge,
+        'phase': phase,
         }
     return jingo.render(request, 'challenges/winning.html', context)
 
