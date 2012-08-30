@@ -16,7 +16,7 @@
   Ideas
   {% endif %}
   {% if phase.is_development %}
-  Proposals
+  Applications
   {% endif %}
   {% endblock  %}
 </h1>
@@ -40,7 +40,7 @@
       <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='ideas') }}">All ideas</a></li>
       {% endif %}
       {% if phase.is_development %}
-      <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='proposals') }}">All proposals</a></li>
+      <li><a{% if not category %} class="current"{% endif %} href="{{ url('entries_all', phase='apps') }}">All applications</a></li>
       {% endif %}
         {% if categories %}
         {% for cat in categories %}
@@ -57,7 +57,7 @@
 <h2 class="all">All ideas</h2>
 {% endif %}
 {% if phase.is_development %}
-<h2 class="all">All proposals</h2>
+<h2 class="all">All applications</h2>
 {% endif %}
 
 {% endif %}
@@ -120,7 +120,7 @@
 </p>
         {% endif %}
         {% if phase.is_development %}
-        <p class="point">We currently don't have any proposals for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='proposals') }}">create an proposal</a></p>{% endif %}
+        <p class="point">We currently don't have any applications for {{ category.name }} {% if phase.is_open %}- be the first to <a class="cta" href="{{ url('create_entry', phase='apps') }}">create an application</a></p>{% endif %}
 
         {% endif %}
 
@@ -130,12 +130,26 @@
 <p class="point">We currently don't have any ideas submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an idea</a></p>
         {% endif %}
         {% if phase.is_development %}
-<p class="point">We currently don't have any proposal submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an proposal</a></p>
+<p class="point">We currently don't have any applications submitted for any of the focus areas - pick your favourite and be the first to <a class="cta" href="{{ url('create_entry', phase=phase.slug_url) }}">create an application</a></p>
         {% endif %}
         {% endif %}
     {% endif %}
     </div>
     </div>
+    {% if phase.is_ideation and request.development.is_open %}
+        {% if category %}
+    <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_for_category', category=category.slug, phase='apps') }}">all development applications in {{ category.name }}</a></p>
+    {% else %}
+        <p class="wimper">See what has been submitted for development - <a href="{{ url('entries_all', phase='apps') }}">all development applications</a></p>
+    {% endif %}
+  {% endif %}
+  {% if phase.is_development %}
+    {% if category %}
+  <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_for_category', category=category.slug, phase='ideas') }}">all idea submissions in {{ category.name }}</a></p>
+  {% else %}
+    <p class="wimper">Looking for more ideas? See what what was submitted in the initial idea stage - <a href="{{ url('entries_all', phase='ideas') }}">all idea submissions</a></p>
+{% endif %}
+  {% endif %}
     </div>
     </div>
 </section>       
