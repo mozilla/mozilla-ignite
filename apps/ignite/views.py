@@ -57,7 +57,11 @@ def judges(request, project, slug, template_name='challenges/all_judges.html'):
     """ List all judges we have in the system """
     profiles = []
     for judge in User.objects.filter(groups__name='Judges'):
-        profiles.append(judge.get_profile())
+        profile = judge.get_profile()
+        # we only want to show featured profiles
+        if profile.featured == True:
+            profiles.append(profile)
+
 
     return jingo.render(request, 'ignite/judges.html', {
         'profiles': profiles
