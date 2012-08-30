@@ -174,6 +174,16 @@ class Phase(BaseModel):
         return None
 
     @cached_property
+    def next_round(self):
+        """Determines the next open ``PhaseRound`` for this ``Phase``"""
+        now = datetime.utcnow()
+        upcoming_rounds = self.phase_rounds.filter(start_date__gte=now).order_by('start_date')
+        if upcoming_rounds:
+            return upcoming_rounds[0]
+        else:
+            return None
+
+    @cached_property
     def current_judging_round(self):
         """Determines what is the current ``PhaseRound`` being judged"""
         now = datetime.utcnow()
