@@ -140,7 +140,7 @@ class Phase(BaseModel):
 
     @models.permalink
     def get_absolute_url(self):
-        slug = 'ideas' if self.is_ideation else 'proposals'
+        slug = 'ideas' if self.is_ideation else 'apps'
         return ('entries_all', [slug])
 
     @cached_property
@@ -227,7 +227,7 @@ class Phase(BaseModel):
 
     @cached_property
     def slug_url(self):
-        return 'proposals' if self.is_development else 'ideas'
+        return 'apps' if self.is_development else 'ideas'
 
 
 @receiver(signals.post_save, sender=Phase)
@@ -398,7 +398,7 @@ class Submission(BaseModel):
     def phase_slug(self):
         if self.is_idea:
             return 'ideas'
-        return 'proposals'
+        return 'apps'
 
     def get_absolute_url(self):
         """Return this submission's URL."""

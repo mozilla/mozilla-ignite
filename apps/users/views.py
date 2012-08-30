@@ -68,6 +68,9 @@ def profile(request, username):
             submissions = Submission.objects.current().filter(created_by=profile)
         else:
             submissions = Submission.objects.visible().filter(created_by=profile)
+    # Filter on submission phase
+    ideation_submissions = submissions.filter(phase__name='Ideation')
+    development_submissions = submissions.filter(phase__name='Development')
     # Show the all the submission related data when the user is the owner
     need_booking_list = []
     booked_list = []
@@ -98,7 +101,8 @@ def profile(request, username):
         'profile': profile,
         'social_links': profile.link_set.all() or False,
         'projects': profile.project_set.all() or False,
-        'submissions': submissions or False,
+        'ideation_submissions': ideation_submissions or False,
+        'development_submissions': development_submissions or False,
         'booked_list': booked_list,
         'need_booking_list': need_booking_list,
         'webcast_list': webcast_list,

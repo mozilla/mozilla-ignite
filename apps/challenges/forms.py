@@ -54,6 +54,7 @@ entry_fields = (
 # List new fields for the Submission
 development_entry_fields = entry_fields + (
     'repository_url',
+    'blog_url',
     )
 
 class EntryForm(forms.ModelForm):
