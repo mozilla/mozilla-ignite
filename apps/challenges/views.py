@@ -391,7 +391,11 @@ def entry_show(request, project, challenge, entry_id, phase, judging_form=None):
     # usually done on template tags. In this case we do it here
     context.update(get_judging_context(request.user, entry, judging_form))
     context.update(get_award_context(entry, request.user))
-    return jingo.render(request, 'challenges/show_entry.html', context)
+    if phase.name == "Development":
+        template = 'challenges/show_entry_development.html'
+    else:
+        template = 'challenges/show_entry.html'
+    return jingo.render(request, template, context)
 
 
 def _get_judging_form(user, entry, data=None, form_class=JudgingForm):

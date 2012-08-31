@@ -2,7 +2,7 @@
 
 {% block schema_org %} itemscope itemtype="http://schema.org/Product"{% endblock %}
 
-{% block page_title %}{{ entry.title }} | {{ _('Submissions') }} | {% endblock %}
+{% block page_title %}{{ entry.title }} | {{ _('Ideas') }} | {% endblock %}
 
 {% block page_id %}show_submission{% endblock %}
 
@@ -30,12 +30,11 @@
     {% if entry.editable_by(user) %}
         <ul class="user_tools">
         {% if development.has_started and entry.owned_by(user) %}
-            <li><a href="{{ url('entry_help', entry_id=entry.parent.slug) }}" class="cta do">Ask for help</a></li>
-            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
-            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
             {% if entry.needs_booking %}
                 <li><a href="{{ url('timeslot:object_list', entry_id=entry.id) }}" class="cta do">Book a timeslot</a></li>
             {% endif %}
+            <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit your submission</a></li>
+            <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete your submission</a></li>
         {% else %}
             <li><a href="{{ entry.get_edit_url() }}" class="cta do">Edit this submission</a></li>
             <li><a href="{{ entry.get_delete_url() }}" class="cta do">Delete this submission</a></li>
@@ -62,6 +61,7 @@
                     <li>Votes: <span class="total_votes">{{ votes }}</span></li>
                 </ul>
             </div>
+            {% block submission_content %}
             <div class="description">
                 <h2 class="point">The problem</h2>
                 <p>{{ entry.brief_description }}</p>
@@ -102,6 +102,7 @@
                     <p>{{ help_required.notes }}</p>
                 </div>
             {% endif %}
+            {% endblock %}
             <address class="vcard">
                 <p class="wimper"><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
