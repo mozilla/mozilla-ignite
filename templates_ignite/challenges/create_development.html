@@ -1,0 +1,189 @@
+{% extends 'base.html' %}
+
+{% block page_title %}{% if errors %}{{ _('Errors in your idea') }} | {% endif %}{{ _('Create submission') }} | {% endblock %}
+
+{% block page_id %}create_submission{% endblock %}
+
+{% block section_class %}entries{% endblock %}
+
+{% block alerts %}
+{% if error_count %}
+<section class="alerts errors">
+    {% trans count=error_count %}
+    <p>You have {{ count }} error in your application. Please correct this before you can submit an idea.</p>
+    {% pluralize %}
+    <p>You have {{ count }} errors in your application. Please correct this before you can submit an idea.</p>
+    {% endtrans %}
+</section>
+{% endif %}
+{% endblock %}
+
+{% block content %}
+{% block greeting %}
+
+<h1 class="shout">{{ _('Submit an application') }}</h1>
+
+<p class="page-intro">{{ _("Congratulations! You've taken the first step towards making the world, and the internet, a better place. Fill out the form below to get started in the Mozilla Ignite Challenge.") }}</p>
+{% endblock %}
+<p><span class="error-hint">*</span> means a required field</p>
+<form action="" method="post" enctype="multipart/form-data">
+    {{ csrf()|safe }}
+    <div class="highlight {% if form.title.errors %}fail{% endif %}">
+        <label for="id_title" class="announce">{% if form.title.errors %}<em>Error in</em> {% endif %}{{ _('Title of Application') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.title.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.title }}
+        </div>
+    </div>
+    <div class="highlight {% if form.brief_description.errors %}fail{% endif %}">
+        <label for="id_brief_description" class="announce">{% if form.brief_description.errors %}<em>Error in</em> {% endif %}{{ _('What problem are you intending to solve?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.brief_description.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.brief_description }}
+        </div>
+    </div>
+    <div class="highlight {% if form.description.errors  %}fail{% endif %}">
+        <label for="wmd-input" class="announce">{% if form.description.errors %}<em>Error in</em> {% endif %}{{ _('What is the technological approach, or development roadmap?') }} <span class="error-hint"><span>(required)</span></span></label></label>
+        <div class="ed">
+          {% for error in form.description.errors %}<strong>{{ error }}</strong>{% endfor %}
+        <div class="wmd-region">
+        {{ form.description }}
+        </div>
+        </div>
+     </div>
+     <div class="highlight {% if form.life_improvements.errors%}fail{% endif %}">
+        <label for="id_life_improvements" class="announce">{% if form.life_improvements.errors %}<em>Error in</em> {% endif %}{{ _('How will end users interact with it, and how will they benefit?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.life_improvements.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.life_improvements }}
+        </div>
+    </div>
+    <div class="highlight {% if form.take_advantage.errors%}fail{% endif %}">
+        <label for="id_take_advantage" class="announce">{% if form.take_advantage.errors %}<em>Error in</em> {% endif %}{{ _('How will your app leverage the 1Gbps, sliceable and deeply programmable network?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.take_advantage.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.take_advantage }}
+        </div>
+    </div>
+    <div class="highlight {% if form.team_members.errors%}fail{% endif %}">
+        <label for="id_team_members" class="announce">{% if form.team_members.errors %}<em>Error in</em> {% endif %}{{ _('Describe yourself and your Team (if applicable)') }} <span class="error-hint"><span>(required)</span></span></label>
+        <p class="hint" id="info_team_members">{{ _('Focus on especially the skills that match the challenges of the problem, number of members, roles and how you’ll work together.') }}</p>
+        <div class="ed">
+          {% for error in form.team_members.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.team_members }}
+        </div>
+    </div>
+    <div class="highlight {% if form.interest_making.errors %}fail{% endif %}">
+        <label for="id_interest_making" class="announce">{% if form.interest_making.errors %}<em>Error in</em> {% endif %}{{ _('Will your work be beta-ready by the end of the Development Challenge?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.interest_making.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.interest_making }}
+        </div>
+    </div>
+    <fieldset class="stacked_field highlight {% if form.category.errors%}fail{% endif %}">
+        <legend><span class="announce">{% if form.category.errors %}<em>Error in</em> {% endif %}{{ _('Which focus area does it address, primarily?') }} <span class="error-hint"><span>(required)</span></span></span></legend>
+        <div class="focus_areas columns ed">
+          {% for error in form.category.errors %}<strong>{{ error }}</strong>{% endfor %}
+            {{ form.category }}
+        </div>
+    </fieldset>
+    <div class="highlight {% if form.collaborators.errors %}fail{% endif %}">
+        <label for="id_collaborators" class="announce">{% if form.collaborators.errors %}<em>Error in</em> {% endif %}{{ _('Do you need help?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <p class="hint" id="info_team_members">{{ _('E.g., developers, support from industry experts, mentorship, learning materials, more team members?') }}</p>
+        <div class="ed">
+          {% for error in form.collaborators.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.collaborators }}
+        </div>
+    </div>
+    <p class="announce">Have any other supporting materials or resources?</p>
+    <p>Any images, wireframes, prototypes, URLs, YouTube videos, slide casts, etc? Illustrations are optional, but wireframes, prototypes or pictures may help the judges understand your Development Proposal and are invited.</p>
+    <div class="image_field highlight">
+        <label for="id_sketh_note" class="announce">{{ _('Napkin sketch') }}</label>
+        <p class="hint" id="info_annouce">{{ _('If your idea makes more sense on paper please include a diagram. <em>(png, jpg, gif)</em>') }}</p>
+        {% if form.sketh_note.value() %}
+            <div class="frame box">
+                <img src="{{ MEDIA_URL }}{{ form.sketh_note.value() }}" alt="" />
+            </div>
+            <input id="sketh_note-clear_id" type="checkbox" name="sketh_note-clear" />
+            <label for="sketh_note-clear_id">{{ _('Delete the current image') }}</label>
+            <p>{{ _("If you don't like what you've currently got upload a different image") }}</p>
+            <input type="file" id="id_sketh_note" name="sketh_note" />
+        {% else %}
+            {{ form.sketh_note }}
+        {% endif %}
+     </div>
+{% if form.repository_url  %}
+     <div class="highlight {% if form.repository_url.errors %}fail{% endif %}">
+       <label for="{{ form.repository_url.auto_id }}" class="announce">{% if form.repository_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL where your work is visible') }} </label>
+       <div class="ed">
+         {% for error in form.repository_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.repository_url }}
+       </div>
+     </div>
+     {% endif %}
+
+{% if form.blog_url  %}
+     <div class="highlight {% if form.blog_url.errors %}fail{% endif %}">
+       <label for="{{ form.blog_url.auto_id }}" class="announce">{% if form.blog_url.errors %}<em>Error in</em> {% endif %}{{ _('Provide a URL for your blog') }}</label>
+       <div class="ed">
+         {% for error in form.blog_url.errors %}
+         <strong>* {{ error }}</strong>
+         {% endfor%}
+         {{ form.blog_url }}
+       </div>
+       <div class="">
+         <p>Please address the following questions on your blog:</p>
+         <ul>
+           <li>How is it going? How is your app progressing?</li>
+           <li>What's been done?</li>
+           <li>What are some of the challenges you are experiencing/have experienced?</li>
+           <li>What are you planning on tackling next?</li>
+         </ul>
+       </div>
+     </div>
+     {% endif %}
+
+     <fieldset class="external_links highlight {% if link_form.non_form_errors() %}fail{% endif %}">
+       <legend><span class="announce">{% if link_form.non_form_errors() %}<em>Error in</em> {% endif %}{{ _('External links') }}</span></legend>
+        <p class="hint">If you've got additional information about your idea elsewhere on the internet (like YouTube pitches, wireframes or blog posts), please include them here. The more information you provide, the better!</p>
+        {{ link_form.management_form }}
+        <div class="ed">
+          {# We are only showing a single error message #}
+          {% for error in link_form.non_form_errors() %}
+          <strong>* {{ error }}</strong>
+          {% endfor %}
+        {% for link in link_form.forms %}
+            <div class="inline_field">
+                {% for field in link.hidden_fields() %}
+                {{ field }}
+                {% endfor %}
+                {% for field in link.visible_fields() %}
+                    {{ field.label_tag() }}
+                    {{ field }}
+                {% endfor %}
+            </div>
+        {% endfor %}
+        </div>
+     </fieldset>
+
+     {% if form.terms_and_conditions %}
+     <div class="highlight inline_field {% if form.terms_and_conditions.errors %}fail{% endif %}">
+       <div class="ed">
+         <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if form.terms_and_conditions.errors %}<em>Error in</em> {% endif %} I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a> <span class="error-hint"><span>(required)</span></span></label>
+         {% for error in form.terms_and_conditions.errors %}<p><strong>* {{ error }}</strong></p>{% endfor%}
+       </div>
+     </div>
+     {% endif %}
+
+     <div class="inline_field">
+        {{ form.is_draft }}
+        <label for="id_is_draft" class="announce">{{ _('Save as draft?') }}</label>
+        <p class="hint" id="info_is_draft">{{ _("Not ready for the world to see your idea yet? Save as draft and it will go public when you're ready.") }}</p>
+     </div>
+     {% block submit %}
+     <input class="cta" type="submit" value="{{ _('Submit your application') }}" />
+     {% endblock %}
+</form>
+{% endblock %}

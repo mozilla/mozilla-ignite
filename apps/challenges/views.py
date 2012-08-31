@@ -242,6 +242,11 @@ def add_submission(request, phase, form_class=NewEntryForm,
         }
     if extra_context:
         context.update(extra_context)
+
+    # to make playing with templates easier I've included a new template for dev
+    if phase.name == "Development":
+        template = "challenges/create_development.html"
+
     return jingo.render(request, template, context)
 
 
@@ -495,6 +500,11 @@ def submission_edit(request, submission, phase, form_class=EntryForm,
         }
     if extra_context:
         context.update(extra_context)
+
+    # to make playing with templates easier I've included a new template for dev
+    if phase.name == "Development":
+        template = "challenges/edit_development.html"
+
     return jingo.render(request, template, context)
 
 
