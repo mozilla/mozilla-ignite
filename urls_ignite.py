@@ -32,7 +32,8 @@ urlpatterns = patterns(
         vote_on_object, vote_dict, name='entry_vote'),
     url(r'^judges/$', 'ignite.views.judges', kwargs=_ignite_kwargs, name='our_judges'),
     url(r'^about/$', 'ignite.views.about', kwargs=_ignite_kwargs,  name='about_ignite'),
-    url(r'^terms/$', 'ignite.views.terms', kwargs=_ignite_kwargs,  name='terms_conditions')
+    url(r'^terms/$', 'ignite.views.terms', kwargs=_ignite_kwargs,  name='terms_conditions'),
+    url(r'^terms_development/$', 'ignite.views.terms_development', kwargs=_ignite_kwargs,  name='terms_conditions_development'),
 )
 
 
