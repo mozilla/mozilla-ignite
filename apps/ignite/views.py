@@ -68,6 +68,10 @@ def terms(request, project, slug, template_name='static/terms_conditions.html'):
     return jingo.render(request, template_name, {})
 
 
+def terms_development(request, project, slug, template_name='static/terms_conditions_development.html'):
+    return jingo.render(request, template_name, {})
+
+
 def fail(request, template_name='404.html'):
     return jingo.render(request, template_name, {}, status=404)
 

@@ -178,7 +178,7 @@
      {% if form.terms_and_conditions %}
      <div class="highlight inline_field {% if form.terms_and_conditions.errors %}fail{% endif %}">
        <div class="ed">
-         <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if form.terms_and_conditions.errors %}<em>Error in</em> {% endif %} I accept the <a href="{{ url('terms_conditions') }}" target="_blank">Challenge rules</a> <span class="error-hint"><span>(required)</span></span></label>
+         <label for="{{ form.terms_and_conditions.auto_id }}" class="announce">{{ form.terms_and_conditions }}{% if form.terms_and_conditions.errors %}<em>Error in</em> {% endif %} I accept the <a href="{{ url('terms_conditions_development') }}" target="_blank">Challenge rules</a> <span class="error-hint"><span>(required)</span></span></label>
          {% for error in form.terms_and_conditions.errors %}<p><strong>* {{ error }}</strong></p>{% endfor%}
        </div>
      </div>
