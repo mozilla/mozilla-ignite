@@ -114,10 +114,14 @@ class DevelopmentEntryForm(EntryForm):
     # sketh_note = forms.ImageField()
     #repository_url = forms.URLField()
     #blog_url = forms.URLField()
-    take_advantage = forms.CharField()
-    interest_making = forms.CharField()
-    team_members = forms.CharField()
-    collaborators = forms.CharField()
+    take_advantage = forms.CharField(
+        widget=forms.Textarea)
+    interest_making = forms.CharField(
+        widget=forms.Textarea)
+    team_members = forms.CharField(
+        widget=forms.Textarea)
+    collaborators = forms.CharField(
+        widget=forms.Textarea)
 
     class Meta:
         model = Submission
