@@ -69,6 +69,7 @@ development_entry_fields = (
     'is_draft',
     'life_improvements',  # How will end users interact with it, and how will they benefit?
     'take_advantage',  # How will your app leverage the 1Gbps, sliceable and deeply programmable network?
+    'required_effort',  # How much effort do you expect this work to take?
     'interest_making',  # Will your work be beta-ready by the end of the Development Challenge?
     'team_members',  # Describe yourself and your Team
     'collaborators',  # Do you need help?
@@ -121,6 +122,8 @@ class DevelopmentEntryForm(EntryForm):
     team_members = forms.CharField(
         widget=forms.Textarea)
     collaborators = forms.CharField(
+        widget=forms.Textarea)
+    required_effort = forms.CharField(
         widget=forms.Textarea)
 
     class Meta:

@@ -73,6 +73,13 @@
         {{ form.team_members }}
         </div>
     </div>
+    <div class="highlight {% if form.required_effort.errors %}fail{% endif %}">
+        <label for="id_required_effort" class="announce">{% if form.required_effort.errors %}<em>Error in</em> {% endif %}{{ _('How much effort do you expect this work to take?') }} <span class="error-hint"><span>(required)</span></span></label>
+        <div class="ed">
+          {% for error in form.required_effort.errors %}<strong>{{ error }}</strong>{% endfor %}
+        {{ form.required_effort }}
+        </div>
+    </div>
     <div class="highlight {% if form.interest_making.errors %}fail{% endif %}">
         <label for="id_interest_making" class="announce">{% if form.interest_making.errors %}<em>Error in</em> {% endif %}{{ _('Will your work be beta-ready by the end of the Development Challenge?') }} <span class="error-hint"><span>(required)</span></span></label>
         <div class="ed">
