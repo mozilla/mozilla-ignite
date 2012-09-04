@@ -1,0 +1,48 @@
+{% extends "challenges/show_entry.html" %}
+
+{% block page_title %}{{ entry.title }} | {{ _('Applications') }} | {% endblock %}
+
+    'interest_making',  # Will your work be beta-ready by the end of the Development Challenge?
+
+{% block submission_content %}
+<div class="description">
+    <h2 class="point">The problem it's intending to solve</h2>
+    <p>{{ entry.brief_description }}</p>
+    <h2 class="point">The technological solution</h2>
+    {{ entry.description_html }}
+    {% if entry.sketh_note %}
+        <div class="frame box sketh"><img src="{{ entry.get_image_src() }}" alt="" /></div>
+    {% endif %}
+    <h2 class="wimper">How will end users will interact with it, and how will they benefit</h2>
+    <p>{{ entry.life_improvements }}</p>
+    <h2 class="wimper">How the app will attempt to leverage the 1Gbps, sliceable and deeply programmable network</h2>
+    <p>{{ entry.take_advantage }}</p>
+</div>
+<h2 class="announce">Further application information</h2>
+{% if entry.blog_url or entry.repository_url or links %}
+    <h3 class="point">Additional supporting information, materials and resources</h3>
+    {% if entry.blog_url %}
+        <p>Read about project updates</strong> - <a href="{{ entry.blog_url }}">project blog</a></p>
+    {% endif %}
+    {% if entry.repository_url %}
+        <p>Take a look at the existing code - </strong><a href="{{ entry.repository_url }}">project repository</a></p>
+    {% endif %}
+    {% if links %}
+        <div class="links">
+            <h4 class="wimper">See also</h4>
+            <ul>
+            {% for link in links %}
+                <li><a class="wimper" href="{{ link.url }}">{{ link.name }}</a></li>
+            {% endfor %}
+            </ul> 
+        </div>
+    {% endif %} 
+{% endif %}
+<h3 class="wimper">Where we hope the application will grow to</h3>
+<p>{{ entry.interest_making }}</p>
+<h3 class="wimper">The amount of effort it should take to make</h3>
+<p>{{ entry.required_effort }}</p>
+<h3 class="wimper">What kind of help we they looking for to help us make this thing</h3>
+<p>{{ entry.collaborators }}</p>
+<p>If you can help let them know in the comments below.</p>
+{% endblock %}

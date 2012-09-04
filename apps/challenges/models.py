@@ -336,6 +336,8 @@ class Submission(BaseModel):
                                      blank=True)
     blog_url = models.URLField(max_length=500, verify_exists=False,
                                blank=True)
+    required_effort = models.TextField(blank=True, null=True,
+                                    verbose_name=_(u'How much effort do you expect this work to take?'))
 
 
     # managers
