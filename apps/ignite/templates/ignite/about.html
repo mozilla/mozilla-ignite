@@ -37,7 +37,7 @@
                     <p>Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days.</p>
                 {% endif %}
                 {% if request.development.is_open %}
-                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Submit your application now</a>
+                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Apply now</a>
                 {% endif %}
 			</div>
 		</div>
@@ -94,8 +94,8 @@
 		<div class="col main box">
 			<p class="intro">The Brainstorm round wrapped on August 23rd. We received over 300 submissions — <a href="{{ url('entries_all', phase='ideas') }}">check out the ideas</a>.</p>
             <p class="intro">We're now entering the Development rounds, where challenge participants compete for money and support to make their gigabit apps a reality.</p>
-            <p class="intro">We're offering $485k in awards over three rounds. Over the course of each round, participants will sprint on their apps and present progress to our panel of judges. The judges will award the prize money among the teams participating in each round.</p>
-            <p class="intro">You can participate in as many rounds as you like.</p>
+            <p class="intro">We're offering $485k in awards over three rounds. Over the course of each round, participants will sprint on their apps and present progress to our panel of judges. At the end of each round, the judges will deliberate and award the prize money among the teams participating.</p>
+            <p class="intro">You can participate in as many rounds as you like. Learn more about how the Development rounds work further down this page.</p>
             <p class="intro">The first round begins on October 4th. To participate in this round, we must receive your application by September 28th.</p>
 		</div>
 		<div class="col bonux box">
@@ -196,7 +196,7 @@
 			<div class="box col">
 				<h3 class="wimper">Win funding</h3>
 				<p><strong>To help make your app ideas a reality, we’re offering a total of $500K in awards</strong>, spread over three Development Rounds. You can compete in a single round, or in all three.</p>
-				<p>At the end of each round, participants will pitch their app in public sessions to a panel of expert judges. Judges and observers will be free to ask questions, with judges using the criteria in this judging scorecard to decide the winners.</p>
+				<p>At the end of each round, participants will pitch their app in public sessions to a panel of expert judges. Judges and observers will be free to ask questions, with judges using the criteria in this <a href="{{ url('terms_conditions_development') }}#judging_scorecard">judging scorecard</a> to decide the winners.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Get support</h3>
