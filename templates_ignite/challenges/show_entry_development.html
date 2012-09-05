@@ -2,20 +2,18 @@
 
 {% block page_title %}{{ entry.title }} | {{ _('Applications') }} | {% endblock %}
 
-    'interest_making',  # Will your work be beta-ready by the end of the Development Challenge?
-
 {% block submission_content %}
 <div class="description">
-    <h2 class="point">The problem it's intending to solve</h2>
+    <h2 class="point">What problem are you intending to solve?</h2>
     <p>{{ entry.brief_description }}</p>
-    <h2 class="point">The technological solution</h2>
+    <h2 class="point">What is the technological approach, or development roadmap?</h2>
     {{ entry.description_html }}
     {% if entry.sketh_note %}
         <div class="frame box sketh"><img src="{{ entry.get_image_src() }}" alt="" /></div>
     {% endif %}
-    <h2 class="wimper">How will end users will interact with it, and how will they benefit</h2>
+    <h2 class="wimper">How will end users interact with it, and how will they benefit?</h2>
     <p>{{ entry.life_improvements }}</p>
-    <h2 class="wimper">How the app will attempt to leverage the 1Gbps, sliceable and deeply programmable network</h2>
+    <h2 class="wimper">How will your app leverage the 1Gbps, sliceable and deeply programmable network?</h2>
     <p>{{ entry.take_advantage }}</p>
 </div>
 <h2 class="announce">Further application information</h2>
@@ -38,11 +36,11 @@
         </div>
     {% endif %} 
 {% endif %}
-<h3 class="wimper">Where we hope the application will grow to</h3>
+<h3 class="wimper">Will your work be beta-ready by the end of the Development Challenge?</h3>
 <p>{{ entry.interest_making }}</p>
-<h3 class="wimper">The amount of effort it should take to make</h3>
+<h3 class="wimper">How much effort do you expect this work to take?</h3>
 <p>{{ entry.required_effort }}</p>
-<h3 class="wimper">What kind of help we they looking for to help us make this thing</h3>
+<h3 class="wimper">Do you need help?</h3>
 <p>{{ entry.collaborators }}</p>
 <p>If you can help let them know in the comments below.</p>
 {% endblock %}
