@@ -27,12 +27,12 @@
         {% endif %}
         {% if development.is_open %}
             <a href="{{ url('create_entry', phase='apps') }}" class="cta">Apply now</a><br />
-            {% if request.development.is_open %}
                 Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete
-            {% else %}
-                Apply by {{ request.development.next_round.end_date.strftime('%B %-d') }} to compete</h3>
+        {% else %}
+            {% if development.has_started %}
+                We're currently judging the last round. The next round opens {{ request.development.next_round.start_date.strftime('%B %-d') }} so be ready to compete</h3>
             {% endif %}
-         {% endif %}
+        {% endif %}
        </div>
     </div>
 </div>
@@ -63,7 +63,7 @@
                 {% if request.development.is_open %}
                     <a class="col-foot" href="{{ url('create_entry', phase='apps') }}">Submit your application</a>
                 {% else %}
-                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open {{ development.start_date.strftime('%B %-d') }}</a>
+                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open {{ request.development.next_round.start_date.strftime('%B %-d') }}</a>
                 {% endif %}
             </li>
         </ul>
@@ -113,6 +113,9 @@
                 {% if request.development.is_open %}
                     <h2 class="point box-title">What's your app?</h2>
                     <a class="cta" href="{{ url('create_entry', phase='apps') }}">Get started</a>
+                {% endif %}
+                {% if request.development.has_started and request.development.is_closed %}
+                    <p class="intro">We're currently judging the last round. The next round opens {{ request.development.next_round.start_date.strftime('%B %-d') }} so be ready to compete</p>
                 {% endif %}
         </div>
     </div>

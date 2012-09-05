@@ -25,9 +25,9 @@
 		<div class="bonus col box">
 			<div class="highlight">
                 {% if request.development.is_open %}
-				    <h3 class="point box-title">Now through {{ request.development.current_round.end_date.strftime('%B %-d') }}: submit your app proposals.</h3>
+				    <h3 class="point box-title">Now through {{ request.development.current_round.end_date.strftime('%B %-d') }}: submit your app proposals or further develop your existing application.</h3>
                 {% else %}
-                    <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.end_date.strftime('%B %-d') }}: submit your app proposals.</h3>
+                    <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.end_date.strftime('%B %-d') }}: submit your app proposals or further develop your existing application.</h3>
                 {% endif %}
 				<p>Time to start hacking: we're offering $485,000 in prizes & support for teams over three rounds.</p>
                 {% if request.ideation.is_open %}
@@ -107,6 +107,9 @@
                     {% endif %}
                     {% if request.development.is_open %}
                        <li><strong><a href="{{ url('create_entry', phase='apps') }}">Submit your applications</a>.</strong> What’s your gigabit dream app?</li>
+                    {% endif %}
+                    {% if request.development.has_started %}
+                    <li><strong><a href="{{ url('entries_all', phase='apps') }}">Check out</a></strong> applications that have been submitted, ask questions and join the conversation.</li>
                     {% endif %}
 					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
@@ -405,7 +408,11 @@
 		</li>
 		<li>
 			<h3 class="wimper">Where are the official rules?</h3>
-			<p>You can check out the official rules <a href="{{ url('terms_conditions') }}" target="_blank">right here</a>.</p>
+            {% if development.has_started %}
+			<p>You can check out the official rules <a href="{{ url('terms_conditions_development') }}" target="_blank">right here</a>.</p>
+            {% else %}
+                <p>You can check out the official rules <a href="{{ url('terms_conditions') }}" target="_blank">right here</a>.</p>
+            {% endif %}
 		</li>
 		<li>
 			<h3 class="wimper">Do I have to participate in the Brainstorming Round?</h3>
