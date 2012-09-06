@@ -14,11 +14,11 @@ from challenges.widgets import CustomRadioSelect
 
 
 entry_widgets = {
-    'title': forms.TextInput(attrs={'aria-describedby':'info_title'}),
-    'brief_description': forms.TextInput(attrs={'aria-describedby':'info_brief_description'}),
-    'sketh_note': forms.FileInput(attrs={'aria-describedby':'info_sketh_note'}),
-    'description': forms.Textarea(attrs={'aria-describedby':'info_description',
-                                         'id':'wmd-input',}),
+    'title': forms.TextInput(attrs={'aria-describedby': 'info_title'}),
+    'brief_description': forms.TextInput(attrs={'aria-describedby': 'info_brief_description'}),
+    'sketh_note': forms.FileInput(attrs={'aria-describedby': 'info_sketh_note'}),
+    'description': forms.Textarea(attrs={'aria-describedby': 'info_description',
+                                         'id': 'wmd-input', }),
     'life_improvements': forms.Textarea(attrs={
         'aria-describedby': 'info_life_improvements',
     }),
@@ -31,6 +31,7 @@ entry_widgets = {
     'team_members': forms.Textarea(attrs={
         'aria-describedby': 'info_team_members'
     }),
+    'collaborators': forms.Textarea(),
     'is_draft': forms.CheckboxInput(attrs={'aria-describedby': 'info_is_draft'}),
     }
 
@@ -52,9 +53,23 @@ entry_fields = (
     )
 
 # List new fields for the Submission
-development_entry_fields = entry_fields + (
+development_entry_fields = (
+    'title',
+    'brief_description',  # What problem are you intending to solve?
+    'description',  # What is the technological approach, or development roadmap?
+    'is_draft',
+    # Following three to support additional resource
+    'sketh_note',
     'repository_url',
     'blog_url',
+    'category',  # Which Priority Area(s) does the app address?
+    'is_draft',
+    'life_improvements',  # How will end users interact with it, and how will they benefit?
+    'take_advantage',  # How will your app leverage the 1Gbps, sliceable and deeply programmable network?
+    'required_effort',  # How much effort do you expect this work to take?
+    'interest_making',  # Will your work be beta-ready by the end of the Development Challenge?
+    'team_members',  # Describe yourself and your Team
+    'collaborators',  # Do you need help?
     )
 
 class EntryForm(forms.ModelForm):
@@ -95,8 +110,18 @@ class DevelopmentEntryForm(EntryForm):
     # it is called on the Submission model
     # e.g. to make the stkety_note required:
     # sketh_note = forms.ImageField()
-    repository_url = forms.URLField()
-    blog_url = forms.URLField()
+    #repository_url = forms.URLField()
+    #blog_url = forms.URLField()
+    take_advantage = forms.CharField(
+        widget=forms.Textarea)
+    interest_making = forms.CharField(
+        widget=forms.Textarea)
+    team_members = forms.CharField(
+        widget=forms.Textarea)
+    collaborators = forms.CharField(
+        widget=forms.Textarea)
+    required_effort = forms.CharField(
+        widget=forms.Textarea)
 
     class Meta:
         model = Submission
@@ -108,6 +133,7 @@ class NewDevelopmentEntryForm(DevelopmentEntryForm):
     """New entries during the Development phase require a Terms and conditions
     flag"""
     terms_and_conditions = forms.BooleanField()
+
     class Meta:
         model = Submission
         fields = development_entry_fields + ('terms_and_conditions',)
