@@ -53,9 +53,6 @@ entry_fields = (
     )
 
 # List new fields for the Submission
-# Also need:
-# How much effort do you expect this work to take?
-
 development_entry_fields = (
     'title',
     'brief_description',  # What problem are you intending to solve?
