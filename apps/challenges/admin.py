@@ -190,7 +190,7 @@ mark_as_winner.description = "Mark Submissions as winners"
 
 class SubmissionAdmin(admin.ModelAdmin):
     model = Submission
-    list_display = ('title', 'created_by', 'category', 'phase',
+    list_display = ('title', 'created_by', 'category', 'phase', 'parent',
                     'is_draft', 'is_winner', 'excluded', 'score',
                     'judge_assignment', 'judgement_count')
     list_filter = ('category', 'is_draft', 'is_winner', 'phase__name',

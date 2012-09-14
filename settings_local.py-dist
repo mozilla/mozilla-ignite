@@ -54,7 +54,7 @@ CACHES = {
 }
 
 # Browser ID performs the assertion with this url e.g. http://localhost:8000
-SITE_URL = 'https://local.mozillaignite.org'
+SITE_URL = 'http://local.mozillaignite.org'
 
 SESSION_COOKIE_SECURE = False
 SESSION_COOKIE_HTTPONLY = False
@@ -87,3 +87,10 @@ HAYSTACK_CONNECTIONS = {
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Create the these directories off media and set to 755 so the app can access them
+USER_AVATAR_PATH = 'img/uploads/avatars/'
+TOPIC_IMAGE_PATH = 'img/uploads/topics/'
+PROJECT_IMAGE_PATH = 'img/uploads/projects/'
+EVENT_IMAGE_PATH = 'img/uploads/events/'
+CHALLENGE_IMAGE_PATH = 'img/uploads/challenges/'
