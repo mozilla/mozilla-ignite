@@ -414,8 +414,10 @@ class Submission(BaseModel):
 
     def get_absolute_url(self):
         """Return this submission's URL."""
-        return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
-                                               'phase': self.phase_slug})
+        if self.parent_slug and self.phase_slug:
+            return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
+                                                   'phase': self.phase_slug})
+        return u''
 
     def get_edit_url(self):
         """Return the URL to edit this submission."""
