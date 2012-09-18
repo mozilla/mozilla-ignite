@@ -1,0 +1,34 @@
+{% extends 'resources/pages/base.html' %}
+
+{% block page_title %}Cheese | {% endblock %}
+
+{% block social_meta %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}resources/css/ignite_ll.css" />
+<script src="{{ MEDIA_URL }}resources/js/popcorn.min.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/ignite_ll_main.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/ignite_ll_webgl_resources.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/global_popcorn_events.js"></script>
+{% endblock %}
+
+{% block resource_title %}<h1>{{ page_data.title }}</h1>{% endblock %}
+
+{% block video %}
+<video id="webgl_lab">
+    <source src="{{ MEDIA_URL }}resources/video/ignite_ll_test.mp4" />
+    <source src="{{ MEDIA_URL }}resources/video/ignite_ll_test.webm" />
+    <source src="{{ MEDIA_URL }}resources/video/ignite_ll_test.theora.ogv" />
+</video>
+{% endblock %}
+
+{% block additional_content %}
+<div id="walkthrough">
+    <a id="walkthrough_link" href="#"><div>Walkthrough</div></a>
+    <audio id="walkthrough_audio">
+        <source src="{{ MEDIA_URL }}resources/audio/walkthrough.ogg" />
+    </audio>
+</div>
+{% endblock %}
+
+{% block extra_assets %}
+<img id="logo2" class="logo_centered" alt="WebGL Learning Lab Logo" src="{{ MEDIA_URL }}resources/svg/webgl_w_text.svg" />
+{% endblock %}

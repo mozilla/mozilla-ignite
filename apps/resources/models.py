@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.db import models
 from django.utils.translation import ugettext as _
 from django_extensions.db.fields import (AutoSlugField, CreationDateTimeField,
@@ -6,13 +7,11 @@ from django_extensions.db.fields import (AutoSlugField, CreationDateTimeField,
 
 class Resource(models.Model):
     """List of resources"""
-    MENTOR = 1
+    EXTERNAL = 1
     LEARNING = 2
-    GENI = 3
     RESOURCE_CHOICES = (
-        (MENTOR, _('Mentor')),
-        (LEARNING, _('Learning Labs/ Webcasts')),
-        (GENI, _('Geni Resources')),
+        (EXTERNAL, _('External Link')),
+        (LEARNING, _('Learning Lab')),
         )
     PUBLISHED = 1
     HIDDEN = 2
@@ -28,8 +27,12 @@ class Resource(models.Model):
     email = models.EmailField(max_length=150, blank=True)
     is_featured = models.BooleanField(default=False)
     status = models.IntegerField(choices=STATUS_CHOICES, default=PUBLISHED)
+    template = models.CharField(max_length=255, null=True, blank=True)
     created = CreationDateTimeField()
     updated = ModificationDateTimeField()
 
     def __unicode__(self):
         return self.title
+
+
+admin.site.register(Resource)

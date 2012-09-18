@@ -5,6 +5,10 @@
 <section>
   <h1>{{ object.title }}</h1>
   <p>{{ object.body }}</p>
+  <p>{{ object.resource_type }}</p>
+  {% if object.resource_type == 2 %}
+    {{ object.slug }}
+  {% endif %}
   {% if object.email %}
   <a href="mailto:{{ object.email }}">Contact Mozilla Ignite</a> to get access
   {% endif %}
