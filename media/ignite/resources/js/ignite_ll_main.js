@@ -111,6 +111,7 @@ ignite = {
             document.webkitCancelFullScreen();
         }, false);
         // Setup frame slider:
+        this.outer = document.getElementById("video_box");
         this.frame = document.getElementById("frame");
         this.slider = document.getElementById("slider");
         this.middle = document.getElementById("video_content");
@@ -334,6 +335,8 @@ ignite = {
             this.frame.style.top = ""+Math.floor((size.height-modified_height)/2)+"px";
             this.frame.style.left = "0px";
         }
+        this.outer.style.width  = modified_width +"px";
+        this.outer.style.height = modified_height+"px";
         this.frame.style.width  = modified_width +"px";
         this.frame.style.height = modified_height+"px";
         this.frame.style.fontSize = Math.round(modified_height/20)+"px";

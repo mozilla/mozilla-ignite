@@ -6,6 +6,9 @@
     font-family: league_gothic_ie;
 	src: url(../fonts/league_gothic.eot);
 }
+#video_box {
+    position: relative;
+}
 #frame{
     background: #2e3132;
     font-family: "League Gothic", league_gothic, league_gothic_ie, sans-serif;
