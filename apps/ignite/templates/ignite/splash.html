@@ -27,7 +27,7 @@
         {% endif %}
         {% if development.is_open %}
             <a href="{{ url('create_entry', phase='apps') }}" class="cta">Apply now</a><br />
-                Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete
+                Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete in this round
         {% else %}
             {% if development.has_started %}
                 We're currently judging the last round. The next round opens {{ request.development.next_round.start_date.strftime('%B %-d') }} so be ready to compete
@@ -36,12 +36,13 @@
        </div>
     </div>
 </div>
+
 <div class="methods">
-    <div class="busta columns">
+	<div class="busta columns">
         <ul>
             <li class="col brainstorm box">
-                <h3 class="exclaim">Brainstorm</h3>
-                <p class="intro">Browse through the ideas submitted in the <a href="{{ url('entries_all', phase='ideas') }}">brainstorm phase</a>. Winners to be announced on the <a href="https://blog.mozillaignite.org/">Ignite blog</a>.</p>
+                <h3 class="exclaim">Explore</h3>
+                <p class="intro">Browse through the ideas submitted in the <a href="{{ url('entries_all', phase='ideas') }}">brainstorm phase</a>, and see the <a href="https://blog.mozillaignite.org/2012/09/ideation-winners/">winning submissions</a>.</p>
                 {% if request.ideation.is_open %}
                     <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
                 {% else %}
@@ -49,7 +50,7 @@
                 {% endif %}
             </li>
             <li class="col hack box">
-                <h3 class="exclaim">Hack</h3>
+                <h3 class="exclaim">Collaborate</h3>
                 <p class="intro">Meet like-minded collaborators at code sprints, design jams and webinars. Gain access to one of the fastest networks on the planet.</p>
                 {% if waffle.switch('show_events') %}
                 <a class="col-foot" href="#upcoming_events">Register for an upcoming event</a>
@@ -58,8 +59,8 @@
                 {% endif %}
             </li>
             <li class="col compete box">
-                <h3 class="exclaim">Compete</h3>
-                <p class="intro">Win funding and support to make your app a reality. <strong>$485,000 in prizes</strong> available over three rounds.</p>
+                <h3 class="exclaim">Build</h3>
+                <p class="intro">Submit code prototypes to earn funding and support. <strong>$485,000 in prizes</strong> available over three rounds.</p>
                 {% if request.development.is_open %}
                     <a class="col-foot" href="{{ url('create_entry', phase='apps') }}">Submit your application</a>
                 {% else %}
@@ -73,7 +74,7 @@
 
 {% block content %}
 <section class="focus_areas columns">
-    <h2 class="point">Design and build apps that revolutionize focus areas like these:</h2>
+    <h2 class="point">Design and build apps that address needs in:</h2>
     <ul>
     {% for cat in categories %}
     <li class="box col {{ cat.slug }}">
@@ -90,7 +91,7 @@
 <h2 class="faux_trigger box">Now through August 23rd: let's brainstorm. <strong>$15,000</strong> in prizes.</h2>
 {% endif %}
 {% if development.is_open %}
-<h2 class="faux_trigger box">Let the hacking begin! <strong>Apply now</strong> to compete in the Development round</h2>
+<h2 class="faux_trigger box">Let the hacking begin! <strong>Apply now</strong> to join the Development Challenge.</h2>
 {% endif %}
 <div class="columns project_data content_columns">
     <div class="dynamic main col box">
