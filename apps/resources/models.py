@@ -1,5 +1,5 @@
-from django.contrib import admin
 from django.db import models
+from django.conf import settings
 from django.utils.translation import ugettext as _
 from django_extensions.db.fields import (AutoSlugField, CreationDateTimeField,
                                          ModificationDateTimeField)
@@ -26,13 +26,18 @@ class Resource(models.Model):
     url = models.URLField(verify_exists=False, max_length=500, blank=True)
     email = models.EmailField(max_length=150, blank=True)
     is_featured = models.BooleanField(default=False)
+    thumbnail = models.ImageField(verbose_name=_(u'Learning Lab thumbnail'),
+            null=True, blank=True,
+            upload_to=settings.CHALLENGE_IMAGE_PATH)
     status = models.IntegerField(choices=STATUS_CHOICES, default=PUBLISHED)
     template = models.CharField(max_length=255, null=True, blank=True)
     created = CreationDateTimeField()
     updated = ModificationDateTimeField()
 
+    def get_image_src(self):
+        media_url = getattr(settings, 'MEDIA_URL', '')
+        path = lambda f: f and '%s%s' % (media_url, f)
+        return path(self.thumbnail)
+
     def __unicode__(self):
         return self.title
-
-
-admin.site.register(Resource)
