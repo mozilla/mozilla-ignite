@@ -38,6 +38,9 @@
                     {% if waffle.switch('show_judges') %}
                     <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
                     {% endif %}
+                    {% if waffle.switch('show_resources') %}
+                    <li><a href="/resources/">{{ _('Resources') }}</a></li>
+                    {% endif %}
                     {% if waffle.switch('show_blog') %}
                     <li><a href="https://blog.mozillaignite.org/">{{ _('Blog') }}</a></li>
                     {% endif %}
