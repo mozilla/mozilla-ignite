@@ -1,0 +1,42 @@
+{% extends 'resources/pages/base.html' %}
+
+{% block page_title %}WebGL Learning Lab | {% endblock %}
+{% block page_id %}webgl{% endblock %}
+{% block section_class %}learning-lab{% endblock %}
+
+{% block social_meta %}
+<link rel="stylesheet" type="text/css" href="{{ MEDIA_URL }}resources/css/ignite_ll.css" />
+<script src="{{ MEDIA_URL }}resources/js/popcorn.min.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/ignite_ll_main.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/ignite_ll_webgl_resources.js"></script>
+<script src="{{ MEDIA_URL }}resources/js/global_popcorn_events.js"></script>
+{% endblock %}
+
+{% block video %}
+<video id="webgl_lab">
+    <source src="//videos-cdn.mozilla.net/serv/webmademovies/ignite/ignite_ll_test.webm" />
+    <source src="//videos-cdn.mozilla.net/serv/webmademovies/ignite/ignite_ll_test.webm" />
+    <source src="//videos-cdn.mozilla.net/serv/webmademovies/ignite/ignite_ll_test.theora.ogv" />
+</video>
+{% endblock %}
+
+{% block additional_content %}
+<div id="walkthrough">
+    <a id="walkthrough_link" href="#"><div>Walkthrough</div></a>
+    <audio id="walkthrough_audio">
+        <source src="{{ MEDIA_URL }}resources/audio/walkthrough.ogg" />
+    </audio>
+</div>
+{% endblock %}
+
+{% block resource_list %}
+<ul id="resource_list"></ul>
+{% endblock %}
+
+{% block community %}
+<!-- community shiz in here -->
+{% endblock %}
+
+{% block extra_assets %}
+<img id="logo2" class="logo_centered" alt="WebGL Learning Lab Logo" src="{{ MEDIA_URL }}resources/svg/webgl_w_text.svg" />
+{% endblock %}
