@@ -2,6 +2,7 @@ import jingo
 
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
+from jinja2.exceptions import TemplateNotFound
 
 from resources.models import Resource
 
@@ -36,4 +37,7 @@ def resource_page(request, slug, template='resources/pages/base.html'):
 
     template = 'resources/pages/%s' % resource_page.template
 
-    return jingo.render(request, template, context)
+    try:
+        return jingo.render(request, template, context)
+    except TemplateNotFound:
+        raise Http404

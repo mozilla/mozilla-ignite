@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils.translation import ugettext as _
-from django_extensions.db.fields import (AutoSlugField, CreationDateTimeField,
+from django_extensions.db.fields import (CreationDateTimeField,
                                          ModificationDateTimeField)
 
 
@@ -20,7 +20,7 @@ class Resource(models.Model):
         (HIDDEN, _('Hidden')),
         )
     title = models.CharField(max_length=255)
-    slug = AutoSlugField(populate_from='title')
+    slug = models.SlugField(verbose_name=_(u'Slug'), max_length=80, unique=True)
     resource_type = models.IntegerField(choices=RESOURCE_CHOICES)
     body = models.TextField()
     url = models.URLField(verify_exists=False, max_length=500, blank=True)
