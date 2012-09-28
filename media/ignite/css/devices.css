@@ -1562,3 +1562,31 @@ address.vcard .frame {
     margin-bottom: 1em;
     display: inline-block;
 }
+/* Resources page */
+.resources .entre section {
+    margin-bottom: 2em;
+}
+.resources .entre section h2 {
+    margin-bottom: 0;
+}
+.resources .entre section ul {
+    padding-left: 0;
+}
+.resources .entre li {
+    overflow: hidden;
+    margin-bottom: 0.5em;
+}
+.resources article .frame {
+    float: left;
+    height: auto;
+    width: 30%;
+    margin-right: 10px;
+    max-height: none;
+}
+.resources .entre h3 {
+    color: #EF4619;
+    margin: 0;
+}
+.resources .frame img {
+    height: auto;
+}
