@@ -607,6 +607,7 @@ form span.error-hint:before {
 /**= Sections */
 /* Masthead */
 .masthead {
+    background: rgb(0, 0, 0);
     background: rgba(0, 0, 0, 0.8);
     border-top: 2px solid #fff;
     color: #fff;
