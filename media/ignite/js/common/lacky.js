@@ -27,7 +27,7 @@ lacky = function(config, file_map) {
     furnish = function(context,o) {
         var obj, context;
         // if no context is defined we know we're looking at the <body>
-        if (!context) { 
+        if (!context) {
             context = document.getElementsByTagName('body')[0];
         } else {
             // checks for a matching ID and falls back to jQuery for non-matches
@@ -74,8 +74,8 @@ lacky = function(config, file_map) {
                     }
                 });
             } else {
-                $(context).trigger('locale_loaded'); 
-            } 
+                $(context).trigger('locale_loaded');
+            }
         }
     };
     /**
@@ -89,7 +89,6 @@ lacky = function(config, file_map) {
         // i will be 0 indexed
         var common = file_map.common,
             len = common.length - 1;
-        console.log(common);
         /**
          * i: the current iteration
          * v: each object in common (above)
@@ -105,10 +104,9 @@ lacky = function(config, file_map) {
                 furnish();
             }
         });
-    }
+    };
     return {
         prepare : prepare,
         furnish : furnish
-    }
-
+    };
 };
