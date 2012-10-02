@@ -495,11 +495,11 @@ ignite = {
                 node = document.createElement("a");
                 node.setAttribute("href", node_json.content)
                 node.setAttribute("target", "_blank");
-                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="linkbox_padding.svg" /></div>';
+                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/linkbox_padding.svg" /></div>';
                 
             } else{
                 node = document.createElement("div");
-                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="ignite_embossed_logo.svg" /></div>';
+                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/ignite_embossed_logo.svg" /></div>';
             }
             node.setAttribute("class", "link_node");
             return node;
