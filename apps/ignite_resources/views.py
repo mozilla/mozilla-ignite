@@ -35,7 +35,7 @@ def resource_page(request, slug, template='ignite_resources/pages/base.html'):
         'page_data': resource_page
     }
 
-    template = 'resources/pages/%s' % resource_page.template
+    template = 'ignite_resources/pages/%s' % resource_page.template
 
     try:
         return jingo.render(request, template, context)
