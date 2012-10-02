@@ -78,7 +78,7 @@ urlpatterns += patterns(
 
 urlpatterns += patterns(
     '',
-    (r'^resources/', include('resources.urls', namespace='resources')),
+    (r'^resources/', include('ignite_resources.urls', namespace='resources')),
     (r'^award/', include('awards.urls', namespace='awards'), _ignite_kwargs),
     (r'^booking/', include('timeslot.urls', namespace='timeslot'),),
     (r'^webcast/', include('webcast.urls', namespace='webcast'),),

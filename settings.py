@@ -264,7 +264,7 @@ INSTALLED_APPS = (
     'voting',
     'timeslot',
     'webcast',
-    'resources',
+    'ignite_resources',
     'badges',
     'awards',
     'blogs',
