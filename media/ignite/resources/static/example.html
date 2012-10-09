@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<!--[if (lt IE 9)]><html class="no-js bad-ie" lang="{{ LANG }}" dir="{{ DIR }}"><![endif]-->
-<!--[if (gt IE 8)|!(IE)]><!--><html class="no-js" lang="{{ LANG }}" dir="{{ DIR }}"><!--<![endif]-->
+<!--[if (lt IE 9)]><html class="no-js bad-ie" lang="en-US" dir="ltr"><![endif]-->
+<!--[if (gt IE 8)|!(IE)]><!--><html class="no-js" lang="en-US" dir="ltr"><!--<![endif]-->
 <head>
-    <title>{% block page_title %}{% endblock %}{{ app_name }}</title>
+    <title>WebGL Learning Lab | Mozilla Ignite</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
     <meta name="viewport" content="initial-scale=1.0, width=device-width">
     <style>
@@ -14,26 +14,25 @@
     <!--[if lt IE 9]>
         <script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link rel="icon" href="{{ MEDIA_URL }}img/favicon.ico" />
-    {% block social_meta %}{% endblock %}
+    <link rel="icon" href="/media/ignite/img/favicon.ico" />
+    <!-- put your page specific CSS/JS in here -->
 </head>
-<body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
+<body id="webgl" class="learning-lab">
     <script type="text/javascript">
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
         var ignite = window.ignite || {};
         ignite.data = {
-            MEDIA_URL : '{{ MEDIA_URL }}',
+            MEDIA_URL : '/media/ignite/',
             JS_BUILD_ID: 'foo'
         };
     </script>
     <div role="main">
     <section>
-    {% block content %}
-        <div id="video_box">
+            <div id="video_box">
             <div id="frame">
                 <div id="slider">
                     <div id="video_content">
-                        {% block video %}{% endblock %}
+                        <!-- put your video in here - Ben will have to upload to the CDN so get any links off of him -->
                         <div id="controls">
                             <svg id="control_play" width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
                                 <title>Play / Pause</title>
@@ -79,32 +78,24 @@
                                 <text id="svg_timer" transform="matrix(2.0294, 0, 0, 2.0294, 4.73115, 22.9506)" text-anchor="left" font-family="sans-serif" font-size="24" y="22" x="0" stroke="#000000"></text>
                             </svg>
                         </div>
-                        {% block additional_content %}{% endblock %}
+                        <!-- any additional content - like walkthroughs go here -->
                     </div>
                     <div id="resources">
                         <!-- This decorative img element is included here and not in CSS as a result of issues with scaling of svg background images. -->
-                        <img class="logo_background" alt="decorative background" src="{{ MEDIA_URL }}resources/svg/ignite_embossed_logo.svg" />
-                        {% block resource_list %}{% endblock %}
+                        <img class="logo_background" alt="decorative background" src="/media/ignite/resources/svg/ignite_embossed_logo.svg" />
+                        <!-- resource list -->
                     </div>
                     <div id="community">
-                        {% block community %}{% endblock %}
+                        <!-- community shiz in here -->
                     </div>
                 </div>
-                <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="{{ MEDIA_URL }}resources/svg/ignite_w_text.svg" />
-                <img id="arrow_left" class="slider_arrow interface" alt="Move Left" src="{{ MEDIA_URL }}resources/svg/arrow_left.svg" width="46" height="188" />
-                <img id="arrow_right" class="slider_arrow interface" alt="Move Right" src="{{ MEDIA_URL }}resources/svg/arrow_right.svg" width="46" height="188" />
-                {% block extra_assets %}{% endblock %}
+                <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="/media/ignite/resources/svg/ignite_w_text.svg" />
+                <img id="arrow_left" class="slider_arrow interface" alt="Move Left" src="/media/ignite/resources/svg/arrow_left.svg" width="46" height="188" />
+                <img id="arrow_right" class="slider_arrow interface" alt="Move Right" src="/media/ignite/resources/svg/arrow_right.svg" width="46" height="188" />
+                <!-- any page specific assets put in here - like the webGL logo -->
             </div>
             </div>
-        {% endblock %}
-        </section>
+                </section>
         </div>
-    {% if waffle.switch('track_hits') %}
-    <!-- START OF SmartSource Data Collector TAG v10.2.0 -->
-    <!-- Copyright (c) 2012 Webtrends Inc. All rights reserved. -->
-    <script src="{{ MEDIA_URL }}js/include/ext/webtrends/webtrends.load.js"></script>
-    <noscript><img alt="dcsimg" id="dcsimg" width="1" height="1" src="//statse.webtrendslive.com/dcs7ggi1tvz5bdbvfb86i75xm_9b9v/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=10.2.10&amp;dcssip=www.mozillaignite.org"/></noscript>
-    <!-- END OF SmartSource Data Collector TAG v10.2.0 -->
-    {% endif %}
-</body>
+    </body>
 </html>
