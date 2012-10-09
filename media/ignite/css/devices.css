@@ -1588,6 +1588,9 @@ address.vcard .frame {
     color: #EF4619;
     margin: 0;
 }
+.resources .entre h4 {
+    margin: 0;
+}
 .resources .frame img {
     height: auto;
 }
