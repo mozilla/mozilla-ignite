@@ -16,7 +16,6 @@
         </ol>
     </nav>
     <div class="col box main">
-        <p class="intro">Do we want to put anything in here for people to read?</p>
         <section id="learning-labs">
             <h2>Ignite Learning Labs</h2>
             <ul>
@@ -32,7 +31,11 @@
                             {% endif %}
                             <h3>{{ lab.title }}</h3>
                         </a>
-                        <p>{{ lab.body }}</p>
+                        <p>{{ lab.body|safe }}</p>
+                        {% if lab.url %}
+                        <h4>Demo files</h4>
+                        <p>Download the demo files at <a href="{{ lab.url }}">{{ lab.url }}</a></p>
+                        {% endif %}
                     {% endif %}
                 </article>
             </li>
