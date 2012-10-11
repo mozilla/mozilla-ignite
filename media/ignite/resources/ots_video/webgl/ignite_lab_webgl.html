@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Mozilla Ignite Learning Lab - WebGL</title>
+        <link rel="stylesheet" type="text/css" href="ignite_ll.css" />
+        <script src="../popcorn.min.js"></script>
+        <script src="../ignite_ll_main.js"></script>
+        <script src="ignite_ll_webgl_resources.js"></script>
+        <script src="global_popcorn_events.js"></script>
+    </head>
+    <body>
+        <div id="support_message">
+            <div id="support_none">
+                <span>Your browser does not support HTML5. Please update your browser to view this video.</span>
+            </div>
+            <div id="support_limited">
+                <span>Your browser is out of date. Please update your browser to access all features of this video.</span>
+                <br />
+                <button id="support_button">Ok</button>
+            </div>
+        </div>
+        <div id="frame">
+            <div id="slider">
+                <div id="video_content">
+                    <video id="webgl_lab">
+                        <source src="ignite_ll.mp4video.mp4"></source>
+                        <source src="ignite_ll.theora.ogv"></source>
+                        <source src="ignite_ll.webmvp8.webm"></source>
+                    </video>
+                    <div id="controls">
+                        <svg id="control_big_play" width="100" height="100" viewBox="0 0 100 100"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <style>
+                                #big_play:hover{
+                                    fill: rgb(239, 72, 25);
+                                    opacity: 1;
+                                }
+                            </style>
+                            <title>Big Play</title>
+                            <path id="big_play" d="m10,10l80,40l-80,40l0,-80" opacity="0.8" id="svg_6" fill="white" />
+                        </svg>
+                        <div id="control_panel">
+                            <svg id="control_play" width="100" height="100" viewBox="0 0 100 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
+                                <title>Play / Pause</title>
+                                <style>
+                                    #pause{
+                                        opacity: 0;
+                                    }
+                                    .icon:hover{
+                                        fill: rgb(239, 72, 25);
+                                    }
+                                </style>
+                                <g class="icon" stroke-linejoin="round" fill="rgb(102, 102, 102)" stroke="#000000" stroke-width="0">
+                                    <g id="play">
+                                        <path id="play" d="m5,5l81,45l-81,45l0,-90z" />
+                                    </g>
+                                    <g id="pause">
+                                        <path d="m12,86l0,-72l20,0l0,71.20879l-20,0.79121z" />
+                                        <path d="m45,86l0,-72l20,0l0,71.20879l-20,0.79121z" />
+                                    </g>
+                                </g>
+                            </svg>
+                            <div id="control_progress">
+                                <div id="control_buffered_time"></div>
+                                <div id="control_elapsed_time"></div>
+                            </div>
+                            <svg id="control_mute" width="100" height="100" viewBox="0 0 100 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
+                                <title>Mute / Unmute</title>
+                                <style>
+                                    .icon:hover{
+                                        fill: rgb(239, 72, 25);
+                                    }
+                                </style>
+                                <g stroke="#000000" stroke-width="0" stroke-linejoin="round">
+                                    <path class="icon" d="m8,30l0,40l20,0l25,25l0,-90l-25,25l-20,0z" fill="rgb(102, 102, 102)" />
+                                    <g id="sound" fill="none" stroke="rgb(102, 102, 102)" stroke-width="8">
+                                        <path d="m65,20a50,50 0 0 10,60" id="svg_6"/>
+                                        <path d="m75,10a50,50 0 0 10,80" id="svg_7"/>
+                                    </g>
+                                </g>
+                            </svg>
+                            <svg id="control_timer" width="300" height="100" viewBox="0 0 225 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
+                                <title>Timer</title>
+                                <text id="svg_timer" transform="matrix(2.0294, 0, 0, 2.0294, 4.73115, 22.9506)" text-anchor="left"
+                                    font-family="sans-serif" font-size="24" y="22" x="0" stroke="#000000"></text>
+                            </svg>
+                        </div>
+                    </div>
+                    <div id="walkthrough">
+                        <a id="walkthrough_link" href="#"><div>Walkthrough</div></a>
+                        <audio id="walkthrough_audio">
+                            <source src="walkthrough.m4a"></source>
+                            <source src="walkthrough.ogg"></source>
+                        </audio>
+                    </div>
+                    <a id="credits_link" href="#"><div>Credits</div></a>
+                </div>
+                <div id="resources">
+                    <!-- This decorative img element is included here and not in CSS as a result of
+                        issues with scaling of svg background images. -->
+                    <img class="logo_background" alt="decorative background" src="../ignite_embossed_logo.svg" />
+                    <ul id="resource_list"></ul>
+                </div>
+                <div id="credits">
+					<ul>
+                        <li>Credits</li>
+                        <li>
+							<span class="credit_name">Open the Studio</span>
+							<span class="credit_type">Design and Development</span>
+						</li>
+						<li>
+							<span class="credit_name">Kenny Katzgrau</span>
+							<span class="credit_type">Interviews And Writing</span>
+						</li>
+                        <li>Special Thanks</li>
+						<li>
+							<span class="credit_name">Ken Russell</span>
+							<span class="credit_type">Interview, Google</span>
+						</li>
+						<li>
+							<span class="credit_name">Gregg Taveras</span>
+							<span class="credit_type">Interview, Google</span>
+						</li>
+						<li>
+							<span class="credit_name">Dov Amihod</span>
+							<span class="credit_type">Interview, TeamUp</span>
+						</li>
+						<li>
+							<span class="credit_name">Thiago Costa</span>
+							<span class="credit_type">Interview, TeamUp</span>
+						</li>
+						<li>
+							<span class="credit_name">Andor Salga</span>
+							<span class="credit_type">Interview, Expert</span>
+						</li>
+					</ul>
+				</div>
+            </div>
+            <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="../ignite_w_text.svg" />
+            <img id="logo2" class="logo_centered" alt="WebGL Learning Lab Logo" src="webgl_w_text.svg" />
+            <svg id="arrow_left" class="slider_arrow interface" width="50px" height="200px" viewBox="0 0 50 200"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <style>
+                    .arrow:hover{
+                        fill: rgb(239, 72, 25);
+                        opacity: 1;
+                    }
+                </style>
+                <polygon class="arrow" fill="#ffffff" opacity="0.4" points="50,0 0,100 50,200" />
+            </svg>
+            <svg id="arrow_right" class="slider_arrow interface" width="50px" height="200px" viewBox="0 0 50 200"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <style>
+                    .arrow:hover{
+                        fill: rgb(239, 72, 25);
+                        opacity: 1;
+                    }
+                </style>
+                <polygon class="arrow" fill="#ffffff" opacity="0.4" points="0,0 50,100 0,200" />
+            </svg>
+        </div>
+    </body>
+</html>
