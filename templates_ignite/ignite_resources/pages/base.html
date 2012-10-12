@@ -4,7 +4,6 @@
 <head>
     <title>{% block page_title %}{% endblock %}{{ app_name }}</title>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <meta name="viewport" content="initial-scale=1.0, width=device-width">
     <style>
         body {
             background: #2E3132;
@@ -15,7 +14,7 @@
         <script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link rel="icon" href="{{ MEDIA_URL }}img/favicon.ico" />
-    {% block social_meta %}{% endblock %}
+    {% block page_files %}{% endblock %}
 </head>
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
     <script type="text/javascript">
@@ -26,16 +25,42 @@
             JS_BUILD_ID: 'foo'
         };
     </script>
-    <div role="main">
-    <section>
     {% block content %}
-        <div id="video_box">
-            <div id="frame">
-                <div id="slider">
-                    <div id="video_content">
-                        {% block video %}{% endblock %}
-                        <div id="controls">
-                            <svg id="control_play" width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+    <div id="video_box">
+        <!-- This div contains "support messages" that will be shown to clients whose browsers do not support HTML5 or other aspects of this media. -->
+        <div id="support_message">
+            <div id="support_none">
+                <span>Your browser does not support HTML5. Please update your browser to view this video.</span>
+            </div>
+            <div id="support_limited">
+                <span>Your browser is out of date. Please update your browser to access all features of this video.</span>
+                <br />
+                <button id="support_button">Ok</button>
+            </div>
+        </div>
+        <div id="frame">
+            <div id="slider">
+                <div id="video_content">
+                    {% block video %}{% endblock %}
+                    <div id="controls">
+                        <svg id="control_big_play" width="100" height="100" viewBox="0 0 100 100"
+                            xmlns="http://www.w3.org/2000/svg"
+                            xmlns:xlink="http://www.w3.org/1999/xlink"
+                            xmlns:ev="http://www.w3.org/2001/xml-events">
+                            <style>
+                                #big_play:hover{
+                                    fill: rgb(239, 72, 25);
+                                    opacity: 1;
+                                }
+                            </style>
+                            <title>Big Play</title>
+                            <path id="big_play" d="m10,10l80,40l-80,40l0,-80" opacity="0.8" id="svg_6" fill="white" />
+                        </svg>
+                        <div id="control_panel">
+                            <svg id="control_play" width="100" height="100" viewBox="0 0 100 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
                                 <title>Play / Pause</title>
                                 <style>
                                     #pause{
@@ -59,7 +84,10 @@
                                 <div id="control_buffered_time"></div>
                                 <div id="control_elapsed_time"></div>
                             </div>
-                            <svg id="control_mute" width="100" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+                            <svg id="control_mute" width="100" height="100" viewBox="0 0 100 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
                                 <title>Mute / Unmute</title>
                                 <style>
                                     .icon:hover{
@@ -74,31 +102,53 @@
                                     </g>
                                 </g>
                             </svg>
-                            <svg id="control_timer" width="300" height="100" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 225 100">
+                            <svg id="control_timer" width="300" height="100" viewBox="0 0 225 100"
+                                xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink"
+                                xmlns:ev="http://www.w3.org/2001/xml-events">
                                 <title>Timer</title>
-                                <text id="svg_timer" transform="matrix(2.0294, 0, 0, 2.0294, 4.73115, 22.9506)" text-anchor="left" font-family="sans-serif" font-size="24" y="22" x="0" stroke="#000000"></text>
+                                <text id="svg_timer" transform="matrix(2.0294, 0, 0, 2.0294, 4.73115, 22.9506)" text-anchor="left"
+                                    font-family="sans-serif" font-size="24" y="22" x="0" stroke="#000000"></text>
                             </svg>
                         </div>
-                        {% block additional_content %}{% endblock %}
                     </div>
-                    <div id="resources">
-                        <!-- This decorative img element is included here and not in CSS as a result of issues with scaling of svg background images. -->
-                        <img class="logo_background" alt="decorative background" src="{{ MEDIA_URL }}resources/svg/ignite_embossed_logo.svg" />
-                        {% block resource_list %}{% endblock %}
-                    </div>
-                    <div id="community">
-                        {% block community %}{% endblock %}
-                    </div>
+                    {% block walkthrough %}{% endblock %}
+                    <a id="credits_link" href="#"><div>Credits</div></a>
                 </div>
-                <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="{{ MEDIA_URL }}resources/svg/ignite_w_text.svg" />
-                <img id="arrow_left" class="slider_arrow interface" alt="Move Left" src="{{ MEDIA_URL }}resources/svg/arrow_left.svg" width="46" height="188" />
-                <img id="arrow_right" class="slider_arrow interface" alt="Move Right" src="{{ MEDIA_URL }}resources/svg/arrow_right.svg" width="46" height="188" />
-                {% block extra_assets %}{% endblock %}
+                {% block resources %}{% endblock %}
+                <div id="credits">
+                    {% block credits %}{% endblock %}
+                </div>
             </div>
-            </div>
-        {% endblock %}
-        </section>
+            <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="{{ MEDIA_URL }}resources/svg/ignite_w_text.svg" />
+            <svg id="arrow_left" class="slider_arrow interface" width="50px" height="200px" viewBox="0 0 50 200"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <style>
+                    .arrow:hover{
+                        fill: rgb(239, 72, 25);
+                        opacity: 1;
+                    }
+                </style>
+                <polygon class="arrow" fill="#ffffff" opacity="0.4" points="50,0 0,100 50,200" />
+            </svg>
+            <svg id="arrow_right" class="slider_arrow interface" width="50px" height="200px" viewBox="0 0 50 200"
+                xmlns="http://www.w3.org/2000/svg"
+                xmlns:xlink="http://www.w3.org/1999/xlink"
+                xmlns:ev="http://www.w3.org/2001/xml-events">
+                <style>
+                    .arrow:hover{
+                        fill: rgb(239, 72, 25);
+                        opacity: 1;
+                    }
+                </style>
+                <polygon class="arrow" fill="#ffffff" opacity="0.4" points="0,0 50,100 0,200" />
+            </svg>
+            {% block extra_assets %}{% endblock %}
         </div>
+    </div>
+    {% endblock %}
     {% if waffle.switch('track_hits') %}
     <!-- START OF SmartSource Data Collector TAG v10.2.0 -->
     <!-- Copyright (c) 2012 Webtrends Inc. All rights reserved. -->

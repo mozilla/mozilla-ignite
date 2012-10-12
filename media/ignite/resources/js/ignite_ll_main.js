@@ -6,8 +6,80 @@
  * http://creativecommons.org/licenses/by/3.0/ or send a letter to Creative
  * Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
  */
-
 ignite = {
+    // Define compatibility flags. This may be expanded in the future.
+    compatibility: {
+        EVENT: 1,
+        DOM: 2,
+        HTML5: 4,
+        CONTROLS: 8,
+        CSS_TRANSITION: 16,
+        status: 0, // Not undefined, so that bitwise operations will work.
+        check: function (dom_content_event){
+            // First check if the event DOMContentLoaded can be listened for and will be fired.
+            if(dom_content_event){
+                // Test for the ability to listen for events.
+                if(document.addEventListener){
+                    this.status |= this.EVENT;
+                }
+            } else{
+                // Test for HTML5 video support by testing for the existence of the main video.
+                    // Note: Assumes document.getElementById. Support charts show support back to IE6.
+                if(document.getElementById("webgl_lab") || document.getElementById("walkthrough_audio")){
+                    this.status |= this.HTML5;
+                }
+                // Test for progress bar click support, which requires clientWidth.
+                    // Note: event.clientX is not tested here, but support charts show near universal compatibility.
+                var progress_bar = document.getElementById("control_progress")
+                if((progress_bar.clientWidth !== undefined) && (progress_bar.offsetLeft !== undefined) && progress_bar.offsetParent){
+                    this.status |= this.CONTROLS;
+                }
+                // Test for DOM manipulation.
+                if(document.createElement && document.appendChild){
+                    var test_element = document.createElement("div");
+                    var test_contents = document.createElement("span");
+                    test_contents.innerHTML = "textContent check";
+                    test_element.appendChild(test_contents)
+                    if(test_element.setAttribute || test_element.innerHTML){
+                        this.status |= this.DOM;
+                    }
+                    // textContent is used by the svg DOM in the custom controls.
+                    if(!test_contents.textContent){
+                        this.status &= ~this.CONTROLS;
+                    }
+                    var test_style = test_element.style;
+                    if( "transition"       in test_style ||
+                        "MozTransition"    in test_style ||
+                        "WebkitTransition" in test_style ||
+                        "OTransition"      in test_style){
+                        this.status |= this.CSS_TRANSITION;
+                    }
+                }
+                /* Remaining Tests:
+                 * mp4 || webm || theora.ogv
+                 * inline SVG
+                 * Embedded fonts
+                 */
+            }
+            return this.status;
+        },
+        notify: function (){
+            /* Function must be delayed to allow for page loading,
+             * particularly the support_message div.
+             */
+            setTimeout(function (){
+                document.getElementById("support_message").style.display = "block";
+                if(!(ignite.compatibility.status & (ignite.compatibility.EVENT | ignite.compatibility.DOM | ignite.compatibility.HTML5))){
+                    document.getElementById("support_none").style.display = "block";
+                } else if(!(ignite.compatibility.status & ignite.compatibility.CSS_TRANSITION && ignite.compatibility.status & ignite.compatibility.CONTROLS)){
+                    document.getElementById("support_limited").style.display = "block";
+                    document.getElementById("support_button").addEventListener("click", function (){
+                        document.getElementById("support_message").style.display = "none";
+                    }, false);
+                }
+            }, 1000);
+        }
+    },
     setup: function (){
         this.seeking = false;
         this.popcorn = Popcorn("#webgl_lab");
@@ -15,107 +87,125 @@ ignite = {
         window.addEventListener("keydown", function (e){ ignite.key_down(e);}, false);
         // Configure Custom Controls:
         var controls = document.getElementById("controls");
-            // Play/Pause Button
-        var play_button = document.getElementById("control_play")
-        play_button.addEventListener("click", function (){
-            if(ignite.popcorn.currentTime() == ignite.popcorn.duration()){
-                ignite.popcorn.currentTime(0);
+        if(this.compatibility.status & this.compatibility.CONTROLS){
+            // Capture standard play events.
+            this.popcorn.media.addEventListener("click", function (){
+                if(ignite.walkthrough_in_progress){ return;}
+                if(ignite.popcorn.paused()){
+                    ignite.popcorn.play()
+                } else{
+                    ignite.popcorn.pause();
+                }
+            }, false);
+            // Big Play Button
+            document.getElementById("control_big_play").addEventListener("click", function (){
+                if(ignite.walkthrough_in_progress){ return;}
                 ignite.popcorn.play();
-                return;
-            }
-            if(ignite.popcorn.paused()){ ignite.popcorn.play();}
-            else{ ignite.popcorn.pause();}
-        }, false);
-        this.popcorn.on("playing", function (){
-            play_button.getElementById("play" ).style.opacity = "0";
-            play_button.getElementById("pause").style.opacity = "1";
-        });
-        this.popcorn.on("pause", function (){
+            }, false)
+            // Play/Pause Button
             var play_button = document.getElementById("control_play")
-            play_button.getElementById("play" ).style.opacity = "1";
-            play_button.getElementById("pause").style.opacity = "0";
-        });
-        this.popcorn.on("ended", function (){
-            var play_button = document.getElementById("control_play")
-            play_button.getElementById("play" ).style.opacity = "1";
-            play_button.getElementById("pause").style.opacity = "0";
-        });
+            play_button.addEventListener("click", function (){
+                if(ignite.walkthrough_in_progress){ return;}
+                if(ignite.popcorn.currentTime() == ignite.popcorn.duration()){
+                    ignite.popcorn.currentTime(0);
+                    ignite.popcorn.play();
+                    return;
+                }
+                if(ignite.popcorn.paused()){ ignite.popcorn.play();}
+                else{ ignite.popcorn.pause();}
+            }, false);
+            this.popcorn.on("playing", function (){
+                document.getElementById("control_big_play").style.opacity = "0";
+                setTimeout(function (){
+                    document.getElementById("control_big_play").style.display = "none";
+                }, 1000)
+                play_button.getElementById("play" ).style.opacity = "0";
+                play_button.getElementById("pause").style.opacity = "1";
+            });
+            this.popcorn.on("pause", function (){
+                var play_button = document.getElementById("control_play")
+                play_button.getElementById("play" ).style.opacity = "1";
+                play_button.getElementById("pause").style.opacity = "0";
+            });
+            this.popcorn.on("ended", function (){
+                var play_button = document.getElementById("control_play")
+                play_button.getElementById("play" ).style.opacity = "1";
+                play_button.getElementById("pause").style.opacity = "0";
+            });
             // Progress Bar and Timer
-        var progress_bar = document.getElementById("control_progress");
-        var buffered_bar = document.getElementById("control_buffered_time");
-        var elapsed_bar = document.getElementById("control_elapsed_time");
-        var timer = document.getElementById("control_timer");
-        progress_bar.addEventListener("click", function (event){
-            var duration = ignite.popcorn.duration();
-            if(!duration){ return;}
-            var resized_width = progress_bar.clientWidth;
-            var actual_left = 0;
-            var offset_element = progress_bar;
-            while(offset_element){
-                actual_left += offset_element.offsetLeft;
-                offset_element = offset_element.offsetParent;
-            }
-            var click_percent = (event.clientX-actual_left) / resized_width;
-            var seek_time = duration * click_percent;
-            elapsed_bar.style.width = ""+(click_percent*100)+"%";
-            ignite.popcorn.currentTime(seek_time);
-        });
-        this.popcorn.on("timeupdate", function (){
-            var duration = ignite.popcorn.duration();
-            if(!duration){ return;}
-            var current_time = ignite.popcorn.currentTime();
-            var elapsed_percent = current_time / duration;
-            elapsed_bar.style.width = ""+(elapsed_percent*100)+"%";
-            var extra_0 = ((current_time%60) < 10)? "0" : "";
-            current_time = ""+Math.floor(current_time/60)+":"+extra_0+Math.floor(current_time%60);
-            var timer_text = timer.getElementById("svg_timer");
-            if(ignite.current_duration){
-                timer_text.textContent = ""+current_time+"/"+ignite.current_duration;
-            } else{
-                timer_text.textContent = ""+current_time;
-            }
-        });
-        this.popcorn.on("progress", function (){
-            ignite.current_duration = ignite.popcorn.duration();
-            if(!ignite.current_duration){ return;}
-            var buffered_range = ignite.popcorn.buffered();
-            var buffer_end = buffered_range.end(0);
-            if(!buffer_end){ buffer_end = 0}
-            buffered_bar.style.width = ""+((buffer_end/ignite.current_duration)*100)+"%";
-            var current_time = ignite.popcorn.currentTime()
-            var extra_0 = ((current_time%60) < 10)? "0" : "";
-            current_time = ""+Math.floor(current_time/60)+":"+extra_0+Math.floor(current_time%60);
-            ignite.current_duration = ""+Math.floor(ignite.current_duration/60)+":"+Math.floor(ignite.current_duration%60);
-            var timer_text = timer.getElementById("svg_timer");
-            if(ignite.current_duration){
-                timer_text.textContent = ""+current_time+"/"+ignite.current_duration;
-            } else{
-                timer_text.textContent = ""+current_time;
-            }
-        });
+            var progress_bar = document.getElementById("control_progress");
+            var buffered_bar = document.getElementById("control_buffered_time");
+            var elapsed_bar = document.getElementById("control_elapsed_time");
+            var timer = document.getElementById("control_timer");
+            progress_bar.addEventListener("click", function (event){
+                if(ignite.walkthrough_in_progress){ return;}
+                var duration = ignite.popcorn.duration();
+                if(!duration){ return;}
+                var resized_width = progress_bar.clientWidth;
+                var actual_left = 0;
+                var offset_element = progress_bar;
+                while(offset_element){
+                    actual_left += offset_element.offsetLeft;
+                    offset_element = offset_element.offsetParent;
+                }
+                var click_percent = (event.clientX-actual_left) / resized_width;
+                var seek_time = duration * click_percent;
+                elapsed_bar.style.width = ""+(click_percent*100)+"%";
+                ignite.popcorn.currentTime(seek_time);
+            });
+            this.popcorn.on("timeupdate", function (){
+                var duration = ignite.popcorn.duration();
+                if(!duration){ return;}
+                var current_time = ignite.popcorn.currentTime();
+                var elapsed_percent = current_time / duration;
+                elapsed_bar.style.width = ""+(elapsed_percent*100)+"%";
+                var extra_0 = ((current_time%60) < 10)? "0" : "";
+                current_time = ""+Math.floor(current_time/60)+":"+extra_0+Math.floor(current_time%60);
+                var timer_text = timer.getElementById("svg_timer");
+                if(ignite.current_duration){
+                    timer_text.textContent = ""+current_time+"/"+ignite.current_duration;
+                } else{
+                    timer_text.textContent = ""+current_time;
+                }
+            });
+            this.popcorn.on("progress", function (){
+                ignite.current_duration = ignite.popcorn.duration();
+                if(!ignite.current_duration){ return;}
+                var buffered_range = ignite.popcorn.buffered();
+                var buffer_end = buffered_range.end(0);
+                if(!buffer_end){ buffer_end = 0}
+                buffered_bar.style.width = ""+((buffer_end/ignite.current_duration)*100)+"%";
+                var current_time = ignite.popcorn.currentTime()
+                var extra_0 = ((current_time%60) < 10)? "0" : "";
+                current_time = ""+Math.floor(current_time/60)+":"+extra_0+Math.floor(current_time%60);
+                ignite.current_duration = ""+Math.floor(ignite.current_duration/60)+":"+Math.floor(ignite.current_duration%60);
+                var timer_text = timer.getElementById("svg_timer");
+                if(ignite.current_duration){
+                    timer_text.textContent = ""+current_time+"/"+ignite.current_duration;
+                } else{
+                    timer_text.textContent = ""+current_time;
+                }
+            });
             // Volume:
-        var mute_button = document.getElementById("control_mute");
-        mute_button.addEventListener("click", function (){
-            if(ignite.popcorn.muted()){
-                ignite.popcorn.unmute();
-                mute_button.getElementById("sound" ).style.opacity = "1";
-            } else{
-                ignite.popcorn.muted(true);
-                mute_button.getElementById("sound" ).style.opacity = "0";
-            }
-        }, false);
-        // Prevent Fullscreen:
-        this.popcorn.media.requestFullScreen = function (){ return false;};
-        this.popcorn.media.mozRequestFullScreen = function (){ return false;};
-        document.addEventListener("webkitfullscreenchange", function () {
-            document.webkitCancelFullScreen();
-        }, false);
+            var mute_button = document.getElementById("control_mute");
+            mute_button.addEventListener("click", function (){
+                if(ignite.popcorn.muted()){
+                    ignite.popcorn.unmute();
+                    mute_button.getElementById("sound" ).style.opacity = "1";
+                } else{
+                    ignite.popcorn.muted(true);
+                    mute_button.getElementById("sound" ).style.opacity = "0";
+                }
+            }, false);
+        } else{
+            this.popcorn.media.controls = "true";
+            controls.style.display = "none";
+        }
         // Setup frame slider:
-        this.outer = document.getElementById("video_box");
         this.frame = document.getElementById("frame");
         this.slider = document.getElementById("slider");
         this.middle = document.getElementById("video_content");
-        this.right  = document.getElementById("community" );
+        this.right  = document.getElementById("credits" );
         this.left   = document.getElementById("resources"  );
         this.video_width = 1280;
         this.video_height = 720;
@@ -134,6 +224,9 @@ ignite = {
             for(var I = 0; I < node.content.length; I++){
                 var resource = node.content[I];
                 resource.tier = tier+1;
+                if(resource.display == "none"){
+                    continue;
+                }
                 var container_li = document.createElement("li");
                 /* A separate block container is needed to prevent our resources
                  * from having an ancestor positioned absolutely. Otherwise
@@ -163,6 +256,7 @@ ignite = {
                                 ignite.resources.highlight(resource_replacement);
                             }
                         })(resource),
+
                     false);
                     logo_text = '"><img src="/media/ignite/resources/svg/ignite_embossed_logo.svg" />';
                     r_element.innerHTML = '<div class="title">'+resource.title+'</div><div class="icon'+logo_text+'</div>';
@@ -232,6 +326,7 @@ ignite = {
             return;
         }
         this.walkthrough_in_progress = true;
+        ignite.arrow_left.style.opacity = "0";
         // There cannot be more than one popcorn instance per document.
         ignite.popcorn.pause();
         //ignite.popcorn.emit("seeking");
@@ -239,45 +334,46 @@ ignite = {
         //var walkthrough = Popcorn("#walkthrough_audio");
         setTimeout(/*
         walkthrough.cue(1, */function (){
-            var test_resource = {title: 'Outside Content', content: "http://example.com/"};
+            var test_resource = {resource_id: "about_webgl"};
             var test_node = ignite.link_node_manager.create_node(test_resource);
             ignite.link_node_manager.add_node(test_node);
-        }, 1000);
+        }, 1333);
         setTimeout(/*
         walkthrough.cue(2, */function (){
-            var test_resource = {title: 'Topic'};
+            var test_resource = {resource_id: "demos"};
             var test_node = ignite.link_node_manager.create_node(test_resource);
             ignite.link_node_manager.add_node(test_node);
-        }, 2000);
+        }, 2666);
         setTimeout(/*
         walkthrough.cue(3, */function (){
-            var test_resource = {title: 'Outside Content', content: "http://example.com/"};
-            var test_node = ignite.link_node_manager.create_node(test_resource);
-            ignite.link_node_manager.add_node(test_node);
-        }, 3000);
-        setTimeout(/*
-        walkthrough.cue(4, */function (){
-            var test_resource = {title: 'Outside Content', content: "http://example.com/"};
+            var test_resource = {resource_id: "mozilla_ignite"};
             var test_node = ignite.link_node_manager.create_node(test_resource);
             ignite.link_node_manager.add_node(test_node);
         }, 4000);
         setTimeout(/*
         walkthrough.cue(6, */function (){
             ignite.link_node_manager.clear_nodes()
-            ignite.transition("left");
-            ignite.arrow_right.style.display = "none";
+            ignite.transition("left", true);
+            ignite.arrow_right.style.opacity = "0";
+            // Transitioning left normally causes the right arrow to appear.
+            // In the walkthrough we want to disable this.
         }, 6000);
         setTimeout(/*
         walkthrough.cue(10, */function (){
             ignite.resources.highlight(ignite.resources.content[0]);
+        }, 9500);
+        setTimeout(/*
+        walkthrough.cue(10, */function (){
+            ignite.resources.highlight(ignite.resources.content[0].content[0]);
         }, 10000);
         setTimeout(/*
         walkthrough.on("ended", */function (){
             ignite.popcorn.currentTime(55);
             ignite.link_node_manager.setup_at(ignite.popcorn.currentTime(55))
             setTimeout(function (){
-                ignite.transition("right");
+                ignite.transition("right", true);
                 ignite.walkthrough_in_progress = false;
+                ignite.popcorn.play()
             }, 250);
             setTimeout(function (){
                 ignite.resources.unhighlight(ignite.resources.highlight_tier1);
@@ -335,13 +431,12 @@ ignite = {
             this.frame.style.top = ""+Math.floor((size.height-modified_height)/2)+"px";
             this.frame.style.left = "0px";
         }
-        this.outer.style.width  = modified_width +"px";
-        this.outer.style.height = modified_height+"px";
         this.frame.style.width  = modified_width +"px";
         this.frame.style.height = modified_height+"px";
-        this.frame.style.fontSize = Math.round(modified_height/20)+"px";
+        document.body.style.fontSize = Math.round(modified_height/20)+"px";
         this.left.style.fontSize = Math.round(modified_height/16)+"px";
         document.getElementById("walkthrough_link").style.fontSize = Math.round(modified_height/13)+"px";
+        document.getElementById("credits_link").style.fontSize = Math.round(modified_height/13)+"px";
         this.middle.style.top     = "0px";
         this.left.style.top       = "0px";
         this.right.style.top      = "0px";
@@ -372,13 +467,16 @@ ignite = {
         this.right.style.height   = modified_height+"px";
         this.slider.style.height  = modified_height+"px";
     },
-    transition: function (direction){
+    transition: function (direction, force){
         this.slider.style.transition       = "left 1s";
         this.slider.style.MozTransition    = "left 1s";
         this.slider.style.WebkitTransition = "left 1s";
         this.slider.style.OTransition      = "left 1s";
         switch(direction){
             case "left":{
+                if(this.arrow_left.style.opacity != "1" && !force){
+                    return;
+                }
                 switch(this.slider_state){
                     case "middle":{
                         this.slider_state = "left";
@@ -392,6 +490,9 @@ ignite = {
                 break;
             }
             case "right":{
+                if((this.arrow_right.style.opacity != "1" && !force)){
+                    return;
+                }
                 switch(this.slider_state){
                     case "middle":{
                         this.slider_state = "right";
@@ -407,6 +508,7 @@ ignite = {
         }
         switch(this.slider_state){
             case "left":{
+                ignite.link_node_manager.clear_nodes();
                 this.slider.style.left = "0%";
                 this.arrow_left.style.opacity = "0";
                 this.arrow_right.style.opacity = "1";
@@ -417,12 +519,17 @@ ignite = {
                 this.slider.style.left = "-100%";
                 this.arrow_left.style.opacity = "1";
                 this.arrow_right.style.opacity = "0";
-                if(!this.walkthrough){
-                    this.popcorn.play();
+                if(!this.walkthrough_in_progress){
+                    ignite.link_node_manager.setup_at(ignite.popcorn.currentTime());
+                    if(ignite.popcorn.currentTime() != ignite.popcorn.duration()){
+                        // Don't play if returning to video from credits or resources after video has ended.
+                        this.popcorn.play();
+                    }
                 }
                 break;
             }
             case "right":{
+                ignite.link_node_manager.clear_nodes();
                 this.slider.style.left = "-200%";
                 this.arrow_right.style.opacity = "0";
                 this.popcorn.pause()
@@ -490,18 +597,24 @@ ignite = {
             }
         },
         create_node: function (node_json){
-            var node;
-            if(node_json.content){
-                node = document.createElement("a");
-                node.setAttribute("href", node_json.content)
+            var node = document.createElement("a");
+			var resource = ignite.resources.get_resource_from_id(node_json.resource_id);
+			if(typeof(resource.content) == "string"){
+				node.setAttribute("class", "link_node");
+                node.setAttribute("href", resource.content)
                 node.setAttribute("target", "_blank");
-                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/linkbox_padding.svg" /></div>';
-                
+                node.innerHTML = '<div class="title">'+resource.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/linkbox_padding.svg" /></div>';
             } else{
-                node = document.createElement("div");
-                node.innerHTML = '<div class="title">'+node_json.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/ignite_embossed_logo.svg" /></div>';
+				node.setAttribute("class", "link_node link_node_group");
+                node.innerHTML = '<div class="title">'+resource.title+'</span></div><div class="icon"><img src="/media/ignite/resources/svg/ignite_embossed_logo.svg" /></div>';
+				node.addEventListener("click", function (){
+                    if(ignite.walkthrough_in_progress){ return;}
+					ignite.transition("left");
+					setTimeout(function (){
+						ignite.resources.navigate_id(node_json.resource_id);
+					}, 500);
+				}, false);
             }
-            node.setAttribute("class", "link_node");
             return node;
         },
         remove_node: function (node){
@@ -627,8 +740,55 @@ ignite.resources = {
             sub_rsc.element.style.WebkitTransition = "";
             sub_rsc.element.style.OTransition      = "";
         }
-    }
+    },
+	navigate_id: function (resource_id){
+		var navigation_steps = resource_id.split(".");
+		var parent_resource = ignite.resources;
+		for(var nav_index = 0; nav_index < navigation_steps.length; nav_index++){
+			var step_id = navigation_steps[nav_index];
+			for(var res_index = 0; res_index < parent_resource.content.length; res_index++){
+				var test_resource = parent_resource.content[res_index];
+				if(test_resource.id == step_id){
+					parent_resource = test_resource;
+					this.highlight(parent_resource);
+					break;
+				}
+			}
+		}
+	},
+	get_resource_from_id: function (resource_id){
+		var navigation_steps = resource_id.split(".");
+		var parent_resource = ignite.resources;
+		for(var nav_index = 0; nav_index < navigation_steps.length; nav_index++){
+			var step_id = navigation_steps[nav_index];
+			for(var res_index = 0; res_index < parent_resource.content.length; res_index++){
+				var test_resource = parent_resource.content[res_index];
+				if(test_resource.id == step_id){
+					parent_resource = test_resource;
+					break;
+				}
+			}
+		}
+		return parent_resource;
+	}
 };
-document.addEventListener("DOMContentLoaded", function (){
-    ignite.setup();
-});
+ignite.compatibility.check(true);
+if((ignite.compatibility.status & ignite.compatibility.EVENT)){
+    document.addEventListener("DOMContentLoaded", function (){
+        ignite.compatibility.check();
+        var full_featured = (
+            ignite.compatibility.CONTROLS |
+            ignite.compatibility.CSS_TRANSITION |
+            ignite.compatibility.DOM |
+            ignite.compatibility.EVENT |
+            ignite.compatibility.HTML5);
+        if(ignite.compatibility.status != full_featured){
+            ignite.compatibility.notify()
+        }
+        if(ignite.compatibility.status & (ignite.compatibility.DOM | ignite.compatibility.HTML5)){
+            ignite.setup();
+        }
+    });
+} else{
+    ignite.compatibility.notify()
+}

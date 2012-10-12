@@ -135,10 +135,8 @@ ignite.link_node_manager.content[0] = {
         {notes: "Add Arrows", time_in: 55, time_out: 56,
             started: undefined, // Needed for unexpected behavior in Chrome.
             start: function (){
-                ignite.arrow_right.style.display = "block";
                 if(this.started){ return;}
                 this.started = true;
-                ignite.arrow_left.style.display  = "block";
                 setTimeout(function (){
                     ignite.arrow_left.style.opacity  = "1";
                     ignite.arrow_right.style.opacity = "0";
@@ -150,6 +148,69 @@ ignite.link_node_manager.content[0] = {
                     this.start();
                 }
             }
+        },
+        {notes: "Credits", time_in: 557, time_out: 600,
+            displayed: undefined, // Needed for unexpected behavior in Chrome.
+            start: function (){
+                if(this.displayed){ return;}
+                this.displayed = true;
+                var credits_button = document.getElementById("credits_link");
+                credits_button.style.display = "block";
+                if(!this.setup){
+                    this.setup = true;
+                    var passed_event = this;
+                    credits_button.addEventListener("click", function (){
+						ignite.transition("right", true);
+                        passed_event.end();
+                    });
+                }
+                /* The following setTimeout call is necessary to prevent
+                 * block and opacity from being set simultaneously, which would
+                 * result in a spontaneous appearance instead of a fade-in.
+                 */
+                if(this.timeout_id){
+                    clearTimeout(this.timeout_id);
+                }
+                this.timeout_id = setTimeout((function (passed_button){
+                    return function (){
+                        passed_button.style.opacity = "1";
+                    }
+                })(credits_button), 1000);
+            },
+            end: function (){
+                if(!this.displayed){ return;}
+                this.displayed = false;
+                var credits_button = document.getElementById("credits_link");
+                credits_button.style.opacity = "0";
+                if(this.timeout_id){
+                    clearTimeout(this.timeout_id);
+                }
+                this.timeout_id = setTimeout((function (passed_button){
+                    return function (){
+                        passed_button.style.display = "none";
+                    }
+                })(credits_button), 1000);
+            },
+            check: function (time_code){
+                if(time_code > this.time_in && time_code < this.time_out){
+                    this.start();
+                } else{
+                    this.end();
+                }
+            }
         }
     ]
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
