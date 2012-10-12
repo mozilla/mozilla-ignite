@@ -1,0 +1,376 @@
+@font-face{
+    font-family: league_gothic;
+    src: url(league_gothic.otf);
+}
+@font-face{
+    font-family: league_gothic_ie;
+	src: url(league_gothic.eot);
+}
+body{
+    background: #2e3132;
+    font-family: "League Gothic", league_gothic, league_gothic_ie, sans-serif;
+}
+#support_message, #support_none, #support_limited{
+    display: none;
+}
+#support_message{
+    position: absolute;
+    left: 25%;
+    top: 25%;
+    width: 50%;
+    height: 50%;
+    background: rgb(204, 204, 204);
+    border: 3px solid black;
+    z-index: 4;
+}
+#support_none, #support_limited{
+    position: relative;
+    top: 35%;
+    text-align: center;
+}
+#support_button{
+    width: 20%;
+}
+#frame{
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    overflow: hidden;
+}
+#frame a:link, #frame a:visited{
+    color: black;
+    text-decoration: none;
+}
+#webgl_lab{
+    position:absolute;
+    width:100%;
+    height:100%;
+}
+#walkthrough_link{
+    display: none;
+    background: rgb( 232, 242, 248);
+    background: rgba( 232, 242, 248, 0.5);
+    border-radius: 2% 2% 2% 2% / 12% 12% 12% 12%;
+    position: absolute;
+	left: 35%;
+	top: 45%;
+    width: 30%;
+    height: 9%;
+    opacity: 0;
+	transition: opacity 1s;
+	-moz-transition: opacity 1s;
+	-webkit-transition: opacity 1s;
+	-o-transition: opacity 1s;
+    text-align: center;
+}
+#walkthrough_link:hover{
+    background: rgb( 255, 255, 255);
+    background: rgba( 232, 242, 248, 1);
+}
+#credits_link{
+    display: none;
+    background: rgb( 232, 242, 248);
+    background: rgba( 232, 242, 248, 0.5);
+    border-radius: 2% 2% 2% 2% / 12% 12% 12% 12%;
+    position: absolute;
+	left: 35%;
+	top: 75%;
+    width: 30%;
+    height: 9%;
+    opacity: 0;
+	transition: opacity 1s;
+	-moz-transition: opacity 1s;
+	-webkit-transition: opacity 1s;
+	-o-transition: opacity 1s;
+    text-align: center;
+}
+#credits_link:hover{
+    background: rgb( 255, 255, 255);
+    background: rgba( 232, 242, 248, 1);
+}
+#logo1{
+    /* Native size: 209 x 91 */
+	display: none;
+	opacity: 0;
+    position: absolute;
+	transition        : left 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-moz-transition   : left 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-webkit-transition: left 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-o-transition     : left 2s, top 1s, opacity 1s, height 1s, width 1s;
+}
+#logo2{
+    /* Native size: 1521 x 837 */
+	display: none;
+	opacity:  0;
+    position: absolute;
+	transition        : right 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-moz-transition   : right 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-webkit-transition: right 2s, top 1s, opacity 1s, height 1s, width 1s;
+	-o-transition     : right 2s, top 1s, opacity 1s, height 1s, width 1s;
+}
+.centered_logo{
+	height: 40%;
+	top: 30%;
+}
+.positioned_logo{
+	height: 12%;
+	top: 4%;
+}
+#logo1.centered_logo{
+    left: 24%;
+}
+#logo2.centered_logo{
+    right: 30%;
+}
+#logo1.positioned_logo{
+    left: 3%;
+}
+#logo2.positioned_logo{
+    right: 3%;
+}
+.slider_arrow{
+    position: absolute;
+    top: 42%;
+    height: 18%;
+	opacity: 0;
+	transition: opacity 1s;
+	-moz-transition: opacity 1s;
+	-webkit-transition: opacity 1s;
+	-o-transition: opacity 1s;
+}
+#arrow_left{
+    left: 1%;
+}
+#arrow_right{
+    right: 1%;
+}
+#slider{
+    position: absolute;
+    background: #2e3132;
+}
+#video_content{
+    position: absolute;
+    overflow: hidden;
+}
+#resources{
+    position: absolute;
+	overflow: hidden;
+}
+#credits{
+    position: absolute;
+	overflow: hidden;
+}
+#credits ul{
+	position: absolute;
+	left: 10%;
+	top: 15%;
+	width: 80%;
+	height: 70%;
+	list-style: none;
+}
+#credits li{
+	position: relative;
+	width: 100%;
+	height: 10%;
+	margin: 1%;
+}
+.credit_name{
+	position: relative;
+	text-align: right;
+	padding-right: 2%;
+	float: left;
+	width: 58%;
+    background: rgb( 232, 242, 248);
+    border-radius: 1% 0% 0% 1% / 20% 0% 0% 20%;
+}
+.credit_type{
+	position: relative;
+	text-align: left;
+	padding-left: 2%;
+	float: right;
+	width: 38%;
+    background: rgb(239, 72, 25);
+    border-radius: 0% 1% 1% 0% / 0% 20% 20% 0%;
+}
+.link_node{
+    display: block;
+    width: 20%;
+    height: 6%;
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+.link_node div.title{
+    background: rgb( 232, 242, 248);
+    background: rgba( 232, 242, 248, 0.5);
+    border-radius: 2% 0% 0% 2% / 12% 0% 0% 12%;
+    width: 80%;
+    height: 100%;
+    text-align: right;
+    padding-right: 2%;
+    display: inline-block;
+}
+.link_node div.icon{
+    float: right;
+    color: white;
+    background: #7f8184;
+    border-radius: 0% 12% 12% 0% / 0% 12% 12% 0%;
+    width: 18%;
+    height: 100%;
+    text-align: center;
+}
+.link_node div.title:hover{
+	background: white;
+}
+.link_node_group div.icon{
+    background: rgb(239, 72, 25); /*#ef4819;*/
+}
+div.icon img{
+    height: 80%;
+    width: 80%;
+    margin: 10%;
+}
+/* Left Div, Resource Link Area */
+#resources ul{
+    list-style-type: none;
+}
+.logo_background{
+    position: absolute;
+    top: 30%;
+    left: 25%;
+    height: 140%;
+}
+.resource{
+    color: black;
+    width: 23%;
+    height: 8%;
+    position: absolute;
+    left: 10%;
+    cursor: pointer;
+    display: block;
+}
+.resource div.title{
+    float: left;
+    background: rgb( 232, 242, 248);
+    border-radius: 2% 0% 0% 2% / 12% 0% 0% 12%;
+    width: 80%;
+    height: 100%;
+    text-align: right;
+    padding-right: 2%;
+    display: inline-block;
+}
+.resource div.icon{
+    float: right;
+    color: white;
+    background: rgb(239, 72, 25); /*#ef4819;*/
+    border-radius: 0% 12% 12% 0% / 0% 12% 12% 0%;
+    width: 18%;
+    height: 100%;
+    text-align: center;
+}
+.resource div.link{
+    background: #7f8184;
+}
+.resource div.title:hover{
+	background: rgb( 255, 204, 153);
+}
+/* Levels of nesting in the resource list. */
+.tier1{
+    left: 10%;
+    z-index: 3;
+}
+.tier2{
+    left: 38%;
+    display: none;
+    z-index: 2;
+}
+.tier3{
+    left: 66%;
+    display: none;
+    z-index: 1;
+}
+/* Custom video controls. */
+#control_panel{
+	position: absolute;
+	bottom: 0%;
+	left: 10%;
+	width: 80%;
+	height: 10%;
+	background: rgb(102, 102, 102, 0);
+	background: rgba(255, 255, 255, 0.4);
+    border-radius: 2% 2% 0% 0% / 25% 25% 0% 0%;
+	opacity: 0.2;
+	transition: opacity 0.3s;
+	-moz-transition: opacity 0.3s;
+	-webkit-transition: opacity 0.3s;
+	-o-transition: opacity 0.3s;
+}
+#control_panel:hover{
+	opacity: 1;
+}
+#control_big_play{
+    cursor: pointer;
+    position: absolute;
+    top: 40%;
+    height: 20%;
+    left: 40%;
+    width: 20%;
+	transition: opacity 0.5s;
+	-moz-transition: opacity 0.5s;
+	-webkit-transition: opacity 0.5s;
+	-o-transition: opacity 0.5s;
+}
+#control_play{
+    cursor: pointer;
+	position: absolute;
+	top: 15%;
+	left: 7%;
+	height: 67%;
+	width: 4.92%; /* 70% of 10% = what% of 80%; w = 8.75; a = 16:9 */
+}
+#control_progress{
+    cursor: pointer;
+	position: absolute;
+	top: 29%;
+	left: 14%;
+	height: 40%;
+	width: 60%;
+	overflow: hidden;
+	background: rgb(102, 102, 102);
+	z-index: 2;
+}
+#control_elapsed_time{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 0%;
+	background: rgb(153, 153, 153);
+}
+#control_buffered_time{
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	height: 100%;
+	width: 0%;
+	background: rgb(51, 51, 51);
+}
+#control_progress:hover #control_elapsed_time{
+	background: rgb(239, 72, 25);
+}
+#control_timer{
+	position: absolute;
+	top: 0%;
+	left: 75%;
+	height: 100%;
+	width: 13%;
+	z-index: 1;
+}
+#control_mute{
+    cursor: pointer;
+	position: absolute;
+	top: 15%;
+	left: 88%;
+	height: 70%;
+	width: 4.92%;
+}
