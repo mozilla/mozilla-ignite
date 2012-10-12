@@ -15,11 +15,13 @@
         <script type="text/javascript" src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
     <link rel="icon" href="../../img/favicon.ico" />
+    <!-- {% block page_files %} -->
     <link rel="stylesheet" type="text/css" href="/media/ignite/resources/css/ignite_ll.css" />
-<script src="../js/popcorn.min.js"></script>
-<script src="../js/ignite_ll_main.js"></script>
-<script src="../js/ignite_ll_webgl_resources.js"></script>
-<script src="../js/global_popcorn_events.js"></script>
+    <script src="../js/popcorn.min.js"></script>
+    <script src="../js/ignite_ll_main.js"></script>
+    <script src="../js/ignite_ll_webgl_resources.js"></script>
+    <script src="../js/global_popcorn_events.js"></script>
+    <!-- {% endblock %} -->
 </head>
 <body id="webgl" class="learning-lab">
     <script type="text/javascript">
@@ -45,11 +47,13 @@
         <div id="frame">
             <div id="slider">
                 <div id="video_content">
+                    <!-- {% block video %} -->
                     <video id="webgl_lab">
                         <source src="http://videos.mozilla.org/serv/webmademovies/ignite/ignite_ll.webmvp8.webm" />
                         <source src="http://videos.mozilla.org/serv/webmademovies/ignite/ignite_ll.mp4video.mp4" />
                         <source src="http://videos.mozilla.org/serv/webmademovies/ignite/ignite_ll.theora.ogv" />
                     </video>
+                    <!-- {% endblock %} -->
                     <div id="controls">
                         <svg id="control_big_play" width="100" height="100" viewBox="0 0 100 100"
                             xmlns="http://www.w3.org/2000/svg"
@@ -120,6 +124,7 @@
                             </svg>
                         </div>
                     </div>
+                    <!-- {% block walkthrough %} -->
                     <div id="walkthrough">
                         <a id="walkthrough_link" href="#"><div>Walkthrough</div></a>
                         <audio id="walkthrough_audio">
@@ -127,14 +132,18 @@
                             <source src="http://videos.mozilla.org/serv/webmademovies/ignite/walkthrough.ogg" />
                         </audio>
                     </div>
+                    <!-- {% endblock %} -->
                     <a id="credits_link" href="#"><div>Credits</div></a>
                 </div>
+                <!-- {% block resources %} -->
                 <div id="resources">
                     <!-- This decorative img element is included here and not in CSS as a result of issues with scaling of svg background images. -->
                     <img class="logo_background" alt="decorative background" src="../svg/ignite_embossed_logo.svg" />
                     <ul id="resource_list"></ul>
                 </div>
+                <!-- {% endblock %} -->
                 <div id="credits">
+                    <!-- {% block credits %} -->
                     <ul>
                         <li>Credits</li>
                         <li>
@@ -167,6 +176,7 @@
                             <span class="credit_type">Interview, Expert</span>
                         </li>
                     </ul>
+                    <!-- {% endblock %} -->
                 </div>
             </div>
             <img id="logo1" class="logo_centered" alt="Mozilla Ignite Logo" src="../svg/ignite_w_text.svg" />
@@ -194,7 +204,9 @@
                 </style>
                 <polygon class="arrow" fill="#ffffff" opacity="0.4" points="0,0 50,100 0,200" />
             </svg>
+            <!-- {% block extra_assets %} -->
             <img id="logo2" class="logo_centered" alt="WebGL Learning Lab Logo" src="../svg/webgl_w_text.svg" />
+            <!-- {% endblock %} -->
         </div>
     </div>
 </body>
