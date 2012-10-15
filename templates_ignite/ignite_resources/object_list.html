@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block page_title %}Ignite Resources | {% endblock %}
+{% block page_id %}index-page{% endblock %}
+{% block section_class %}resources{% endblock %}
+
+{% block content %}
+<h1>Ignite Resources</h1>
+
+<div class="content_columns columns">
+    <nav class="col index box">
+        <h2 class="wimper">Index</h2>
+        <ol>
+            <li><a href="#learning-labs">Learning Labs</a></li>
+            <li><a href="#external">External Resources</a></li>
+        </ol>
+    </nav>
+    <div class="col box main">
+        <section id="learning-labs">
+            <h2>Ignite Learning Labs</h2>
+            <ul>
+            {% for lab in labs %}
+            <li>
+                <article>
+                    {% if lab.slug %}
+                        <a href="/resources/labs/{{ lab.slug }}/">
+                            {% if lab.thumbnail %}
+                                <div class="frame box">
+                                    <img src="{{ lab.get_image_src() }}" alt="" />
+                                </div>
+                            {% endif %}
+                            <h3>{{ lab.title }}</h3>
+                        </a>
+                        <p>{{ lab.body|safe }}</p>
+                        {% if lab.url %}
+                        <h4>Demo files</h4>
+                        <p>Download the demo files at <a href="{{ lab.url }}">{{ lab.url }}</a></p>
+                        {% endif %}
+                    {% endif %}
+                </article>
+            </li>
+            {% endfor %}
+            </ul>
+        </section>
+        <section id="external">
+            <h2>External Resources</h2>
+            <ul>
+            {% for link in links %}
+            <li>
+                <article>
+                    {% if link.url %}
+                        <h3><a href="{{ link.url }}">{{ link.title }}</a></h3>
+                        <p>{{ link.body }}</p>
+                        <a href="{{ link.url }}">Read the full article at {{ link.url }}</a>
+                    {% endif %}
+                </article>
+            </li>
+            {% endfor %}
+            </ul>
+        </section>
+    </div>
+</div>
+{% endblock %}

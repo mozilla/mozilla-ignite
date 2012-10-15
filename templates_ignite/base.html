@@ -38,6 +38,9 @@
                     {% if waffle.switch('show_judges') %}
                     <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
                     {% endif %}
+                    {% if waffle.switch('show_resources') %}
+                    <li><a href="/resources/">{{ _('Resources') }}</a></li>
+                    {% endif %}
                     {% if waffle.switch('show_blog') %}
                     <li><a href="https://blog.mozillaignite.org/">{{ _('Blog') }}</a></li>
                     {% endif %}
@@ -101,6 +104,7 @@
                 <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}img/partners/webfwd.png"></a></li>
                 <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}img/partners/mdn.png"></a></li>
                 <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}img/partners/ignite.png"></a></li>
+                <li><a href="http://energy.gov"><img width="90" height="75" alt="US Department of Energy" src="{{ MEDIA_URL }}img/partners/doe.png"></a></li>
             </ul>
             </div>
         </section>

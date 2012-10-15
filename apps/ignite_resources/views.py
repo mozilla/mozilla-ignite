@@ -4,10 +4,10 @@ from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from jinja2.exceptions import TemplateNotFound
 
-from resources.models import Resource
+from ignite_resources.models import Resource
 
 
-def object_list(request, template='resources/object_list.html'):
+def object_list(request, template='ignite_resources/object_list.html'):
     """Lists the current resources"""
     labs = Resource.objects.filter(
             status=Resource.PUBLISHED,
@@ -24,7 +24,7 @@ def object_list(request, template='resources/object_list.html'):
     return jingo.render(request, template, context)
 
 
-def resource_page(request, slug, template='resources/pages/base.html'):
+def resource_page(request, slug, template='ignite_resources/pages/base.html'):
     """ Grab the intended resource from the DB so we can render it """
     try:
         resource_page = Resource.objects.get(slug=slug)
@@ -35,7 +35,7 @@ def resource_page(request, slug, template='resources/pages/base.html'):
         'page_data': resource_page
     }
 
-    template = 'resources/pages/%s' % resource_page.template
+    template = 'ignite_resources/pages/%s' % resource_page.template
 
     try:
         return jingo.render(request, template, context)
