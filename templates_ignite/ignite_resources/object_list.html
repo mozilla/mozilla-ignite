@@ -5,7 +5,7 @@
 {% block section_class %}resources{% endblock %}
 
 {% block content %}
-<h1>Ignite Resources</h1>
+<h1>Developer Resources</h1>
 
 <div class="content_columns columns">
     <nav class="col index box">
@@ -17,7 +17,7 @@
     </nav>
     <div class="col box main">
         <section id="learning-labs">
-            <h2>Ignite Learning Labs</h2>
+            <h2>Learning Labs &amp; Hackable Examples</h2>
             <ul>
             {% for lab in labs %}
             <li>
@@ -33,8 +33,8 @@
                         </a>
                         <p>{{ lab.body|safe }}</p>
                         {% if lab.url %}
-                        <h4>Demo files</h4>
-                        <p>Download the demo files at <a href="{{ lab.url }}">{{ lab.url }}</a></p>
+                        <h4>Hackable Demo</h4>
+                        <p>Jump into the example project at <a href="{{ lab.url }}">{{ lab.url }}</a></p>
                         {% endif %}
                     {% endif %}
                 </article>
