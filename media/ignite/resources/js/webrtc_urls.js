@@ -4,5 +4,5 @@ ignite.url = {
     logo1: "../svg/ignite_w_text.svg",
     logo2: "../svg/webrtc_w_text.svg",
     resource_background: "../svg/ignite_embossed_logo.svg",
-    hackable_demo: undefined, // This should be the only url needed.
+    hackable_demo: "https://github.com/mozilla/mozilla-ignite-learning-lab-demos/tree/master/lab-2-webrtc-video",
 };
