@@ -9,15 +9,22 @@ from ignite_resources.models import Resource
 
 def object_list(request, template='ignite_resources/object_list.html'):
     """Lists the current resources"""
+    sticky = Resource.objects.filter(
+            status=Resource.PUBLISHED,
+            resource_type=2,
+            is_featured=True
+        ).order_by('title')
     labs = Resource.objects.filter(
             status=Resource.PUBLISHED,
-            resource_type=2
+            resource_type=2,
+            is_featured=False
         ).order_by('-created')
     links = Resource.objects.filter(
             status=Resource.PUBLISHED,
             resource_type=1
         ).order_by('title')
     context = {
+        'sticky': sticky,
         'labs': labs,
         'links': links
         }
