@@ -10,6 +10,13 @@
             margin: 0;
         }
     </style>
+    <script type="text/javascript">
+        var ignite_bundle = window.ignite || {};
+        ignite_bundle.data = {
+            MEDIA_URL : '{{ MEDIA_URL }}',
+            JS_BUILD_ID: 'foo'
+        };
+    </script>
     <!--[if lt IE 9]>
         <script type="text/javascript" src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
@@ -19,11 +26,6 @@
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
     <script type="text/javascript">
         document.documentElement.className = document.documentElement.className.replace(/\bno-js\b/, '');
-        var ignite = window.ignite || {};
-        ignite.data = {
-            MEDIA_URL : '{{ MEDIA_URL }}',
-            JS_BUILD_ID: 'foo'
-        };
     </script>
     {% block content %}
     <div id="video_box">
