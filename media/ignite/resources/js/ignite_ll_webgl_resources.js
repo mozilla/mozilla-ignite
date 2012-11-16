@@ -130,9 +130,9 @@ ignite.resources.content = [
             {id: "3dfx_ad", title: "3DFX Ad", content: "http://www.youtube.com/watch?v=ooLO2xeyJZA"}
         ]},
 		{title: 'Video Features 1', content: [
-            {title: 'One Millionth Tower', content: 'http://highrise.nfb.ca/onemillionthtower/'},
-            {title: 'Turbulent Point Cloud', content: 'http://www.ro.me/tech/turbulent-point-cloud'},
-            {title: 'Hatching Glow Shader', content: 'http://www.ro.me/tech/hatching-glow-shader'},
+            {title: 'One Millionth T.', content: 'http://highrise.nfb.ca/onemillionthtower/'},
+            {title: 'Turbulent Point C.', content: 'http://www.ro.me/tech/turbulent-point-cloud'},
+            {title: 'Hatching Glow S.', content: 'http://www.ro.me/tech/hatching-glow-shader'},
             {title: 'Kai &apos;Opua', content: 'http://www.webgl.com/2012/05/webgl-game-kai-opua/'},
             {title: 'ro.me', content: 'http://www.ro.me/'},
             {title: 'Shiny Knot', content: 'http://www.chromeexperiments.com/detail/floating-shiny-knot/'},
@@ -157,12 +157,12 @@ ignite.resources.content = [
             {title: 'Codecademy', content: 'http://www.codecademy.com/#!/exercises/0'},
             {title: 'Khan Academy', content: 'http://www.khanacademy.org/'},
             {title: 'Radiohead Video', content: 'http://www.youtube.com/watch?v=oLrsguw1Zac'}
-        ]} // TODO: Remember to ask Mike about "grey link" attributions.
+        ]}
 	]},
 	{id: "assorted", display: "none", content: [
 		{id: "java_&_opengl", title: "Java & OpenGL", content: "http://www.opengl.org/resources/bindings/"},
 		{id: "dependencies", title: "Dependencies", content: "http://en.wikipedia.org/wiki/Dependency_hell"},
-        {id: "coupling", title: "Coupling", content: "TODO"},
+        {id: "coupling", title: "Coupling", content: "http://en.wikipedia.org/wiki/Coupling_%28computer_programming%29"},
 		{id: "teamup", title: "TeamUp", content: "http://www.getteamup.com"},
 		{id: "boot_to_gecko", title: "Boot to Gecko", content: "http://www.mozilla.org/en-US/b2g/"},
         {id: "firefox_os", title: "Firefox OS", content: "http://www.digitaltrends.com/mobile/firefox-os-can-mozilla-move-to-mobile-phones/For"},
@@ -179,7 +179,7 @@ ignite.resources.content = [
         {id: "p2pu", title: "Peer 2 Peer U", content: "https://p2pu.org/en/"},
         {id: "khan_academy", title: "Khan Academy", content: "http://www.khanacademy.org/"},
         {id: "the_gig", title: "&quot;The Gig&quot;", content: "http://chattanoogagig.com/"},
-        {id: "webgl_exercise", title: "WebGL Exercise", content: "TODO"},
+        {id: "webgl_exercise", title: "WebGL Exercise", content: "https://github.com/mozilla/mozilla-ignite-learning-lab-demos/tree/master/lab-1-webgl"},
         {id: "andors_submission", title: "Andor's Entry", content: "https://mozillaignite.org/ideas/323/"}
 	]}
 ];
