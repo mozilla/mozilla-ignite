@@ -92,8 +92,8 @@ ignite = {
         logo1.src = ignite.url.logo1;
         var logo2 = document.getElementById("logo2");
         logo2.src = ignite.url.logo2;
-	var demo_link = document.getElementById("demo_link");
-	demo_link.href = ignite.url.hackable_demo;
+        var demo_link = document.getElementById("demo_link");
+        demo_link.href = ignite.url.hackable_demo;
         // Configure Custom Controls:
         var controls = document.getElementById("controls");
         if(this.compatibility.status & this.compatibility.CONTROLS){
