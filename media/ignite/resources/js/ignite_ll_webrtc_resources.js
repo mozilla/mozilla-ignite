@@ -89,7 +89,7 @@ ignite.resources.content = [
             {id: "getusermedia", title: "getUserMedia()", content: "http://www.html5rocks.com/en/tutorials/getusermedia/intro/"},
             {id: "peer_connection_api", title: "Peer Connection", content: "https://webrtc-demos.appspot.com/html/pc1.html"}
         ]},
-        {id: "webrtc_org", title: "WebRTC.org", content: "http://wwww.webrtc.org"},
+        {id: "webrtc_org", title: "WebRTC.org", content: "http://www.webrtc.org"},
         {id: "webrtc_wikipedia", title: 'Wikipedia', content: 'http://en.wikipedia.org/wiki/Webrtc'},
         {id: "w3c_specs", title: "W3C Specs", content: "http://dev.w3.org/2011/webrtc/editor/getusermedia.html"}
     ]},
