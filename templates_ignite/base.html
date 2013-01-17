@@ -16,6 +16,20 @@
     <![endif]-->
     <link rel="icon" href="{{ MEDIA_URL }}img/favicon.ico" />
     {% block social_meta %}{% endblock %}
+    {% if waffle.switch('track_hits') %}
+        <script type="text/javascript">
+            var _gaq = _gaq || [];
+            _gaq.push(['_setAccount', 'UA-35433268-3']);
+            _gaq.push(['_trackPageview']);
+            (function() {
+                var ga = document.createElement('script'); ga.type = 'text/javascript';
+                ga.async = true;
+                ga.src = ('https:' == document.location.protocol ? 'https://ssl' :'http://www') + '.google-analytics.com/ga.js';
+                var s = document.getElementsByTagName('script')[0];
+                s.parentNode.insertBefore(ga, s);
+            })();
+        </script>
+    {% endif %}
 </head>
 <body id="{% block page_id %}{% endblock %}" class="{% block section_class %}{% endblock %}">
     <script type="text/javascript">
@@ -37,6 +51,9 @@
                     {% if development.has_started %}<li><a href="{{ url('entries_all', phase='apps') }}">{{ _('Applications') }}</a></li>{% endif %}
                     {% if waffle.switch('show_judges') %}
                     <li><a href="{{ url('our_judges') }}">{{ _('Judges') }}</a></li>
+                    {% endif %}
+                    {% if waffle.switch('show_resources') %}
+                    <li><a href="/resources/">{{ _('Resources') }}</a></li>
                     {% endif %}
                     {% if waffle.switch('show_blog') %}
                     <li><a href="https://blog.mozillaignite.org/">{{ _('Blog') }}</a></li>
@@ -101,6 +118,7 @@
                 <li><a href="http://www.webfwd.org"><img width="90" height="75" alt="WebFWD" src="{{ MEDIA_URL }}img/partners/webfwd.png"></a></li>
                 <li><a href="http://developer.mozilla.org"><img width="90" height="75" alt="Mozilla Developer Network" src="{{ MEDIA_URL }}img/partners/mdn.png"></a></li>
                 <li><a href="http://us-ignite.org"><img width="90" height="75" alt="US Ignite" src="{{ MEDIA_URL }}img/partners/ignite.png"></a></li>
+                <li><a href="http://energy.gov"><img width="90" height="75" alt="US Department of Energy" src="{{ MEDIA_URL }}img/partners/doe.png"></a></li>
             </ul>
             </div>
         </section>
@@ -155,12 +173,5 @@
     {% endblock %}
     {% block page_js %}{% endblock %}
     <script src="//www.mozilla.org/tabzilla/media/js/tabzilla.js"></script>
-    {% if waffle.switch('track_hits') %}
-    <!-- START OF SmartSource Data Collector TAG v10.2.0 -->
-    <!-- Copyright (c) 2012 Webtrends Inc. All rights reserved. -->
-    <script src="{{ MEDIA_URL }}js/include/ext/webtrends/webtrends.load.js"></script>
-    <noscript><img alt="dcsimg" id="dcsimg" width="1" height="1" src="//statse.webtrendslive.com/dcs7ggi1tvz5bdbvfb86i75xm_9b9v/njs.gif?dcsuri=/nojavascript&amp;WT.js=No&amp;WT.tv=10.2.10&amp;dcssip=www.mozillaignite.org"/></noscript>
-    <!-- END OF SmartSource Data Collector TAG v10.2.0 -->
-    {% endif %}
 </body>
 </html>

@@ -20,7 +20,6 @@
 			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
 			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
 			<p class="intro"><strong>The best ideas will win funding and support</strong>, and help shape the internet’s future.</p>
-			<p><a href="{{ url('entries_all', phase='ideas') }}">Check out</a> what has been submitted so far.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
@@ -92,11 +91,11 @@
 	</figure>
 	<div class="columns content_columns">
 		<div class="col main box">
-			<p class="intro">The Brainstorm round wrapped on August 23rd. We received over 300 submissions — <a href="{{ url('entries_all', phase='ideas') }}">check out the ideas</a>.</p>
-            <p class="intro">We're now entering the Development rounds, where challenge participants compete for money and support to make their gigabit apps a reality.</p>
-            <p class="intro">We're offering $485k in awards over three rounds. Over the course of each round, participants will sprint on their apps and present progress to our panel of judges. The judges will award the prize money among the teams participating in each round.</p>
-            <p class="intro">You can participate in as many rounds as you like.</p>
-            <p class="intro">The first round begins on October 4th. To participate in this round, we must receive your application by September 28th.</p>
+			<p class="intro">The Brainstorm Round wrapped on August 23rd. We received over 300 ideas for gigabit apps and services  — <a href="{{ url('entries_all', phase='ideas') }}">check out the ideas</a>, or <a href="https://blog.mozillaignite.org/2012/09/ideation-winners/">see the winning entries here</a>. We awarded $15,000 in prizes in all.</p>
+            <p class="intro">Now it's time to build. We're currently in the Development Phase of the challenge, where participants apply for money and support to make their gigabit apps a reality. We're offering an additional $485,000 in awards over three rounds.</p>
+            <p class="intro">Over the course of each round, participants will sprint on their apps and present progress to our panel of judges. At the end of each round, the judges will deliberate and split the prize money among the teams participating.</p>
+			<p class="intro">You can join in the challenge at any time. You are eligible to win an award in all three development rounds, so please <a href="{{ url('create_entry', phase='apps') }}">submit your application</a> as soon as possible.</p>
+			<p class="intro">Once you submit your application, you can continue to refine it and add more supporting resources. At the end of each Development Round, we'll reach out and schedule a time for you to pitch to the panel of judges. <a href="{{ url('create_entry', phase='apps') }}">Apply now!</a></p>
 		</div>
 		<div class="col bonux box">
 			<div class="highlight">
@@ -106,9 +105,9 @@
 					   <li><strong><a href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
                     {% if request.development.is_open %}
-                       <li><strong><a href="{{ url('create_entry', phase='apps') }}">Submit your applications</a>.</strong> What’s your gigabit dream app?</li>
+                       <li><strong><a href="{{ url('create_entry', phase='apps') }}">Submit your application</a>.</strong> What’s your gigabit dream app?</li>
                     {% endif %}
-					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Check out</a></strong> ideas that have been submitted, ask questions and join the conversation.</li>
+					<li><strong><a href="{{ url('entries_all', phase='ideas') }}">Explore</a></strong> ideas and concepts from the community, ask questions and join the conversation.</li>
 					<li><strong>Attend</strong> an upcoming event, from instructional webcasts to in-person hackfests.</li>
 					<li><strong>Stay in touch.</strong> Follow <a href="https://twitter.com/#!/mozillaignite">Mozilla Ignite</a> on Twitter or join our <a href="https://lists.mozilla.org/listinfo/community-ignite">community discussion list</a>.</li>
 					<li><strong>Volunteer</strong> to become a mentor or evangelist.</li>
@@ -158,7 +157,7 @@
 				<h3 class="wimper">What is the Brainstorming Round?</h3>
 				<p>The Brainstorming Round is an opportunity for everyone interested in the potential of next-generation application to participate.</p>
 				<p>We are seeking your creative ideas, sketches and blue sky proposals. The best ideas will get attention, funding and support to hopefully become reality. All are welcome. <strong>You don't have to be a developer or technologist -- you just need a Big Idea.</strong></p>
-				<p>The best ideas will win prizes ranging from $1,000 to $5,000. They'll also be eligible to win a Notable Idea Award or People's Choice Award.</p>
+				<p>The best ideas will win prizes ranging from $1,000 to $5,000.</p>
 			</div>
 			<div class="box col">
 				<h3 class="wimper">Why a Brainstorming Round?</h3>
