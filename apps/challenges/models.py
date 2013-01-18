@@ -413,15 +413,20 @@ class Submission(BaseModel):
         return 'apps'
 
     def get_absolute_url(self):
-        """Return this submission's URL."""
+        """
+        Return this submission's URL
+        """
         if self.parent_slug and self.phase_slug:
             return self._lookup_url('entry_show', {'entry_id': self.parent_slug,
                                                    'phase': self.phase_slug})
         return u''
 
     def get_edit_url(self):
-        """Return the URL to edit this submission."""
-        return self._lookup_url('entry_edit', {'pk': self.id,
+        """
+        Return the URL to edit this submission, we need to use the submission
+        parent as that is what holds the key of which submission to edit
+        """
+        return self._lookup_url('entry_edit', {'pk': self.parent_slug,
                                                'phase': self.phase_slug})
 
     def get_delete_url(self):
