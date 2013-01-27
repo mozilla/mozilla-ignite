@@ -354,7 +354,7 @@ ignite = {
         }, 2666);
         setTimeout(/*
         walkthrough.cue(3, */function (){
-            var test_resource = {resource_id: "demos"};
+            var test_resource = {resource_id: "contributors"};
             var test_node = ignite.link_node_manager.create_node(test_resource);
             ignite.link_node_manager.add_node(test_node);
         }, 4000);
