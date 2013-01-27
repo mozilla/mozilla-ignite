@@ -175,7 +175,7 @@ ignite.link_node_manager.content[0] = {
             end: function (){
                 if(!this.displayed){ return;}
                 this.displayed = false;
-                var credits_button = document.getElementById("credits_link");
+                var credits_button = document.getElementById("demo_link");
                 credits_button.style.opacity = "0";
                 if(this.timeout_id){
                     clearTimeout(this.timeout_id);
