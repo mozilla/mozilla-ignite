@@ -42,7 +42,7 @@ ignite.link_node_manager.content[0] = {
                 }
             }
         },
-        {notes: "The WebGL logo", time_in: 3, time_out: 4,
+        {notes: "The WebSockets logo", time_in: 3, time_out: 4,
             start: function (){
                 var logo2 = document.getElementById("logo2");
                 logo2.className = "centered_logo";
@@ -149,7 +149,7 @@ ignite.link_node_manager.content[0] = {
                 }
             }
         },
-        {notes: "Excercise", time_in: 543, time_out: 600,
+        {notes: "Excercise", time_in: 523, time_out: 600,
             displayed: undefined, // Needed for unexpected behavior in Chrome.
             start: function (){
                 if(this.displayed){ return;}
@@ -194,7 +194,7 @@ ignite.link_node_manager.content[0] = {
                 }
             }
         },
-        {notes: "Credits", time_in: 549, time_out: 600,
+        {notes: "Credits", time_in: 528, time_out: 600,
             displayed: undefined, // Needed for unexpected behavior in Chrome.
             start: function (){
                 if(this.displayed){ return;}
