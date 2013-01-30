@@ -376,8 +376,8 @@ ignite = {
         }, 10000);
         setTimeout(/*
         walkthrough.on("ended", */function (){
-            ignite.popcorn.currentTime(10);
-            ignite.link_node_manager.setup_at(ignite.popcorn.currentTime(10))
+            ignite.popcorn.currentTime(11);
+            ignite.link_node_manager.setup_at(ignite.popcorn.currentTime(11))
             setTimeout(function (){
                 ignite.transition("right", true);
                 ignite.walkthrough_in_progress = false;
