@@ -1,0 +1,17 @@
+SRC_DIR = '/data/genericrhel6-stage/src/mozillaignite.allizom.org/mozillaignite'
+WWW_DIR = '/data/genericrhel6-stage/www/mozillaignite.allizom.org/mozillaignite'
+
+#CRON_NAME = 'mozillaignite.allizom.org-gencron'
+
+DEPLOY_SCRIPT = "/data/genericrhel6-stage/deploy -n mozillaignite.allizom.org"
+REMOTE_UPDATE_SCRIPT = "/data/bin/update-www.sh mozillaignite.allizom.org"
+
+WEB_HOSTGROUP = 'genericrhel6-stage'
+#CELERY_HOSTGROUP = 'genericrhel6-celery-stage'
+#CELERY_SERVICE = 'celeryd-mozillaignite-stage'
+
+UPDATE_REF = '1.0.X'
+SSH_KEY = '/root/.ssh/id_rsa'
+
+REMOTE_WSGI = '/data/www/mozillaignite.allizom.org/mozillaignite/mozillaignite/wsgi/betafarm.wsgi'
+REMOTE_HOSTNAME = 'mozillaignite.allizom.org'
