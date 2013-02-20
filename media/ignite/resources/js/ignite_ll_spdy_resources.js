@@ -77,7 +77,9 @@ ignite.resources.content = [
         {id: 'chromium_projects', title: 'White Paper', content: 'http://www.chromium.org/spdy/spdy-whitepaper'},
         {id: "spdy_wikipedia", title: 'Wikipedia', content: 'http://en.wikipedia.org/wiki/SPDY'},
         {id: 'spdy_and_http2', title: 'SPDY & HTTP2.0', content: 'http://www.infoq.com/news/2012/11/http20-first-draft'},
-        {id: 'moz_hacks', title: 'Mozilla Hacks', content: 'http://hacks.mozilla.org/2012/02/spdy-brings-responsive-and-scalable-transport-to-firefox-11/'}
+        {id: 'moz_hacks', title: 'Mozilla Hacks', content: 'http://hacks.mozilla.org/2012/02/spdy-brings-responsive-and-scalable-transport-to-firefox-11/'},
+        {id: 'websockets', title: 'SPDY+Websockets', content: 'http://cto.kaazing.com/2012/08/06/speedy-and-websockets-3/'},
+        {id: 'best_practices', title: 'Best Practices', content: 'http://dev.chromium.org/spdy/spdy-best-practices'}
     ]},
     {id: "contributors", title: "Contributors", content:[
         {id: "tom_croucher", title: "Tom H-C", content: [
