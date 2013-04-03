@@ -30,7 +30,7 @@
                 Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete in this round
         {% else %}
             {% if development.has_started %}
-                We're currently judging the last round. The next round opens {{ request.development.next_round.start_date.strftime('%B %-d') }} so be ready to compete
+                We're currently judging the last round, we'll soon be announcing the final winners.
             {% endif %}
         {% endif %}
        </div>
@@ -64,7 +64,11 @@
                 {% if request.development.is_open %}
                     <a class="col-foot" href="{{ url('create_entry', phase='apps') }}">Submit your application</a>
                 {% else %}
-                    <a class="col-foot" href="{{ url('about_ignite')}}">Applications open {{ request.development.next_round.start_date.strftime('%B %-d') }}</a>
+                    {% if development.has_started %}
+                        <p style="line-height: 1.5; min-height: 50px;" class="col-foot">We're currently judging the last round, we'll soon be announcing the final winners.</p>
+                    {% else %}
+                        <a class="col-foot" href="{{ url('about_ignite')}}">Applications open {{ request.development.next_round.start_date.strftime('%B %-d') }}</a>
+                    {% endif %}
                 {% endif %}
             </li>
         </ul>
@@ -116,7 +120,7 @@
                     <a class="cta" href="{{ url('create_entry', phase='apps') }}">Get started</a>
                 {% endif %}
                 {% if request.development.has_started and request.development.is_closed %}
-                    <p class="intro">We're currently judging the last round. The next round opens {{ request.development.next_round.start_date.strftime('%B %-d') }} so be ready to compete</p>
+                    <p class="intro">We're currently judging the last round, we'll soon be announcing the final winners.</p>
                 {% endif %}
         </div>
     </div>
