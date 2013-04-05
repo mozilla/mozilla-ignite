@@ -27,7 +27,11 @@
         {% endif %}
         {% if development.is_open %}
             <a href="{{ url('create_entry', phase='apps') }}" class="cta">Apply now</a><br />
-                Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete in this round
+                {% if waffle.switch('use_hacked_PST') %}
+                    Apply by {{ request.development.current_round.hacked_PST_enddate.strftime('%B %-d') }} to compete in this round
+                {% else %}
+                    Apply by {{ request.development.current_round.end_date.strftime('%B %-d') }} to compete in this round
+                {% endif %}
         {% else %}
             {% if development.has_started %}
                 We're currently judging the last round, we'll soon be announcing the final winners.
