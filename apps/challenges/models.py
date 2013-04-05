@@ -144,6 +144,10 @@ class Phase(BaseModel):
         return ('entries_all', [slug])
 
     @cached_property
+    def hacked_PST_enddate(self):
+        return self.end_date - relativedelta(hours=8)
+
+    @cached_property
     def days_remaining(self):
         now = datetime.utcnow()
         if not self.is_open:
