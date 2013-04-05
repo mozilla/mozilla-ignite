@@ -676,6 +676,9 @@ class PhaseRound(models.Model):
         time_remaining = self.end_date - now
         return time_remaining.days if time_remaining.days >= 0 else -1
 
+    # horrible but required hack - the server is GMT - display the end-date in PST
+    # this is not built to work during times when DST is in the US but not the UK
+    # and should be removed when server times are using the correct timezone
     @cached_property
     def hacked_PST_enddate(self):
         return self.end_date - relativedelta(hours=8)

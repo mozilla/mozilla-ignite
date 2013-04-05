@@ -28,7 +28,11 @@
                     <p>Time to start hacking: we're offering $485,000 in prizes & support for teams over three rounds.</p>
                 {% else %}
                     {% if development.next_round %}
-                        <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.end_date.strftime('%B %-d') }}: submit your app proposals or further develop your existing application.</h3>
+                        {% if waffle.switch('use_hacked_PST') %}
+                            <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.hacked_PST_enddate.strftime('%B %-d') }}: submit your app proposals or further develop your existing application.</h3>
+                        {% else %}
+                            <h3 class="point box-title">{{ request.development.next_round.start_date.strftime('%B %-d') }} through {{ request.development.next_round.end_date.strftime('%B %-d') }}: submit your app proposals or further develop your existing application.</h3>
+                        {% endif %}
                         <p>Time to start hacking: we're offering $485,000 in prizes & support for teams over three rounds.</p>
                     {% else %}
                         <p class="point box-title">We're currently judging the last round, we'll soon be announcing the final winners.</p>
