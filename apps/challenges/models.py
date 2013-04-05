@@ -144,10 +144,6 @@ class Phase(BaseModel):
         return ('entries_all', [slug])
 
     @cached_property
-    def hacked_PST_enddate(self):
-        return self.end_date - relativedelta(hours=8)
-
-    @cached_property
     def days_remaining(self):
         now = datetime.utcnow()
         if not self.is_open:
@@ -679,6 +675,10 @@ class PhaseRound(models.Model):
             return -1
         time_remaining = self.end_date - now
         return time_remaining.days if time_remaining.days >= 0 else -1
+
+    @cached_property
+    def hacked_PST_enddate(self):
+        return self.end_date - relativedelta(hours=8)
 
 
 class SubmissionParent(models.Model):
