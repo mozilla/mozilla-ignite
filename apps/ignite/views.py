@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404
 import jingo
+import waffle
 
 from django.contrib.auth.models import User
 from challenges.models import Submission, Category
@@ -12,9 +13,14 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
     """Show an individual project challenge."""
     project = get_object_or_404(Project, slug=project)
     challenge = get_object_or_404(project.challenge_set, slug=slug)
+    num_blogs = 3
+    # have we announced the winners yet - switch template
+    if waffle.switch_is_active('announce_winners'):
+        template_name = 'ignite/homepage-winners.html'
+        num_blogs = 5
     blogs = BlogEntry.objects.filter(
         page='splash'
-    ).order_by("-updated",)[:3]
+    ).order_by("-updated",)[:num_blogs]
     # if the dev challenge is open we want to only show dev entries
     if request.development.is_open:
         entries = (Submission.objects.visible()
@@ -49,8 +55,10 @@ def splash(request, project, slug, template_name='ignite/splash.html'):
     })
 
 
-def about(request, project, slug):
-    return jingo.render(request, 'ignite/about.html')
+def about(request, project, slug, template_name='ignite/about.html'):
+    if waffle.switch_is_active('announce_winners'):
+        template_name = 'ignite/about-winners.html'
+    return jingo.render(request, template_name)
 
 
 def judges(request, project, slug, template_name='challenges/all_judges.html'):
