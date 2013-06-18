@@ -19,25 +19,12 @@
             <iframe src="//player.vimeo.com/video/46589415" width="500" height="281" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe> <p><a href="http://vimeo.com/46589415">Mozilla Ignite Challenge 2012</a> from <a href="http://vimeo.com/youraface">Graham Wheeler</a> on <a href="http://vimeo.com">Vimeo</a>.</p>
 			<p class="intro"><strong>Mozilla Ignite is an open innovation challenge hosted by Mozilla and the National Science Foundation</strong> as part of the <a href="http://us-ignite.org/">US Ignite</a> initiative. The goal: imagine and build apps that show the full potential of next-generation networks, in areas that matter -- like healthcare, education, energy, manufacturing and public safety.</p>
 			<p class="intro"><strong>Show us what’s next</strong>. Imagine the limitations of today’s internet no longer apply. What becomes possible at 1 gigabit per second? How would you take advantage of deeply programmable, sliceable networks? How would you leverage speeds up to 250 times faster than today's?</p>
-			<p class="intro"><strong>The best ideas will win funding and support</strong>, and help shape the internet’s future.</p>
+			<p class="intro"><strong>The best ideas are getting funding and support</strong>, and will help shape the Internet's future.</p>
 		</div>
 		<div class="bonus col box">
 			<div class="highlight">
-                {% if request.development.is_open %}
-				    <h3 class="point box-title">Now through September 28th: submit your app proposals.</h3>
-                {% else %}
-                    <h3 class="point box-title">September 1st through September 28th: submit your app proposals.</h3>
-                {% endif %}
-				<p>Time to start hacking: we're offering $485,000 in prizes & support for teams over three rounds.</p>
-                {% if request.ideation.is_open %}
-				    <a class="cta" href="{{ url('create_entry', phase='ideas') }}">Submit your idea now</a>
-                {% endif %}
-                {% if request.ideation.is_closed and not request.development.days_until == -1  %}
-                    <p>Ideation is being judged and closed for new submissions; but the development phase will open in {{ request.development.days_until }} days.</p>
-                {% endif %}
-                {% if request.development.is_open %}
-                    <a class="cta" href="{{ url('create_entry', phase='apps') }}">Submit your application now</a>
-                {% endif %}
+				<p class="point box-title">22 winning projects have been announced</p>
+				<p><a href="{{ url('challenge_show') }}#winners">See our winners</a> &amp; get involved with any you find exciting.</p>
 			</div>
 		</div>
 	</div>
@@ -312,10 +299,6 @@
 		<li>
 			<h3 class="wimper">Where are the official rules?</h3>
 			<p>You can check out the official rules <a href="{{ url('terms_conditions') }}" target="_blank">right here</a>.</p>
-		</li>
-		<li>
-			<h3 class="wimper">Do I have to participate in the Brainstorming Round?</h3>
-			<p>No, participation in the Brainstorming Round is encouraged but not required. But bear in mind that the brainstorm is an excellent opportunity to refine your application and find potential collaborators for your team.</p>
 		</li>
 		<li>
 			<h3 class="wimper">Why are you running three rounds of development?</h3>
