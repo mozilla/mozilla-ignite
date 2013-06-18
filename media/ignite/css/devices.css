@@ -790,7 +790,8 @@ div[role=main] {
     padding-bottom: 4em;
     padding-top: 2em;
 }
-#splash div[role=main] {
+#splash div[role=main],
+#splash-winners div[role=main] {
     padding-top: 0;
 }
 /* homepage */
@@ -1000,10 +1001,8 @@ fieldset .focus_areas ul {
     top: 0;
     left: 0;
     line-height: 1;
-    width: 110px;
-    -webkit-box-sizing: border-box;
-    -moz-box-sizing: border-box;
-    box-sizing: border-box;
+    width: 32px;
+    height: 100px;
 }
 .events .date .date-part {
     display: inline-block;
@@ -1013,6 +1012,17 @@ fieldset .focus_areas ul {
     font-weight: bold;
     font-size: 25px;
     margin-top: 0.2em;
+}
+.hfeed {
+    list-style-type: none;
+    padding-left: 0;
+}
+.hfeed li {
+    border-bottom: 1px solid #f1f1f1;
+    padding-bottom: 1em;
+}
+#splash-winners .submissions .cta {
+    margin: 0.5em 0;
 }
 /* About page */
 /* JS panels */

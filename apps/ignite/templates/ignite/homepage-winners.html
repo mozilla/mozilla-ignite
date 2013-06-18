@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% from "challenges/helpers.html" import created_by with context %}
+
+{% block page_id %}splash-winners{% endblock %}
+
+{% block section_class %}content{% endblock %}
+
+{% block site_title %}<h1 class="brand"><img src="{{ MEDIA_URL }}img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></h1>{% endblock %}
+
+{% block header %}
+<div class="tagline">
+    <h2 class="busta">
+        <span class="wimper sweet"><em>Calling all</em> developers, network engineers and community catalysts...</span>
+        <strong><img src="{{ MEDIA_URL }}img/build.png" alt="Build apps from the future" width="940" height="182" /></strong>
+    </h2>
+</div>
+<div class="ignite_info">
+    <div class="busta">
+        <p class="box intro"><strong>Design and build apps for the faster, smarter internet of the future</strong>. Mozilla and the National Science Foundation invite you to take part in an open innovation challenge. The goal: show how next-generation networks can revolutionize healthcare, education, public safety, energy and more.</p>
+    </div>
+</div>
+
+<div class="methods">
+	<div class="busta columns">
+        <ul>
+            <li class="col brainstorm box">
+                <h3 class="exclaim">Explore</h3>
+                <p class="intro">Browse through the ideas submitted in the <a href="{{ url('entries_all', phase='ideas') }}">brainstorm phase</a>, and see the <a href="https://blog.mozillaignite.org/2012/09/ideation-winners/">winning ideas</a>.</p>
+                {% if request.ideation.is_open %}
+                    <a class="col-foot" href="{{ url('create_entry', phase='ideas') }}">Submit your ideas</a>
+                {% else %}
+                    <a class="col-foot" href="{{ url('entries_all', phase='ideas') }}">See what ideas people came up with</a>
+                {% endif %}
+            </li>
+            <li class="col hack box">
+                <h3 class="exclaim">Collaborate</h3>
+                <p class="intro">Teams are pushing to make their gigabit prototypes into 'minimum viable pilots'. Get in touch &amp; help them connect to your community.</p>
+                {% if waffle.switch('show_events') %}
+                <a class="col-foot" href="#upcoming_events">Register for an upcoming event</a>
+                {% else %}
+                <p class="col-foot">Ignite events being announced soon</p>
+                {% endif %}
+            </li>
+            <li class="col compete box">
+                <h3 class="exclaim">Build</h3>
+                <p class="intro"><strong>$500,000 in awards</strong> helped 22 teams start building amazing gigabit apps &amp; services. Check out the projects and how you can help.</p>
+                <a class="col-foot" href="#winners">See our challenge winners</a>
+            </li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="columns content_columns">
+    <div class="col box main">
+        <article class="highlight">
+            <h2 id="winners" class="box">Our challenge winners</h2>
+            <ul class="submissions columns">
+                {% include "ignite/_winners.html" %}
+            </ul>
+        </article>
+    </div>
+    <div class="bonus col box">
+        {% if waffle.switch('show_blog') %}
+        <article class="blogs">
+            <h2 class="point">Latest news</h2>
+            <ol class="hfeed">
+                {% for blog in blogs %}
+                <li class="box">
+                    <article class="hentry">
+                        <h2 class="wimper entry-title"><a href="{{ blog.link }}">{{ blog.title }}</a></h2>
+                        <footer>
+                            <span class="updated"><span class="value-title" title="{{ blog.updated.strftime('%Y-%m-%dT%H:%M:%SZ') }}"></span>{{ blog.updated.strftime('%B %d, %Y') }}</span> by <address class="author hcard"><span class="fn">{{ blog.autor }}</span></address>
+                        </footer>
+                        <p class="entry-summary">{{ blog.summary|replace("Continue reading →", "") }}</p>
+                        <a href="{{ blog.link }}" rel="bookmark">Read more <span>on {{ blog.title }}</span></a>
+                    </article>
+                </li>
+                {% endfor %}
+            </ol>
+            <footer>
+                <p class="intro">Stay up to date <a href="https://blog.mozillaignite.org/" class="cta do">View all posts</a>
+            </footer>
+        </article>
+        {% endif %}
+        {% if waffle.switch('show_events') %}
+        <article class="events" id="upcoming_events">
+            <h2 class="wimper">Upcoming Events</h2>
+            <ol>
+              {% for event in event_list %}
+              <li>
+                <h3 class="wimper">{{ event.name }}</h3>
+                <p class="date">{{ event.start.strftime('%b') }} <span>{{ event.start.day }}</span></p>
+                <p>{{ event.venue.name }} - <a href="{{ event.url }}">register</a></p>
+              </li>
+              {% endfor%}
+            </ol>
+        </article>
+        {% endif %}
+    </div>
+</div>
+<section class="focus_areas columns">
+    <h2 class="point">See all the ideas we got to address needs in:</h2>
+    <ul>
+    {% for cat in categories %}
+    <li class="box col {{ cat.slug }}">
+      {% if request.development.has_started %}
+      <a href="{{ url('entries_for_category', category=cat.slug, phase='apps') }}"><strong>{{ cat.name }}</strong></a>
+      {% else %}
+      <a href="{{ url('entries_for_category', category=cat.slug, phase='ideas') }}"><strong>{{ cat.name }}</strong></a>
+      {% endif %}
+    </li>
+    {% endfor %}
+    </ul>
+</section>
+{% endblock %}

@@ -94,6 +94,15 @@ figure img {
 .submissions .col:nth-child(3n + 1) {
     clear: left;
 }
+#splash-winners .submissions .col {
+    width: 50%;
+}
+#splash-winners .submissions .col:nth-child(3n + 1) {
+    clear: none;
+}
+#splash-winners .submissions .col:nth-child(2n + 1) {
+    clear: left;
+}
 .sweet {
     padding: 0 2em 0 0;
     border-radius: 24px;
@@ -156,6 +165,11 @@ header .meta em {
 }
 .ignite_info br {
     display: block;
+}
+#splash-winners .ignite_info p {
+    background-image: url(../img/css/lightning-bolt.png), url(../img/css/homepage_arrow.png);
+    background-position: 40px 50%, 130px 0;
+    width: 100%;
 }
 .methods:after {
     content: "&nbsp;";
