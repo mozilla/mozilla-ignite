@@ -103,7 +103,7 @@
                 </div>
             {% endif %}
             {% endblock %}
-            <address class="vcard">
+            <address class="vcard" id="team_details">
                 <p class="wimper"><a class="fn url" href="{{ url('users_profile', username=entry.created_by.user.username) }}">{{ entry.created_by.name }}</a></p>
                 <p>{{ entry.created_by.bio }}</p>
                 {% if entry.team_members %}
