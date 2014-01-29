@@ -1,0 +1,7 @@
+{% if waffle.switch('migration_notice') %}
+<div class="notice">
+  <div class="busta clearfix">
+    MIGRATION NOTICE. <a href="#TODO">New site</a>
+  </div>
+</div>
+{% endif %}
