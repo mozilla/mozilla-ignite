@@ -1,3 +1,4 @@
+import json
 from datetime import datetime
 
 from django.conf.urls.defaults import patterns, url
@@ -8,12 +9,12 @@ from django.contrib.admin.options import IncorrectLookupParameters
 from django.core.paginator import InvalidPage
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.shortcuts import render
 from django.contrib.admin.views.main import ChangeList
+from django.core.serializers.json import DjangoJSONEncoder
 
-
-
+from challenges import exporter
 from challenges.forms import PhaseRoundAdminForm, JudgingAssignmentAdminForm
 from challenges.judging import (get_judge_profiles, get_submissions,
                                 get_assignments)
@@ -69,6 +70,7 @@ class PhaseRoundInline(admin.TabularInline):
     model = PhaseRound
     form = PhaseRoundAdminForm
     extra = 1
+
 
 class PhaseAdmin(admin.ModelAdmin):
     change_list_template = 'admin/phases/phases_change_list.html'
@@ -287,6 +289,19 @@ class SubmissionParentAdmin(admin.ModelAdmin):
     list_display = ['name', 'submission', 'slug', 'is_featured']
     list_filter = ['is_featured', 'status']
     search_fields = ['name', 'submission__title', 'slug']
+
+    def export_entries(self, request):
+        data = exporter.export_entries()
+        json_data = json.dumps(data, cls=DjangoJSONEncoder)
+        return HttpResponse(json_data, content_type="application/json")
+
+    def get_urls(self):
+        urls = super(SubmissionParentAdmin, self).get_urls()
+        custom_urls = patterns(
+            '',
+            url(r'^export/$', self.admin_site.admin_view(self.export_entries))
+        )
+        return custom_urls + urls
 
 
 admin.site.unregister(User)
