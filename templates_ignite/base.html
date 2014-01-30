@@ -42,7 +42,7 @@
     </script>
     <header class="masthead">
         <div class="busta clearfix">
-            {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
+          {% block site_title %}<p class="brand"><a href="{{ url('challenge_show') }}"><img src="{{ MEDIA_URL }}img/logo.png" alt="Mozilla Ignite" width="136" height="66" /></a></p>{% endblock %}
             <a href="http://www.mozilla.org" id="tabzilla">mozilla.org</a>
             <nav>
                 <ul>
@@ -70,7 +70,9 @@
                 </ul>
             </nav>
             {% include "includes/toolbar.html"%}
+
         </div>
+        {% include "includes/migration_banner.html" %}
     </header>
     <div role="main">
     <section>
