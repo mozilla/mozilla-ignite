@@ -613,3 +613,34 @@ def entry_help_list(request, project, challenge):
     context = {'page': paginated_query}
     return jingo.render(request, 'challenges/submission_help_list.html',
                         context)
+
+
+def _get_submission_score(submission):
+    judgement_list = submission.judgement_set.all()
+    answer_list = []
+    if judgement_list:
+        for judgement in judgement_list:
+            for answer in judgement.answers.all():
+                answer_list.append(answer)
+    return answer_list
+
+
+@login_required
+def export_challenges(request):
+    if not request.user.is_superuser:
+        raise Http404
+    context = {'object_list': []}
+    for phase in Phase.objects.all():
+        data = {
+            'phase': phase,
+            'submission_list': []
+        }
+        submission_list = phase.submission_set.all()
+        for submission in submission_list:
+            submission_data = {
+                'submission': submission,
+                'score': _get_submission_score(submission)
+            }
+            data['submission_list'].append(submission_data)
+        context['object_list'].append(data)
+    return jingo.render(request, 'challenges/export.html', context)
