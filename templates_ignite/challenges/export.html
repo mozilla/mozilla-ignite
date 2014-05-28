@@ -1,0 +1,35 @@
+<html>
+  <head>
+    <title>Challenge export</title>
+  </head>
+  <body>
+    <h1>Challenge export</h1>
+    {% for object in object_list %}
+    <h2>{{ object.phase.name }}</h2>
+    <table border="1">
+      {% for submission in object.submission_list %}
+      {# Only submissions that have been scored #}
+      {% if submission.score %}
+      <tr>
+        <td colspan="4">Title: {{ submission.submission.title }}</td>
+      </tr>
+      <tr>
+        <th>Question</th>
+        <th>Score</th>
+        <th>Judge</th>
+        <th>Notes</th>
+      </tr>
+      {% for answer in submission.score %}
+      <tr>
+        <td>{{ answer.criterion.question }}</td>
+        <td>{{ answer.rating }}</td>
+        <td>{{ answer.judgement.judge }}</td>
+        <td>{{ answer.judgement.notes }}</td>
+      </tr>
+      {% endfor %}
+      {% endif %}
+      {% endfor%}
+    </table>
+    {% endfor%}
+  </body>
+</html>

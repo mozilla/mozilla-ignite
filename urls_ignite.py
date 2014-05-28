@@ -73,7 +73,9 @@ urlpatterns += patterns(
         kwargs=_ignite_kwargs, name='entries_assigned'),
     url(r'^submissions/green-lit/$', 'entries_winning',
         kwargs=_ignite_kwargs, name='entries_winning'),
-    )
+    url(r'^challenges/export/$', 'export_challenges',
+        name='export_challenges'),
+)
 
 
 urlpatterns += patterns(
